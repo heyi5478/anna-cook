@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import Head from "next/head";
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -24,8 +25,12 @@ export default function Home() {
       </Head>
 
       <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+        Hello world!
+      </h1>
+
+      <div className="flex justify-center items-center h-screen">
+      <Button>Click me</Button>
+    </div>
 
       <div
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
