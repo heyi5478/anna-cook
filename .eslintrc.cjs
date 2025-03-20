@@ -63,5 +63,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 0,
     'react/react-in-jsx-scope': 0,
     'react/require-default-props': 0,
+    'max-len': [
+      'error',
+      { code: 120, ignoreStrings: true, ignoreTemplateLiterals: true },
+    ],
   },
 };
