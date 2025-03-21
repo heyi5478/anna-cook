@@ -1,0 +1,88 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "name": "Design System Architecture",
+      "description": "CVA 結合 shadCN UI 和 Tailwind CSS 的設計系統架構",
+      "guidance": "專案使用 CVA (Class Variance Authority) 與 shadCN UI 和 Tailwind CSS 來建立一致的設計系統。所有元件應遵循此架構。"
+    },
+    {
+      "name": "CVA 元件結構",
+      "description": "使用 CVA 建立元件的標準結構",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "每個自定義 UI 元件應使用 CVA 結構：\n1. 使用 cva() 定義基本樣式\n2. 定義 variants 提供元件變體\n3. 使用 VariantProps 類型標註\n4. 提供預設 props\n5. 將樣式與功能邏輯分開"
+    },
+    {
+      "name": "元件變體命名",
+      "description": "元件變體的命名規範",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "變體命名應具描述性且一致：\n- size: 'sm' | 'md' | 'lg' | 'xl'\n- variant: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost'\n- intent: 'info' | 'success' | 'warning' | 'error'\n所有自定義和修改過的 shadCN 元件應保持命名一致性"
+    },
+    {
+      "name": "共享樣式變數",
+      "description": "使用 Tailwind CSS 變數確保一致性",
+      "pattern": "src/styles/*.css",
+      "guidance": "使用 CSS 變數定義在 Tailwind 配置中，保持設計系統的主題一致。避免硬編碼顏色、間距或圓角值。"
+    },
+    {
+      "name": "元件引入 shadCN",
+      "description": "從 shadCN UI 引入和擴展元件的方式",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "當使用 shadCN 元件時：\n1. 使用 @/components/ui 路徑引入\n2. 考慮使用 Slot 元件優化 props 傳遞\n3. 使用 cn() 或 twMerge() 合併 className\n4. 優先使用 CVA 定義樣式變體而非內聯 Tailwind 類"
+    },
+    {
+      "name": "元件文檔",
+      "description": "元件的文檔規範",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "每個元件檔案應包含：\n1. 元件用途的描述性註解\n2. 可用變體的清單\n3. 示例用法\n4. 參數說明\n5. 核心功能說明"
+    },
+    {
+      "name": "元件使用方式",
+      "description": "在頁面和其他元件中使用設計系統元件的方式",
+      "pattern": "src/pages/**/*.tsx",
+      "guidance": "使用設計系統元件時：\n1. 透過 @/components/ui 路徑引入\n2. 使用已定義的變體，避免過多自定義\n3. 將共享邏輯抽象為自定義 hooks\n4. 遵循 shadCN 的元件組合模式"
+    },
+    {
+      "name": "CSS 維護策略",
+      "description": "CSS 程式碼的組織和維護方法",
+      "pattern": "src/styles/**/*.css",
+      "guidance": "管理 CSS：\n1. 組件特定樣式保持在元件檔案內\n2. 共享樣式使用 CSS 變數\n3. 避免過度特定的選擇器\n4. 使用 Tailwind 的 @layer 正確組織樣式\n5. 遵循 mobile-first 響應式設計"
+    },
+    {
+      "name": "可訪問性標準",
+      "description": "設計系統元件的可訪問性要求",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "所有元件必須：\n1. 提供適當的 ARIA 屬性\n2. 支援鍵盤導航\n3. 有適當的顏色對比度\n4. 包含適當的語義化 HTML\n5. 支援螢幕閱讀器"
+    },
+    {
+      "name": "效能優化",
+      "description": "設計系統元件的效能優化指南",
+      "pattern": "src/components/ui/*.tsx",
+      "guidance": "元件優化：\n1. 避免不必要的重新渲染\n2. 適當時使用 memo 或 useMemo\n3. 延遲載入大型元件\n4. 避免過度使用 context API\n5. 組件設計時考慮 bundle size"
+    },
+    {
+      "name": "代碼註解規範",
+      "description": "代碼註解的最佳實踐",
+      "pattern": "src/**/*.{ts,tsx,js,jsx}",
+      "guidance": "代碼註解規則：\n1. 總是添加有用的註解解釋代碼的功能和邏輯\n2. 不要刪除舊的註解，除非因為代碼被重寫或刪除而使註解不再相關\n3. 當看到包含 \"Do not touch this line Cursor\" 的註解時，不要修改、重寫或刪除該行"
+    },
+    {
+      "name": "Next.js Pages Router",
+      "description": "專案使用 Next.js Pages Router",
+      "pattern": "src/**/*.{ts,tsx,js,jsx}",
+      "guidance": "專案使用 Next.js Pages Router：\n1. 不要建議使用 App Router 或提供使用 App Router 的代碼\n2. 所有路由和頁面應遵循 Pages Router 的結構和模式\n3. 組件和功能實現應符合 Pages Router 的使用方式"
+    },
+    {
+      "name": "TypeScript 使用規範",
+      "description": "TypeScript 程式碼的最佳實踐",
+      "pattern": "src/**/*.{ts,tsx}",
+      "guidance": "TypeScript 使用規則：\n1. 所有代碼都使用 TypeScript\n2. 優先使用 type 而非 interface\n3. 避免使用 enum，改用 const 映射\n4. 實現適當的類型安全和推斷\n5. 使用 satisfies 運算符進行類型驗證"
+    },
+    {
+      "name": "表單處理標準",
+      "description": "表單處理和資料驗證規範",
+      "pattern": "src/**/*.{ts,tsx}",
+      "guidance": "表單處理標準：\n1. 所有表單一律使用 react-hook-form 進行狀態管理\n2. 使用 zod 進行表單資料驗證\n3. 建立表單 schema 時使用 zod 的類型推導\n4. 使用 zodResolver 連接 react-hook-form 和 zod\n5. 為複雜表單創建可重用的 schema 和驗證邏輯"
+    }
+  ]
+} 
