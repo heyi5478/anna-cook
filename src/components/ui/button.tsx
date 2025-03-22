@@ -37,14 +37,15 @@ const buttonVariants = cva(
 /**
  * 按鈕元件的 props 類型定義
  */
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  /**
-   * 是否將樣式應用於子元素而不是按鈕本身
-   */
-  asChild?: boolean;
-}
+export type ButtonProps =
+  & React.ButtonHTMLAttributes<HTMLButtonElement>
+  & VariantProps<typeof buttonVariants>
+  & {
+    /**
+     * 是否將樣式應用於子元素而不是按鈕本身
+     */
+    asChild?: boolean;
+  };
 
 /**
  * 按鈕元件，支援多種變體和尺寸
