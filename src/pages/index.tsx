@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 export default function HomePage() {
   /**
@@ -35,6 +36,8 @@ export default function HomePage() {
         <h2 className="font-medium mb-2">人氣食譜</h2>
         {/* 人氣食譜內容 */}
       </main>
+
+      <Footer companyName="商標" studioName="Creative studio" />
     </div>
   )
 }
