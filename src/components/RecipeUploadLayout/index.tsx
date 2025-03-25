@@ -30,7 +30,6 @@ export default function RecipeUploadForm() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
     defaultValues: {
