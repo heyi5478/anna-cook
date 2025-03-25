@@ -67,9 +67,9 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         <nav className="space-y-2">
-          {navItems.map((item, index) => (
+          {navItems.map((item) => (
             <Link
-              key={index}
+              key={item.href}
               href={item.href}
               className="flex items-center justify-between py-2 border-b border-gray-300"
             >
