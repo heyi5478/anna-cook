@@ -1,43 +1,41 @@
-import type React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { ChevronRight, Globe } from "lucide-react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
+import type React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { ChevronRight, Globe } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 // 定義 footer 的基本樣式和變體
-const footerVariants = cva("w-full bg-gray-200 py-4 px-4", {
+const footerVariants = cva('w-full bg-gray-200 py-4 px-4', {
   variants: {
     variant: {
-      default: "border-t border-gray-300",
-      transparent: "bg-transparent",
+      default: 'border-t border-gray-300',
+      transparent: 'bg-transparent',
     },
     size: {
-      sm: "py-2",
-      md: "py-4",
-      lg: "py-6",
+      sm: 'py-2',
+      md: 'py-4',
+      lg: 'py-6',
     },
   },
   defaultVariants: {
-    variant: "default",
-    size: "md",
+    variant: 'default',
+    size: 'md',
   },
-})
+});
 
 // 定義 footer 的 props 類型
-export type FooterProps =
-  & React.HTMLAttributes<HTMLDivElement>
-  & VariantProps<typeof footerVariants>
-  & {
-    companyName?: string
-    year?: number
-    studioName?: string
+export type FooterProps = React.HTMLAttributes<HTMLDivElement> &
+  VariantProps<typeof footerVariants> & {
+    companyName?: string;
+    year?: number;
+    studioName?: string;
   };
 
 // 定義導航項目類型
 type NavItem = {
-  label: string
-  href: string
-}
+  label: string;
+  href: string;
+};
 
 /**
  * 應用程式頁腳元件，包含導航連結和版權信息
@@ -46,22 +44,27 @@ export const Footer: React.FC<FooterProps> = ({
   className,
   variant,
   size,
-  companyName = "商標",
+  companyName = '商標',
   year = new Date().getFullYear(),
-  studioName = "Creative studio",
+  studioName = 'Creative studio',
   ...props
 }) => {
   // 導航項目數據
   const navItems: NavItem[] = [
-    { label: "人氣食譜", href: "/popular" },
-    { label: "最新食譜", href: "/latest" },
-    { label: "關於我們", href: "/about" },
-  ]
+    { label: '人氣食譜', href: '/popular' },
+    { label: '最新食譜', href: '/latest' },
+    { label: '關於我們', href: '/about' },
+  ];
 
   return (
-    <footer className={cn(footerVariants({ variant, size, className }))} {...props}>
+    <footer
+      className={cn(footerVariants({ variant, size, className }))}
+      {...props}
+    >
       <div className="mb-4">
-        <div className="bg-gray-400 text-white py-1 px-3 inline-block rounded mb-4">{companyName}</div>
+        <div className="bg-gray-400 text-white py-1 px-3 inline-block rounded mb-4">
+          {companyName}
+        </div>
 
         <nav className="space-y-2">
           {navItems.map((item, index) => (
@@ -79,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({
 
       <div className="mt-6 text-center text-sm text-gray-600">
         <p className="mb-2">
-          商業協助?{" "}
+          商業協助?{' '}
           <Link href="/contact" className="underline">
             聯絡我們
           </Link>
@@ -92,5 +95,5 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
