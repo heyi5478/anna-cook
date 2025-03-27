@@ -24,7 +24,7 @@ export default function StepIndicator({
   return (
     <div className={cn('mb-10', className)}>
       <div className="relative flex items-center justify-between">
-        <div className="absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-200" />
+        <div className="absolute left-4 right-4 top-4 h-0.5 bg-gray-200" />
 
         {steps.map((step) => (
           <div key={step} className="relative flex flex-col items-center">
