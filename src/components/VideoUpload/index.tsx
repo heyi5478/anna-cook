@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import UploadArea from './UploadArea';
 
 // 定義片段類型
 type Segment = {
@@ -622,36 +623,11 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
       {/* 上傳區域 */}
       {!videoUrl ? (
-        <div className="px-4">
-          <h2 className="text-xl font-semibold mb-4">上傳您的影片</h2>
-          <div
-            className="flex flex-col items-center justify-center border border-gray-300 rounded-lg p-6 h-64 bg-white"
-            onClick={() => document.getElementById('video-upload')?.click()}
-          >
-            <input
-              type="file"
-              accept="video/*"
-              id="video-upload"
-              className="hidden"
-              onChange={atFileUpload}
-              aria-label="上傳影片"
-            />
-            <div className="flex flex-col items-center justify-center cursor-pointer w-full h-full">
-              <ImageIcon
-                className="h-12 w-12 text-gray-400 mb-2"
-                aria-hidden="true"
-              />
-              <span className="text-gray-500">點擊選擇影片檔案上傳</span>
-            </div>
-          </div>
-          <div className="text-gray-500 mt-2">{fileName}</div>
-          {errors.video && (
-            <div className="text-red-500 text-sm mt-1 flex items-center error-message">
-              <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
-              {errors.video}
-            </div>
-          )}
-        </div>
+        <UploadArea
+          fileName={fileName}
+          error={errors.video}
+          onUpload={atFileUpload}
+        />
       ) : (
         <div className="px-4 space-y-4">
           {/* 上傳進度 */}
