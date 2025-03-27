@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import StepIndicator from '@/components/ui/StepIndicator';
 import UploadArea from './UploadArea';
 
 // 定義片段類型
@@ -607,18 +608,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     <div className="flex flex-col w-full max-w-md mx-auto h-full bg-gray-50">
       {/* 步驟指示器 */}
       <div className="px-4 py-6">
-        <div className="flex items-center justify-between mb-2">
-          <div className="h-0.5 bg-gray-700 w-full relative">
-            <div className="absolute left-0 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-            <div className="absolute right-0 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <div className="text-gray-900 font-medium">Step 1</div>
-          <div className="text-gray-900 font-medium">Step 2</div>
-          <div className="text-gray-900 font-medium">Step 3</div>
-        </div>
+        <StepIndicator currentStep={3} />
       </div>
 
       {/* 上傳區域 */}
