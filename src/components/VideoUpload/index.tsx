@@ -15,6 +15,7 @@ import {
   Image as ImageIcon,
   AlertCircle,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // 定義片段類型
 type Segment = {
@@ -775,11 +776,12 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
               {segments.map((segment, index) => (
                 <div
                   key={segment.id}
-                  className={`absolute top-0 bottom-0 border-2 pointer-events-none z-10 ${
+                  className={cn(
+                    'absolute top-0 bottom-0 border-2 pointer-events-none z-10',
                     index === currentSegmentIndex
                       ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-blue-300 bg-blue-300/10'
-                  }`}
+                      : 'border-blue-300 bg-blue-300/10',
+                  )}
                   style={{
                     left: `${segment.startPercent}%`,
                     width: `${segment.endPercent - segment.startPercent}%`,
@@ -860,18 +862,20 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
           {/* 標記按鈕 */}
           <div className="flex justify-between gap-4 mt-4">
-            <button
+            <Button
               onClick={atMarkStartPoint}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              variant="outline"
+              className="flex-1"
             >
               標記起點
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={atMarkEndPoint}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              variant="outline"
+              className="flex-1"
             >
               標記終點
-            </button>
+            </Button>
           </div>
 
           {/* 說明文字 */}
@@ -882,11 +886,12 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             <textarea
               value={segments[currentSegmentIndex]?.description || ''}
               onChange={atDescriptionChange}
-              className={`w-full p-2 text-sm border rounded-md min-h-[80px] resize-none ${
+              className={cn(
+                'w-full p-2 text-sm border rounded-md min-h-[80px] resize-none',
                 errors.description
                   ? 'border-red-500 bg-red-50'
-                  : 'border-gray-300 text-gray-600'
-              }`}
+                  : 'border-gray-300 text-gray-600',
+              )}
               placeholder="請輸入此步驟的說明文字..."
             />
             {errors.description && (
@@ -898,34 +903,33 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           </div>
 
           {/* 重置按鈕 */}
-          <button
+          <Button
             onClick={atResetCurrentSegment}
-            className="w-full py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 flex items-center justify-center"
+            variant="outline"
+            className="w-full flex items-center justify-center"
           >
             <span className="mr-2">↻</span>
             重置
-          </button>
+          </Button>
 
           {/* 按鈕群組 */}
           <div className="flex gap-3 mt-6">
-            <button
-              onClick={atCancel}
-              className="w-1/2 py-3 px-4 text-gray-700 border border-gray-300 rounded-md flex items-center justify-center"
-            >
+            <Button onClick={atCancel} variant="outline" className="w-1/2">
               取消
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={atSubmit}
               disabled={isSubmitting || Object.keys(errors).length > 0}
-              className={`w-1/2 py-3 px-4 text-white rounded-md flex items-center justify-center ${
+              variant={
                 isSubmitting || Object.keys(errors).length > 0
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gray-500 hover:bg-gray-600'
-              }`}
+                  ? 'secondary'
+                  : 'default'
+              }
+              className="w-1/2"
             >
               <Check className="h-5 w-5 mr-2" />
               完成
-            </button>
+            </Button>
           </div>
         </div>
       )}
