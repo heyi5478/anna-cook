@@ -144,13 +144,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     const video = videoRef.current;
     const videoDuration = video.duration;
     const thumbnailCount = 10; // 生成10張縮圖
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    canvas.width = 160; // 縮圖寬度
-    canvas.height = 90; // 縮圖高度
 
     // 儲存當前播放位置
     const currentPos = video.currentTime;
@@ -161,9 +154,19 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       (_, i) => (videoDuration / thumbnailCount) * i,
     );
 
-    // 使用 Promise.all 處理所有縮圖生成
-    const generateThumbnail = async (time: number) => {
-      video.currentTime = time;
+    // 創建一個函數來順序處理縮圖
+    const processTimePointsSequentially = async (
+      points: number[],
+      index = 0,
+      results: string[] = [],
+    ): Promise<string[]> => {
+      // 基本情況：處理完所有時間點
+      if (index >= points.length) {
+        return results;
+      }
+
+      // 設置影片時間
+      video.currentTime = points[index];
 
       // 等待影片更新到指定時間
       await new Promise<void>((resolve) => {
@@ -174,15 +177,31 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
         video.addEventListener('seeked', seeked);
       });
 
-      // 繪製縮圖
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg', 0.5);
+      // 為當前幀創建縮圖
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (ctx) {
+        canvas.width = 160; // 縮圖寬度
+        canvas.height = 90; // 縮圖高度
+
+        // 繪製縮圖
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.5);
+
+        // 遞迴處理下一個時間點
+        return processTimePointsSequentially(points, index + 1, [
+          ...results,
+          thumbnailUrl,
+        ]);
+      }
+
+      // 如果無法獲取 ctx，直接處理下一幀
+      return processTimePointsSequentially(points, index + 1, results);
     };
 
-    // 並行處理所有縮圖
-    const thumbnailResults = await Promise.all(
-      timePoints.map(generateThumbnail),
-    );
+    // 開始順序處理縮圖
+    const thumbnailResults = await processTimePointsSequentially(timePoints);
     setThumbnails(thumbnailResults);
 
     // 恢復原始播放位置
