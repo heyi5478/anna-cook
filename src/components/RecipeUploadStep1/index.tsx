@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { uploadRecipeBasic, type RecipeFormData } from '@/services/api';
+import StepIndicator from '@/components/ui/StepIndicator';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -176,27 +177,7 @@ export default function RecipeUploadForm() {
       </nav>
 
       {/* 步驟指示器 */}
-      <div className="mb-10">
-        <div className="relative flex items-center justify-between">
-          <div className="absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-200" />
-
-          {[1, 2, 3].map((step) => (
-            <div key={step} className="relative flex flex-col items-center">
-              <div
-                className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center z-10',
-                  currentStep >= step
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-500',
-                )}
-              >
-                {step}
-              </div>
-              <span className="mt-2 text-sm font-medium">Step {step}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <StepIndicator currentStep={currentStep} />
 
       {/* 錯誤訊息顯示 */}
       {errorMsg && (
