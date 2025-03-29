@@ -498,7 +498,7 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
 
       {/* 步驟編輯模態視窗 */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
             <DialogTitle>{editingStep?.title || '編輯步驟'}</DialogTitle>
           </DialogHeader>
