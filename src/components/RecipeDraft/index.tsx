@@ -76,21 +76,22 @@ export const RecipeDraft: React.FC<RecipeDraftProps> = ({
   };
 
   /**
-   * 處理保存所有變更
+   * 處理儲存所有變更
    */
   const atSaveAll = () => {
-    alert('所有變更已保存！');
-    // 這裡應該實現保存到後端的邏輯
-  };
-
-  /**
-   * 處理取消編輯
-   */
-  const atCancelEdit = () => {
-    // 使用自訂確認對話框替代 window.confirm
-    // 通過公共狀態管理或模態對話框實現
-    // 這裡簡化處理
-    alert('取消編輯功能將在此實現，所有未保存的變更將會丟失');
+    // 處理儲存所有變更
+    console.log('儲存所有變更', {
+      title: recipeName,
+      introduction: recipeIntro,
+      videoId: '',
+      coverImageUrl: coverImage,
+      difficulty: '',
+      mealType: '',
+      cookingTime,
+      servingSize,
+      ingredients,
+      seasonings,
+    });
   };
 
   return (
@@ -216,21 +217,13 @@ export const RecipeDraft: React.FC<RecipeDraftProps> = ({
           <CookingSteps size={size} />
 
           {/* 操作按鈕 */}
-          <div className="px-4 py-2 space-y-2">
+          <div className="px-4 py-2">
             <Button
               className="w-full bg-gray-500 text-white py-2"
               onClick={atSaveAll}
               type="button"
             >
-              儲存變更
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full py-2"
-              onClick={atCancelEdit}
-              type="button"
-            >
-              取消編輯
+              儲存草稿
             </Button>
           </div>
         </div>
