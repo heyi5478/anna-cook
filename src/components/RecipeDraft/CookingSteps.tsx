@@ -1,18 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import type React from 'react';
-import { Edit, Plus, Trash, Play, Pause } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import Player from '@vimeo/player';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Edit, Play, Pause } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import Player from '@vimeo/player';
+import { Button } from '@/components/ui/button';
 
 type Step = {
   id: string;
@@ -25,7 +18,7 @@ type Step = {
 };
 
 const vimeoPlayerVariants = cva(
-  'relative w-full aspect-video bg-black rounded overflow-hidden',
+  'relative w-full aspect-video bg-black rounded overflow-hidden mb-4',
   {
     variants: {
       size: {
@@ -47,12 +40,13 @@ const vimeoPlayerVariants = cva(
 
 type VimeoPlayerProps = {
   videoId: string;
-  currentTime: number;
-  isPlaying: boolean;
+  startTime: number;
+  endTime: number;
   onTimeUpdate?: (time: number) => void;
   size?: VariantProps<typeof vimeoPlayerVariants>['size'];
   variant?: VariantProps<typeof vimeoPlayerVariants>['variant'];
   className?: string;
+  isPlaying: boolean;
 };
 
 /**
@@ -60,28 +54,25 @@ type VimeoPlayerProps = {
  */
 const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
   videoId,
-  currentTime,
-  isPlaying,
+  startTime,
+  endTime,
   size,
   variant,
   className,
   onTimeUpdate,
+  isPlaying,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Player | null>(null);
+  const isLoopingRef = useRef<boolean>(false);
 
-  /**
-   * 初始化 Vimeo 播放器
-   */
+  // 初始化播放器
   useEffect(() => {
-    if (typeof window !== 'undefined' && containerRef.current) {
-      // 清理舊的播放器實例
-      if (playerRef.current) {
-        playerRef.current.destroy();
-      }
+    let player: Player | null = null;
 
+    if (typeof window !== 'undefined' && containerRef.current) {
       // 創建新的播放器實例
-      playerRef.current = new Player(containerRef.current, {
+      player = new Player(containerRef.current, {
         id: parseInt(videoId, 10),
         width: 640,
         height: 360,
@@ -89,55 +80,62 @@ const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
         responsive: true,
       });
 
-      /**
-       * 設置時間更新事件監聽器
-       */
-      playerRef.current.on('timeupdate', (data) => {
+      playerRef.current = player;
+
+      // 設定初始播放位置
+      player.setCurrentTime(startTime).catch((error) => {
+        console.error('設定初始時間失敗:', error);
+      });
+
+      // 監聽播放進度
+      player.on('timeupdate', (data) => {
+        // 更新當前時間
         if (onTimeUpdate) {
           onTimeUpdate(data.seconds);
         }
-      });
 
-      // 設置初始時間
-      playerRef.current.setCurrentTime(currentTime);
+        // 到達結束時間時重新回到起始時間
+        if (data.seconds >= endTime && !isLoopingRef.current) {
+          isLoopingRef.current = true;
+          player
+            ?.setCurrentTime(startTime)
+            .then(() => {
+              isLoopingRef.current = false;
+            })
+            .catch((error) => {
+              console.error('循環播放段落失敗:', error);
+              isLoopingRef.current = false;
+            });
+        }
+      });
     }
 
     return () => {
       // 清理播放器
-      if (playerRef.current) {
-        playerRef.current.destroy();
+      if (player) {
+        player.destroy().catch((error) => {
+          console.error('播放器銷毀失敗:', error);
+        });
         playerRef.current = null;
       }
     };
-  }, [videoId, onTimeUpdate, currentTime]);
+  }, [videoId, startTime, endTime, onTimeUpdate]);
 
-  /**
-   * 控制播放和暫停
-   */
+  // 控制播放狀態
   useEffect(() => {
-    if (playerRef.current) {
-      if (isPlaying) {
-        playerRef.current.play().catch((error) => {
-          console.error('播放失敗:', error);
-        });
-      } else {
-        playerRef.current.pause().catch((error) => {
-          console.error('暫停失敗:', error);
-        });
-      }
-    }
-  }, [isPlaying]);
+    const player = playerRef.current;
+    if (!player) return;
 
-  /**
-   * 設置當前時間
-   */
-  useEffect(() => {
-    if (playerRef.current && !isPlaying) {
-      playerRef.current.setCurrentTime(currentTime).catch((error) => {
-        console.error('設置時間失敗:', error);
+    if (isPlaying) {
+      player.play().catch((error) => {
+        console.error('播放失敗:', error);
+      });
+    } else {
+      player.pause().catch((error) => {
+        console.error('暫停失敗:', error);
       });
     }
-  }, [currentTime, isPlaying]);
+  }, [isPlaying]);
 
   return (
     <div className={cn(vimeoPlayerVariants({ size, variant }), className)}>
@@ -186,7 +184,7 @@ const secondsToTime = (seconds: number): string => {
 };
 
 /**
- * 顯示料理步驟區域，支持編輯、新增和刪除步驟
+ * 顯示料理步驟區域，支持查看步驟影片並跳轉到編輯頁面
  */
 export const CookingSteps: React.FC<CookingStepsProps> = ({
   size,
@@ -194,11 +192,12 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
   className,
   ...props
 }) => {
+  const router = useRouter();
   // 假設的 Vimeo 影片 ID
   const videoId = '1062288466';
 
   // 步驟資料 - 使用 timeToSeconds 確保一致性
-  const [steps, setSteps] = useState<Step[]>([
+  const [steps] = useState<Step[]>([
     {
       id: '1',
       title: '步驟 1',
@@ -228,183 +227,50 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
     },
   ]);
 
-  // 編輯相關狀態
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingStep, setEditingStep] = useState<Step | null>(null);
-  const [editContent, setEditContent] = useState('');
-  const [editStartSeconds, setEditStartSeconds] = useState(0);
-  const [editEndSeconds, setEditEndSeconds] = useState(0);
+  // 獲取第一個步驟用於預設播放
+  const firstStep = steps[0];
 
-  // 播放器相關狀態
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isPreviewingRange, setIsPreviewingRange] = useState(false);
-  const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // 視頻播放相關狀態 - 預設播放步驟1
+  const [currentTime, setCurrentTime] = useState(firstStep.startSeconds);
+  const [isPlaying, setIsPlaying] = useState(true); // 預設播放
+  const [activeStepId, setActiveStepId] = useState<string | null>(firstStep.id); // 預設選中步驟1
+  const [activeStartTime, setActiveStartTime] = useState(
+    firstStep.startSeconds,
+  );
+  const [activeEndTime, setActiveEndTime] = useState(firstStep.endSeconds);
 
   /**
-   * 處理開始編輯步驟
+   * 處理導航到步驟編輯頁面
    */
-  const atStartEdit = (step: Step) => {
-    setEditingStep(step);
-    setEditContent(step.content);
-    setEditStartSeconds(step.startSeconds);
-    setEditEndSeconds(step.endSeconds);
-    setCurrentTime(step.startSeconds);
-    setIsDialogOpen(true);
+  const atNavigateToStepEditor = () => {
+    // 透過 URL 查詢參數傳遞步驟資料
+    const queryParams = new URLSearchParams({
+      videoId,
+      // 將步驟數據序列化為 JSON 並傳遞
+      stepsData: JSON.stringify(steps),
+    }).toString();
+
+    router.push(`/recipe/edit-steps?${queryParams}`);
   };
 
   /**
-   * 處理取消編輯
+   * 處理預覽步驟視頻範圍
    */
-  const atCancelEdit = () => {
-    setIsDialogOpen(false);
-    setEditingStep(null);
-    // 停止任何正在進行的預覽
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-    }
-    setIsPlaying(false);
-  };
-
-  /**
-   * 處理保存編輯
-   */
-  const atSaveEdit = () => {
-    if (editingStep) {
-      const updatedSteps = steps.map((step) =>
-        step.id === editingStep.id
-          ? {
-              ...step,
-              content: editContent,
-              startTime: secondsToTime(editStartSeconds),
-              endTime: secondsToTime(editEndSeconds),
-              startSeconds: editStartSeconds,
-              endSeconds: editEndSeconds,
-            }
-          : step,
-      );
-      setSteps(updatedSteps);
-    }
-    setIsDialogOpen(false);
-    setEditingStep(null);
-    // 停止任何正在進行的預覽
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-    }
-    setIsPlaying(false);
-  };
-
-  /**
-   * 處理新增步驟
-   */
-  const atAddStep = () => {
-    const newStepNumber = steps.length + 1;
-    // 計算新步驟的預設時間範圍
-    const lastStep = steps[steps.length - 1];
-    const defaultStartSeconds = lastStep ? lastStep.endSeconds + 1 : 0;
-    const defaultEndSeconds = defaultStartSeconds + 10; // 預設 10 秒長度
-
-    const newStep = {
-      id: Date.now().toString(),
-      title: `步驟 ${newStepNumber}`,
-      content: '',
-      startTime: secondsToTime(defaultStartSeconds),
-      endTime: secondsToTime(defaultEndSeconds),
-      startSeconds: defaultStartSeconds,
-      endSeconds: defaultEndSeconds,
-    };
-
-    setSteps([...steps, newStep]);
-    // 直接開始編輯新步驟
-    atStartEdit(newStep);
-  };
-
-  /**
-   * 處理刪除步驟
-   */
-  const atDeleteStep = (id: string) => {
-    // 刪除步驟
-    const filteredSteps = steps.filter((step) => step.id !== id);
-
-    // 重新編號步驟
-    const renamedSteps = filteredSteps.map((step, index) => ({
-      ...step,
-      title: `步驟 ${index + 1}`,
-    }));
-
-    setSteps(renamedSteps);
-  };
-
-  /**
-   * 處理預覽時間範圍
-   */
-  const atPreviewRange = () => {
-    if (!editingStep) return;
-
-    // 停止任何正在進行的預覽
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
+  const atPreviewStep = (step: Step) => {
+    // 如果正在播放同一個步驟，則停止播放
+    if (isPlaying && activeStepId === step.id) {
       setIsPlaying(false);
-      setIsPreviewingRange(false);
-      previewTimerRef.current = null;
+      setActiveStepId(null);
       return;
     }
 
-    // 開始預覽
-    setCurrentTime(editStartSeconds);
+    // 設置活動步驟和時間範圍
+    setActiveStartTime(step.startSeconds);
+    setActiveEndTime(step.endSeconds);
+    setActiveStepId(step.id);
+
+    // 開始播放
     setIsPlaying(true);
-    setIsPreviewingRange(true);
-
-    // 設置計時器在結束時間停止播放
-    const duration = (editEndSeconds - editStartSeconds) * 1000;
-    previewTimerRef.current = setTimeout(() => {
-      setIsPlaying(false);
-      setIsPreviewingRange(false);
-      previewTimerRef.current = null;
-    }, duration);
-  };
-
-  /**
-   * 處理時間滑桿變更
-   */
-  const atTimeSliderChange = (value: number[], type: 'start' | 'end') => {
-    if (type === 'start') {
-      setEditStartSeconds(value[0]);
-      // 確保起始時間不超過結束時間
-      if (value[0] >= editEndSeconds) {
-        setEditEndSeconds(value[0] + 1);
-      }
-    } else {
-      setEditEndSeconds(value[0]);
-      // 確保結束時間不小於起始時間
-      if (value[0] <= editStartSeconds) {
-        setEditStartSeconds(value[0] - 1);
-      }
-    }
-
-    // 更新播放器當前時間
-    setCurrentTime(type === 'start' ? value[0] : value[0]);
-  };
-
-  /**
-   * 處理內容變更
-   */
-  const atContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditContent(e.target.value);
-  };
-
-  /**
-   * 處理使用當前時間作為起始時間
-   */
-  const atUseCurrentTimeForStart = () => {
-    setEditStartSeconds(Math.floor(currentTime));
-  };
-
-  /**
-   * 處理使用當前時間作為結束時間
-   */
-  const atUseCurrentTimeForEnd = () => {
-    setEditEndSeconds(Math.floor(currentTime));
   };
 
   return (
@@ -412,36 +278,71 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
       className={cn(cookingStepsVariants({ size, variant }), className)}
       {...props}
     >
-      <h3
-        className={cn('font-medium mb-2', {
+      <div className="flex justify-between items-center mb-4">
+        <h3
+          className={cn('font-medium', {
+            'text-xs': size === 'sm',
+            'text-sm': size === 'md',
+            'text-base': size === 'lg',
+          })}
+        >
+          料理步驟
+        </h3>
+        <button
+          type="button"
+          className="p-1 bg-gray-100 rounded-full"
+          onClick={atNavigateToStepEditor}
+          aria-label="編輯料理步驟"
+        >
+          <Edit size={16} />
+        </button>
+      </div>
+
+      {/* Vimeo 播放器 */}
+      <VimeoPlayer
+        videoId={videoId}
+        startTime={activeStartTime}
+        endTime={activeEndTime}
+        isPlaying={isPlaying}
+        onTimeUpdate={setCurrentTime}
+        size={size}
+      />
+
+      <div
+        className={cn('mb-2 text-right', {
           'text-xs': size === 'sm',
           'text-sm': size === 'md',
           'text-base': size === 'lg',
         })}
       >
-        料理步驟
-      </h3>
+        當前時間: {secondsToTime(currentTime)}
+      </div>
 
       {steps.map((step) => (
         <div key={step.id} className="border rounded mb-4">
-          <div className="flex justify-between items-center p-2 border-b">
+          <div className="p-2 border-b flex justify-between items-center">
             <h4 className="font-medium">{step.title}</h4>
-            <div className="flex space-x-1">
-              <button
+            {step.content ? (
+              <Button
                 type="button"
-                className="p-1"
-                onClick={() => atStartEdit(step)}
+                variant="outline"
+                size="sm"
+                onClick={() => atPreviewStep(step)}
+                className="flex items-center h-8"
               >
-                <Edit size={16} />
-              </button>
-              <button
-                type="button"
-                className="p-1 text-red-500"
-                onClick={() => atDeleteStep(step.id)}
-              >
-                <Trash size={16} />
-              </button>
-            </div>
+                {isPlaying && activeStepId === step.id ? (
+                  <>
+                    <Pause size={14} className="mr-1" />
+                    <span>停止</span>
+                  </>
+                ) : (
+                  <>
+                    <Play size={14} className="mr-1" />
+                    <span>播放</span>
+                  </>
+                )}
+              </Button>
+            ) : null}
           </div>
 
           <div className="p-4">
@@ -453,7 +354,9 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
               })}
             >
               {step.content || (
-                <span className="text-gray-400">點擊編輯按鈕添加步驟內容</span>
+                <span className="text-gray-400">
+                  點擊上方編輯按鈕修改步驟內容
+                </span>
               )}
             </div>
 
@@ -478,169 +381,6 @@ export const CookingSteps: React.FC<CookingStepsProps> = ({
           </div>
         </div>
       ))}
-
-      <button
-        type="button"
-        className="w-full p-2 border border-dashed rounded flex items-center justify-center"
-        onClick={atAddStep}
-      >
-        <Plus size={16} className="mr-1" />
-        <span
-          className={cn({
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
-        >
-          新增步驟
-        </span>
-      </button>
-
-      {/* 步驟編輯模態視窗 */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
-          <DialogHeader>
-            <DialogTitle>{editingStep?.title || '編輯步驟'}</DialogTitle>
-          </DialogHeader>
-
-          {/* Vimeo 播放器 */}
-          <div className="mb-4">
-            <VimeoPlayer
-              videoId={videoId}
-              currentTime={currentTime}
-              isPlaying={isPlaying}
-              onTimeUpdate={(time) => setCurrentTime(time)}
-              size={size}
-            />
-
-            <div className="flex justify-between items-center mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={atPreviewRange}
-                className="flex items-center"
-                type="button"
-              >
-                {isPreviewingRange ? (
-                  <>
-                    <Pause size={16} className="mr-1" />
-                    <span>停止預覽</span>
-                  </>
-                ) : (
-                  <>
-                    <Play size={16} className="mr-1" />
-                    <span>預覽時間段</span>
-                  </>
-                )}
-              </Button>
-              <span
-                className={cn({
-                  'text-xs': size === 'sm',
-                  'text-sm': size === 'md',
-                  'text-base': size === 'lg',
-                })}
-              >
-                當前時間: {secondsToTime(currentTime)}
-              </span>
-            </div>
-          </div>
-
-          {/* 步驟內容編輯 */}
-          <div className="mb-4">
-            <div
-              className={cn('font-medium block mb-1', {
-                'text-xs': size === 'sm',
-                'text-sm': size === 'md',
-                'text-base': size === 'lg',
-              })}
-            >
-              步驟說明
-            </div>
-            <textarea
-              className={cn('w-full p-2 border rounded', {
-                'text-xs': size === 'sm',
-                'text-sm': size === 'md',
-                'text-base': size === 'lg',
-              })}
-              value={editContent}
-              onChange={atContentChange}
-              rows={3}
-              placeholder="輸入步驟說明..."
-              aria-label="步驟說明"
-            />
-          </div>
-
-          {/* 時間範圍設置 */}
-          <div className="space-y-4">
-            <div>
-              <div
-                className={cn('font-medium flex justify-between', {
-                  'text-xs': size === 'sm',
-                  'text-sm': size === 'md',
-                  'text-base': size === 'lg',
-                })}
-              >
-                <span>起始時間: {secondsToTime(editStartSeconds)}</span>
-                <button
-                  type="button"
-                  className="text-xs text-blue-500"
-                  onClick={atUseCurrentTimeForStart}
-                  aria-label="使用當前時間作為起始時間"
-                >
-                  使用當前時間
-                </button>
-              </div>
-              <Slider
-                value={[editStartSeconds]}
-                min={0}
-                max={300} // 假設影片最長 5 分鐘
-                step={1}
-                onValueChange={(value) => atTimeSliderChange(value, 'start')}
-                className="mt-2"
-                aria-label="起始時間滑桿"
-              />
-            </div>
-
-            <div>
-              <div
-                className={cn('font-medium flex justify-between', {
-                  'text-xs': size === 'sm',
-                  'text-sm': size === 'md',
-                  'text-base': size === 'lg',
-                })}
-              >
-                <span>結束時間: {secondsToTime(editEndSeconds)}</span>
-                <button
-                  type="button"
-                  className="text-xs text-blue-500"
-                  onClick={atUseCurrentTimeForEnd}
-                  aria-label="使用當前時間作為結束時間"
-                >
-                  使用當前時間
-                </button>
-              </div>
-              <Slider
-                value={[editEndSeconds]}
-                min={0}
-                max={300} // 假設影片最長 5 分鐘
-                step={1}
-                onValueChange={(value) => atTimeSliderChange(value, 'end')}
-                className="mt-2"
-                aria-label="結束時間滑桿"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={atCancelEdit} type="button">
-              取消
-            </Button>
-            <Button onClick={atSaveEdit} type="button">
-              確認
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
