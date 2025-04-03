@@ -89,7 +89,7 @@ export const Video: React.FC<VimeoPlayerProps> = ({
         }
       }
     };
-  }, [videoId, width]);
+  }, [videoId, width, onDurationChange]);
 
   /**
    * 設置影片播放時間範圍和時間更新事件
