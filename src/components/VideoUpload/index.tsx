@@ -1,5 +1,3 @@
-'use client';
-
 import type React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
@@ -17,6 +15,9 @@ import {
   Image as ImageIcon,
   AlertCircle,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import StepIndicator from '@/components/ui/StepIndicator';
+import UploadArea from './UploadArea';
 
 // 定義片段類型
 type Segment = {
@@ -145,13 +146,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     const video = videoRef.current;
     const videoDuration = video.duration;
     const thumbnailCount = 10; // 生成10張縮圖
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    canvas.width = 160; // 縮圖寬度
-    canvas.height = 90; // 縮圖高度
 
     // 儲存當前播放位置
     const currentPos = video.currentTime;
@@ -162,9 +156,19 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       (_, i) => (videoDuration / thumbnailCount) * i,
     );
 
-    // 使用 Promise.all 處理所有縮圖生成
-    const generateThumbnail = async (time: number) => {
-      video.currentTime = time;
+    // 創建一個函數來順序處理縮圖
+    const processTimePointsSequentially = async (
+      points: number[],
+      index = 0,
+      results: string[] = [],
+    ): Promise<string[]> => {
+      // 基本情況：處理完所有時間點
+      if (index >= points.length) {
+        return results;
+      }
+
+      // 設置影片時間
+      video.currentTime = points[index];
 
       // 等待影片更新到指定時間
       await new Promise<void>((resolve) => {
@@ -175,15 +179,31 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
         video.addEventListener('seeked', seeked);
       });
 
-      // 繪製縮圖
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg', 0.5);
+      // 為當前幀創建縮圖
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (ctx) {
+        canvas.width = 160; // 縮圖寬度
+        canvas.height = 90; // 縮圖高度
+
+        // 繪製縮圖
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.5);
+
+        // 遞迴處理下一個時間點
+        return processTimePointsSequentially(points, index + 1, [
+          ...results,
+          thumbnailUrl,
+        ]);
+      }
+
+      // 如果無法獲取 ctx，直接處理下一幀
+      return processTimePointsSequentially(points, index + 1, results);
     };
 
-    // 並行處理所有縮圖
-    const thumbnailResults = await Promise.all(
-      timePoints.map(generateThumbnail),
-    );
+    // 開始順序處理縮圖
+    const thumbnailResults = await processTimePointsSequentially(timePoints);
     setThumbnails(thumbnailResults);
 
     // 恢復原始播放位置
@@ -588,52 +608,16 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     <div className="flex flex-col w-full max-w-md mx-auto h-full bg-gray-50">
       {/* 步驟指示器 */}
       <div className="px-4 py-6">
-        <div className="flex items-center justify-between mb-2">
-          <div className="h-0.5 bg-gray-700 w-full relative">
-            <div className="absolute left-0 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-            <div className="absolute right-0 -top-1.5 w-4 h-4 bg-gray-700 rounded-full" />
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <div className="text-gray-900 font-medium">Step 1</div>
-          <div className="text-gray-900 font-medium">Step 2</div>
-          <div className="text-gray-900 font-medium">Step 3</div>
-        </div>
+        <StepIndicator currentStep={3} />
       </div>
 
       {/* 上傳區域 */}
       {!videoUrl ? (
-        <div className="px-4">
-          <h2 className="text-xl font-semibold mb-4">上傳您的影片</h2>
-          <div
-            className="flex flex-col items-center justify-center border border-gray-300 rounded-lg p-6 h-64 bg-white"
-            onClick={() => document.getElementById('video-upload')?.click()}
-          >
-            <input
-              type="file"
-              accept="video/*"
-              id="video-upload"
-              className="hidden"
-              onChange={atFileUpload}
-              aria-label="上傳影片"
-            />
-            <div className="flex flex-col items-center justify-center cursor-pointer w-full h-full">
-              <ImageIcon
-                className="h-12 w-12 text-gray-400 mb-2"
-                aria-hidden="true"
-              />
-              <span className="text-gray-500">點擊選擇影片檔案上傳</span>
-            </div>
-          </div>
-          <div className="text-gray-500 mt-2">{fileName}</div>
-          {errors.video && (
-            <div className="text-red-500 text-sm mt-1 flex items-center error-message">
-              <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
-              {errors.video}
-            </div>
-          )}
-        </div>
+        <UploadArea
+          fileName={fileName}
+          error={errors.video}
+          onUpload={atFileUpload}
+        />
       ) : (
         <div className="px-4 space-y-4">
           {/* 上傳進度 */}
@@ -777,11 +761,12 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
               {segments.map((segment, index) => (
                 <div
                   key={segment.id}
-                  className={`absolute top-0 bottom-0 border-2 pointer-events-none z-10 ${
+                  className={cn(
+                    'absolute top-0 bottom-0 border-2 pointer-events-none z-10',
                     index === currentSegmentIndex
                       ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-blue-300 bg-blue-300/10'
-                  }`}
+                      : 'border-blue-300 bg-blue-300/10',
+                  )}
                   style={{
                     left: `${segment.startPercent}%`,
                     width: `${segment.endPercent - segment.startPercent}%`,
@@ -862,18 +847,20 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
           {/* 標記按鈕 */}
           <div className="flex justify-between gap-4 mt-4">
-            <button
+            <Button
               onClick={atMarkStartPoint}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              variant="outline"
+              className="flex-1"
             >
               標記起點
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={atMarkEndPoint}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              variant="outline"
+              className="flex-1"
             >
               標記終點
-            </button>
+            </Button>
           </div>
 
           {/* 說明文字 */}
@@ -884,11 +871,12 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             <textarea
               value={segments[currentSegmentIndex]?.description || ''}
               onChange={atDescriptionChange}
-              className={`w-full p-2 text-sm border rounded-md min-h-[80px] resize-none ${
+              className={cn(
+                'w-full p-2 text-sm border rounded-md min-h-[80px] resize-none',
                 errors.description
                   ? 'border-red-500 bg-red-50'
-                  : 'border-gray-300 text-gray-600'
-              }`}
+                  : 'border-gray-300 text-gray-600',
+              )}
               placeholder="請輸入此步驟的說明文字..."
             />
             {errors.description && (
@@ -900,34 +888,33 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           </div>
 
           {/* 重置按鈕 */}
-          <button
+          <Button
             onClick={atResetCurrentSegment}
-            className="w-full py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 flex items-center justify-center"
+            variant="outline"
+            className="w-full flex items-center justify-center"
           >
             <span className="mr-2">↻</span>
             重置
-          </button>
+          </Button>
 
           {/* 按鈕群組 */}
           <div className="flex gap-3 mt-6">
-            <button
-              onClick={atCancel}
-              className="w-1/2 py-3 px-4 text-gray-700 border border-gray-300 rounded-md flex items-center justify-center"
-            >
+            <Button onClick={atCancel} variant="outline" className="w-1/2">
               取消
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={atSubmit}
               disabled={isSubmitting || Object.keys(errors).length > 0}
-              className={`w-1/2 py-3 px-4 text-white rounded-md flex items-center justify-center ${
+              variant={
                 isSubmitting || Object.keys(errors).length > 0
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gray-500 hover:bg-gray-600'
-              }`}
+                  ? 'secondary'
+                  : 'default'
+              }
+              className="w-1/2"
             >
               <Check className="h-5 w-5 mr-2" />
               完成
-            </button>
+            </Button>
           </div>
         </div>
       )}
