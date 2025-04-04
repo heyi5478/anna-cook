@@ -1,247 +1,146 @@
-import type React from 'react';
-import { useState } from 'react';
-import { Edit, Check, X, Plus, Trash } from 'lucide-react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash } from 'lucide-react';
 
 type Ingredient = {
-  id: string;
   name: string;
-  quantity: string;
+  amount: string;
+  id?: string;
 };
 
-const ingredientListVariants = cva('px-4 py-2', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-    variant: {
-      default: 'bg-white',
-      outline: 'border rounded-md',
-      ghost: 'bg-transparent',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    variant: 'default',
-  },
-});
+type Seasoning = {
+  name: string;
+  amount: string;
+  id?: string;
+};
 
 type IngredientListProps = {
-  title: string;
   ingredients: Ingredient[];
-  onUpdate?: (ingredients: Ingredient[]) => void;
-} & VariantProps<typeof ingredientListVariants> &
-  React.HTMLAttributes<HTMLDivElement>;
+  seasonings: Seasoning[];
+  onUpdateIngredient: (
+    index: number,
+    field: keyof Ingredient,
+    value: string,
+  ) => void;
+  onRemoveIngredient: (index: number) => void;
+  onAddIngredient: () => void;
+  onUpdateSeasoning: (
+    index: number,
+    field: keyof Seasoning,
+    value: string,
+  ) => void;
+  onRemoveSeasoning: (index: number) => void;
+  onAddSeasoning: () => void;
+};
 
 /**
- * 顯示食材或調味料清單，支持編輯、新增和刪除
+ * 食材清單元件
  */
-export const IngredientList: React.FC<IngredientListProps> = ({
-  title,
-  ingredients: initialIngredients,
-  size,
-  variant,
-  className,
-  onUpdate,
-  ...props
-}) => {
-  const [ingredients, setIngredients] =
-    useState<Ingredient[]>(initialIngredients);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editQuantity, setEditQuantity] = useState('');
-
-  /**
-   * 處理開始編輯食材
-   */
-  const atStartEdit = (ingredient: Ingredient) => {
-    setEditingId(ingredient.id);
-    setEditName(ingredient.name);
-    setEditQuantity(ingredient.quantity);
-  };
-
-  /**
-   * 處理取消編輯
-   */
-  const atCancelEdit = () => {
-    setEditingId(null);
-  };
-
-  /**
-   * 處理保存編輯
-   */
-  const atSaveEdit = () => {
-    if (editingId) {
-      const updatedIngredients = ingredients.map((item) =>
-        item.id === editingId
-          ? { ...item, name: editName, quantity: editQuantity }
-          : item,
-      );
-      setIngredients(updatedIngredients);
-      if (onUpdate) {
-        onUpdate(updatedIngredients);
-      }
-    }
-    setEditingId(null);
-  };
-
-  /**
-   * 處理新增食材
-   */
-  const atAddIngredient = () => {
-    const newIngredient = {
-      id: `ing-${Date.now()}`,
-      name: '新食材',
-      quantity: '1份',
-    };
-    const updatedIngredients = [...ingredients, newIngredient];
-    setIngredients(updatedIngredients);
-    if (onUpdate) {
-      onUpdate(updatedIngredients);
-    }
-    // 立即進入編輯模式
-    atStartEdit(newIngredient);
-  };
-
-  /**
-   * 處理刪除食材
-   */
-  const atDeleteIngredient = (id: string) => {
-    const updatedIngredients = ingredients.filter((item) => item.id !== id);
-    setIngredients(updatedIngredients);
-    if (onUpdate) {
-      onUpdate(updatedIngredients);
-    }
-  };
-
-  /**
-   * 處理編輯食材名稱變更
-   */
-  const atNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditName(e.target.value);
-  };
-
-  /**
-   * 處理編輯食材數量變更
-   */
-  const atQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditQuantity(e.target.value);
-  };
-
+export const IngredientList = ({
+  ingredients,
+  seasonings,
+  onUpdateIngredient,
+  onRemoveIngredient,
+  onAddIngredient,
+  onUpdateSeasoning,
+  onRemoveSeasoning,
+  onAddSeasoning,
+}: IngredientListProps) => {
   return (
-    <div
-      className={cn(ingredientListVariants({ size, variant }), className)}
-      {...props}
-    >
-      <div className="flex justify-between items-center mb-2">
-        <h3
-          className={cn('font-medium', {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
+    <>
+      {/* 食材清單 */}
+      <div className="mb-4">
+        <h2 className="mb-2 text-lg font-medium">食材清單</h2>
+        {ingredients.map((ingredient, index) => (
+          <div
+            key={
+              ingredient.id ||
+              `ingredient-${ingredient.name}-${ingredient.amount}-${index}`
+            }
+            className="flex items-center mb-2"
+          >
+            <div className="flex items-center flex-1">
+              <Input
+                value={ingredient.name}
+                onChange={(e) =>
+                  onUpdateIngredient(index, 'name', e.target.value)
+                }
+                className="flex-1 mr-2"
+                placeholder="食材名稱"
+              />
+              <Input
+                value={ingredient.amount}
+                onChange={(e) =>
+                  onUpdateIngredient(index, 'amount', e.target.value)
+                }
+                className="w-16 mr-2"
+                placeholder="數量"
+              />
+            </div>
+            <button
+              onClick={() => onRemoveIngredient(index)}
+              className="p-1 text-gray-500"
+            >
+              <Trash className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAddIngredient}
+          className="mt-2"
         >
-          {title}
-        </h3>
-        <button
-          type="button"
-          className="p-1 bg-gray-100 rounded-full"
-          onClick={atAddIngredient}
-        >
-          <Plus size={16} />
-        </button>
+          <Plus className="w-4 h-4 mr-1" /> 新增食材
+        </Button>
       </div>
 
-      <ul className="space-y-2">
-        {ingredients.map((ingredient) => (
-          <li key={ingredient.id} className="flex justify-between items-center">
-            {editingId === ingredient.id ? (
-              <div className="flex w-full space-x-2">
-                <input
-                  type="text"
-                  className={cn('flex-1 p-1 border rounded', {
-                    'text-xs': size === 'sm',
-                    'text-sm': size === 'md',
-                    'text-base': size === 'lg',
-                  })}
-                  value={editName}
-                  onChange={atNameChange}
-                  placeholder="食材名稱"
-                />
-                <input
-                  type="text"
-                  className={cn('w-20 p-1 border rounded', {
-                    'text-xs': size === 'sm',
-                    'text-sm': size === 'md',
-                    'text-base': size === 'lg',
-                  })}
-                  value={editQuantity}
-                  onChange={atQuantityChange}
-                  placeholder="數量"
-                />
-                <div className="flex space-x-1">
-                  <button
-                    type="button"
-                    className="p-1 text-green-600"
-                    onClick={atSaveEdit}
-                  >
-                    <Check size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    className="p-1 text-red-600"
-                    onClick={atCancelEdit}
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center">
-                  <span
-                    className={cn({
-                      'text-xs': size === 'sm',
-                      'text-sm': size === 'md',
-                      'text-base': size === 'lg',
-                    })}
-                  >
-                    • {ingredient.name}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span
-                    className={cn('mr-4', {
-                      'text-xs': size === 'sm',
-                      'text-sm': size === 'md',
-                      'text-base': size === 'lg',
-                    })}
-                  >
-                    {ingredient.quantity}
-                  </span>
-                  <button
-                    type="button"
-                    className="p-1"
-                    onClick={() => atStartEdit(ingredient)}
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    className="p-1 text-red-500"
-                    onClick={() => atDeleteIngredient(ingredient.id)}
-                  >
-                    <Trash size={16} />
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
+      {/* 調味料清單 */}
+      <div className="mb-4">
+        <h2 className="mb-2 text-lg font-medium">調味料清單</h2>
+        {seasonings.map((seasoning, index) => (
+          <div
+            key={
+              seasoning.id ||
+              `seasoning-${seasoning.name}-${seasoning.amount}-${index}`
+            }
+            className="flex items-center mb-2"
+          >
+            <div className="flex items-center flex-1">
+              <Input
+                value={seasoning.name}
+                onChange={(e) =>
+                  onUpdateSeasoning(index, 'name', e.target.value)
+                }
+                className="flex-1 mr-2"
+                placeholder="調味料名稱"
+              />
+              <Input
+                value={seasoning.amount}
+                onChange={(e) =>
+                  onUpdateSeasoning(index, 'amount', e.target.value)
+                }
+                className="w-16 mr-2"
+                placeholder="數量"
+              />
+            </div>
+            <button
+              onClick={() => onRemoveSeasoning(index)}
+              className="p-1 text-gray-500"
+            >
+              <Trash className="w-4 h-4" />
+            </button>
+          </div>
         ))}
-      </ul>
-    </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAddSeasoning}
+          className="mt-2"
+        >
+          <Plus className="w-4 h-4 mr-1" /> 新增調味料
+        </Button>
+      </div>
+    </>
   );
 };

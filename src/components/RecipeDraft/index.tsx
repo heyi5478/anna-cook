@@ -1,169 +1,361 @@
 import { useState } from 'react';
-import type React from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import { Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ImageIcon } from 'lucide-react';
 import { EditableSection } from './EditableSection';
-import { IngredientList } from './IngredientList';
-import { TagsSection } from './TagsSection';
 import { CookingInfo } from './CookingInfo';
-import { CookingSteps } from './CookingSteps';
+import { IngredientList } from './IngredientList';
+import { TagSection } from './TagsSection';
+import { CookingStep } from './CookingSteps';
 
-const recipeDraftVariants = cva('flex flex-col min-h-screen bg-gray-100', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-    variant: {
-      default: 'bg-gray-100',
-      outline: 'bg-white border',
-      ghost: 'bg-transparent',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    variant: 'default',
-  },
-});
+// 定義食材類型
+type Ingredient = {
+  name: string;
+  amount: string;
+  id?: string; // 添加可選的 id 屬性
+};
 
-type RecipeDraftProps = VariantProps<typeof recipeDraftVariants> &
-  React.HTMLAttributes<HTMLDivElement>;
+// 定義調味料類型
+type Seasoning = {
+  name: string;
+  amount: string;
+  id?: string; // 添加可選的 id 屬性
+};
+
+// 修改 Step 類型，添加 vimeoId 屬性
+type Step = {
+  description: string;
+  startTime: string;
+  endTime: string;
+  video?: string;
+  vimeoId?: string; // 添加 Vimeo 影片 ID
+};
+
+// 定義食譜類型
+type Recipe = {
+  name: string;
+  image: string | null;
+  description: string;
+  ingredients: Ingredient[];
+  seasonings: Seasoning[];
+  tags: string[];
+  cookingTime: string;
+  cookingTimeValue: string; // 添加烹飪時間數值
+  cookingTimeUnit: string; // 添加烹飪時間單位
+  servings: string;
+  servingsValue: string; // 添加份量數值
+  servingsUnit: string; // 添加份量單位
+  steps: Step[];
+};
+
+// 定義編輯狀態類型
+type EditState = {
+  name: boolean;
+  description: boolean;
+  cookingTime: boolean;
+  servings: boolean;
+};
 
 /**
- * 食譜草稿編輯元件
+ * 食譜編輯器元件
  */
-export const RecipeDraft: React.FC<RecipeDraftProps> = ({
-  size,
-  variant,
-  className,
-  ...props
-}) => {
-  const [recipeName, setRecipeName] = useState('美味炒牛肉');
-  const [recipeIntro, setRecipeIntro] = useState(
-    '食譜簡介內容將會加入人工生態圈，會有趣味的，讓大家都學得會，並且還可以讓更多人愛上！',
-  );
-  const [coverImage, setCoverImage] = useState('');
-  const [cookingTime, setCookingTime] = useState('30 分鐘');
-  const [servingSize, setServingSize] = useState('2 人份');
+export default function RecipeEditor() {
+  // 初始化食譜狀態
+  // 在 recipe 初始狀態中更新步驟，添加 Vimeo 影片 ID
+  const [recipe, setRecipe] = useState<Recipe>({
+    name: '馬鈴薯料理',
+    image: null,
+    description:
+      '食譜簡介料理中加入在生薑做菜，薑汁香醇的，這味道回甘超人難忘！',
+    ingredients: [
+      { name: '馬鈴薯', amount: '2個' },
+      { name: '馬鈴薯', amount: '2個' },
+      { name: '馬鈴薯', amount: '2個' },
+    ],
+    seasonings: [
+      { name: '胡椒鹽', amount: '2匙' },
+      { name: '胡椒鹽', amount: '2匙' },
+      { name: '胡椒鹽', amount: '2匙' },
+    ],
+    tags: ['馬鈴薯', '馬鈴薯'],
+    cookingTime: '30 分鐘',
+    cookingTimeValue: '30',
+    cookingTimeUnit: '分鐘',
+    servings: '2人份',
+    servingsValue: '2',
+    servingsUnit: '人份',
+    steps: [
+      {
+        description: '將馬鈴薯切塊',
+        startTime: '0:12',
+        endTime: '0:30',
+        vimeoId: '76979871', // 示例 Vimeo ID
+      },
+      {
+        description: '加入調味料拌勻',
+        startTime: '0:31',
+        endTime: '0:45',
+        vimeoId: '76979871', // 示例 Vimeo ID
+      },
+      {
+        description: '放入烤箱烘烤',
+        startTime: '0:46',
+        endTime: '1:20',
+        vimeoId: '76979871', // 示例 Vimeo ID
+      },
+    ],
+  });
 
-  const [ingredients, setIngredients] = useState([
-    { id: '1', name: '高麗菜', quantity: '2顆' },
-    { id: '2', name: '高麗菜', quantity: '2顆' },
-    { id: '3', name: '高麗菜', quantity: '2顆' },
-  ]);
-
-  const [seasonings, setSeasonings] = useState([
-    { id: '1', name: '胡椒鹽', quantity: '2匙' },
-    { id: '2', name: '胡椒鹽', quantity: '2匙' },
-    { id: '3', name: '胡椒鹽', quantity: '2匙' },
-  ]);
+  // 添加編輯狀態
+  const [editState, setEditState] = useState<EditState>({
+    name: false,
+    description: false,
+    cookingTime: false,
+    servings: false,
+  });
 
   /**
-   * 處理上傳封面圖片
+   * 切換編輯狀態
    */
-  const atUploadCoverImage = () => {
-    // 這裡應該實現圖片上傳功能
-    alert('封面圖片上傳功能將在此實現');
-    // 模擬上傳後設置圖片 URL
-    setCoverImage('/placeholder.svg');
-  };
-
-  /**
-   * 處理儲存所有變更
-   */
-  const atSaveAll = () => {
-    // 處理儲存所有變更
-    console.log('儲存所有變更', {
-      title: recipeName,
-      introduction: recipeIntro,
-      videoId: '',
-      coverImageUrl: coverImage,
-      difficulty: '',
-      mealType: '',
-      cookingTime,
-      servingSize,
-      ingredients,
-      seasonings,
+  const atToggleEdit = (field: keyof EditState) => {
+    setEditState({
+      ...editState,
+      [field]: !editState[field],
     });
   };
 
+  /**
+   * 更新食譜名稱
+   */
+  const atUpdateName = (name: string) => {
+    setRecipe({ ...recipe, name });
+  };
+
+  /**
+   * 更新食譜描述
+   */
+  const atUpdateDescription = (description: string) => {
+    setRecipe({ ...recipe, description });
+  };
+
+  /**
+   * 更新食材
+   */
+  const atUpdateIngredient = (
+    index: number,
+    field: keyof Ingredient,
+    value: string,
+  ) => {
+    const updatedIngredients = [...recipe.ingredients];
+    updatedIngredients[index] = {
+      ...updatedIngredients[index],
+      [field]: value,
+    };
+    setRecipe({ ...recipe, ingredients: updatedIngredients });
+  };
+
+  /**
+   * 刪除食材
+   */
+  const atRemoveIngredient = (index: number) => {
+    const updatedIngredients = recipe.ingredients.filter((_, i) => i !== index);
+    setRecipe({ ...recipe, ingredients: updatedIngredients });
+  };
+
+  /**
+   * 新增食材
+   */
+  const atAddIngredient = () => {
+    setRecipe({
+      ...recipe,
+      ingredients: [...recipe.ingredients, { name: '', amount: '' }],
+    });
+  };
+
+  /**
+   * 更新調味料
+   */
+  const atUpdateSeasoning = (
+    index: number,
+    field: keyof Seasoning,
+    value: string,
+  ) => {
+    const updatedSeasonings = [...recipe.seasonings];
+    updatedSeasonings[index] = { ...updatedSeasonings[index], [field]: value };
+    setRecipe({ ...recipe, seasonings: updatedSeasonings });
+  };
+
+  /**
+   * 刪除調味料
+   */
+  const atRemoveSeasoning = (index: number) => {
+    const updatedSeasonings = recipe.seasonings.filter((_, i) => i !== index);
+    setRecipe({ ...recipe, seasonings: updatedSeasonings });
+  };
+
+  /**
+   * 新增調味料
+   */
+  const atAddSeasoning = () => {
+    setRecipe({
+      ...recipe,
+      seasonings: [...recipe.seasonings, { name: '', amount: '' }],
+    });
+  };
+
+  /**
+   * 新增標籤
+   */
+  const atAddTag = (tag: string) => {
+    if (tag && !recipe.tags.includes(tag)) {
+      setRecipe({
+        ...recipe,
+        tags: [...recipe.tags, tag],
+      });
+    }
+  };
+
+  /**
+   * 刪除標籤
+   */
+  const atRemoveTag = (tag: string) => {
+    setRecipe({
+      ...recipe,
+      tags: recipe.tags.filter((t) => t !== tag),
+    });
+  };
+
+  /**
+   * 更新烹飪時間數值
+   */
+  const atUpdateCookingTimeValue = (value: string) => {
+    // 確保只能輸入數字
+    if (/^\d*$/.test(value)) {
+      const cookingTime = `${value} ${recipe.cookingTimeUnit}`;
+      setRecipe({
+        ...recipe,
+        cookingTimeValue: value,
+        cookingTime,
+      });
+    }
+  };
+
+  /**
+   * 更新份量數值
+   */
+  const atUpdateServingsValue = (value: string) => {
+    // 確保只能輸入數字
+    if (/^\d*$/.test(value)) {
+      const servings = `${value}${recipe.servingsUnit}`;
+      setRecipe({
+        ...recipe,
+        servingsValue: value,
+        servings,
+      });
+    }
+  };
+
+  /**
+   * 刪除步驟
+   */
+  const atRemoveStep = (index: number) => {
+    const updatedSteps = recipe.steps.filter((_, i) => i !== index);
+    setRecipe({ ...recipe, steps: updatedSteps });
+  };
+
+  /**
+   * 儲存食譜
+   */
+  const atSaveRecipe = () => {
+    console.log('儲存食譜:', recipe);
+    // 這裡可以實作儲存到後端的邏輯
+  };
+
   return (
-    <div
-      className={cn(recipeDraftVariants({ size, variant }), className)}
-      {...props}
-    >
-      <Head>
-        <title>編輯草稿頁</title>
-        <meta name="description" content="食譜草稿編輯頁" />
-      </Head>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* 頂部導航 */}
+      <header className="flex items-center justify-between p-4 bg-white border-b">
+        <div className="flex items-center space-x-4">
+          <span className="font-bold">Logo</span>
+          <span className="text-gray-500">關鍵字搜尋</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button className="p-2 rounded-full" aria-label="搜尋">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+          <button className="p-2 rounded-full" aria-label="個人資料">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
 
-      <Header />
+      {/* 麵包屑導航 */}
+      <div className="flex items-center p-4 text-sm text-gray-500 bg-white">
+        <span>首頁</span>
+        <span className="mx-2">{'>'}</span>
+        <span>建立食譜</span>
+        <span className="mx-2">{'>'}</span>
+        <span>基礎設定</span>
+      </div>
 
-      <main className="flex-1 max-w-md mx-auto bg-white w-full">
-        <div className="flex flex-col space-y-4 pb-20">
-          {/* 麵包屑導航 */}
-          <div
-            className={cn('px-4 py-2 text-gray-600 border-b', {
-              'text-xs': size === 'sm',
-              'text-sm': size === 'md',
-              'text-base': size === 'lg',
-            })}
-          >
-            <span>首頁</span> {'>'} <span>編輯食譜</span> {'>'}{' '}
-            <span>草稿編輯</span>
-          </div>
-
+      {/* 主要內容 */}
+      <main className="flex-1 p-4">
+        <div className="max-w-md mx-auto">
           {/* 食譜名稱 */}
           <EditableSection
             title="食譜名稱"
-            content={recipeName}
-            className="px-4 py-2"
-            onSave={setRecipeName}
-            size={size}
+            isEditing={editState.name}
+            onToggleEdit={() => atToggleEdit('name')}
+            editView={
+              <Input
+                value={recipe.name}
+                onChange={(e) => atUpdateName(e.target.value)}
+                className="w-full"
+                autoFocus
+              />
+            }
+            displayView={
+              <div className="p-2 bg-white border rounded">{recipe.name}</div>
+            }
           />
 
           {/* 封面圖片 */}
-          <div className="px-4">
-            <p
-              className={cn('font-medium mb-2', {
-                'text-xs': size === 'sm',
-                'text-sm': size === 'md',
-                'text-base': size === 'lg',
-              })}
-            >
-              封面圖片
-            </p>
-            <div
-              className="bg-gray-200 h-48 flex items-center justify-center relative cursor-pointer"
-              onClick={atUploadCoverImage}
-            >
-              {coverImage ? (
-                <Image
-                  src={coverImage || '/placeholder.svg'}
-                  alt="封面圖片"
-                  layout="fill"
-                  objectFit="cover"
+          <div className="mb-4">
+            <h2 className="mb-2 text-lg font-medium">封面圖片</h2>
+            <div className="flex items-center justify-center w-full h-40 bg-gray-200 rounded">
+              {recipe.image ? (
+                <img
+                  src={recipe.image || '/placeholder.svg'}
+                  alt="食譜封面"
+                  className="object-cover w-full h-full rounded"
                 />
               ) : (
-                <div className="flex flex-col items-center">
-                  <Camera size={32} className="text-gray-400 mb-2" />
-                  <span
-                    className={cn('text-gray-500', {
-                      'text-xs': size === 'sm',
-                      'text-sm': size === 'md',
-                      'text-base': size === 'lg',
-                    })}
-                  >
-                    點擊上傳封面圖片
-                  </span>
-                </div>
+                <ImageIcon className="w-8 h-8 text-gray-400" />
               )}
             </div>
           </div>
@@ -171,74 +363,67 @@ export const RecipeDraft: React.FC<RecipeDraftProps> = ({
           {/* 食譜簡介 */}
           <EditableSection
             title="食譜簡介"
-            content={recipeIntro}
-            className="px-4 py-2"
-            onSave={setRecipeIntro}
-            size={size}
+            isEditing={editState.description}
+            onToggleEdit={() => atToggleEdit('description')}
+            editView={
+              <Textarea
+                value={recipe.description}
+                onChange={(e) => atUpdateDescription(e.target.value)}
+                className="w-full"
+                autoFocus
+              />
+            }
+            displayView={
+              <div className="p-2 bg-white border rounded min-h-[100px]">
+                {recipe.description}
+              </div>
+            }
           />
 
-          {/* 食材清單 */}
+          {/* 食材和調味料清單 */}
           <IngredientList
-            title="食材清單"
-            ingredients={ingredients}
-            onUpdate={setIngredients}
-            size={size}
+            ingredients={recipe.ingredients}
+            seasonings={recipe.seasonings}
+            onUpdateIngredient={atUpdateIngredient}
+            onRemoveIngredient={atRemoveIngredient}
+            onAddIngredient={atAddIngredient}
+            onUpdateSeasoning={atUpdateSeasoning}
+            onRemoveSeasoning={atRemoveSeasoning}
+            onAddSeasoning={atAddSeasoning}
           />
 
-          {/* 調味料清單 */}
-          <IngredientList
-            title="調味料清單"
-            ingredients={seasonings}
-            onUpdate={setSeasonings}
-            size={size}
+          {/* 食譜標籤 */}
+          <TagSection
+            tags={recipe.tags}
+            onAddTag={atAddTag}
+            onRemoveTag={atRemoveTag}
           />
 
-          {/* 烹調標籤 */}
-          <TagsSection size={size} />
-
-          {/* 烹飪時間和人數 */}
-          <div className="flex px-4 py-2 justify-between">
-            <CookingInfo
-              title="烹飪時間"
-              value={cookingTime}
-              onSave={setCookingTime}
-              size={size}
-            />
-
-            <CookingInfo
-              title="人數"
-              value={servingSize}
-              onSave={setServingSize}
-              size={size}
-            />
-          </div>
+          {/* 烹飪時間和份量 */}
+          <CookingInfo
+            cookingTimeValue={recipe.cookingTimeValue}
+            cookingTimeUnit={recipe.cookingTimeUnit}
+            cookingTime={recipe.cookingTime}
+            servingsValue={recipe.servingsValue}
+            servingsUnit={recipe.servingsUnit}
+            servings={recipe.servings}
+            isEditingCookingTime={editState.cookingTime}
+            isEditingServings={editState.servings}
+            onUpdateCookingTimeValue={atUpdateCookingTimeValue}
+            onUpdateServingsValue={atUpdateServingsValue}
+            onToggleEditCookingTime={() => atToggleEdit('cookingTime')}
+            onToggleEditServings={() => atToggleEdit('servings')}
+          />
 
           {/* 料理步驟 */}
-          <CookingSteps size={size} />
+          <CookingStep steps={recipe.steps} onRemoveStep={atRemoveStep} />
 
-          {/* 操作按鈕 */}
-          <div className="px-4 py-2">
-            <Button
-              className="w-full bg-gray-500 text-white py-2"
-              onClick={atSaveAll}
-              type="button"
-            >
-              儲存草稿
-            </Button>
-          </div>
+          {/* 儲存按鈕 */}
+          <Button onClick={atSaveRecipe} className="w-full mb-4">
+            儲存草稿
+          </Button>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
-};
-
-/**
- * RecipeDraftConfirmation 頁面元件
- */
-const RecipeDraftConfirmation = () => {
-  return <RecipeDraft />;
-};
-
-export default RecipeDraftConfirmation;
+}
