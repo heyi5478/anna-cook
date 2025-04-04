@@ -9,30 +9,28 @@ import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';
 import { CookingStep } from './CookingSteps';
 
-// 定義食材類型
+// 類型定義區塊
 type Ingredient = {
   name: string;
   amount: string;
-  id?: string; // 添加可選的 id 屬性
+  id?: string;
 };
 
-// 定義調味料類型
 type Seasoning = {
   name: string;
   amount: string;
-  id?: string; // 添加可選的 id 屬性
+  id?: string;
 };
 
-// 修改 Step 類型，添加 vimeoId 屬性
 type Step = {
   description: string;
   startTime: string;
   endTime: string;
   video?: string;
-  vimeoId?: string; // 添加 Vimeo 影片 ID
+  vimeoId?: string;
+  id?: string;
 };
 
-// 定義食譜類型
 type Recipe = {
   name: string;
   image: string | null;
@@ -41,15 +39,14 @@ type Recipe = {
   seasonings: Seasoning[];
   tags: string[];
   cookingTime: string;
-  cookingTimeValue: string; // 添加烹飪時間數值
-  cookingTimeUnit: string; // 添加烹飪時間單位
+  cookingTimeValue: string;
+  cookingTimeUnit: string;
   servings: string;
-  servingsValue: string; // 添加份量數值
-  servingsUnit: string; // 添加份量單位
+  servingsValue: string;
+  servingsUnit: string;
   steps: Step[];
 };
 
-// 定義編輯狀態類型
 type EditState = {
   name: boolean;
   description: boolean;
@@ -58,11 +55,10 @@ type EditState = {
 };
 
 /**
- * 食譜編輯器元件
+ * 食譜草稿編輯器元件 - 用於建立和編輯食譜草稿
  */
-export default function RecipeEditor() {
+export default function RecipeDraft() {
   // 初始化食譜狀態
-  // 在 recipe 初始狀態中更新步驟，添加 Vimeo 影片 ID
   const [recipe, setRecipe] = useState<Recipe>({
     name: '馬鈴薯料理',
     image: null,
@@ -90,24 +86,24 @@ export default function RecipeEditor() {
         description: '將馬鈴薯切塊',
         startTime: '0:12',
         endTime: '0:30',
-        vimeoId: '76979871', // 示例 Vimeo ID
+        vimeoId: '76979871',
       },
       {
         description: '加入調味料拌勻',
         startTime: '0:31',
         endTime: '0:45',
-        vimeoId: '76979871', // 示例 Vimeo ID
+        vimeoId: '76979871',
       },
       {
         description: '放入烤箱烘烤',
         startTime: '0:46',
         endTime: '1:20',
-        vimeoId: '76979871', // 示例 Vimeo ID
+        vimeoId: '76979871',
       },
     ],
   });
 
-  // 添加編輯狀態
+  // 編輯狀態管理
   const [editState, setEditState] = useState<EditState>({
     name: false,
     description: false,
@@ -116,7 +112,7 @@ export default function RecipeEditor() {
   });
 
   /**
-   * 切換編輯狀態
+   * 切換指定欄位的編輯狀態
    */
   const atToggleEdit = (field: keyof EditState) => {
     setEditState({
@@ -140,7 +136,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 更新食材
+   * 更新食材屬性
    */
   const atUpdateIngredient = (
     index: number,
@@ -156,7 +152,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 刪除食材
+   * 移除指定食材
    */
   const atRemoveIngredient = (index: number) => {
     const updatedIngredients = recipe.ingredients.filter((_, i) => i !== index);
@@ -164,7 +160,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 新增食材
+   * 新增空白食材
    */
   const atAddIngredient = () => {
     setRecipe({
@@ -174,7 +170,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 更新調味料
+   * 更新調味料屬性
    */
   const atUpdateSeasoning = (
     index: number,
@@ -187,7 +183,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 刪除調味料
+   * 移除指定調味料
    */
   const atRemoveSeasoning = (index: number) => {
     const updatedSeasonings = recipe.seasonings.filter((_, i) => i !== index);
@@ -195,7 +191,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 新增調味料
+   * 新增空白調味料
    */
   const atAddSeasoning = () => {
     setRecipe({
@@ -205,7 +201,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 新增標籤
+   * 新增標籤至食譜
    */
   const atAddTag = (tag: string) => {
     if (tag && !recipe.tags.includes(tag)) {
@@ -217,7 +213,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 刪除標籤
+   * 從食譜中移除標籤
    */
   const atRemoveTag = (tag: string) => {
     setRecipe({
@@ -227,7 +223,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 更新烹飪時間數值
+   * 更新烹飪時間數值並重新計算顯示文字
    */
   const atUpdateCookingTimeValue = (value: string) => {
     // 確保只能輸入數字
@@ -242,7 +238,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 更新份量數值
+   * 更新份量數值並重新計算顯示文字
    */
   const atUpdateServingsValue = (value: string) => {
     // 確保只能輸入數字
@@ -257,7 +253,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 刪除步驟
+   * 移除指定烹飪步驟
    */
   const atRemoveStep = (index: number) => {
     const updatedSteps = recipe.steps.filter((_, i) => i !== index);
@@ -265,7 +261,7 @@ export default function RecipeEditor() {
   };
 
   /**
-   * 儲存食譜
+   * 儲存食譜草稿至後端
    */
   const atSaveRecipe = () => {
     console.log('儲存食譜:', recipe);
