@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
+  Pause,
   Plus,
   RotateCcw,
   Trash2,
@@ -344,7 +345,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           <ChevronRight className="h-5 w-5" />
         </button>
         <button onClick={atTogglePlay} className="p-2 text-gray-600">
-          <Play className="h-5 w-5" />
+          {isPlaying ? (
+            <Pause className="h-5 w-5" />
+          ) : (
+            <Play className="h-5 w-5" />
+          )}
         </button>
         <button onClick={atAddStep} className="p-2 text-gray-600">
           <Plus className="h-5 w-5" />
