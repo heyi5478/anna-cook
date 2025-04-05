@@ -1,201 +1,110 @@
-'use client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { X } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 
-import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import { X, Plus } from 'lucide-react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-
-type Tag = {
-  id: string;
-  name: string;
+type TagSectionProps = {
+  tags: string[];
+  onAddTag: (tag: string) => void;
+  onRemoveTag: (tag: string) => void;
 };
 
-const tagsSectionVariants = cva('px-4 py-2', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-    variant: {
-      default: 'bg-white',
-      outline: 'border rounded-md',
-      ghost: 'bg-transparent',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    variant: 'default',
-  },
-});
-
-type TagsSectionProps = VariantProps<typeof tagsSectionVariants> &
-  React.HTMLAttributes<HTMLDivElement>;
-
 /**
- * 顯示烹調標籤區域，支持添加和刪除標籤
+ * 標籤區塊元件 - 用於管理食譜的標籤集合
+ * 支援新增和刪除標籤，並顯示標籤數量上限
  */
-export const TagsSection: React.FC<TagsSectionProps> = ({
-  size,
-  variant,
-  className,
-  ...props
-}) => {
-  const [tags, setTags] = useState<Tag[]>([
-    { id: '1', name: '熱炒類' },
-    { id: '2', name: '家常菜' },
-  ]);
-  const [newTagName, setNewTagName] = useState('');
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const maxTags = 5;
+export const TagSection = ({
+  tags,
+  onAddTag,
+  onRemoveTag,
+}: TagSectionProps) => {
+  const [newTag, setNewTag] = useState('');
 
   /**
-   * 處理刪除標籤
+   * 處理新增標籤事件
+   * 驗證輸入值並新增至標籤列表
    */
-  const atRemoveTag = (id: string) => {
-    setTags(tags.filter((tag) => tag.id !== id));
-  };
-
-  /**
-   * 處理添加標籤
-   */
-  const atAddTag = () => {
-    if (newTagName.trim() && tags.length < maxTags) {
-      setTags([
-        ...tags,
-        { id: Date.now().toString(), name: newTagName.trim() },
-      ]);
-      setNewTagName('');
-      setIsAddingTag(false);
+  const atHandleAddTag = () => {
+    if (newTag.trim()) {
+      onAddTag(newTag.trim());
+      setNewTag('');
     }
   };
 
   /**
-   * 處理取消添加標籤
+   * 處理輸入框變更事件
    */
-  const atCancelAddTag = () => {
-    setIsAddingTag(false);
-    setNewTagName('');
+  const atHandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTag(e.target.value);
   };
 
   /**
-   * 處理標籤名稱變更
+   * 處理標籤移除事件
    */
-  const atTagNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTagName(e.target.value);
+  const atHandleRemoveTag = (tag: string) => {
+    onRemoveTag(tag);
   };
 
   /**
-   * 當 isAddingTag 為 true 時，安全地聚焦輸入框
+   * 處理輸入框按鍵事件 - 按下 Enter 時新增標籤
    */
-  useEffect(() => {
-    if (isAddingTag && inputRef.current) {
-      // 短暫延遲確保螢幕閱讀器有時間宣告界面變更
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
+  const atHandleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      atHandleAddTag();
     }
-    return undefined;
-  }, [isAddingTag]);
+  };
+
+  /**
+   * 渲染單個標籤元素
+   */
+  const renderTag = (tag: string) => {
+    return (
+      <Badge key={tag} variant="outline" className="flex items-center gap-1">
+        {tag}
+        <button
+          onClick={() => atHandleRemoveTag(tag)}
+          aria-label={`移除標籤 ${tag}`}
+          className="focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary rounded-full"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </Badge>
+    );
+  };
 
   return (
-    <div
-      className={cn(tagsSectionVariants({ size, variant }), className)}
-      {...props}
-    >
-      <div className="flex justify-between items-center mb-2">
-        <h3
-          className={cn('font-medium', {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
-        >
-          烹調標籤
-        </h3>
-        {!isAddingTag && tags.length < maxTags && (
-          <button
-            type="button"
-            className="p-1 bg-gray-100 rounded-full"
-            onClick={() => setIsAddingTag(true)}
+    <div className="mb-4">
+      <h2 className="mb-2 text-lg font-medium">食譜標籤</h2>
+      <Card className="p-4">
+        {/* 標籤計數區 */}
+        <p className="mb-2 text-sm text-gray-500">已選擇 ({tags.length}/5)</p>
+
+        {/* 標籤顯示區域 */}
+        <div className="flex flex-wrap gap-2 mb-4">{tags.map(renderTag)}</div>
+
+        {/* 標籤輸入區域 */}
+        <div className="flex">
+          <Input
+            value={newTag}
+            onChange={atHandleInputChange}
+            onKeyPress={atHandleKeyPress}
+            placeholder="新增標籤"
+            className="flex-1 mr-2"
+            aria-label="輸入新標籤"
+          />
+          <Button
+            onClick={atHandleAddTag}
+            size="sm"
+            aria-label="新增標籤"
+            disabled={!newTag.trim()}
           >
-            <Plus size={16} />
-          </button>
-        )}
-      </div>
-
-      <div className="bg-gray-200 p-2 rounded">
-        <div
-          className={cn('text-gray-500 mb-1', {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
-        >
-          已標籤 ({tags.length}/{maxTags})
+            新增
+          </Button>
         </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          {tags.map((tag) => (
-            <div
-              key={tag.id}
-              className="bg-white p-2 rounded flex justify-between items-center"
-            >
-              <span
-                className={cn({
-                  'text-xs': size === 'sm',
-                  'text-sm': size === 'md',
-                  'text-base': size === 'lg',
-                })}
-              >
-                {tag.name}
-              </span>
-              <button
-                type="button"
-                className="text-gray-500 hover:text-red-500"
-                onClick={() => atRemoveTag(tag.id)}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-
-          {isAddingTag && (
-            <div className="bg-white p-1 rounded flex items-center">
-              <input
-                ref={inputRef}
-                type="text"
-                className={cn('flex-1 p-1 border-none outline-none', {
-                  'text-xs': size === 'sm',
-                  'text-sm': size === 'md',
-                  'text-base': size === 'lg',
-                })}
-                value={newTagName}
-                onChange={atTagNameChange}
-                placeholder="新標籤"
-              />
-              <button
-                type="button"
-                className="text-green-500 px-1"
-                onClick={atAddTag}
-              >
-                <Plus size={14} />
-              </button>
-              <button
-                type="button"
-                className="text-red-500 px-1"
-                onClick={atCancelAddTag}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      </Card>
     </div>
   );
 };

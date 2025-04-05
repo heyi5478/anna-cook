@@ -5,29 +5,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
+  Pause,
   Plus,
   RotateCcw,
   Trash2,
   Check,
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Video } from './Video';
-
-/**
- * 格式化時間為 mm:ss 格式
- */
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
-/**
- * 格式化時間為 0.00 秒格式
- */
-const formatSeconds = (seconds: number): string => {
-  return `${seconds.toFixed(2)} 秒`;
-};
+import {
+  VimeoPlayer,
+  formatTime as formatTimeHMS,
+  formatSeconds as formatSec,
+} from '@/components/ui/VimeoPlayer';
 
 type Step = {
   id: number;
@@ -319,7 +308,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
 
       {/* 影片預覽 */}
       <div className="bg-gray-100 aspect-video flex items-center justify-center my-2">
-        <Video
+        <VimeoPlayer
           videoId={videoId}
           width={400}
           startTime={startTime}
@@ -327,13 +316,14 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           onTimeUpdate={atTimeUpdate}
           onDurationChange={atDurationChange}
           isPlaying={isPlaying}
+          loop
         />
       </div>
 
       {/* 當前時間和總長度 */}
       <div className="flex justify-between px-4 py-2 text-sm">
-        <div>當前: {formatSeconds(currentTime)}</div>
-        <div>總長: {formatSeconds(videoDuration)}</div>
+        <div>當前: {formatSec(currentTime)}</div>
+        <div>總長: {formatSec(videoDuration)}</div>
       </div>
 
       {/* 步驟導航 */}
@@ -356,7 +346,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           <ChevronRight className="h-5 w-5" />
         </button>
         <button onClick={atTogglePlay} className="p-2 text-gray-600">
-          <Play className="h-5 w-5" />
+          {isPlaying ? (
+            <Pause className="h-5 w-5" />
+          ) : (
+            <Play className="h-5 w-5" />
+          )}
         </button>
         <button onClick={atAddStep} className="p-2 text-gray-600">
           <Plus className="h-5 w-5" />
@@ -367,7 +361,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       <div className="px-4 py-2">
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>0:00</span>
-          <span>{formatTime(videoDuration)}</span>
+          <span>{formatTimeHMS(videoDuration)}</span>
         </div>
         <div className="py-6">
           <Slider
@@ -385,8 +379,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
 
       {/* 起點和終點 */}
       <div className="flex justify-between px-4 py-2 text-sm">
-        <div>起點: {formatSeconds(startTime)}</div>
-        <div>終點: {formatSeconds(endTime)}</div>
+        <div>起點: {formatSec(startTime)}</div>
+        <div>終點: {formatSec(endTime)}</div>
       </div>
 
       {/* 標記按鈕 */}

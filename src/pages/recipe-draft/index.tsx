@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import { RecipeDraft } from '@/components/RecipeDraft';
+import RecipeDraft from '@/components/RecipeDraft';
 
 const RecipeDraftPage: NextPage = () => {
   return <RecipeDraft />;
