@@ -1,7 +1,13 @@
 import type React from 'react';
 
-import { ChevronDown, ImageIcon, Plus, Trash } from 'lucide-react';
+import { ImageIcon, Plus, Trash } from 'lucide-react';
 import VimeoPlayer, { timeToSeconds } from '@/components/ui/VimeoPlayer';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 // 型別定義區塊
 type Step = {
@@ -22,26 +28,8 @@ type CookingStepProps = {
  * 料理步驟元件 - 顯示烹飪過程的步驟列表及相關影片
  */
 export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
-  /**
-   * 切換步驟展開/收合狀態
-   */
-  const atToggleStep = (index: number) => {
-    const stepElement = document.getElementById(`step-${index}`);
-    if (stepElement) {
-      stepElement.classList.toggle('hidden');
-    }
-  };
-
-  /**
-   * 處理步驟刪除事件
-   */
-  const atHandleRemoveStep = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    index: number,
-  ) => {
-    e.stopPropagation();
-    onRemoveStep(index);
-  };
+  // 設定初始展開的步驟值（只有步驟1展開）
+  const defaultValue = ['step-0'];
 
   /**
    * 渲染步驟影片區塊
@@ -103,7 +91,6 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
 
   return (
     <div className="mb-4">
-      {/* 標題列 */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">料理步驟</h2>
         <button className="p-1" aria-label="新增步驟">
@@ -111,37 +98,37 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
         </button>
       </div>
 
-      {/* 步驟列表 */}
-      {steps.map((step, index) => (
-        <div
-          key={step.id || `step-${step.description}-${step.startTime}-${index}`}
-          className="mb-4"
-        >
-          {/* 步驟標題列 */}
-          <div
-            className="flex items-center justify-between p-2 bg-gray-100 rounded cursor-pointer"
-            onClick={() => atToggleStep(index)}
+      <Accordion type="multiple" defaultValue={defaultValue} className="w-full">
+        {steps.map((step, index) => (
+          <AccordionItem
+            key={
+              step.id || `step-${step.description}-${step.startTime}-${index}`
+            }
+            value={`step-${index}`}
+            className="mb-2 border rounded"
           >
-            <h3 className="font-medium">步驟 {index + 1}</h3>
-            <div className="flex items-center">
-              <ChevronDown className="w-4 h-4" />
+            <div className="grid grid-cols-[1fr_auto] items-center">
+              <AccordionTrigger className="px-2 py-3 hover:no-underline">
+                <h3 className="font-medium text-left">步驟 {index + 1}</h3>
+              </AccordionTrigger>
               <button
-                onClick={(e) => atHandleRemoveStep(e, index)}
-                className="ml-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveStep(index);
+                }}
+                className="mr-2 p-1 text-gray-500 z-10"
                 aria-label={`刪除步驟 ${index + 1}`}
               >
                 <Trash className="w-4 h-4" />
               </button>
             </div>
-          </div>
-
-          {/* 步驟詳細內容 */}
-          <div id={`step-${index}`} className="p-4 mt-2 border rounded">
-            {renderStepVideo(step)}
-            {renderStepInfo(step)}
-          </div>
-        </div>
-      ))}
+            <AccordionContent className="p-4 pt-2 border-t">
+              {renderStepVideo(step)}
+              {renderStepInfo(step)}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   );
 };
