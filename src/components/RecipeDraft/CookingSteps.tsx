@@ -1,7 +1,7 @@
 import type React from 'react';
 
 import { ImageIcon, Plus, Trash } from 'lucide-react';
-import VimeoPlayer, { timeToSeconds } from '@/components/ui/VimeoPlayer';
+import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
 import {
   Accordion,
   AccordionContent,

@@ -12,7 +12,8 @@ import {
   Check,
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import VimeoPlayer, {
+import {
+  VimeoPlayer,
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/ui/VimeoPlayer';

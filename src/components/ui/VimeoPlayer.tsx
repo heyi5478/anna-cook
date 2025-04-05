@@ -301,5 +301,3 @@ export const timeToSeconds = (timeStr: string): number => {
 export const formatSeconds = (seconds: number): string => {
   return `${seconds.toFixed(2)} 秒`;
 };
-
-export default VimeoPlayer;
