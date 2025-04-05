@@ -1,8 +1,7 @@
 import type React from 'react';
 
 import { ChevronDown, ImageIcon, Plus, Trash } from 'lucide-react';
-import { useRef, useEffect, useState } from 'react';
-import Player, { type Options } from '@vimeo/player';
+import VimeoPlayer, { timeToSeconds } from '@/components/ui/VimeoPlayer';
 
 // 型別定義區塊
 type Step = {
@@ -17,122 +16,6 @@ type Step = {
 type CookingStepProps = {
   steps: Step[];
   onRemoveStep: (index: number) => void;
-};
-
-type VimeoPlayerProps = {
-  videoId: string;
-  width?: number;
-  startTime: number;
-  endTime: number;
-};
-
-/**
- * 將時間字串轉換為秒數
- * @param timeStr - 格式為 "mm:ss" 的時間字串
- * @returns 轉換後的秒數
- */
-const timeToSeconds = (timeStr: string): number => {
-  const parts = timeStr.split(':');
-  if (parts.length === 2) {
-    const minutes = Number.parseInt(parts[0], 10);
-    const seconds = Number.parseInt(parts[1], 10);
-    return minutes * 60 + seconds;
-  }
-  return 0;
-};
-
-/**
- * Vimeo 影片播放器元件 - 用於顯示指定時間範圍的 Vimeo 影片片段
- */
-export const Video: React.FC<VimeoPlayerProps> = ({
-  videoId,
-  width = 640,
-  startTime,
-  endTime,
-}) => {
-  const playerContainer = useRef<HTMLDivElement>(null);
-  const isLoopingRef = useRef<boolean>(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    let player: Player | undefined;
-
-    /**
-     * 初始化 Vimeo 播放器並設定相關事件監聽
-     */
-    const initPlayer = () => {
-      if (!playerContainer.current) return;
-
-      const options: Options = {
-        url: `https://vimeo.com/${videoId}`,
-        autoplay: true,
-        // muted: true,
-        responsive: true,
-        width,
-        height: (width * 9) / 16,
-      };
-
-      player = new Player(playerContainer.current, options);
-
-      // 設定影片從指定時間開始播放
-      player.setCurrentTime(startTime).catch((error: unknown) => {
-        console.error('設定起始時間失敗:', error);
-      });
-
-      // 設定事件監聽
-      setupEventListeners();
-    };
-
-    /**
-     * 設定播放器的事件監聽器
-     */
-    const setupEventListeners = () => {
-      if (!player) return;
-
-      // 監聽播放進度，達到結束時間時跳回起始時間以達成循環效果
-      player.on('timeupdate', (data: { seconds: number }) => {
-        if (data.seconds >= endTime && !isLoopingRef.current) {
-          isLoopingRef.current = true;
-          player
-            ?.setCurrentTime(startTime)
-            .then(() => {
-              isLoopingRef.current = false;
-            })
-            .catch((error: unknown) => {
-              console.error('循環播放段落失敗:', error);
-              isLoopingRef.current = false;
-            });
-        }
-      });
-
-      // 監聽載入完成事件
-      player.on('loaded', () => {
-        setIsLoaded(true);
-      });
-    };
-
-    initPlayer();
-
-    // 清理函式
-    return () => {
-      if (player) {
-        player
-          .destroy()
-          .catch((error: unknown) => console.error('播放器銷毀失敗:', error));
-      }
-    };
-  }, [videoId, width, startTime, endTime]);
-
-  return (
-    <div className="w-full h-full relative">
-      <div ref={playerContainer} className="w-full h-full" />
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <ImageIcon className="w-8 h-8 text-gray-400" />
-        </div>
-      )}
-    </div>
-  );
 };
 
 /**
@@ -169,10 +52,13 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
         <div className="block mb-2 text-sm font-medium">步驟影片</div>
         <div className="relative aspect-video bg-gray-200 rounded overflow-hidden mb-2">
           {step.vimeoId ? (
-            <Video
+            <VimeoPlayer
               videoId={step.vimeoId}
               startTime={timeToSeconds(step.startTime)}
               endTime={timeToSeconds(step.endTime)}
+              responsive
+              muted
+              loop
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
