@@ -6,6 +6,7 @@ import { Menu, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SideMenu } from '@/components/layout/Header/SideMenu'; // 引入子選單組件
 
 // 定義 header 的基本樣式和變體
 const headerVariants = cva('w-full flex items-center gap-2 p-2 bg-gray-200', {
@@ -49,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
   ...props
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // 新增子選單開關狀態
 
   /**
    * 處理搜尋表單提交事件
@@ -65,14 +67,20 @@ export const Header: React.FC<HeaderProps> = ({
       className={cn(headerVariants({ variant, size, className }))}
       {...props}
     >
-      <Button
+      {/* 選單按鈕 */}
+      <SideMenu 
+        isOpen={isMenuOpen} 
+        onOpenChange={setIsMenuOpen} 
+        onMenuClick={atMenuClick} 
+      />
+      {/*選單按鈕暫存，已移到子組件去了<Button
         variant="ghost"
         size="icon"
         onClick={atMenuClick}
         aria-label="選單"
       >
         <Menu className="h-5 w-5" />
-      </Button>
+      </Button>*/}
 
       <div className="font-medium">{logoText}</div>
 
