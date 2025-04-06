@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { uploadRecipeBasic, type RecipeFormData } from '@/services/api';
 import StepIndicator from '@/components/ui/StepIndicator';
 
@@ -22,8 +23,11 @@ const recipeFormSchema = z.object({
 type RecipeFormValues = z.infer<typeof recipeFormSchema>;
 
 export default function RecipeUploadForm() {
+  // 初始化路由器
+  const router = useRouter();
+
   // 設定目前步驟狀態
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep] = useState(1);
 
   // 設定預覽圖片狀態
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -106,9 +110,9 @@ export default function RecipeUploadForm() {
       console.log('API 上傳結果:', result);
 
       if (result && result.StatusCode === 200) {
-        // 前往下一步
-        console.log('上傳成功，前往下一步');
-        setCurrentStep(2);
+        // 上傳成功後跳轉到步驟2頁面
+        console.log('上傳成功，跳轉到步驟2頁面');
+        router.push('/upload-recipe-step2');
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
