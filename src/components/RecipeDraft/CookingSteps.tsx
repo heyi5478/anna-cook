@@ -1,6 +1,7 @@
 import type React from 'react';
 
-import { ImageIcon, Plus, Trash } from 'lucide-react';
+import { ImageIcon, Plus, Trash, Play, Pause } from 'lucide-react';
+import { useState } from 'react';
 import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
 import {
   Accordion,
@@ -8,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 
 // 型別定義區塊
 type Step = {
@@ -30,11 +32,26 @@ type CookingStepProps = {
 export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   // 設定初始展開的步驟值（只有步驟1展開）
   const defaultValue = ['step-0'];
+  // 追踪每個步驟的播放狀態
+  const [playingSteps, setPlayingSteps] = useState<Record<string, boolean>>({});
+
+  /**
+   * 切換步驟影片的播放狀態
+   */
+  const atTogglePlay = (stepId: string) => {
+    setPlayingSteps((prev) => ({
+      ...prev,
+      [stepId]: !prev[stepId],
+    }));
+  };
 
   /**
    * 渲染步驟影片區塊
    */
-  const renderStepVideo = (step: Step) => {
+  const renderStepVideo = (step: Step, index: number) => {
+    const stepId = step.id || `step-${index}`;
+    const isPlaying = playingSteps[stepId] || false;
+
     return (
       <div className="mb-4">
         <div className="block mb-2 text-sm font-medium">步驟影片</div>
@@ -47,6 +64,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
               responsive
               muted
               loop
+              isPlaying={isPlaying}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
@@ -61,12 +79,35 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   /**
    * 渲染步驟資訊區塊
    */
-  const renderStepInfo = (step: Step) => {
+  const renderStepInfo = (step: Step, index: number) => {
+    const stepId = step.id || `step-${index}`;
+    const isPlaying = playingSteps[stepId] || false;
+
     return (
       <>
-        {/* 步驟描述 - 只讀 */}
+        {/* 步驟描述與播放按鈕 */}
         <div className="mb-4">
-          <div className="block mb-2 text-sm font-medium">步驟描述</div>
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-medium">步驟描述</div>
+            {step.vimeoId && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => atTogglePlay(stepId)}
+                className="text-xs"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-3 h-3 mr-1" /> 暫停
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 mr-1" /> 播放
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
           <div className="p-3 bg-gray-50 rounded border min-h-[100px]">
             {step.description}
           </div>
@@ -123,8 +164,8 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
               </button>
             </div>
             <AccordionContent className="p-4 pt-2 border-t">
-              {renderStepVideo(step)}
-              {renderStepInfo(step)}
+              {renderStepVideo(step, index)}
+              {renderStepInfo(step, index)}
             </AccordionContent>
           </AccordionItem>
         ))}
