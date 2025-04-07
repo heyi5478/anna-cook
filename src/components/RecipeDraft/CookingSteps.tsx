@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { ImageIcon, Plus, Trash, Play, Pause } from 'lucide-react';
+import { ImageIcon, Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
 import {
@@ -135,7 +135,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">料理步驟</h2>
         <button className="p-1" aria-label="新增步驟">
-          <Plus className="w-4 h-4" />
+          <Edit className="w-4 h-4" />
         </button>
       </div>
 
