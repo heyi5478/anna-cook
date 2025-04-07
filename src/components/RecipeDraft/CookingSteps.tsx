@@ -2,6 +2,7 @@ import type React from 'react';
 
 import { ImageIcon, Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
 import {
   Accordion,
@@ -34,6 +35,15 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   const defaultValue = ['step-0'];
   // 追踪每個步驟的播放狀態
   const [playingSteps, setPlayingSteps] = useState<Record<string, boolean>>({});
+  // 使用路由器進行頁面導航
+  const router = useRouter();
+
+  /**
+   * 導航到影片編輯頁面
+   */
+  const atNavigateToVideoEdit = () => {
+    router.push('/recipe-draft-video');
+  };
 
   /**
    * 切換步驟影片的播放狀態
@@ -134,7 +144,11 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
     <div className="mb-4">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">料理步驟</h2>
-        <button className="p-1" aria-label="新增步驟">
+        <button
+          className="p-1"
+          aria-label="新增步驟"
+          onClick={atNavigateToVideoEdit}
+        >
           <Edit className="w-4 h-4" />
         </button>
       </div>
