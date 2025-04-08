@@ -1,7 +1,145 @@
+import { useState } from 'react';
+import { Plus, ChevronDown, X } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { CategoryCard } from '@/components/recipe/CategoryCard';
+import { RecipeCard } from '@/components/recipe/RecipeCard';
 
+// 定義食譜類型
+type Recipe = {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  time: number;
+  servings: number;
+  rating: number;
+  description: string;
+};
+
+// 定義分類類型
+type Category = {
+  id: string;
+  title: string;
+  image: string;
+  description: string;
+};
+
+/**
+ * 網站首頁組件
+ */
 export default function HomePage() {
+  // 設定當前選中的標籤
+  const [activeTab, setActiveTab] = useState('latest');
+  // 控制浮動按鈕選單的顯示
+  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+
+  // 切換浮動選單顯示狀態
+  const toggleFloatingMenu = () => {
+    setShowFloatingMenu(!showFloatingMenu);
+  };
+
+  // 季節食譜分類
+  const seasonalCategories: Category[] = [
+    {
+      id: '1',
+      title: '馬鈴薯烤蛋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '2',
+      title: '馬鈴薯烤蛋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '3',
+      title: '馬鈴薯烤蛋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+  ];
+
+  // 特色食譜分類
+  const specialCategories: Category[] = [
+    {
+      id: '3',
+      title: '馬鈴薯烤蛋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '4',
+      title: '馬鈴薯烤蛋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+  ];
+
+  // 食譜列表
+  const recipes: Recipe[] = [
+    {
+      id: '1',
+      title: '家傳滷五花',
+      image: '/placeholder.svg?height=80&width=80',
+      category: 'meat',
+      time: 30,
+      servings: 2,
+      rating: 4.5,
+      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
+    },
+    {
+      id: '2',
+      title: '家傳滷五花',
+      image: '/placeholder.svg?height=80&width=80',
+      category: 'meat',
+      time: 30,
+      servings: 2,
+      rating: 4.5,
+      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
+    },
+    {
+      id: '3',
+      title: '家傳滷五花',
+      image: '/placeholder.svg?height=80&width=80',
+      category: 'meat',
+      time: 30,
+      servings: 2,
+      rating: 4.5,
+      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
+    },
+    {
+      id: '4',
+      title: '家傳滷五花',
+      image: '/placeholder.svg?height=80&width=80',
+      category: 'meat',
+      time: 30,
+      servings: 2,
+      rating: 4.5,
+      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
+    },
+    {
+      id: '5',
+      title: '家傳滷五花',
+      image: '/placeholder.svg?height=80&width=80',
+      category: 'meat',
+      time: 30,
+      servings: 2,
+      rating: 4.5,
+      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
+    },
+  ];
+
   /**
    * 處理選單按鈕點擊事件
    */
@@ -38,11 +176,141 @@ export default function HomePage() {
           <div className="text-gray-400">圖片區域</div>
         </div>
 
-        <h2 className="font-medium mb-2">人氣食譜</h2>
-        {/* 人氣食譜內容 */}
+        {/* 季節食譜區塊 */}
+        <section className="px-4 py-3">
+          <h2 className="text-xl font-bold mb-3">季節食譜</h2>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {seasonalCategories.map((category, index) => (
+                <CarouselItem
+                  key={category.id}
+                  className="pl-2 md:pl-4 basis-1/2"
+                >
+                  <CategoryCard
+                    category={category}
+                    intent={index === 0 ? 'featured' : 'default'}
+                    size="md"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-end gap-1 mt-2">
+              <CarouselPrevious className="relative static right-0 h-8 w-8" />
+              <CarouselNext className="relative static right-0 h-8 w-8" />
+            </div>
+          </Carousel>
+        </section>
+
+        {/* 特色食譜區塊 */}
+        <section className="px-4 py-3">
+          <h2 className="text-xl font-bold mb-3">特色食譜</h2>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {specialCategories.map((category) => (
+                <CarouselItem
+                  key={category.id}
+                  className="pl-2 md:pl-4 basis-1/2"
+                >
+                  <CategoryCard category={category} size="md" />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-end gap-1 mt-2">
+              <CarouselPrevious className="relative static right-0 h-8 w-8" />
+              <CarouselNext className="relative static right-0 h-8 w-8" />
+            </div>
+          </Carousel>
+        </section>
+
+        {/* 標籤欄 */}
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full border-b"
+        >
+          <TabsList className="w-full justify-start bg-transparent h-auto p-0">
+            <TabsTrigger
+              value="latest"
+              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
+            >
+              最新食譜
+            </TabsTrigger>
+            <TabsTrigger
+              value="popular"
+              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
+            >
+              人氣食譜
+            </TabsTrigger>
+            <TabsTrigger
+              value="convenience"
+              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
+            >
+              超商食譜
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {/* 食譜列表 */}
+        <div className="px-4 py-2">
+          {recipes.map((recipe, index) => {
+            // 根據索引決定顯示風格
+            let intent: 'default' | 'featured' | 'new' = 'default';
+            if (index === 0) intent = 'featured';
+            else if (index === 1) intent = 'new';
+
+            return (
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                intent={intent}
+                variant={index % 2 === 0 ? 'default' : 'primary'}
+              />
+            );
+          })}
+        </div>
+
+        {/* 載入更多按鈕 */}
+        <div className="flex justify-center py-4">
+          <Button
+            variant="ghost"
+            className="text-gray-500 flex items-center gap-1"
+          >
+            更多食譜 <ChevronDown size={16} />
+          </Button>
+        </div>
       </main>
 
       <Footer companyName="商標" studioName="Creative studio" />
+      {/* 浮動按鈕和選單 */}
+      <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
+        {/* 浮動選單 */}
+        {showFloatingMenu && (
+          <div className="flex flex-col gap-3 mb-3 items-end">
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32">
+              搜尋食譜
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-white text-gray-800 border-orange-500 border hover:bg-orange-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
+            >
+              新增食譜
+            </Button>
+          </div>
+        )}
+
+        {/* 主浮動按鈕 */}
+        <Button
+          size="icon"
+          onClick={toggleFloatingMenu}
+          className={`h-12 w-12 rounded-full shadow-lg transition-all duration-300 ${
+            showFloatingMenu
+              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              : 'bg-orange-200 text-orange-600 hover:bg-orange-300'
+          }`}
+        >
+          {showFloatingMenu ? <X size={24} /> : <Plus size={24} />}
+        </Button>
+      </div>
     </div>
   );
 }
