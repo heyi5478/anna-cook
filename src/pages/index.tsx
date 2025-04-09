@@ -1,18 +1,14 @@
+import type React from 'react';
 import { useState } from 'react';
-import { Plus, ChevronDown, X } from 'lucide-react';
+import { Plus, ChevronDown, X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-import { CategoryCard } from '@/components/recipe/CategoryCard';
-import { RecipeCard } from '@/components/recipe/RecipeCard';
+import { CategoryCard } from '@/components/ui/CategoryCard';
+import { RecipeCard } from '@/components/ui/RecipeCard';
+import useEmblaCarousel from 'embla-carousel-react';
+import { cva } from 'class-variance-authority';
 
 // 定義食譜類型
 type Recipe = {
@@ -33,6 +29,107 @@ type Category = {
   image: string;
   description: string;
 };
+
+// 定義輪播容器樣式
+const carouselContainerVariants = cva('relative group', {
+  variants: {
+    size: {
+      default: 'w-full',
+      compact: 'max-w-screen-lg mx-auto',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+// 定義輪播軌道樣式
+const carouselTrackVariants = cva('flex', {
+  variants: {
+    spacing: {
+      default: '-ml-4',
+      tight: '-ml-2',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+// 定義輪播導航按鈕樣式
+const carouselButtonVariants = cva(
+  'absolute top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity',
+  {
+    variants: {
+      position: {
+        left: 'left-0',
+        right: 'right-0',
+      },
+    },
+    defaultVariants: {
+      position: 'left',
+    },
+  },
+);
+
+// Netflix風格輪播元件
+function CarouselSection({
+  title,
+  items,
+  renderItem,
+}: {
+  title: string;
+  items: any[];
+  renderItem: (item: any) => React.ReactNode;
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    loop: false,
+    skipSnaps: false,
+    dragFree: true,
+  });
+
+  // 處理向前滾動
+  const scrollPrev = () => {
+    if (emblaApi) emblaApi.scrollPrev();
+  };
+
+  // 處理向後滾動
+  const scrollNext = () => {
+    if (emblaApi) emblaApi.scrollNext();
+  };
+
+  return (
+    <div className={carouselContainerVariants()}>
+      <h2 className="text-xl font-bold mb-3 px-4">{title}</h2>
+
+      {/* 前滾按鈕 */}
+      <button
+        className={carouselButtonVariants({ position: 'left' })}
+        onClick={scrollPrev}
+        aria-label="查看上一頁"
+      >
+        <ChevronLeft size={24} />
+      </button>
+
+      {/* 輪播區域 */}
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className={carouselTrackVariants()}>
+          {items.map((item) => renderItem(item))}
+        </div>
+      </div>
+
+      {/* 後滾按鈕 */}
+      <button
+        className={carouselButtonVariants({ position: 'right' })}
+        onClick={scrollNext}
+        aria-label="查看下一頁"
+      >
+        <ChevronRight size={24} />
+      </button>
+    </div>
+  );
+}
 
 /**
  * 網站首頁組件
@@ -64,7 +161,25 @@ export default function HomePage() {
     },
     {
       id: '3',
-      title: '馬鈴薯烤蛋',
+      title: '番茄燉湯',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '4',
+      title: '香煎鱈魚',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '5',
+      title: '蘑菇燉飯',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '家常創意',
+    },
+    {
+      id: '6',
+      title: '花椰菜燉湯',
       image: '/placeholder.svg?height=150&width=150',
       description: '家常創意',
     },
@@ -73,16 +188,40 @@ export default function HomePage() {
   // 特色食譜分類
   const specialCategories: Category[] = [
     {
-      id: '3',
+      id: '7',
       title: '馬鈴薯烤蛋',
       image: '/placeholder.svg?height=150&width=150',
       description: '家常創意',
     },
     {
-      id: '4',
-      title: '馬鈴薯烤蛋',
+      id: '8',
+      title: '滷肉飯',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '台式料理',
+    },
+    {
+      id: '9',
+      title: '泡菜鍋',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '韓式料理',
+    },
+    {
+      id: '10',
+      title: '牛肉麵',
       image: '/placeholder.svg?height=150&width=150',
       description: '家常創意',
+    },
+    {
+      id: '11',
+      title: '壽司捲',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '日式料理',
+    },
+    {
+      id: '12',
+      title: '蒜蓉蝦',
+      image: '/placeholder.svg?height=150&width=150',
+      description: '粵式料理',
     },
   ];
 
@@ -177,49 +316,26 @@ export default function HomePage() {
         </div>
 
         {/* 季節食譜區塊 */}
-        <section className="px-4 py-3">
-          <h2 className="text-xl font-bold mb-3">季節食譜</h2>
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {seasonalCategories.map((category, index) => (
-                <CarouselItem
-                  key={category.id}
-                  className="pl-2 md:pl-4 basis-1/2"
-                >
-                  <CategoryCard
-                    category={category}
-                    intent={index === 0 ? 'featured' : 'default'}
-                    size="md"
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex justify-end gap-1 mt-2">
-              <CarouselPrevious className="relative static right-0 h-8 w-8" />
-              <CarouselNext className="relative static right-0 h-8 w-8" />
-            </div>
-          </Carousel>
+        {/* 季節食譜區塊 - Netflix風格輪播 */}
+        <section className="py-3">
+          <CarouselSection
+            title="季節食譜"
+            items={seasonalCategories}
+            renderItem={(category) => (
+              <CategoryCard key={category.id} category={category} />
+            )}
+          />
         </section>
 
         {/* 特色食譜區塊 */}
-        <section className="px-4 py-3">
-          <h2 className="text-xl font-bold mb-3">特色食譜</h2>
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {specialCategories.map((category) => (
-                <CarouselItem
-                  key={category.id}
-                  className="pl-2 md:pl-4 basis-1/2"
-                >
-                  <CategoryCard category={category} size="md" />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex justify-end gap-1 mt-2">
-              <CarouselPrevious className="relative static right-0 h-8 w-8" />
-              <CarouselNext className="relative static right-0 h-8 w-8" />
-            </div>
-          </Carousel>
+        <section className="py-3">
+          <CarouselSection
+            title="特色食譜"
+            items={specialCategories}
+            renderItem={(category) => (
+              <CategoryCard key={category.id} category={category} />
+            )}
+          />
         </section>
 
         {/* 標籤欄 */}
