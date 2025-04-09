@@ -14,7 +14,7 @@ type Category = {
 
 // 定義卡片樣式變體
 const categoryCardVariants = cva(
-  'overflow-hidden', // 基本樣式
+  'overflow-hidden h-full', // 基本樣式
   {
     variants: {
       size: {
@@ -34,11 +34,29 @@ const categoryCardVariants = cva(
   },
 );
 
+// 定義連結容器樣式
+const categoryLinkVariants = cva(
+  'pl-4 min-w-[160px] transition-transform duration-300 hover:scale-105', // 新增的基本樣式
+  {
+    variants: {
+      size: {
+        sm: '',
+        md: '',
+        lg: '',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+);
+
 // 定義元件 props 類型
 export interface CategoryCardProps
   extends VariantProps<typeof categoryCardVariants> {
   category: Category;
   className?: string;
+  linkClassName?: string;
 }
 
 /**
@@ -49,9 +67,13 @@ export function CategoryCard({
   size,
   intent,
   className,
+  linkClassName,
 }: CategoryCardProps) {
   return (
-    <Link href={`/category/${category.id}`}>
+    <Link
+      href={`/category/${category.id}`}
+      className={cn(categoryLinkVariants({ size }), linkClassName)}
+    >
       <Card className={cn(categoryCardVariants({ size, intent }), className)}>
         <div className="relative h-24">
           <Image
@@ -61,7 +83,7 @@ export function CategoryCard({
             className="object-cover"
           />
         </div>
-        <CardContent className="p-2 text-center">
+        <CardContent className="p-2">
           <h3 className="font-medium">{category.title}</h3>
           <p className="text-xs text-gray-500">{category.description}</p>
         </CardContent>
