@@ -1,0 +1,99 @@
+import Image from 'next/image';
+import Head from 'next/head';
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react';
+
+/**
+ * 登入頁面組件
+ */
+export default function LoginPage() {
+  /**
+   * 處理Google登入
+   */
+  const atGoogleLogin = () => {
+    console.log('Google登入');
+  };
+
+  /**
+   * 處理電子郵件登入
+   */
+  const atEmailLogin = () => {
+    console.log('電子郵件登入');
+  };
+
+  return (
+    <>
+      <Head>
+        <title>登入 | 安那煮 | 家傳好菜</title>
+        <meta name="description" content="安那煮 - 分享你的拿手美味" />
+      </Head>
+      <div className="flex min-h-screen flex-col">
+        <main className="flex flex-1 flex-col">
+          {/* 橘色背景頂部區域 */}
+          <div className="bg-[#E84A00] py-16 flex justify-center items-center">
+            <div className="container flex justify-center items-center">
+              <div className="relative w-full max-w-md flex justify-center">
+                <Image
+                  src="/login-logo.svg"
+                  alt="安那煮 Logo"
+                  width={400}
+                  height={120}
+                  className="h-auto"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 登入選項區域 */}
+          <div className="flex-1 flex flex-col items-center px-4 py-12">
+            <h1 className="text-base font-normal text-center mb-12">
+              立即加入分享你的拿手美味
+            </h1>
+
+            <div className="w-full max-w-md space-y-6">
+              {/* Google登入按鈕 */}
+              <Button
+                variant="outline"
+                className="w-full py-6 text-lg font-normal relative px-6 border-gray-300"
+                onClick={atGoogleLogin}
+              >
+                <span className="absolute left-6">
+                  <Image
+                    src="/google-icon.svg"
+                    alt="Google"
+                    width={24}
+                    height={24}
+                  />
+                </span>
+                <span className="mx-auto">使用 Google 繼續</span>
+              </Button>
+
+              {/* 分隔線 */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500">或</span>
+                </div>
+              </div>
+
+              {/* 電子郵件登入按鈕 */}
+              <Button
+                variant="outline"
+                className="w-full py-6 text-lg font-normal relative px-6 border-gray-300"
+                onClick={atEmailLogin}
+              >
+                <span className="absolute left-6">
+                  <Mail className="w-6 h-6" />
+                </span>
+                <span className="mx-auto">使用電子郵件繼續</span>
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </>
+  );
+}
