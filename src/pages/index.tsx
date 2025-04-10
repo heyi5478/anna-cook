@@ -264,22 +264,10 @@ export default function HomePage() {
         </Tabs>
 
         {/* 食譜列表 */}
-        <div className="px-4 py-2">
-          {recipes.map((recipe, index) => {
-            // 根據索引決定顯示風格
-            let intent: 'default' | 'featured' | 'new' = 'default';
-            if (index === 0) intent = 'featured';
-            else if (index === 1) intent = 'new';
-
-            return (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                intent={intent}
-                variant={index % 2 === 0 ? 'default' : 'primary'}
-              />
-            );
-          })}
+        <div className="py-2">
+          {recipes.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
         </div>
 
         {/* 載入更多按鈕 */}
