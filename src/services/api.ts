@@ -20,6 +20,34 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+export type GoogleAuthResponse = {
+  StatusCode: number;
+  msg: string;
+  redirectUri: string;
+};
+
+/**
+ * 獲取 Google 登入 URL
+ */
+export const fetchGoogleAuthUrl = async (): Promise<string> => {
+  try {
+    console.log(`發送請求: GET ${API_BASE_URL}/auth/google/auth`);
+    const res = await fetch(`${API_BASE_URL}/auth/google/auth`);
+    console.log('回應狀態:', res.status, res.statusText);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data: GoogleAuthResponse = await res.json();
+    console.log('回應資料:', data);
+    return data.redirectUri;
+  } catch (error) {
+    console.error('獲取 Google 登入 URL 失敗:', error);
+    throw error;
+  }
+};
+
 /**
  * 獲取首頁顯示的食譜列表
  */

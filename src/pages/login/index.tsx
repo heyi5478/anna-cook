@@ -2,16 +2,39 @@ import Image from 'next/image';
 import Head from 'next/head';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
+import { useState } from 'react';
 
 /**
  * 登入頁面組件
  */
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   /**
    * 處理Google登入
    */
-  const atGoogleLogin = () => {
-    console.log('Google登入');
+  const atGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      console.log('請求 Google 登入');
+
+      // 向我們的 API route發送請求
+      const response = await fetch('/api/auth/google');
+
+      if (!response.ok) {
+        throw new Error('獲取 Google 登入 URL 失敗');
+      }
+
+      const data = await response.json();
+
+      // 重定向到 Google 登入頁面
+      window.location.href = data.redirectUri;
+    } catch (error) {
+      console.error('Google 登入錯誤:', error);
+      // 這裡可以添加錯誤處理，例如顯示錯誤訊息給使用者
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /**
@@ -57,6 +80,7 @@ export default function LoginPage() {
                 variant="outline"
                 className="w-full py-6 text-lg font-normal relative px-6 border-gray-300"
                 onClick={atGoogleLogin}
+                disabled={isLoading}
               >
                 <span className="absolute left-6">
                   <Image
@@ -66,7 +90,9 @@ export default function LoginPage() {
                     height={24}
                   />
                 </span>
-                <span className="mx-auto">使用 Google 繼續</span>
+                <span className="mx-auto">
+                  {isLoading ? '處理中...' : '使用 Google 繼續'}
+                </span>
               </Button>
 
               {/* 分隔線 */}
