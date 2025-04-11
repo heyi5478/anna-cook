@@ -19,7 +19,7 @@ export default function LoginPage() {
       console.log('請求 Google 登入');
 
       // 向我們的 API route發送請求
-      const response = await fetch('/api/auth/google');
+      const response = await fetch('/api/auth/google/google');
 
       if (!response.ok) {
         throw new Error('獲取 Google 登入 URL 失敗');
