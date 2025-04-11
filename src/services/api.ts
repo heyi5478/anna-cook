@@ -20,6 +20,34 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+export type GoogleAuthResponse = {
+  StatusCode: number;
+  msg: string;
+  redirectUri: string;
+};
+
+/**
+ * 獲取 Google 登入 URL
+ */
+export const fetchGoogleAuthUrl = async (): Promise<string> => {
+  try {
+    console.log(`發送請求: GET ${API_BASE_URL}/auth/google/auth`);
+    const res = await fetch(`${API_BASE_URL}/auth/google/auth`);
+    console.log('回應狀態:', res.status, res.statusText);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data: GoogleAuthResponse = await res.json();
+    console.log('回應資料:', data);
+    return data.redirectUri;
+  } catch (error) {
+    console.error('獲取 Google 登入 URL 失敗:', error);
+    throw error;
+  }
+};
+
 /**
  * 獲取首頁顯示的食譜列表
  */
@@ -136,6 +164,39 @@ export const uploadRecipeBasic = async (
     return data;
   } catch (error) {
     console.error('上傳食譜失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 使用 Google 授權碼換取 token
+ */
+export const exchangeGoogleCodeForToken = async (
+  code: string,
+): Promise<any> => {
+  try {
+    console.log(
+      `發送請求: GET ${API_BASE_URL}/auth/google/callback?code=${code}`,
+    );
+
+    const res = await fetch(
+      `${API_BASE_URL}/auth/google/callback?code=${encodeURIComponent(code)}`,
+      {
+        method: 'GET',
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log('回應資料:', data);
+    return data;
+  } catch (error) {
+    console.error('Google code 換取 token 失敗:', error);
     throw error;
   }
 };
