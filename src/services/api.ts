@@ -167,3 +167,36 @@ export const uploadRecipeBasic = async (
     throw error;
   }
 };
+
+/**
+ * 使用 Google 授權碼換取 token
+ */
+export const exchangeGoogleCodeForToken = async (
+  code: string,
+): Promise<any> => {
+  try {
+    console.log(
+      `發送請求: GET ${API_BASE_URL}/auth/google/callback?code=${code}`,
+    );
+
+    const res = await fetch(
+      `${API_BASE_URL}/auth/google/callback?code=${encodeURIComponent(code)}`,
+      {
+        method: 'GET',
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log('回應資料:', data);
+    return data;
+  } catch (error) {
+    console.error('Google code 換取 token 失敗:', error);
+    throw error;
+  }
+};

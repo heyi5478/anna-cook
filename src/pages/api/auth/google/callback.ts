@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import cookie from 'cookie';
+import { exchangeGoogleCodeForToken } from '@/services/api';
 
 /**
  * 處理 Google OAuth 登入回調
@@ -28,21 +29,8 @@ export default async function handler(
 
     console.log('收到 Google 回調，授權碼:', code);
 
-    // 將授權碼傳送給後端 API - 使用 GET 方式並通過 querystring 傳遞
-    const backendResponse = await fetch(
-      `http://13.71.34.213/api/auth/google/callback?code=${encodeURIComponent(code as string)}`,
-      {
-        method: 'GET',
-      },
-    );
-
-    // 檢查後端回應
-    if (!backendResponse.ok) {
-      throw new Error(`後端 API 回應錯誤: ${backendResponse.status}`);
-    }
-
-    // 解析回應取得 token
-    const data = await backendResponse.json();
+    // 使用 API 服務發送授權碼給後端
+    const data = await exchangeGoogleCodeForToken(code as string);
     const { token } = data;
 
     if (!token) {
