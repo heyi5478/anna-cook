@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import StepIndicator from '@/components/ui/StepIndicator';
+import { useRouter } from 'next/router';
+import { uploadRecipeVideo } from '@/services/api';
 import UploadArea from './UploadArea';
 
 // 定義片段類型
@@ -74,6 +76,13 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  // API 錯誤狀態
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // 取得路由
+  const router = useRouter();
+  const { recipeId } = router.query;
+
   const videoRef = useRef<HTMLVideoElement>(null);
 
   /**
@@ -90,8 +99,8 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
         return;
       }
 
-      // 清除錯誤訊息
-      setErrors((prev) => ({ ...prev, video: undefined }));
+      // 清除所有錯誤訊息
+      setErrors({});
 
       // 模擬上傳進度
       setIsUploading(true);
@@ -112,6 +121,19 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       // 創建本地URL以預覽影片
       const url = URL.createObjectURL(file);
       setVideoUrl(url);
+
+      // 預先創建一個默認片段
+      const initialSegment: Segment = {
+        id: generateId(),
+        startTime: 0,
+        endTime: 0, // 稍後由 atVideoLoaded 更新實際時長
+        startPercent: 0,
+        endPercent: 100,
+        description:
+          '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
+      };
+      setSegments([initialSegment]);
+      setCurrentSegmentIndex(0);
     }
   };
 
@@ -120,6 +142,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
    */
   const atDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
+    console.log('說明文字變更:', value.length, '字元');
 
     // 更新當前片段的說明文字
     const updatedSegments = [...segments];
@@ -131,9 +154,21 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
     // 驗證說明文字
     if (value.trim().length < 10) {
+      console.log('說明文字不足 10 字，設置錯誤');
       setErrors((prev) => ({ ...prev, description: '說明文字至少需要10個字' }));
     } else {
-      setErrors((prev) => ({ ...prev, description: undefined }));
+      console.log('說明文字已達標準，清除錯誤');
+      // 完全清除錯誤狀態，確保按鈕可點擊
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.description;
+        return newErrors;
+      });
+
+      // 立即重新驗證表單，確保按鈕狀態更新
+      setTimeout(() => {
+        validateForm();
+      }, 10);
     }
   };
 
@@ -214,25 +249,40 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
    * 影片載入後的處理，在影片載入後生成縮圖
    */
   const atVideoLoaded = () => {
-    if (videoRef.current) {
+    if (videoRef.current && videoUrl) {
+      console.log('影片載入完成，初始化片段');
       const videoDuration = videoRef.current.duration || 134.63;
       setDuration(videoDuration);
 
-      // 創建第一個片段
-      const initialSegment: Segment = {
-        id: generateId(),
-        startTime: 0,
-        endTime: videoDuration,
-        startPercent: 0,
-        endPercent: 100,
-        description:
-          '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！食譜料理中加入花生醬燉煮',
-      };
+      // 強制再次清除錯誤
+      setErrors({});
 
-      setSegments([initialSegment]);
+      // 更新片段的時長
+      const updatedSegments =
+        segments.length > 0
+          ? segments.map((segment, index) =>
+              index === 0
+                ? { ...segment, endTime: videoDuration, endPercent: 100 }
+                : segment,
+            )
+          : [
+              {
+                id: generateId(),
+                startTime: 0,
+                endTime: videoDuration,
+                startPercent: 0,
+                endPercent: 100,
+                description:
+                  '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
+              },
+            ];
+
+      setSegments(updatedSegments);
       setCurrentSegmentIndex(0);
       setTrimValues([0, 100]);
-      generateThumbnails(); // 生成縮圖
+
+      // 生成縮圖
+      generateThumbnails();
     }
   };
 
@@ -508,6 +558,13 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
    * 驗證所有欄位
    */
   const validateForm = (): boolean => {
+    console.log('驗證表單：', {
+      videoFile: !!videoFile,
+      segments: segments.length,
+      currentSegmentIndex,
+      hasDescription: segments[currentSegmentIndex]?.description?.length || 0,
+    });
+
     const newErrors: {
       video?: string;
       description?: string;
@@ -519,30 +576,85 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     }
 
     // 驗證說明文字
-    const currentDescription = segments[currentSegmentIndex]?.description || '';
-    if (!currentDescription || currentDescription.trim().length < 10) {
-      newErrors.description = '說明文字至少需要10個字';
+    // 只有在有片段且影片已上傳的情況下才檢查說明文字
+    if (segments.length > 0 && videoFile) {
+      const currentDescription =
+        segments[currentSegmentIndex]?.description?.trim() || '';
+      if (currentDescription.length < 10) {
+        newErrors.description = '說明文字至少需要10個字';
+      }
     }
 
+    console.log('驗證結果：', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    // 再次確認設置後的錯誤數量
+    const errorCount = Object.keys(newErrors).length;
+    console.log(`驗證完成，錯誤數量: ${errorCount}`);
+
+    return errorCount === 0;
   };
 
   /**
    * 完成剪輯並提交
    */
-  const atSubmit = () => {
+  const atSubmit = async () => {
     setIsSubmitting(true);
+    setApiError(null);
 
     // 驗證所有欄位
     const isValid = validateForm();
 
     if (isValid && videoFile) {
-      onSave({
-        file: videoFile,
-        segments,
-        description: segments[currentSegmentIndex]?.description,
-      });
+      try {
+        // 確認 recipeId 存在
+        if (!recipeId) {
+          throw new Error('無法取得食譜 ID，請回到步驟一重新開始');
+        }
+
+        // 先告知父元件已完成剪輯
+        onSave({
+          file: videoFile,
+          segments,
+          description: segments[currentSegmentIndex]?.description,
+        });
+
+        // 上傳影片到 API
+        console.log(`開始上傳影片至食譜 ID: ${recipeId}`);
+        const response = await uploadRecipeVideo(
+          parseInt(recipeId as string, 10),
+          videoFile,
+        );
+
+        console.log('影片上傳回應:', response);
+
+        // 檢查回應是否成功
+        if (response.message && !response.videoUri) {
+          throw new Error(response.message);
+        }
+
+        // 上傳成功，導向到食譜草稿頁面
+        console.log('影片上傳成功，導向到草稿頁面');
+        router.push(`/recipe-draft?recipeId=${recipeId}`);
+      } catch (error) {
+        console.error('影片上傳失敗:', error);
+        setApiError(
+          error instanceof Error ? error.message : '影片上傳失敗，請稍後再試',
+        );
+
+        // 滾動到錯誤訊息
+        setTimeout(() => {
+          const errorElement = document.querySelector('.api-error');
+          if (errorElement) {
+            errorElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+          }
+        }, 100);
+
+        setIsSubmitting(false);
+      }
     } else {
       // 驗證失敗，滾動到第一個錯誤
       setTimeout(() => {
@@ -551,9 +663,9 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 100);
-    }
 
-    setIsSubmitting(false);
+      setIsSubmitting(false);
+    }
   };
 
   /**
@@ -633,20 +745,20 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
           {/* 影片預覽 */}
           <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              className="w-full h-full object-contain"
-              onLoadedMetadata={atVideoLoaded}
-              onTimeUpdate={atTimeUpdate}
-              onClick={atTogglePlayPause}
-            >
-              <track kind="captions" src="" label="中文" default />
-              您的瀏覽器不支援影片標籤
-            </video>
-
-            {!videoUrl && (
-              <div className="absolute inset-0 flex items-center justify-center">
+            {videoUrl ? (
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="w-full h-full object-contain"
+                onLoadedMetadata={atVideoLoaded}
+                onTimeUpdate={atTimeUpdate}
+                onClick={atTogglePlayPause}
+              >
+                <track kind="captions" label="中文" default />
+                您的瀏覽器不支援影片標籤
+              </video>
+            ) : (
+              <div className="flex items-center justify-center h-full">
                 <ImageIcon
                   className="h-12 w-12 text-gray-400"
                   aria-hidden="true"
@@ -867,17 +979,22 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           <div className="mt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
               說明文字 (步驟 {currentSegmentIndex + 1})
+              <span className="ml-2 text-xs text-gray-500">
+                {segments[currentSegmentIndex]?.description?.trim().length || 0}
+                /10 字元
+              </span>
             </h3>
             <textarea
               value={segments[currentSegmentIndex]?.description || ''}
               onChange={atDescriptionChange}
+              onBlur={() => validateForm()}
               className={cn(
                 'w-full p-2 text-sm border rounded-md min-h-[80px] resize-none',
                 errors.description
                   ? 'border-red-500 bg-red-50'
                   : 'border-gray-300 text-gray-600',
               )}
-              placeholder="請輸入此步驟的說明文字..."
+              placeholder="請輸入此步驟的說明文字，至少需要10個字元..."
             />
             {errors.description && (
               <div className="text-red-500 text-sm mt-1 flex items-center error-message">
@@ -897,13 +1014,111 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             重置
           </Button>
 
+          {/* API 錯誤訊息 */}
+          {apiError && (
+            <div className="text-red-500 text-sm p-2 bg-red-50 border border-red-300 rounded-md flex items-center api-error">
+              <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
+              {apiError}
+            </div>
+          )}
+
+          {/* Debug 按鈕 - 開發環境使用 */}
+          {process.env.NODE_ENV === 'development' && (
+            <Button
+              onClick={() => {
+                console.log('Debug 資訊:', {
+                  videoFile: !!videoFile,
+                  videoUrl: !!videoUrl,
+                  segments: segments.length > 0 ? segments.length : '無片段',
+                  currentSegmentIndex,
+                  errors: Object.keys(errors).length > 0 ? errors : '無錯誤',
+                  isSubmitting,
+                  recipeId,
+                  description:
+                    segments[currentSegmentIndex]?.description || '無說明文字',
+                  descriptionLength:
+                    segments[currentSegmentIndex]?.description?.trim().length ||
+                    0,
+                });
+
+                // 強制清除所有錯誤
+                setErrors({});
+
+                // 如果沒有片段但有影片，創建一個預設片段
+                if (segments.length === 0 && videoFile) {
+                  const initialSegment: Segment = {
+                    id: generateId(),
+                    startTime: 0,
+                    endTime: duration,
+                    startPercent: 0,
+                    endPercent: 100,
+                    description:
+                      '這是一段預設的說明文字，至少包含十個字元以上。這應該足以通過驗證了。',
+                  };
+                  setSegments([initialSegment]);
+                  setCurrentSegmentIndex(0);
+                } else if (segments.length > 0) {
+                  // 確保現有片段說明文字足夠長
+                  const updatedSegments = [...segments];
+                  if (
+                    !updatedSegments[currentSegmentIndex]?.description ||
+                    updatedSegments[currentSegmentIndex].description.trim()
+                      .length < 10
+                  ) {
+                    updatedSegments[currentSegmentIndex] = {
+                      ...updatedSegments[currentSegmentIndex],
+                      description:
+                        '這是一段預設的說明文字，至少包含十個字元以上。這應該足以通過驗證了。',
+                    };
+                    setSegments(updatedSegments);
+                  }
+                }
+
+                // 延遲重新驗證以確保狀態更新完成
+                setTimeout(() => {
+                  const valid = validateForm();
+                  console.log('重新驗證結果:', valid);
+                  if (!valid) {
+                    console.log('驗證仍然失敗，再次強制清除錯誤');
+                    setErrors({});
+                  }
+                }, 100);
+              }}
+              variant="outline"
+              className="w-full bg-yellow-50 text-yellow-700 border-yellow-300"
+            >
+              Debug 工具 (重置錯誤狀態)
+            </Button>
+          )}
+
           {/* 按鈕群組 */}
           <div className="flex gap-3 mt-6">
             <Button onClick={atCancel} variant="outline" className="w-1/2">
               取消
             </Button>
             <Button
-              onClick={atSubmit}
+              onClick={() => {
+                // 先檢查文字字數，如果已達標準但按鈕仍禁用，強制清除錯誤
+                const currentDescription =
+                  segments[currentSegmentIndex]?.description?.trim() || '';
+                if (
+                  currentDescription.length >= 10 &&
+                  Object.keys(errors).length > 0
+                ) {
+                  console.log('文字已符合標準但按鈕仍禁用，強制清除錯誤');
+                  setErrors({});
+                  setTimeout(() => atSubmit(), 50);
+                } else {
+                  console.log('嘗試提交，當前按鈕狀態:', {
+                    disabled: isSubmitting || Object.keys(errors).length > 0,
+                    isSubmitting,
+                    errorsCount: Object.keys(errors).length,
+                    errors,
+                    descriptionLength: currentDescription.length,
+                  });
+                  atSubmit();
+                }
+              }}
               disabled={isSubmitting || Object.keys(errors).length > 0}
               variant={
                 isSubmitting || Object.keys(errors).length > 0
@@ -912,10 +1127,36 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
               }
               className="w-1/2"
             >
-              <Check className="h-5 w-5 mr-2" />
-              完成
+              {isSubmitting ? (
+                '上傳中...'
+              ) : (
+                <>
+                  <Check className="h-5 w-5 mr-2" />
+                  完成
+                </>
+              )}
             </Button>
           </div>
+
+          {/* 強制重設狀態按鈕 - 當文字已足夠但按鈕仍然禁用時使用 */}
+          {Object.keys(errors).length > 0 &&
+            segments[currentSegmentIndex]?.description?.trim().length >= 10 && (
+              <Button
+                onClick={() => {
+                  console.log('強制重設狀態並提交');
+                  setErrors({});
+                  setTimeout(() => {
+                    if (Object.keys(errors).length === 0) {
+                      atSubmit();
+                    }
+                  }, 100);
+                }}
+                variant="default"
+                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white"
+              >
+                強制繼續 (狀態已修復)
+              </Button>
+            )}
         </div>
       )}
     </div>
