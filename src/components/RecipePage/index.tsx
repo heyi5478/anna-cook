@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Clock, Star, MessageSquare, Share2, ThumbsUp } from 'lucide-react';
+import { Clock, Star, MessageSquare, Share2, Bookmark } from 'lucide-react';
 
 // 引入 UI 元件
 import { Button } from '@/components/ui/button';
@@ -328,12 +328,12 @@ export default function RecipePage() {
                 liked && interactionButtonStyles({ state: 'active' }),
               )}
               onClick={atLikeClick}
-              aria-label="點讚"
+              aria-label="點收藏"
             >
-              <ThumbsUp
+              <Bookmark
                 className={`w-5 h-5 ${liked ? 'fill-[#FF5722] text-[#FF5722]' : ''}`}
               />
-              <span>讚</span>
+              <span>收藏</span>
             </button>
             <button
               className={cn(
