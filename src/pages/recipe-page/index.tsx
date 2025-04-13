@@ -1,5 +1,6 @@
 import { NextPage } from 'next';
 import { ProductCard } from '@/components/ui/adCard';
+import Review from '@/components/RecipePage/Review';
 
 const RecipePage: NextPage = () => {
   return (
@@ -11,6 +12,7 @@ const RecipePage: NextPage = () => {
         price={120}
         imageUrl="/Rectangle 70.png"
       />
+      <Review />
     </div>
   );
 };
