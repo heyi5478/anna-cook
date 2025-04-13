@@ -1,11 +1,10 @@
 import type React from 'react';
 
 import { useState } from 'react';
-import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar } from '@/components/ui/avatar';
 import { StarRating } from '@/components/RecipePage/StarRating';
+import { ReviewDisplay } from '@/components/RecipePage/ReviewDisplay';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -101,18 +100,42 @@ export default function Review() {
                 <FormField
                   control={form.control}
                   name="comment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          placeholder="詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！"
-                          className="min-h-[120px] text-base"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    // 擷取 field 的 onBlur 函式
+                    const { onBlur: fieldOnBlur, ...restField } = field;
+
+                    return (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder="詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！"
+                            className="min-h-[120px] text-base"
+                            onFocus={(e) => {
+                              // 實現自動聚焦並清空預設文字的功能
+                              if (
+                                e.target.value === field.value &&
+                                field.value === ''
+                              ) {
+                                e.target.placeholder = '';
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // 呼叫原始的 onBlur 處理器
+                              fieldOnBlur();
+
+                              // 失去焦點時，如果文字框為空，則恢復預設提示文字
+                              if (field.value === '') {
+                                e.target.placeholder =
+                                  '詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！';
+                              }
+                            }}
+                            {...restField}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <Button
@@ -151,25 +174,11 @@ export default function Review() {
               ratingTitle="您的評價"
             />
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-start gap-3">
-                <Avatar className="h-12 w-12 bg-gray-300">
-                  <span className="sr-only">{review.username}</span>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-medium">{review.username}</h3>
-                  <p className="mt-2 text-gray-700">
-                    {review.comment ||
-                      '詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！食譜料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！'}
-                  </p>
-
-                  <div className="flex items-center justify-end mt-3">
-                    <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
-                    <span className="ml-1 text-sm">{review.userRating}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ReviewDisplay
+              comment={review.comment}
+              username={review.username}
+              userRating={review.userRating}
+            />
 
             <Button
               onClick={() => {
