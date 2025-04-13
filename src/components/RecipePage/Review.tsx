@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
 
-// 定義評論介面
+// 定義評論類型
 type Review = {
   rating: number;
   comment: string;
@@ -14,6 +14,9 @@ type Review = {
   userRating?: number;
 };
 
+/**
+ * 食譜評論元件，提供使用者評分和評論功能
+ */
 export default function Review() {
   // 狀態管理
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -24,17 +27,28 @@ export default function Review() {
     userRating: 4.3,
   });
 
-  // 處理評論提交
-  const handleSubmit = (e: React.FormEvent) => {
+  /**
+   * 處理評論提交
+   */
+  const atSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (review.comment.trim()) {
       setIsSubmitted(true);
     }
   };
 
-  // 處理評論內容變更
-  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  /**
+   * 處理評論內容變更
+   */
+  const atCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReview({ ...review, comment: e.target.value });
+  };
+
+  /**
+   * 處理評分變更
+   */
+  const atRatingChange = (rating: number) => {
+    setReview((prev) => ({ ...prev, rating }));
   };
 
   return (
@@ -49,7 +63,7 @@ export default function Review() {
                   <button
                     key={star}
                     type="button"
-                    onClick={() => setReview({ ...review, rating: star })}
+                    onClick={() => atRatingChange(star)}
                     className="focus:outline-none"
                     aria-label={`評分 ${star} 星`}
                   >
@@ -73,11 +87,11 @@ export default function Review() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={atSubmit} className="space-y-4">
               <Textarea
                 placeholder="詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！"
                 value={review.comment}
-                onChange={handleCommentChange}
+                onChange={atCommentChange}
                 className="min-h-[120px] text-base"
                 required
               />
