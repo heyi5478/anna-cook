@@ -5,6 +5,7 @@ import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
+import { StarRating } from '@/components/RecipePage/StarRating';
 
 // 定義評論類型
 type Review = {
@@ -57,35 +58,13 @@ export default function Review() {
         {!isSubmitted ? (
           // 未提交狀態 - 評論表單
           <div className="space-y-6">
-            <div className="flex justify-between w-full">
-              <div className="flex items-center space-x-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => atRatingChange(star)}
-                    className="focus:outline-none"
-                    aria-label={`評分 ${star} 星`}
-                  >
-                    <Star
-                      className={`w-10 h-10 ${
-                        star <= review.rating
-                          ? 'text-orange-600 fill-orange-600'
-                          : 'text-orange-600'
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-              <div className="flex flex-col items-center justify-center">
-                <h2 className="text-xl font-medium text-center mb-1">
-                  您的評價
-                </h2>
-                <span className="text-xl font-medium self-end">
-                  {review.rating}
-                </span>
-              </div>
-            </div>
+            <StarRating
+              rating={review.rating}
+              onRatingChange={atRatingChange}
+              size="lg"
+              showRating
+              ratingTitle="您的評價"
+            />
 
             <form onSubmit={atSubmit} className="space-y-4">
               <Textarea
@@ -122,28 +101,13 @@ export default function Review() {
         ) : (
           // 已提交狀態 - 顯示評論
           <div className="space-y-6">
-            <div className="flex justify-between w-full">
-              <div className="flex items-center space-x-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`w-10 h-10 ${
-                      star <= review.rating
-                        ? 'text-orange-600 fill-orange-600'
-                        : 'text-orange-600'
-                    }`}
-                  />
-                ))}
-              </div>
-              <div className="flex flex-col items-center justify-center">
-                <h2 className="text-xl font-medium text-center mb-1">
-                  您的評價
-                </h2>
-                <span className="text-xl font-medium self-end">
-                  {review.rating}
-                </span>
-              </div>
-            </div>
+            <StarRating
+              rating={review.rating}
+              size="lg"
+              readOnly
+              showRating
+              ratingTitle="您的評價"
+            />
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-start gap-3">
