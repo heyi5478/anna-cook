@@ -1,17 +1,20 @@
 import { NextPage } from 'next';
-import { ProductCard } from '@/components/ui/adCard';
+import Head from 'next/head';
+import RecipePageComponent from '@/components/RecipePage';
 
 const RecipePage: NextPage = () => {
   return (
-    <div className="grid gap-6">
-      <ProductCard
-        id="1"
-        name="金蘭醬油"
-        description="廣告敘述廣告敘述，廣告敘述廣告敘述，廣告敘述廣告敘述，廣告敘述廣告敘述，廣告敘述廣告敘述"
-        price={120}
-        imageUrl="/Rectangle 70.png"
-      />
-    </div>
+    <>
+      <Head>
+        <title>家傳滷五花肉 - 食譜詳情</title>
+        <meta
+          name="description"
+          content="美味的家傳滷五花肉食譜，簡單易做，香氣四溢"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <RecipePageComponent />
+    </>
   );
 };
 
