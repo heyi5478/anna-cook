@@ -6,11 +6,31 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
 import { StarRating } from '@/components/RecipePage/StarRating';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+
+// 定義表單 schema
+const reviewSchema = z.object({
+  rating: z.number().min(1).max(5),
+  comment: z
+    .string()
+    .min(10, { message: '評論內容至少需要 10 個字' })
+    .max(500, { message: '評論內容不可超過 500 個字' }),
+});
+
+// 定義表單類型
+type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 // 定義評論類型
-type Review = {
-  rating: number;
-  comment: string;
+type Review = ReviewFormValues & {
   username?: string;
   userRating?: number;
 };
@@ -29,27 +49,25 @@ export default function Review() {
   });
 
   /**
+   * 設定表單
+   */
+  const form = useForm<ReviewFormValues>({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: {
+      rating: 5,
+      comment: '',
+    },
+  });
+
+  /**
    * 處理評論提交
    */
-  const atSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (review.comment.trim()) {
-      setIsSubmitted(true);
-    }
-  };
-
-  /**
-   * 處理評論內容變更
-   */
-  const atCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setReview({ ...review, comment: e.target.value });
-  };
-
-  /**
-   * 處理評分變更
-   */
-  const atRatingChange = (rating: number) => {
-    setReview((prev) => ({ ...prev, rating }));
+  const atSubmit = (data: ReviewFormValues) => {
+    setReview((prev) => ({
+      ...prev,
+      ...data,
+    }));
+    setIsSubmitted(true);
   };
 
   return (
@@ -58,45 +76,69 @@ export default function Review() {
         {!isSubmitted ? (
           // 未提交狀態 - 評論表單
           <div className="space-y-6">
-            <StarRating
-              rating={review.rating}
-              onRatingChange={atRatingChange}
-              size="lg"
-              showRating
-              ratingTitle="您的評價"
-            />
-
-            <form onSubmit={atSubmit} className="space-y-4">
-              <Textarea
-                placeholder="詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！"
-                value={review.comment}
-                onChange={atCommentChange}
-                className="min-h-[120px] text-base"
-                required
-              />
-              <Button
-                type="submit"
-                variant="outline"
-                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 flex items-center justify-center gap-2"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(atSubmit)}
+                className="space-y-4"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-700"
+                <FormField
+                  control={form.control}
+                  name="rating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <StarRating
+                        rating={field.value}
+                        onRatingChange={(rating) => field.onChange(rating)}
+                        size="lg"
+                        showRating
+                        ratingTitle="您的評價"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！"
+                          className="min-h-[120px] text-base"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 flex items-center justify-center gap-2"
                 >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-                提交留言
-              </Button>
-            </form>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-gray-700"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                  提交留言
+                </Button>
+              </form>
+            </Form>
           </div>
         ) : (
           // 已提交狀態 - 顯示評論
@@ -130,7 +172,10 @@ export default function Review() {
             </div>
 
             <Button
-              onClick={() => setIsSubmitted(false)}
+              onClick={() => {
+                form.reset();
+                setIsSubmitted(false);
+              }}
               variant="outline"
               className="w-full"
             >
