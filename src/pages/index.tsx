@@ -191,20 +191,13 @@ export default function HomePage() {
     console.log('Search submitted:', query);
   };
 
-  /**
-   * 處理登入按鈕點擊事件
-   */
-  const atLoginClick = () => {
-    console.log('Login clicked');
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header
-        logoText="Logo"
+        variant="default"
+        size="lg"
         atMenuClick={atMenuClick}
         atSearchSubmit={atSearchSubmit}
-        atLoginClick={atLoginClick}
       />
 
       {/* 頁面其他內容將在這裡 */}
