@@ -1,139 +1,113 @@
-import type React from 'react';
-import { useState } from 'react';
-import { Edit, Check, X } from 'lucide-react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-
-const cookingInfoVariants = cva('flex-1', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-    variant: {
-      default: 'bg-white',
-      outline: 'border rounded-md p-3',
-      ghost: 'bg-transparent',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    variant: 'default',
-  },
-});
+import { Input } from '@/components/ui/input';
+import { Check, Edit } from 'lucide-react';
 
 type CookingInfoProps = {
-  title: string;
-  value: string;
-  onSave?: (newValue: string) => void;
-} & VariantProps<typeof cookingInfoVariants> &
-  React.HTMLAttributes<HTMLDivElement>;
+  cookingTimeValue: string;
+  cookingTimeUnit: string;
+  cookingTime: string;
+  servingsValue: string;
+  servingsUnit: string;
+  servings: string;
+  isEditingCookingTime: boolean;
+  isEditingServings: boolean;
+  onUpdateCookingTimeValue: (value: string) => void;
+  onUpdateServingsValue: (value: string) => void;
+  onToggleEditCookingTime: () => void;
+  onToggleEditServings: () => void;
+};
 
 /**
- * 顯示烹飪相關資訊（時間或人數），支持編輯功能
+ * 烹飪資訊元件 - 顯示與編輯烹飪時間和適合份量
  */
-export const CookingInfo: React.FC<CookingInfoProps> = ({
-  title,
-  value,
-  size,
-  variant,
-  className,
-  onSave,
-  ...props
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedValue, setEditedValue] = useState(value);
-
+export const CookingInfo = ({
+  cookingTimeValue,
+  cookingTimeUnit,
+  cookingTime,
+  servingsValue,
+  servingsUnit,
+  servings,
+  isEditingCookingTime,
+  isEditingServings,
+  onUpdateCookingTimeValue,
+  onUpdateServingsValue,
+  onToggleEditCookingTime,
+  onToggleEditServings,
+}: CookingInfoProps) => {
   /**
-   * 處理編輯按鈕點擊事件
+   * 渲染時間編輯區塊
    */
-  const atEditClick = () => {
-    setIsEditing(true);
+  const renderTimeEditSection = () => {
+    return isEditingCookingTime ? (
+      <div className="flex items-center border rounded overflow-hidden">
+        <Input
+          type="text"
+          value={cookingTimeValue}
+          onChange={(e) => onUpdateCookingTimeValue(e.target.value)}
+          className="border-0 flex-1"
+          autoFocus
+        />
+        <div className="px-3 py-2 bg-gray-100 text-gray-500">
+          {cookingTimeUnit}
+        </div>
+      </div>
+    ) : (
+      <div className="p-2 bg-white border rounded">{cookingTime}</div>
+    );
   };
 
   /**
-   * 處理取消編輯事件
+   * 渲染份量編輯區塊
    */
-  const atCancelEdit = () => {
-    setIsEditing(false);
-    setEditedValue(value);
-  };
-
-  /**
-   * 處理保存編輯事件
-   */
-  const atSaveEdit = () => {
-    setIsEditing(false);
-    if (onSave) {
-      onSave(editedValue);
-    }
-  };
-
-  /**
-   * 處理輸入值變更事件
-   */
-  const atValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedValue(e.target.value);
+  const renderServingsEditSection = () => {
+    return isEditingServings ? (
+      <div className="flex items-center border rounded overflow-hidden">
+        <Input
+          type="text"
+          value={servingsValue}
+          onChange={(e) => onUpdateServingsValue(e.target.value)}
+          className="border-0 flex-1"
+          autoFocus
+        />
+        <div className="px-3 py-2 bg-gray-100 text-gray-500">
+          {servingsUnit}
+        </div>
+      </div>
+    ) : (
+      <div className="p-2 bg-white border rounded">{servings}</div>
+    );
   };
 
   return (
-    <div
-      className={cn(cookingInfoVariants({ size, variant }), className)}
-      {...props}
-    >
-      <h3
-        className={cn('font-medium mb-1', {
-          'text-xs': size === 'sm',
-          'text-sm': size === 'md',
-          'text-base': size === 'lg',
-        })}
-      >
-        {title}
-      </h3>
-      {!isEditing ? (
-        <div className="flex justify-between items-center">
-          <span
-            className={cn({
-              'text-xs': size === 'sm',
-              'text-sm': size === 'md',
-              'text-base': size === 'lg',
-            })}
-          >
-            {value}
-          </span>
-          <button type="button" className="p-1" onClick={atEditClick}>
-            <Edit size={16} />
+    <div className="flex mb-4 space-x-4">
+      {/* 烹飪時間區塊 */}
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-medium">烹飪時間</h2>
+          <button className="p-1" onClick={onToggleEditCookingTime}>
+            {isEditingCookingTime ? (
+              <Check className="w-4 h-4 text-green-500" />
+            ) : (
+              <Edit className="w-4 h-4" />
+            )}
           </button>
         </div>
-      ) : (
-        <div className="flex space-x-1">
-          <input
-            type="text"
-            className={cn('flex-1 p-1 border rounded', {
-              'text-xs': size === 'sm',
-              'text-sm': size === 'md',
-              'text-base': size === 'lg',
-            })}
-            value={editedValue}
-            onChange={atValueChange}
-          />
-          <button
-            type="button"
-            className="p-1 text-green-600"
-            onClick={atSaveEdit}
-          >
-            <Check size={16} />
-          </button>
-          <button
-            type="button"
-            className="p-1 text-red-600"
-            onClick={atCancelEdit}
-          >
-            <X size={16} />
+        {renderTimeEditSection()}
+      </div>
+
+      {/* 適合人份區塊 */}
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-medium">適合人份</h2>
+          <button className="p-1" onClick={onToggleEditServings}>
+            {isEditingServings ? (
+              <Check className="w-4 h-4 text-green-500" />
+            ) : (
+              <Edit className="w-4 h-4" />
+            )}
           </button>
         </div>
-      )}
+        {renderServingsEditSection()}
+      </div>
     </div>
   );
 };

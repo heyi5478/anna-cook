@@ -1,139 +1,56 @@
-import type React from 'react';
-import { useState } from 'react';
-import { Edit, Check, X } from 'lucide-react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-
-const editableSectionVariants = cva('relative', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-    variant: {
-      default: 'bg-white',
-      outline: 'border rounded-md p-3',
-      ghost: 'bg-transparent',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    variant: 'default',
-  },
-});
+import type { ReactNode } from 'react';
+import { Check, Edit } from 'lucide-react';
 
 type EditableSectionProps = {
   title: string;
-  content: string;
-  onSave?: (newContent: string) => void;
-} & VariantProps<typeof editableSectionVariants> &
-  React.HTMLAttributes<HTMLDivElement>;
+  isEditing: boolean;
+  onToggleEdit: () => void;
+  editView: ReactNode;
+  displayView: ReactNode;
+};
 
 /**
- * 可編輯的內容區塊，點擊編輯按鈕後可以進行內容編輯
+ * 可編輯區塊元件 - 提供一個可切換編輯/顯示模式的通用容器
+ * 適用於需要內容可編輯功能的區塊，如標題、描述等
  */
-export const EditableSection: React.FC<EditableSectionProps> = ({
+export const EditableSection = ({
   title,
-  content,
-  size,
-  variant,
-  className,
-  onSave,
-  ...props
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState(content);
-
+  isEditing,
+  onToggleEdit,
+  editView,
+  displayView,
+}: EditableSectionProps) => {
   /**
-   * 處理編輯按鈕點擊事件
+   * 渲染編輯/儲存按鈕
    */
-  const atEditClick = () => {
-    setIsEditing(true);
-  };
-
-  /**
-   * 處理取消編輯事件
-   */
-  const atCancelEdit = () => {
-    setIsEditing(false);
-    setEditedContent(content);
-  };
-
-  /**
-   * 處理保存編輯事件
-   */
-  const atSaveEdit = () => {
-    setIsEditing(false);
-    if (onSave) {
-      onSave(editedContent);
-    }
-  };
-
-  /**
-   * 處理文本內容變更事件
-   */
-  const atContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedContent(e.target.value);
+  const renderActionButton = () => {
+    return (
+      <button
+        className="p-1"
+        onClick={onToggleEdit}
+        aria-label={isEditing ? '儲存' : '編輯'}
+      >
+        {isEditing ? (
+          <Check className="w-4 h-4 text-green-500" />
+        ) : (
+          <Edit className="w-4 h-4" />
+        )}
+      </button>
+    );
   };
 
   return (
-    <div
-      className={cn(editableSectionVariants({ size, variant }), className)}
-      {...props}
-    >
-      <div className="flex justify-between items-start">
-        <h3
-          className={cn('font-medium mb-1', {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
-        >
-          {title}
-        </h3>
-        {!isEditing ? (
-          <button type="button" className="p-1" onClick={atEditClick}>
-            <Edit size={16} />
-          </button>
-        ) : (
-          <div className="flex space-x-1">
-            <button
-              type="button"
-              className="p-1 text-green-600"
-              onClick={atSaveEdit}
-            >
-              <Check size={16} />
-            </button>
-            <button
-              type="button"
-              className="p-1 text-red-600"
-              onClick={atCancelEdit}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
+    <div className="mb-4">
+      {/* 標題列與動作按鈕 */}
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-medium">{title}</h2>
+        {renderActionButton()}
       </div>
 
-      {!isEditing ? (
-        <p
-          className={cn('text-gray-700', {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-base': size === 'lg',
-          })}
-        >
-          {content}
-        </p>
-      ) : (
-        <textarea
-          className="w-full p-2 border rounded"
-          value={editedContent}
-          onChange={atContentChange}
-          rows={3}
-        />
-      )}
+      {/* 內容區域 - 根據狀態顯示編輯或顯示視圖 */}
+      <div className="content-container">
+        {isEditing ? editView : displayView}
+      </div>
     </div>
   );
 };

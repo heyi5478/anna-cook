@@ -4,7 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import StepIndicator from '@/components/ui/StepIndicator';
+import { updateRecipeStep2, type RecipeStep2Data } from '@/services/api';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -18,6 +20,7 @@ const recipeStep2Schema = z.object({
         name: z.string().min(1, { message: '請輸入食材名稱' }),
         amount: z.string().min(1, { message: '請輸入數量' }),
         unit: z.string().optional(),
+        isFlavoring: z.boolean().default(false),
       }),
     )
     .min(1, { message: '至少需要一項食材' }),
@@ -37,8 +40,22 @@ const recipeStep2Schema = z.object({
 type RecipeStep2Values = z.infer<typeof recipeStep2Schema>;
 
 export default function RecipeUploadStep2() {
+  // 初始化路由器取得 recipeId
+  const router = useRouter();
+  const { recipeId } = router.query;
+
+  // 設定載入狀態
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 設定錯誤訊息
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   // 設定目前步驟狀態
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep] = useState(2);
+
+  // 設定自訂標籤
+  const [customTag, setCustomTag] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
 
   // 初始化 react-hook-form
   const {
@@ -52,7 +69,9 @@ export default function RecipeUploadStep2() {
       recipeTitle: '馬鈴薯燉肉',
       recipeDescription:
         '食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！',
-      ingredients: [{ name: '馬鈴薯', amount: '2', unit: '顆' }],
+      ingredients: [
+        { name: '馬鈴薯', amount: '2', unit: '顆', isFlavoring: false },
+      ],
       seasonings: [{ name: '初榨醬油', amount: '1', unit: '小匙' }],
       cookingTime: '120',
       servings: '4',
@@ -79,20 +98,117 @@ export default function RecipeUploadStep2() {
     name: 'seasonings',
   });
 
-  // 處理表單提交
-  const atSubmit = (data: RecipeStep2Values) => {
-    console.log('表單資料:', data);
-    setCurrentStep(3);
+  /**
+   * 處理表單提交
+   */
+  const atSubmit = async (data: RecipeStep2Values) => {
+    // 清除先前的錯誤訊息
+    setErrorMsg(null);
+
+    try {
+      setIsLoading(true);
+
+      if (!recipeId) {
+        setErrorMsg('無法取得食譜 ID，請回到步驟一重新開始');
+        return;
+      }
+
+      console.log('表單資料:', data);
+
+      // 將表單資料轉換為 API 需要的格式
+      const apiData: RecipeStep2Data = {
+        recipeIntro: data.recipeDescription,
+        cookingTime: parseInt(data.cookingTime, 10),
+        portion: parseInt(data.servings, 10),
+        ingredients: [
+          // 將食材和調料合併，並區分 isFlavoring
+          ...data.ingredients.map((item) => ({
+            ingredientName: item.name,
+            ingredientAmount: parseFloat(item.amount),
+            ingredientUnit: item.unit || '',
+            isFlavoring: false,
+          })),
+          ...data.seasonings.map((item) => ({
+            ingredientName: item.name,
+            ingredientAmount: parseFloat(item.amount),
+            ingredientUnit: item.unit || '',
+            isFlavoring: true,
+          })),
+        ],
+        tags: tags.length > 0 ? tags : undefined,
+      };
+
+      console.log('API 請求資料:', apiData);
+
+      // 呼叫 API 更新食譜詳細資訊
+      const result = await updateRecipeStep2(
+        parseInt(recipeId as string, 10),
+        apiData,
+      );
+
+      console.log('API 回應結果:', result);
+
+      if (result && result.StatusCode === 200) {
+        // 更新成功後跳轉到步驟3頁面
+        console.log('更新成功，跳轉到上傳影片頁面');
+        router.push({
+          pathname: '/upload-video',
+          query: { recipeId: result.Id },
+        });
+      } else {
+        // API 回傳錯誤
+        console.error('API 回傳錯誤:', result);
+        setErrorMsg(result?.msg || '更新失敗，請稍後再試');
+      }
+    } catch (error) {
+      console.error('更新食譜詳細資訊發生異常:', error);
+      setErrorMsg(
+        error instanceof Error ? error.message : '更新過程中發生錯誤',
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 添加新食材
   const atAddIngredient = () => {
-    appendIngredient({ name: '', amount: '', unit: '' });
+    appendIngredient({ name: '', amount: '', unit: '', isFlavoring: false });
   };
 
   // 添加新調料
   const atAddSeasoning = () => {
     appendSeasoning({ name: '', amount: '', unit: '' });
+  };
+
+  /**
+   * 添加標籤
+   */
+  const atAddTag = () => {
+    if (
+      customTag.trim() &&
+      !tags.includes(customTag.trim()) &&
+      tags.length < 5
+    ) {
+      setTags([...tags, customTag.trim()]);
+      setCustomTag('');
+    }
+  };
+
+  /**
+   * 移除標籤
+   */
+  const atRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  /**
+   * 處理標籤輸入按 Enter 鍵
+   */
+  const atTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      atAddTag();
+    }
   };
 
   return (
@@ -112,6 +228,13 @@ export default function RecipeUploadStep2() {
 
       {/* 步驟指示器 */}
       <StepIndicator currentStep={currentStep} />
+
+      {/* 錯誤訊息顯示 */}
+      {errorMsg && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-600 rounded-md">
+          {errorMsg}
+        </div>
+      )}
 
       {/* 表單 */}
       <form onSubmit={handleSubmit(atSubmit)}>
@@ -345,15 +468,64 @@ export default function RecipeUploadStep2() {
         {/* 食譜標籤 */}
         <div className="mb-6">
           <h2 className="text-lg font-medium mb-2">食譜標籤</h2>
-          <div className="bg-gray-200 p-3 rounded-md">
+          <div className="bg-gray-50 p-3 rounded-md border border-gray-300">
             <div className="flex justify-between items-center mb-2">
-              <span>增加新標籤 (0/5)</span>
+              <span>增加新標籤 ({tags.length}/5)</span>
             </div>
-            <input
-              type="text"
-              placeholder="輸入自訂標籤"
-              className="w-full p-2 border border-gray-300 rounded-md bg-white"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="輸入自訂標籤"
+                className="flex-1 p-2 border border-gray-300 rounded-md bg-white"
+                value={customTag}
+                onChange={(e) => setCustomTag(e.target.value)}
+                onKeyDown={atTagKeyDown}
+                disabled={tags.length >= 5}
+              />
+              <button
+                type="button"
+                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
+                onClick={atAddTag}
+                disabled={!customTag.trim() || tags.length >= 5}
+              >
+                新增
+              </button>
+            </div>
+
+            {/* 已新增的標籤 */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {tags.map((tag) => (
+                  <div
+                    key={tag}
+                    className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full flex items-center"
+                  >
+                    <span>{tag}</span>
+                    <button
+                      type="button"
+                      className="ml-1 text-gray-500"
+                      onClick={() => atRemoveTag(tag)}
+                      aria-label={`移除標籤 ${tag}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -417,9 +589,15 @@ export default function RecipeUploadStep2() {
         {/* 下一步按鈕 */}
         <button
           type="submit"
-          className="w-full py-3 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition-colors"
+          disabled={isLoading}
+          className={cn(
+            'w-full py-3 text-white rounded-md transition-colors',
+            isLoading
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-gray-400 hover:bg-gray-500',
+          )}
         >
-          下一步
+          {isLoading ? '提交中...' : '下一步'}
         </button>
       </form>
     </div>

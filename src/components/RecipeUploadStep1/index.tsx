@@ -1,18 +1,50 @@
 import type React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { uploadRecipeBasic, type RecipeFormData } from '@/services/api';
 import StepIndicator from '@/components/ui/StepIndicator';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
   recipeName: z.string().min(2, { message: '食譜名稱至少需要 2 個字元' }),
-  coverImage: z.any().optional(),
+  // 使用自定義驗證器而非 refine 來處理檔案上傳
+  coverImage: z
+    .any()
+    .optional()
+    .superRefine((value, ctx) => {
+      // 這個檢查會在 UI 上處理，而不是依賴 Zod
+      if (!value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '請上傳封面圖片',
+        });
+        return;
+      }
+
+      // 檢查是否為有效的 File 物件
+      if (!(value instanceof File)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '請選擇有效的圖片檔案',
+        });
+        return;
+      }
+
+      // 檢查檔案類型
+      const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!validFileTypes.includes(value.type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '僅支援 JPG, JPEG 與 PNG 格式的圖片',
+        });
+      }
+    }),
   agreement: z.literal(true, {
     errorMap: () => ({ message: '請同意條款才能繼續' }),
   }),
@@ -22,11 +54,17 @@ const recipeFormSchema = z.object({
 type RecipeFormValues = z.infer<typeof recipeFormSchema>;
 
 export default function RecipeUploadForm() {
+  // 初始化路由器
+  const router = useRouter();
+
   // 設定目前步驟狀態
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep] = useState(1);
 
   // 設定預覽圖片狀態
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // 設定選擇的檔案
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // 設定載入狀態
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +76,7 @@ export default function RecipeUploadForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting, isValid },
   } = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
@@ -46,6 +85,13 @@ export default function RecipeUploadForm() {
       agreement: undefined,
     },
   });
+
+  // 當選擇的檔案改變時，更新表單值
+  useEffect(() => {
+    if (selectedFile) {
+      setValue('coverImage', selectedFile, { shouldValidate: true });
+    }
+  }, [selectedFile, setValue]);
 
   /**
    * 處理表單提交
@@ -72,31 +118,18 @@ export default function RecipeUploadForm() {
         return;
       }
 
+      // 檢查圖片（使用已經處理好的檔案）
+      if (!selectedFile) {
+        console.error('未上傳封面圖片');
+        setErrorMsg('請上傳封面圖片');
+        return;
+      }
+
       // 準備上傳資料
       const uploadData: RecipeFormData = {
         recipeName: data.recipeName,
+        coverImage: selectedFile,
       };
-
-      // 檢查圖片
-      if (data.coverImage) {
-        console.log('準備上傳圖片:', data.coverImage);
-
-        if (data.coverImage instanceof File) {
-          uploadData.coverImage = data.coverImage;
-          console.log('圖片已添加到上傳資料中');
-        } else if (
-          data.coverImage instanceof FileList &&
-          data.coverImage.length > 0
-        ) {
-          const [file] = Array.from(data.coverImage);
-          uploadData.coverImage = file;
-          console.log('從 FileList 中提取圖片添加到上傳資料中');
-        } else {
-          console.warn('圖片格式無效，跳過圖片上傳:', data.coverImage);
-        }
-      } else {
-        console.log('未選擇圖片，僅上傳食譜名稱');
-      }
 
       console.log('最終上傳資料:', uploadData);
 
@@ -106,9 +139,12 @@ export default function RecipeUploadForm() {
       console.log('API 上傳結果:', result);
 
       if (result && result.StatusCode === 200) {
-        // 前往下一步
-        console.log('上傳成功，前往下一步');
-        setCurrentStep(2);
+        // 上傳成功後跳轉到步驟2頁面，並帶上創建的食譜 ID
+        console.log('上傳成功，跳轉到步驟2頁面');
+        router.push({
+          pathname: '/upload-recipe-step2',
+          query: { recipeId: result.Id },
+        });
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
@@ -130,7 +166,19 @@ export default function RecipeUploadForm() {
   const atImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 檢查檔案格式
+      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+        console.error('不支援的圖片格式:', file.type);
+        setErrorMsg('僅支援 JPG, JPEG 與 PNG 格式的圖片');
+        setImagePreview(null);
+        setSelectedFile(null);
+        return;
+      }
+
       console.log('選擇了圖片:', file.name, file.type, file.size);
+
+      // 設定選擇的檔案
+      setSelectedFile(file);
 
       // 建立檔案預覽
       const reader = new FileReader();
@@ -141,6 +189,7 @@ export default function RecipeUploadForm() {
     } else {
       console.log('沒有選擇圖片或圖片無效');
       setImagePreview(null);
+      setSelectedFile(null);
     }
   };
 
@@ -151,11 +200,10 @@ export default function RecipeUploadForm() {
     console.error('表單驗證錯誤:', formErrors);
     if (formErrors.recipeName) {
       setErrorMsg(formErrors.recipeName.message);
+    } else if (formErrors.coverImage) {
+      setErrorMsg(formErrors.coverImage.message);
     } else if (formErrors.agreement) {
       setErrorMsg(formErrors.agreement.message);
-    } else if (formErrors.coverImage) {
-      setErrorMsg('圖片上傳有誤，請重新選擇圖片');
-      console.error('圖片錯誤詳情:', formErrors.coverImage);
     } else {
       setErrorMsg('表單填寫有誤，請檢查後重新提交');
     }
@@ -238,10 +286,13 @@ export default function RecipeUploadForm() {
             htmlFor="coverImage"
             className="block text-lg font-medium mb-2"
           >
-            上傳封面圖片
+            上傳封面圖片<span className="text-red-500 ml-1">*</span>
           </label>
           <div
-            className="border border-gray-300 rounded-md bg-gray-50 p-4 h-64 flex items-center justify-center cursor-pointer"
+            className={cn(
+              'border rounded-md bg-gray-50 p-4 h-64 flex items-center justify-center cursor-pointer',
+              errors.coverImage ? 'border-red-500' : 'border-gray-300',
+            )}
             onClick={() => document.getElementById('coverImage')?.click()}
           >
             {imagePreview ? (
@@ -270,36 +321,32 @@ export default function RecipeUploadForm() {
                 <span className="mt-2 text-sm text-center">
                   點擊上傳圖片
                   <br />
-                  (選填)
+                  <span className="text-red-500">(必填)</span>
                 </span>
               </div>
             )}
             <input
               id="coverImage"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png"
               className="hidden"
-              {...register('coverImage', {
-                onChange: atImageChange,
-                setValueAs: (value) => {
-                  // 如果是 FileList，返回第一個檔案
-                  if (value && value instanceof FileList && value.length > 0) {
-                    return value[0];
-                  }
-                  // 如果已經是 File 或其他值，直接返回
-                  return value;
-                },
-              })}
+              onChange={atImageChange}
+              // 不再使用 register 直接綁定檔案欄位，我們將手動處理檔案上傳
             />
           </div>
+          {errors.coverImage && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.coverImage.message?.toString() || '請上傳有效的封面圖片'}
+            </p>
+          )}
           {imagePreview && (
             <p className="mt-1 text-sm text-green-500">
               已選擇圖片，可點擊重新選擇
             </p>
           )}
-          {!imagePreview && (
+          {!imagePreview && !errors.coverImage && (
             <p className="mt-1 text-sm text-gray-500">
-              圖片格式: JPG, PNG (選填)
+              圖片格式: JPG, PNG (必填)
             </p>
           )}
         </div>
