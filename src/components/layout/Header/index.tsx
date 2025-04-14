@@ -9,10 +9,13 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-// 定義 header 的基本樣式和變體
+/**
+ * 定義 header 的基本樣式和變體
+ */
 const headerVariants = cva(
-  'w-full flex items-center bg-[#E84A00] px-4 py-2 h-16',
+  'w-full flex items-center justify-between bg-[#E64300] px-4 py-2 h-16',
   {
     variants: {
       variant: {
@@ -32,7 +35,27 @@ const headerVariants = cva(
   },
 );
 
-// 定義 header 的 props 類型
+/**
+ * 定義選單項目的樣式
+ */
+const menuItemVariants = cva(
+  'flex items-center w-full px-4 py-4 text-base font-medium transition-colors',
+  {
+    variants: {
+      active: {
+        true: 'bg-[#E64300] text-white',
+        false: 'hover:bg-gray-100',
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  },
+);
+
+/**
+ * 定義 header 的 props 類型
+ */
 export type HeaderProps = React.HTMLAttributes<HTMLDivElement> &
   VariantProps<typeof headerVariants> & {
     isLoggedIn?: boolean;
@@ -49,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
   className,
   variant,
   size,
-  isLoggedIn = false,
+  isLoggedIn = true,
   userName = '',
   userAvatar = '',
   atMenuClick,
@@ -57,6 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
   ...props
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   /**
    * 處理搜尋表單提交事件
@@ -68,21 +92,149 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  /**
+   * 處理選單項目點擊事件
+   */
+  const atMenuItemClick = () => {
+    setIsSheetOpen(false);
+    // 可以在這裡加入路由跳轉邏輯
+  };
+
+  /**
+   * 渲染未登入用戶的選單項目
+   */
+  const renderGuestMenu = () => (
+    <>
+      <div className="flex flex-col items-center p-6 mb-4">
+        <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+          <User className="h-8 w-8 text-gray-500" />
+        </div>
+        <h2 className="text-xl font-bold">登入/註冊</h2>
+      </div>
+
+      <div className="w-full">
+        <p className="px-4 py-2 text-gray-500">未登入</p>
+
+        <Link
+          href="/create-recipe"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          建立食譜
+        </Link>
+
+        <Link
+          href="/faq"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          常見問題
+        </Link>
+
+        <Link
+          href="/contact"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          聯繫我們
+        </Link>
+      </div>
+    </>
+  );
+
+  /**
+   * 渲染已登入用戶的選單項目
+   */
+  const renderUserMenu = () => (
+    <>
+      <div className="flex flex-col items-center p-6 mb-4">
+        <Avatar className="h-16 w-16 mb-2">
+          <AvatarImage
+            src={userAvatar || '/placeholder.svg'}
+            alt={userName || '用戶頭像'}
+          />
+          <AvatarFallback>
+            <User className="h-8 w-8" />
+          </AvatarFallback>
+        </Avatar>
+        <h2 className="text-xl font-bold">{userName || '用戶名稱'}</h2>
+      </div>
+
+      <div className="w-full">
+        <Link
+          href="/user/profile"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          會員中心
+        </Link>
+
+        <Link
+          href="/create-recipe"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          建立食譜
+        </Link>
+
+        <Link
+          href="/my-recipes"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          我的食譜
+        </Link>
+
+        <Link
+          href="/faq"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          常見問題
+        </Link>
+
+        <Link
+          href="/contact"
+          className={cn(menuItemVariants({}))}
+          onClick={atMenuItemClick}
+        >
+          聯繫我們
+        </Link>
+
+        <button className={cn(menuItemVariants({}))} onClick={atMenuItemClick}>
+          登出
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <header
       className={cn(headerVariants({ variant, size, className }))}
       {...props}
     >
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={atMenuClick}
-          className="text-white hover:bg-[#c43f00] hover:text-white"
-          aria-label="選單"
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (atMenuClick) atMenuClick();
+              }}
+              className="text-white hover:bg-[#E64300] hover:text-white"
+              aria-label="選單"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="p-0 w-80 sm:max-w-sm bg-[#FAFAFA]"
+          >
+            {isLoggedIn ? renderUserMenu() : renderGuestMenu()}
+          </SheetContent>
+        </Sheet>
 
         <Link href="/" className="flex items-center">
           <div className="relative h-10 w-16">
