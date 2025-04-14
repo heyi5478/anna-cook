@@ -274,7 +274,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      <Footer companyName="商標" studioName="Creative studio" />
+      <Footer companyName="版權所有" studioName="來自安那煮 Anna Cook" />
       {/* 浮動按鈕和選單 */}
       <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
         {/* 浮動選單 */}
