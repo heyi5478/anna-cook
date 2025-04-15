@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageIcon } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { fetchRecipeDraft } from '@/services/api';
 import { EditableSection } from './EditableSection';
 import { CookingInfo } from './CookingInfo';
 import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';
 import { CookingStep } from './CookingSteps';
+
+// API 基礎 URL
+const API_BASE_URL = 'http://13.71.34.213';
 
 // 類型定義區塊
 type Ingredient = {
@@ -58,49 +63,26 @@ type EditState = {
  * 食譜草稿編輯器元件 - 用於建立和編輯食譜草稿
  */
 export default function RecipeDraft() {
+  const router = useRouter();
+  const { recipeId } = router.query;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // 初始化食譜狀態
   const [recipe, setRecipe] = useState<Recipe>({
-    name: '馬鈴薯料理',
+    name: '',
     image: null,
-    description:
-      '食譜簡介料理中加入在生薑做菜，薑汁香醇的，這味道回甘超人難忘！',
-    ingredients: [
-      { name: '馬鈴薯', amount: '2個' },
-      { name: '馬鈴薯', amount: '2個' },
-      { name: '馬鈴薯', amount: '2個' },
-    ],
-    seasonings: [
-      { name: '胡椒鹽', amount: '2匙' },
-      { name: '胡椒鹽', amount: '2匙' },
-      { name: '胡椒鹽', amount: '2匙' },
-    ],
-    tags: ['馬鈴薯', '馬鈴薯'],
-    cookingTime: '30 分鐘',
-    cookingTimeValue: '30',
+    description: '',
+    ingredients: [],
+    seasonings: [],
+    tags: [],
+    cookingTime: '',
+    cookingTimeValue: '',
     cookingTimeUnit: '分鐘',
-    servings: '2人份',
-    servingsValue: '2',
+    servings: '',
+    servingsValue: '',
     servingsUnit: '人份',
-    steps: [
-      {
-        description: '將馬鈴薯切塊',
-        startTime: '0:12',
-        endTime: '0:30',
-        vimeoId: '76979871',
-      },
-      {
-        description: '加入調味料拌勻',
-        startTime: '0:31',
-        endTime: '0:45',
-        vimeoId: '76979871',
-      },
-      {
-        description: '放入烤箱烘烤',
-        startTime: '0:46',
-        endTime: '1:20',
-        vimeoId: '76979871',
-      },
-    ],
+    steps: [],
   });
 
   // 編輯狀態管理
@@ -110,6 +92,98 @@ export default function RecipeDraft() {
     cookingTime: false,
     servings: false,
   });
+
+  // 從 API 獲取食譜草稿資料
+  useEffect(() => {
+    console.log('useEffect 執行，recipeId:', recipeId);
+
+    async function loadRecipeDraft() {
+      if (!recipeId) {
+        console.log('沒有 recipeId 參數，不進行 API 請求');
+        setLoading(false);
+        setError('請確認網址中包含正確的食譜 ID');
+        return;
+      }
+
+      console.log('開始獲取食譜草稿，ID:', recipeId);
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const id = Number(recipeId);
+        if (Number.isNaN(id)) {
+          console.log('ID 轉換為數字失敗:', recipeId);
+          setError('無效的食譜 ID');
+          setLoading(false);
+          return;
+        }
+
+        console.log('調用 fetchRecipeDraft API，recipeId:', id);
+        const draftData = await fetchRecipeDraft(id);
+        console.log('API 回應資料:', draftData);
+
+        if (draftData.StatusCode !== 200) {
+          setError(draftData.msg);
+          setLoading(false);
+          return;
+        }
+
+        // 轉換 API 資料為元件所需格式
+        const { recipe: recipeData, ingredients, tags, steps } = draftData;
+
+        setRecipe({
+          name: recipeData.recipeName,
+          image: recipeData.coverPhoto || null,
+          description: recipeData.description || '',
+          ingredients: ingredients
+            .filter((item) => !item.isFlavoring)
+            .map((item) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              id: item.ingredientId.toString(),
+            })),
+          seasonings: ingredients
+            .filter((item) => item.isFlavoring)
+            .map((item) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              id: item.ingredientId.toString(),
+            })),
+          tags: tags.map((tag) => tag.tagName),
+          cookingTime: `${recipeData.cookingTime} 分鐘`,
+          cookingTimeValue: recipeData.cookingTime.toString(),
+          cookingTimeUnit: '分鐘',
+          servings: `${recipeData.portion}人份`,
+          servingsValue: recipeData.portion.toString(),
+          servingsUnit: '人份',
+          steps: steps.map((step) => ({
+            description: step.stepDescription,
+            startTime: formatTimeFromSeconds(step.videoStart),
+            endTime: formatTimeFromSeconds(step.videoEnd),
+            id: step.stepId.toString(),
+          })),
+        });
+      } catch (err) {
+        console.error('獲取食譜草稿失敗:', err);
+        setError('獲取食譜草稿時發生錯誤');
+      } finally {
+        console.log('載入流程結束，設置 loading = false');
+        setLoading(false);
+      }
+    }
+
+    loadRecipeDraft();
+  }, [recipeId]);
+
+  /**
+   * 將秒數格式化為 MM:SS 格式
+   */
+  const formatTimeFromSeconds = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   /**
    * 切換指定欄位的編輯狀態
@@ -268,6 +342,23 @@ export default function RecipeDraft() {
     // 這裡可以實作儲存到後端的邏輯
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-xl font-semibold">載入食譜草稿中...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="text-xl font-semibold text-red-500">{error}</div>
+        <Button onClick={() => router.push('/')}>回首頁</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* 頂部導航 */}
@@ -346,7 +437,11 @@ export default function RecipeDraft() {
             <div className="flex items-center justify-center w-full h-40 bg-gray-200 rounded">
               {recipe.image ? (
                 <img
-                  src={recipe.image || '/placeholder.svg'}
+                  src={
+                    recipe.image.startsWith('http')
+                      ? recipe.image
+                      : `${API_BASE_URL}${recipe.image}`
+                  }
                   alt="食譜封面"
                   className="object-cover w-full h-full rounded"
                 />

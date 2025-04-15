@@ -55,6 +55,49 @@ export type VideoUploadResponse = {
   newToken?: string;
 };
 
+export type RecipeDraftIngredient = {
+  ingredientId: number;
+  ingredientName: string;
+  ingredientAmount: number;
+  ingredientUnit: string;
+  isFlavoring: boolean;
+};
+
+export type RecipeDraftTag = {
+  tagId: number;
+  tagName: string;
+};
+
+export type RecipeDraftStep = {
+  stepId: number;
+  stepOrder: number;
+  stepDescription: string;
+  videoStart: number;
+  videoEnd: number;
+};
+
+export type RecipeDraft = {
+  id: number;
+  displayId: string;
+  recipeName: string;
+  isPublished: boolean;
+  coverPhoto: string;
+  description: string;
+  cookingTime: number;
+  portion: number;
+  videoId?: string;
+};
+
+export type RecipeDraftResponse = {
+  StatusCode: number;
+  msg: string;
+  recipe: RecipeDraft;
+  ingredients: RecipeDraftIngredient[];
+  tags: RecipeDraftTag[];
+  steps: RecipeDraftStep[];
+  newToken?: string;
+};
+
 /**
  * 獲取 Google 登入 URL
  */
@@ -139,7 +182,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MiwiRGlzcGxheUlkIjoiTTAwMDAwMSIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xMVQwODo0MTowMy44NDM1NjcwWiJ9.PGu7Rc_kTZBU2RtzhPL7aRJeKVOCzTK2s_L1LfP3atgAGRaxdvvtbOeejNU5CUGzLGkXvIr4gUZJ0nIjq9ejyA';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MiwiRGlzcGxheUlkIjoiTTAwMDAwMSIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xNVQwNTo1MzowMC45NTkwNzY5WiJ9.KMF5A7X6DaKl4cLCSN6K6izhqCHG_DM0DK8IVMnZoRtde1tHm1v71M6H48ehZx2yQ9kJ5V-bAo-eFlmMomOPlg';
   }
 
   return null;
@@ -346,6 +389,63 @@ export const updateRecipeStep2 = async (
     return responseData;
   } catch (error) {
     console.error('更新食譜詳細資訊失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 獲取尚未發佈的草稿食譜詳細資訊
+ */
+export const fetchRecipeDraft = async (
+  recipeId: number,
+): Promise<RecipeDraftResponse> => {
+  try {
+    console.log(`發送請求: GET ${API_BASE_URL}/recipes/${recipeId}/draft`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${API_BASE_URL}/recipes/${recipeId}/draft`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.StatusCode !== 200) {
+      return responseData;
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('獲取草稿食譜失敗:', error);
     throw error;
   }
 };
