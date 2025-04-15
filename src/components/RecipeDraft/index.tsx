@@ -132,6 +132,18 @@ export default function RecipeDraft() {
         // 轉換 API 資料為元件所需格式
         const { recipe: recipeData, ingredients, tags, steps } = draftData;
 
+        // 從 videoId 中提取 Vimeo ID
+        let vimeoId = '';
+        if (recipeData.videoId) {
+          // 假設 videoId 格式為 "/videos/1075575886"
+          const match = recipeData.videoId.match(/\/videos\/(\d+)/);
+          if (match && match[1]) {
+            const [, extractedId] = match;
+            vimeoId = extractedId;
+            console.log('提取的 Vimeo ID:', vimeoId);
+          }
+        }
+
         setRecipe({
           name: recipeData.recipeName,
           image: recipeData.coverPhoto || null,
@@ -162,6 +174,7 @@ export default function RecipeDraft() {
             startTime: formatTimeFromSeconds(step.videoStart),
             endTime: formatTimeFromSeconds(step.videoEnd),
             id: step.stepId.toString(),
+            vimeoId, // 添加 vimeoId 屬性到每個步驟
           })),
         });
       } catch (err) {
