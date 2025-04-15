@@ -4,7 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { fetchRecipeDraft } from '@/services/api';
+import {
+  fetchRecipeDraft,
+  submitRecipeDraft,
+  RecipeDraftSubmitDetail,
+  RecipeDraftSubmitStep,
+} from '@/services/api';
 import { EditableSection } from './EditableSection';
 import { CookingInfo } from './CookingInfo';
 import { IngredientList } from './IngredientList';
@@ -350,9 +355,77 @@ export default function RecipeDraft() {
   /**
    * 儲存食譜草稿至後端
    */
-  const atSaveRecipe = () => {
-    console.log('儲存食譜:', recipe);
-    // 這裡可以實作儲存到後端的邏輯
+  const atSaveRecipe = async () => {
+    if (!recipeId) {
+      setError('無法儲存草稿：找不到食譜 ID');
+      return;
+    }
+
+    try {
+      // 設置載入狀態
+      setLoading(true);
+
+      // 將食譜資料轉換為 API 要求的格式
+      const detailData: RecipeDraftSubmitDetail = {
+        RecipeIntro: recipe.description,
+        CookingTime: parseInt(recipe.cookingTimeValue, 10) || 0,
+        Portion: parseInt(recipe.servingsValue, 10) || 0,
+        Ingredients: [
+          ...recipe.ingredients.map((item) => ({
+            IngredientName: item.name,
+            IngredientAmount: parseFloat(item.amount.split(' ')[0]) || 0,
+            IngredientUnit: item.amount.split(' ')[1] || '',
+            IsFlavoring: false,
+          })),
+          ...recipe.seasonings.map((item) => ({
+            IngredientName: item.name,
+            IngredientAmount: parseFloat(item.amount.split(' ')[0]) || 0,
+            IngredientUnit: item.amount.split(' ')[1] || '',
+            IsFlavoring: true,
+          })),
+        ],
+        Tags: recipe.tags,
+      };
+
+      // 轉換烹飪步驟
+      const stepsData: RecipeDraftSubmitStep[] = recipe.steps.map((step) => {
+        // 將 "分:秒" 格式的時間轉換為秒數
+        const convertTimeToSeconds = (timeStr: string): number => {
+          const [minutes, seconds] = timeStr.split(':').map(Number);
+          return minutes * 60 + seconds;
+        };
+
+        return {
+          Description: step.description,
+          StartTime: convertTimeToSeconds(step.startTime),
+          EndTime: convertTimeToSeconds(step.endTime),
+        };
+      });
+
+      // 使用 API 儲存草稿
+      const response = await submitRecipeDraft(
+        parseInt(recipeId as string, 10),
+        recipe.name,
+        detailData,
+        stepsData,
+        // 注意：這裡沒有傳遞 photo 參數，因為我們已經有了圖片
+      );
+
+      // 處理回應
+      if (response.StatusCode === 200) {
+        console.log('草稿儲存成功:', response);
+
+        // 導向到使用者中心頁面
+        router.push('/user-center');
+      } else {
+        setError(`儲存失敗: ${response.msg}`);
+      }
+    } catch (err) {
+      console.error('儲存草稿時發生錯誤:', err);
+      setError('儲存草稿時發生錯誤');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
