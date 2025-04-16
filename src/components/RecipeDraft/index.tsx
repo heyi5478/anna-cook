@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { fetchRecipeDraft } from '@/services/api';
+import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { EditableSection } from './EditableSection';
 import { CookingInfo } from './CookingInfo';
 import { IngredientList } from './IngredientList';
@@ -67,6 +67,7 @@ export default function RecipeDraft() {
   const { recipeId } = router.query;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // 初始化食譜狀態
   const [recipe, setRecipe] = useState<Recipe>({
@@ -235,25 +236,30 @@ export default function RecipeDraft() {
       ...updatedIngredients[index],
       [field]: value,
     };
-    setRecipe({ ...recipe, ingredients: updatedIngredients });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      ingredients: updatedIngredients,
+    }));
   };
 
   /**
    * 移除指定食材
    */
   const atRemoveIngredient = (index: number) => {
-    const updatedIngredients = recipe.ingredients.filter((_, i) => i !== index);
-    setRecipe({ ...recipe, ingredients: updatedIngredients });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      ingredients: prevRecipe.ingredients.filter((_, i) => i !== index),
+    }));
   };
 
   /**
    * 新增空白食材
    */
   const atAddIngredient = () => {
-    setRecipe({
-      ...recipe,
-      ingredients: [...recipe.ingredients, { name: '', amount: '' }],
-    });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      ingredients: [...prevRecipe.ingredients, { name: '', amount: '' }],
+    }));
   };
 
   /**
@@ -266,25 +272,30 @@ export default function RecipeDraft() {
   ) => {
     const updatedSeasonings = [...recipe.seasonings];
     updatedSeasonings[index] = { ...updatedSeasonings[index], [field]: value };
-    setRecipe({ ...recipe, seasonings: updatedSeasonings });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      seasonings: updatedSeasonings,
+    }));
   };
 
   /**
    * 移除指定調味料
    */
   const atRemoveSeasoning = (index: number) => {
-    const updatedSeasonings = recipe.seasonings.filter((_, i) => i !== index);
-    setRecipe({ ...recipe, seasonings: updatedSeasonings });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      seasonings: prevRecipe.seasonings.filter((_, i) => i !== index),
+    }));
   };
 
   /**
    * 新增空白調味料
    */
   const atAddSeasoning = () => {
-    setRecipe({
-      ...recipe,
-      seasonings: [...recipe.seasonings, { name: '', amount: '' }],
-    });
+    setRecipe((prevRecipe) => ({
+      ...prevRecipe,
+      seasonings: [...prevRecipe.seasonings, { name: '', amount: '' }],
+    }));
   };
 
   /**
@@ -350,9 +361,64 @@ export default function RecipeDraft() {
   /**
    * 儲存食譜草稿至後端
    */
-  const atSaveRecipe = () => {
-    console.log('儲存食譜:', recipe);
-    // 這裡可以實作儲存到後端的邏輯
+  const atSaveRecipe = async () => {
+    try {
+      console.log('正在提交食譜草稿:', recipe);
+
+      if (!recipeId) {
+        console.error('無法提交草稿：缺少食譜 ID');
+        return;
+      }
+
+      // 設置提交中狀態
+      setSaving(true);
+
+      // 準備提交的資料
+      const submitData = {
+        recipeName: recipe.name,
+        recipeIntro: recipe.description,
+        cookingTime: parseInt(recipe.cookingTimeValue, 10) || 0,
+        portion: parseInt(recipe.servingsValue, 10) || 0,
+        ingredients: [
+          // 食材列表 (非調味料)
+          ...recipe.ingredients.map((item) => ({
+            name: item.name,
+            amount: item.amount,
+            isFlavoring: false,
+          })),
+          // 調味料列表
+          ...recipe.seasonings.map((item) => ({
+            name: item.name,
+            amount: item.amount,
+            isFlavoring: true,
+          })),
+        ],
+        tags: recipe.tags,
+        steps: recipe.steps.map((step) => ({
+          description: step.description,
+          startTime: step.startTime,
+          endTime: step.endTime,
+        })),
+      };
+
+      // 呼叫 API 提交草稿
+      const response = await submitRecipeDraft(Number(recipeId), submitData);
+
+      // 處理回應
+      if (response.StatusCode === 200) {
+        console.log('草稿提交成功:', response);
+
+        // 跳轉到用戶中心頁面
+        router.push('/user-center');
+      } else {
+        console.error('草稿提交失敗:', response);
+      }
+    } catch (err) {
+      console.error('提交過程發生錯誤:', err);
+    } finally {
+      // 結束提交狀態
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -523,8 +589,12 @@ export default function RecipeDraft() {
           <CookingStep steps={recipe.steps} onRemoveStep={atRemoveStep} />
 
           {/* 儲存按鈕 */}
-          <Button onClick={atSaveRecipe} className="w-full mb-4">
-            儲存草稿
+          <Button
+            onClick={atSaveRecipe}
+            className="w-full mb-4"
+            disabled={saving}
+          >
+            {saving ? '正在提交...' : '儲存草稿'}
           </Button>
         </div>
       </main>

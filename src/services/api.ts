@@ -111,6 +111,33 @@ export type UpdateStepsResponse = {
   newToken?: string;
 };
 
+export type SubmitDraftResponse = {
+  StatusCode: number;
+  msg: string;
+  recipeId?: number;
+  newToken?: string;
+  error?: string;
+};
+
+type SubmitDraftDetail = {
+  RecipeIntro: string;
+  CookingTime: number;
+  Portion: number;
+  Ingredients: {
+    IngredientName: string;
+    IngredientAmount: number;
+    IngredientUnit: string;
+    IsFlavoring: boolean;
+  }[];
+  Tags: string[];
+};
+
+type SubmitDraftStep = {
+  Description: string;
+  StartTime: number;
+  EndTime: number;
+};
+
 /**
  * 獲取 Google 登入 URL
  */
@@ -195,7 +222,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MiwiRGlzcGxheUlkIjoiTTAwMDAwMSIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xNVQxMTo1NTozNi43Mzk5ODExWiJ9.GFkEKZ18t0E3cPIbB-oaiK0iLNrLlzTiF6wK10zoCE0U8AOc9TjuyQIEywzNc03kEMgix3p124iyo8Ak5VfOdg';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MiwiRGlzcGxheUlkIjoiTTAwMDAwMSIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xNlQwNTo0NzowNy4zODM0NTc5WiJ9.jibLTHrtfeVmlUFE7EL1wvYY3XLnv0CcmlLu4EAHzo69kapstVn7FYZYMN-YaaBYTA3ILmkr_OrLUK4jjmHuIQ';
   }
 
   return null;
@@ -585,6 +612,145 @@ export const uploadRecipeVideo = async (
     return {
       message:
         error instanceof Error ? error.message : '上傳影片過程中發生錯誤',
+    };
+  }
+};
+
+/**
+ * 提交食譜草稿到後端並發布
+ */
+export const submitRecipeDraft = async (
+  recipeId: number,
+  data: {
+    recipeName: string;
+    coverImage?: File;
+    recipeIntro: string;
+    cookingTime: number;
+    portion: number;
+    ingredients: {
+      name: string;
+      amount: string;
+      isFlavoring: boolean;
+    }[];
+    tags: string[];
+    steps: {
+      description: string;
+      startTime: string;
+      endTime: string;
+    }[];
+  },
+): Promise<SubmitDraftResponse> => {
+  try {
+    console.log(
+      `發送請求: POST ${API_BASE_URL}/recipes/${recipeId}/submit-draft`,
+    );
+    console.log('請求資料:', data);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 準備 detail JSON 內容
+    const detail: SubmitDraftDetail = {
+      RecipeIntro: data.recipeIntro,
+      CookingTime: data.cookingTime,
+      Portion: data.portion,
+      Ingredients: data.ingredients.map((item) => {
+        // 從格式 "100 g" 中提取數量和單位
+        const amountStr = item.amount.trim();
+        let amount = 0;
+        let unit = '';
+
+        // 嘗試解析數字和單位
+        const match = amountStr.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+        if (match) {
+          amount = parseFloat(match[1]);
+          unit = match[2].trim();
+        }
+
+        return {
+          IngredientName: item.name,
+          IngredientAmount: amount,
+          IngredientUnit: unit || '個',
+          IsFlavoring: item.isFlavoring,
+        };
+      }),
+      Tags: data.tags,
+    };
+
+    // 準備 steps JSON 內容
+    const steps: SubmitDraftStep[] = data.steps.map((step) => {
+      // 從格式 "1:30" 轉換為秒數
+      const convertTimeToSeconds = (timeStr: string): number => {
+        const parts = timeStr.split(':');
+        if (parts.length === 2) {
+          const minutes = parseInt(parts[0], 10);
+          const seconds = parseInt(parts[1], 10);
+          return minutes * 60 + seconds;
+        }
+        return 0;
+      };
+
+      return {
+        Description: step.description,
+        StartTime: convertTimeToSeconds(step.startTime),
+        EndTime: convertTimeToSeconds(step.endTime),
+      };
+    });
+
+    // 創建 FormData 物件
+    const formData = new FormData();
+    formData.append('recipeName', data.recipeName);
+    formData.append('detail', JSON.stringify(detail));
+    formData.append('steps', JSON.stringify(steps));
+
+    // 如果有封面圖片，添加到表單中
+    if (data.coverImage && data.coverImage instanceof File) {
+      formData.append('photo', data.coverImage);
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${API_BASE_URL}/recipes/${recipeId}/submit-draft`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('提交食譜草稿失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: error instanceof Error ? error.message : '提交草稿時發生未知錯誤',
     };
   }
 };
