@@ -60,34 +60,6 @@ const DEFAULT_STEPS: Step[] = [
 ];
 
 /**
- * 步驟指示器元件，顯示目前所在的步驟
- */
-const StepIndicator = ({
-  steps,
-  currentStep,
-}: {
-  steps: Step[];
-  currentStep: number;
-}) => (
-  <div className="px-4 py-2">
-    <div className="relative flex items-center justify-between">
-      <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-300 -z-10" />
-      {steps.map((step, index) => (
-        <div
-          key={step.id}
-          className={`flex flex-col items-center z-10 ${currentStep === step.id ? 'text-black' : 'text-gray-500'}`}
-        >
-          <div
-            className={`w-4 h-4 rounded-full ${currentStep === step.id ? 'bg-black' : 'bg-gray-400'} mb-1`}
-          />
-          <span className="text-xs">Step {index + 1}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-/**
  * 步驟導航控制元件
  */
 const StepNavigation = ({
@@ -454,55 +426,6 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
 
   return (
     <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
-      {/* 頂部導航 */}
-      <div className="flex items-center p-2 bg-white border-b">
-        <button className="p-2" aria-label="選單">
-          <div className="w-6 h-6 flex flex-col justify-around">
-            <div className="h-0.5 bg-gray-600 w-full" />
-            <div className="h-0.5 bg-gray-600 w-full" />
-            <div className="h-0.5 bg-gray-600 w-full" />
-          </div>
-        </button>
-        <div className="mx-2 font-bold">Logo</div>
-        <div className="flex-1 mx-2">
-          <div className="bg-gray-100 rounded-full flex items-center px-3 py-1">
-            <span className="text-gray-500 text-sm">簡單字搜尋</span>
-            <div className="ml-auto">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-        <button className="p-2" aria-label="使用者設定檔">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </button>
-      </div>
-
       {/* 麵包屑導航 */}
       <div className="flex items-center p-2 text-sm text-gray-600">
         <span>首頁</span>
@@ -511,10 +434,6 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         <ChevronRight className="h-4 w-4 mx-1" />
         <span>切割食譜影片</span>
       </div>
-
-      {/* 步驟指示器 */}
-      <StepIndicator steps={steps} currentStep={currentStep} />
-
       {/* 影片預覽 */}
       <div className="bg-gray-100 aspect-video flex items-center justify-center my-2">
         <VimeoPlayer
@@ -601,27 +520,6 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           <Check className="h-4 w-4 mr-2" />
           全部完成
         </Button>
-      </div>
-
-      {/* 底部導航 */}
-      <div className="mt-4 bg-gray-100 p-4">
-        <div className="bg-gray-400 text-white px-4 py-1 w-16 mb-4">商標</div>
-        <div className="border-b border-gray-300 py-2 flex justify-between items-center">
-          <div>人氣食譜</div>
-          <ChevronRight className="h-5 w-5" />
-        </div>
-        <div className="border-b border-gray-300 py-2 flex justify-between items-center">
-          <div>最新食譜</div>
-          <ChevronRight className="h-5 w-5" />
-        </div>
-        <div className="border-b border-gray-300 py-2 flex justify-between items-center">
-          <div>關於我們</div>
-          <ChevronRight className="h-5 w-5" />
-        </div>
-        <div className="text-center text-gray-500 text-xs mt-4">
-          <div>需要協助? 聯絡我們</div>
-          <div className="mt-1">© 版權所有來自Createx studio</div>
-        </div>
       </div>
     </div>
   );
