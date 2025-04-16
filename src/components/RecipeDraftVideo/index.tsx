@@ -26,7 +26,7 @@ type Step = {
 };
 
 type VideoEditorProps = {
-  videoId: number | string;
+  videoId?: number | string;
   totalDuration?: number;
 };
 
@@ -34,7 +34,7 @@ type VideoEditorProps = {
  * 食譜影片編輯器元件，用於切割食譜影片並添加步驟說明
  */
 const VideoEditor: React.FC<VideoEditorProps> = ({
-  videoId,
+  videoId = '1062288466',
   totalDuration = 0,
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
