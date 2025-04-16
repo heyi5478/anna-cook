@@ -177,14 +177,19 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    * 根據步驟 ID 更新步驟資料
    */
   const updateStepById = useCallback(
-    (stepId: number, updateFn: (step: Step) => Partial<Step>) => {
+    (stepIndex: number, updateFn: (step: Step) => Partial<Step>) => {
+      if (stepIndex < 1 || stepIndex > steps.length) return;
+
+      const stepId = steps[stepIndex - 1]?.id;
+      if (stepId === undefined) return;
+
       setSteps((prevSteps) =>
         prevSteps.map((step) =>
           step.id === stepId ? { ...step, ...updateFn(step) } : step,
         ),
       );
     },
-    [],
+    [steps],
   );
 
   /**
@@ -212,15 +217,19 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    */
   const addStep = useCallback(() => {
     const newStepId = Math.max(...steps.map((s) => s.id)) + 1;
-    setSteps([
-      ...steps,
-      {
-        id: newStepId,
-        startTime: 0,
-        endTime: 10,
-        description: `步驟 ${newStepId}：請輸入步驟說明`,
-      },
-    ]);
+    const newStep = {
+      id: newStepId,
+      startTime: 0,
+      endTime: 10,
+      description: `步驟 ${newStepId}：請輸入步驟說明`,
+    };
+
+    setSteps((prevSteps) => [...prevSteps, newStep]);
+    // 自動切換到新添加的步驟，使用setTimeout確保在下一個渲染週期執行
+    setTimeout(() => {
+      setIsStepChanging(true); // 設置步驟切換狀態
+      setCurrentStep(steps.length + 1);
+    }, 10);
   }, [steps]);
 
   /**
@@ -228,9 +237,28 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    */
   const deleteCurrentStep = useCallback(() => {
     if (steps.length > 1) {
-      const newSteps = steps.filter((step) => step.id !== currentStep);
-      setSteps(newSteps);
-      setCurrentStep(Math.min(currentStep, newSteps.length));
+      const currentStepId = steps[currentStep - 1]?.id;
+      if (currentStepId) {
+        // 先將狀態設為切換中，避免UI閃爍
+        setIsStepChanging(true);
+
+        // 移除當前步驟
+        const newSteps = steps.filter((step) => step.id !== currentStepId);
+        setSteps(newSteps);
+
+        // 計算新的當前步驟索引
+        const newCurrentStep =
+          currentStep > newSteps.length ? newSteps.length : currentStep;
+
+        // 在短暫延遲後設置新的當前步驟，確保UI平滑過渡
+        setTimeout(() => {
+          setCurrentStep(newCurrentStep);
+          // 在下一個渲染週期完成步驟切換
+          setTimeout(() => {
+            setIsStepChanging(false);
+          }, 50);
+        }, 10);
+      }
     }
   }, [currentStep, steps]);
 
@@ -246,11 +274,14 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
         endTime: index * 5 + 5, // 每個步驟長度為 5 秒
       })),
     );
+
     // 更新當前步驟的時間
-    const currentStepIndex = currentStep - 1;
-    setStartTime(currentStepIndex * 5);
-    setEndTime(currentStepIndex * 5 + 5);
-  }, [currentStep]);
+    if (steps.length > 0 && currentStep <= steps.length) {
+      const currentStepIndex = currentStep - 1;
+      setStartTime(currentStepIndex * 5);
+      setEndTime(currentStepIndex * 5 + 5);
+    }
+  }, [currentStep, steps]);
 
   /**
    * 更新步驟說明文字
