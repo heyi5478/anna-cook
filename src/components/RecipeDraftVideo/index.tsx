@@ -311,17 +311,14 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   /**
    * 更新時間範圍滑桿值
    */
-  const updateTimeRange = useCallback(
-    (values: number[]) => {
-      if (values.length === 2) {
-        const [newStartTime, newEndTime] = values;
-        setIsDragging(true);
-        setStartTime(newStartTime);
-        setEndTime(newEndTime);
-      }
-    },
-    [currentStep],
-  );
+  const updateTimeRange = useCallback((values: number[]) => {
+    if (values.length === 2) {
+      const [newStartTime, newEndTime] = values;
+      setIsDragging(true);
+      setStartTime(newStartTime);
+      setEndTime(newEndTime);
+    }
+  }, []);
 
   /**
    * 當滑動結束時，更新步驟資料
@@ -402,6 +399,19 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   } = useStepManager();
 
   /**
+   * 處理時間軸滑塊變化
+   */
+  const handleTimeRangeChange = useCallback(
+    (values: number[]) => {
+      if (!isDragging) {
+        setIsPlaying(false); // 開始拖動時暫停影片
+      }
+      updateTimeRange(values);
+    },
+    [isDragging, updateTimeRange],
+  );
+
+  /**
    * 標記當前時間為步驟起點
    */
   const atMarkStart = useCallback(() => {
@@ -421,8 +431,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
    * 切換影片播放/暫停狀態
    */
   const atTogglePlay = useCallback(() => {
-    setIsPlaying(!isPlaying);
-  }, [isPlaying]);
+    // 只有在非拖動狀態下才允許切換播放狀態
+    if (!isDragging) {
+      setIsPlaying(!isPlaying);
+    }
+  }, [isPlaying, isDragging]);
 
   return (
     <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
@@ -478,10 +491,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
             max={videoDuration}
             min={0}
             step={0.1}
-            onValueChange={updateTimeRange}
+            onValueChange={handleTimeRangeChange}
             onValueCommit={onSliderCommitted}
-            className="[&>span:first-child]:h-3 [&>span:first-child]:bg-gray-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-gray-400"
+            className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-gray-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-gray-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             thumbClassName="h-6 w-4 bg-white border-2 border-gray-400 rounded-sm shadow-md hover:border-gray-600 focus:border-gray-600 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
+            disabled={false}
           />
         </div>
       </div>
