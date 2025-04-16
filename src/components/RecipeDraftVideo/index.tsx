@@ -60,53 +60,6 @@ const DEFAULT_STEPS: Step[] = [
 ];
 
 /**
- * 步驟導航控制元件
- */
-const StepNavigation = ({
-  currentStep,
-  totalSteps,
-  isPlaying,
-  onPrev,
-  onNext,
-  onTogglePlay,
-  onAddStep,
-}: {
-  currentStep: number;
-  totalSteps: number;
-  isPlaying: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  onTogglePlay: () => void;
-  onAddStep: () => void;
-}) => (
-  <div className="flex items-center justify-between px-4 py-2">
-    <button
-      onClick={onPrev}
-      className="p-2 text-gray-600"
-      disabled={currentStep === 1}
-    >
-      <ChevronLeft className="h-5 w-5" />
-    </button>
-    <div className="text-sm">
-      步驟 {currentStep}/{totalSteps}
-    </div>
-    <button
-      onClick={onNext}
-      className="p-2 text-gray-600"
-      disabled={currentStep === totalSteps}
-    >
-      <ChevronRight className="h-5 w-5" />
-    </button>
-    <button onClick={onTogglePlay} className="p-2 text-gray-600">
-      {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-    </button>
-    <button onClick={onAddStep} className="p-2 text-gray-600">
-      <Plus className="h-5 w-5" />
-    </button>
-  </div>
-);
-
-/**
  * 時間標記按鈕元件
  */
 const TimeMarkButtons = ({
@@ -218,6 +171,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     initialSteps[0].description,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isStepChanging, setIsStepChanging] = useState<boolean>(false);
 
   /**
    * 根據步驟 ID 更新步驟資料
@@ -238,6 +192,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    */
   const goToNextStep = useCallback(() => {
     if (currentStep < steps.length) {
+      setIsStepChanging(true);
       setCurrentStep(currentStep + 1);
     }
   }, [currentStep, steps.length]);
@@ -247,6 +202,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    */
   const goToPrevStep = useCallback(() => {
     if (currentStep > 1) {
+      setIsStepChanging(true);
       setCurrentStep(currentStep - 1);
     }
   }, [currentStep]);
@@ -338,6 +294,13 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   );
 
   /**
+   * 完成步驟切換
+   */
+  const completeStepChange = useCallback(() => {
+    setIsStepChanging(false);
+  }, []);
+
+  /**
    * 當前步驟變更時更新起始和結束時間以及描述
    */
   useEffect(() => {
@@ -356,6 +319,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     endTime,
     currentDescription,
     isDragging,
+    isStepChanging,
     updateStepById,
     goToNextStep,
     goToPrevStep,
@@ -365,6 +329,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     updateDescription,
     updateTimeRange,
     onSliderCommitted,
+    completeStepChange,
   };
 }
 
@@ -387,6 +352,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     endTime,
     currentDescription,
     isDragging,
+    isStepChanging,
     updateStepById,
     goToNextStep,
     goToPrevStep,
@@ -396,7 +362,17 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     updateDescription,
     updateTimeRange,
     onSliderCommitted,
+    completeStepChange,
   } = useStepManager();
+
+  /**
+   * 處理影片載入完成事件
+   */
+  const handleVideoLoaded = useCallback(() => {
+    if (isStepChanging) {
+      completeStepChange();
+    }
+  }, [isStepChanging, completeStepChange]);
 
   /**
    * 處理時間軸滑塊變化
@@ -431,11 +407,29 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
    * 切換影片播放/暫停狀態
    */
   const atTogglePlay = useCallback(() => {
-    // 只有在非拖動狀態下才允許切換播放狀態
-    if (!isDragging) {
+    // 只有在非拖動狀態且非步驟切換狀態下才允許切換播放狀態
+    if (!isDragging && !isStepChanging) {
       setIsPlaying(!isPlaying);
     }
-  }, [isPlaying, isDragging]);
+  }, [isPlaying, isDragging, isStepChanging]);
+
+  /**
+   * 處理步驟切換
+   */
+  const handleStepChange = useCallback(
+    (direction: 'prev' | 'next') => {
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+
+      if (direction === 'prev') {
+        goToPrevStep();
+      } else {
+        goToNextStep();
+      }
+    },
+    [isPlaying, goToPrevStep, goToNextStep],
+  );
 
   return (
     <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
@@ -452,11 +446,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         <VimeoPlayer
           videoId={videoId}
           width={400}
-          startTime={isDragging ? undefined : startTime}
-          endTime={isDragging ? undefined : endTime}
+          startTime={isDragging || isStepChanging ? undefined : startTime}
+          endTime={isDragging || isStepChanging ? undefined : endTime}
           onTimeUpdate={updateCurrentTime}
           onDurationChange={updateDuration}
           isPlaying={isPlaying}
+          onLoaded={handleVideoLoaded}
           loop
         />
       </div>
@@ -468,15 +463,39 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       </div>
 
       {/* 步驟導航 */}
-      <StepNavigation
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        isPlaying={isPlaying}
-        onPrev={goToPrevStep}
-        onNext={goToNextStep}
-        onTogglePlay={atTogglePlay}
-        onAddStep={addStep}
-      />
+      <div className="flex items-center justify-between px-4 py-2">
+        <button
+          onClick={() => handleStepChange('prev')}
+          className="p-2 text-gray-600"
+          disabled={currentStep === 1}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <div className="text-sm">
+          步驟 {currentStep}/{steps.length}
+        </div>
+        <button
+          onClick={() => handleStepChange('next')}
+          className="p-2 text-gray-600"
+          disabled={currentStep === steps.length}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+        <button
+          onClick={atTogglePlay}
+          className={`p-2 ${isDragging || isStepChanging ? 'text-gray-400' : 'text-gray-600'}`}
+          disabled={isDragging || isStepChanging}
+        >
+          {isPlaying ? (
+            <Pause className="h-5 w-5" />
+          ) : (
+            <Play className="h-5 w-5" />
+          )}
+        </button>
+        <button onClick={addStep} className="p-2 text-gray-600">
+          <Plus className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* 時間軸 */}
       <div className="px-4 py-2">
