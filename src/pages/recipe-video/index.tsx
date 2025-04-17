@@ -5,9 +5,9 @@ import { VimeoPlayer } from '@/components/ui/VimeoPlayer';
 import {
   ArrowLeft,
   Play,
-  ArrowLeft as StepPrevious,
-  ArrowRight as StepNext,
   ListOrdered,
+  StepBack,
+  StepForward,
 } from 'lucide-react';
 
 /**
@@ -315,16 +315,14 @@ export default function RecipeVideoPage() {
                 onClick={atPrevStep}
                 disabled={currentStepIndex === 0}
               >
-                <StepPrevious className="w-5 h-5 mr-1" />
-                上一步
+                <StepBack className="w-8 h-8" />
               </button>
               <button
                 className="flex-1 bg-gray-900 hover:bg-gray-700 text-white p-3 rounded-r-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={atNextStep}
                 disabled={currentStepIndex === steps.length - 1}
               >
-                下一步
-                <StepNext className="w-5 h-5 ml-1" />
+                <StepForward className="w-8 h-8" />
               </button>
             </div>
           </div>
