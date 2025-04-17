@@ -253,9 +253,24 @@ export default function RecipeVideoPage() {
         <div className="w-[200px] bg-gray-800 text-white p-6 flex flex-col h-full overflow-auto">
           <div className="flex-1">
             <div className="mb-8">
-              <h1 className="text-xl font-bold mb-3">當前步驟</h1>
-              <div className="text-4xl font-bold mb-4">
-                {currentStepIndex + 1}/{steps.length}
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={atPrevStep}
+                  disabled={currentStepIndex === 0}
+                >
+                  <StepBack className="w-6 h-6" />
+                </button>
+                <div className="text-4xl font-bold">
+                  {currentStepIndex + 1}/{steps.length}
+                </div>
+                <button
+                  className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={atNextStep}
+                  disabled={currentStepIndex === steps.length - 1}
+                >
+                  <StepForward className="w-6 h-6" />
+                </button>
               </div>
               <h2 className="text-xl font-semibold mb-2">
                 {steps[currentStepIndex]?.title}
@@ -302,29 +317,12 @@ export default function RecipeVideoPage() {
           {/* 底部導航控制區域 */}
           <div className="mt-auto pt-4">
             <button
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center mb-4"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center"
               onClick={() => setShowStepsList(!showStepsList)}
             >
               <ListOrdered className="w-5 h-5 mr-2" />
               {showStepsList ? '隱藏步驟列表' : '顯示步驟列表'}
             </button>
-
-            <div className="flex justify-between">
-              <button
-                className="flex-1 bg-gray-900 hover:bg-gray-700 text-white p-3 rounded-l-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={atPrevStep}
-                disabled={currentStepIndex === 0}
-              >
-                <StepBack className="w-8 h-8" />
-              </button>
-              <button
-                className="flex-1 bg-gray-900 hover:bg-gray-700 text-white p-3 rounded-r-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={atNextStep}
-                disabled={currentStepIndex === steps.length - 1}
-              >
-                <StepForward className="w-8 h-8" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
