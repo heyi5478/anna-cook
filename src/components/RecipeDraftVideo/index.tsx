@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
@@ -17,6 +17,8 @@ import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/ui/VimeoPlayer';
+import { fetchRecipeDraft, type RecipeDraftStep } from '@/services/api';
+import { useRouter } from 'next/router';
 
 /**
  * 步驟資料型別
@@ -35,9 +37,10 @@ type Step = {
 type VideoEditorProps = {
   videoId?: number | string;
   totalDuration?: number;
+  recipeId?: number;
 };
 
-// 初始範例步驟資料
+// 初始範例步驟資料 (作為備用)
 const DEFAULT_STEPS: Step[] = [
   {
     id: 1,
@@ -58,6 +61,20 @@ const DEFAULT_STEPS: Step[] = [
     description: '步驟三：完成料理，裝盤即可享用',
   },
 ];
+
+/**
+ * 轉換 API 回傳的步驟資料為元件使用的格式
+ */
+const convertApiStepsToComponentSteps = (
+  apiSteps: RecipeDraftStep[],
+): Step[] => {
+  return apiSteps.map((step) => ({
+    id: step.stepId,
+    startTime: step.videoStart,
+    endTime: step.videoEnd,
+    description: step.stepDescription,
+  }));
+};
 
 /**
  * 時間標記按鈕元件
@@ -165,13 +182,30 @@ function debounce<T extends (...args: any[]) => any>(
 function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   const [steps, setSteps] = useState<Step[]>(initialSteps);
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [startTime, setStartTime] = useState<number>(initialSteps[0].startTime);
-  const [endTime, setEndTime] = useState<number>(initialSteps[0].endTime);
+  const [startTime, setStartTime] = useState<number>(
+    initialSteps[0]?.startTime || 0,
+  );
+  const [endTime, setEndTime] = useState<number>(
+    initialSteps[0]?.endTime || 10,
+  );
   const [currentDescription, setCurrentDescription] = useState<string>(
-    initialSteps[0].description,
+    initialSteps[0]?.description || '請輸入步驟說明',
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isStepChanging, setIsStepChanging] = useState<boolean>(false);
+
+  /**
+   * 設置新的步驟資料
+   */
+  const setStepsData = useCallback((newSteps: Step[]) => {
+    setSteps(newSteps);
+    if (newSteps.length > 0) {
+      setStartTime(newSteps[0].startTime);
+      setEndTime(newSteps[0].endTime);
+      setCurrentDescription(newSteps[0].description);
+      setCurrentStep(1);
+    }
+  }, []);
 
   /**
    * 根據步驟 ID 更新步驟資料
@@ -216,7 +250,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    * 添加新的步驟
    */
   const addStep = useCallback(() => {
-    const newStepId = Math.max(...steps.map((s) => s.id)) + 1;
+    const newStepId = Math.max(...steps.map((s) => s.id), 0) + 1;
     const newStep = {
       id: newStepId,
       startTime: 0,
@@ -351,6 +385,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     currentDescription,
     isDragging,
     isStepChanging,
+    setStepsData,
     updateStepById,
     goToNextStep,
     goToPrevStep,
@@ -370,8 +405,14 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
 const VideoEditor: React.FC<VideoEditorProps> = ({
   videoId = '1062288466',
   totalDuration = 0,
+  recipeId,
 }) => {
+  const router = useRouter();
+  const { recipeId: urlRecipeId } = router.query;
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+  const [actualVideoId, setActualVideoId] = useState<string | number>(videoId);
 
   const { currentTime, videoDuration, updateDuration, updateCurrentTime } =
     useVideoTime(totalDuration);
@@ -384,6 +425,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     currentDescription,
     isDragging,
     isStepChanging,
+    setStepsData,
     updateStepById,
     goToNextStep,
     goToPrevStep,
@@ -395,6 +437,68 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     onSliderCommitted,
     completeStepChange,
   } = useStepManager();
+
+  /**
+   * 從 API 獲取食譜草稿資料
+   */
+  useEffect(() => {
+    const fetchRecipeData = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // 使用 URL 中的 recipeId 參數或 props 中的 recipeId
+        const recipeIdValue = Number(urlRecipeId) || recipeId;
+
+        console.log('取得食譜 ID:', recipeIdValue);
+
+        if (!recipeIdValue) {
+          setLoading(false);
+          console.log('未提供食譜 ID，使用預設資料');
+          return; // 如果沒有 ID，使用預設資料
+        }
+
+        console.log('開始從 API 獲取食譜草稿，ID:', recipeIdValue);
+        const response = await fetchRecipeDraft(recipeIdValue);
+        console.log('API 回應資料:', response);
+
+        if (response.StatusCode !== 200) {
+          throw new Error(response.msg || '獲取食譜草稿失敗');
+        }
+
+        // 設置影片 ID
+        if (response.recipe.videoId) {
+          // 從 URL 路徑中提取最後的數字部分作為 Vimeo ID
+          const videoIdMatch = response.recipe.videoId.match(/\/([^/]+)$/);
+          const extractedVideoId = videoIdMatch
+            ? videoIdMatch[1]
+            : response.recipe.videoId;
+          console.log('提取的影片 ID:', extractedVideoId);
+          setActualVideoId(extractedVideoId);
+        } else {
+          console.log('回應中沒有影片 ID，使用預設值:', videoId);
+        }
+
+        // 轉換步驟資料並設置
+        if (response.steps && response.steps.length > 0) {
+          console.log('API 回傳步驟數量:', response.steps.length);
+          const convertedSteps = convertApiStepsToComponentSteps(
+            response.steps,
+          );
+          console.log('轉換後的步驟資料:', convertedSteps);
+          setStepsData(convertedSteps);
+        } else {
+          console.log('API 回傳步驟為空，使用預設步驟');
+        }
+      } catch (err) {
+        console.error('獲取食譜草稿失敗:', err);
+        setError(err instanceof Error ? err.message : '獲取食譜草稿時發生錯誤');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipeData();
+  }, [urlRecipeId, recipeId, setStepsData, videoId]);
 
   /**
    * 處理影片載入完成事件
@@ -462,6 +566,46 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     [isPlaying, goToPrevStep, goToNextStep],
   );
 
+  /**
+   * 使用 useMemo 記憶化時間軸 Slider 元件
+   */
+  const timelineSlider = useMemo(
+    () => (
+      <div className="py-6">
+        <Slider
+          defaultValue={[startTime, endTime]}
+          value={[startTime, endTime]}
+          max={videoDuration}
+          min={0}
+          step={0.1}
+          onValueChange={handleTimeRangeChange}
+          onValueCommit={onSliderCommitted}
+          className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-gray-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-gray-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          thumbClassName="h-6 w-4 bg-white border-2 border-gray-400 rounded-sm shadow-md hover:border-gray-600 focus:border-gray-600 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
+          disabled={false}
+        />
+      </div>
+    ),
+    [
+      startTime,
+      endTime,
+      videoDuration,
+      handleTimeRangeChange,
+      onSliderCommitted,
+      isDragging,
+    ],
+  );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">載入中...</div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-500 p-4">{error}</div>;
+  }
+
   return (
     <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
       {/* 麵包屑導航 */}
@@ -475,7 +619,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       {/* 影片預覽 */}
       <div className="bg-gray-100 aspect-video flex items-center justify-center my-2">
         <VimeoPlayer
-          videoId={videoId}
+          videoId={actualVideoId}
           width={400}
           startTime={isDragging || isStepChanging ? undefined : startTime}
           endTime={isDragging || isStepChanging ? undefined : endTime}
@@ -534,20 +678,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           <span>0:00</span>
           <span>{formatTimeHMS(videoDuration)}</span>
         </div>
-        <div className="py-6">
-          <Slider
-            defaultValue={[startTime, endTime]}
-            value={[startTime, endTime]}
-            max={videoDuration}
-            min={0}
-            step={0.1}
-            onValueChange={handleTimeRangeChange}
-            onValueCommit={onSliderCommitted}
-            className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-gray-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-gray-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-            thumbClassName="h-6 w-4 bg-white border-2 border-gray-400 rounded-sm shadow-md hover:border-gray-600 focus:border-gray-600 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
-            disabled={false}
-          />
-        </div>
+        {timelineSlider}
       </div>
 
       {/* 起點和終點 */}
