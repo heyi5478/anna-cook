@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import StepIndicator from '@/components/ui/StepIndicator';
 import { useRouter } from 'next/router';
-import { uploadRecipeVideo } from '@/services/api';
+import { uploadRecipeVideo, updateRecipeSteps } from '@/services/api';
 import UploadArea from './UploadArea';
 
 // 定義片段類型
@@ -88,7 +88,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
   /**
    * 處理影片檔案上傳
    */
-  const atFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const atFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     if (files && files.length > 0) {
       const file = files[0];
@@ -102,21 +102,63 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       // 清除所有錯誤訊息
       setErrors({});
 
-      // 模擬上傳進度
+      // 開始上傳進度動畫
       setIsUploading(true);
       setVideoFile(file);
       setFileName(file.name);
 
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsUploading(false);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 300);
+      try {
+        // 確認 recipeId 存在
+        if (!recipeId) {
+          throw new Error(
+            '無法取得食譜 ID，請確認網址中包含正確的 recipeId 參數',
+          );
+        }
+
+        // 立即將影片上傳到後端
+        console.log(`開始上傳影片至食譜 ID: ${recipeId}`);
+
+        // 模擬進度更新
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90;
+            }
+            return prev + 5;
+          });
+        }, 300);
+
+        // 實際上傳到後端
+        const response = await uploadRecipeVideo(
+          parseInt(recipeId as string, 10),
+          file,
+        );
+
+        console.log('影片上傳回應:', response);
+
+        // 完成進度更新
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+
+        // 檢查回應是否成功
+        if (response.message && !response.videoUri) {
+          throw new Error(response.message);
+        }
+
+        console.log('影片上傳成功，可繼續剪輯操作');
+        setApiError(null);
+      } catch (error) {
+        console.error('影片上傳失敗:', error);
+        setApiError(
+          error instanceof Error ? error.message : '影片上傳失敗，請稍後再試',
+        );
+      } finally {
+        // 無論成功或失敗，結束上傳狀態
+        setTimeout(() => {
+          setIsUploading(false);
+        }, 500);
+      }
 
       // 創建本地URL以預覽影片
       const url = URL.createObjectURL(file);
@@ -612,34 +654,46 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           throw new Error('無法取得食譜 ID，請回到步驟一重新開始');
         }
 
-        // 先告知父元件已完成剪輯
+        // 告知父元件已完成剪輯
         onSave({
           file: videoFile,
           segments,
           description: segments[currentSegmentIndex]?.description,
         });
 
-        // 上傳影片到 API
-        console.log(`開始上傳影片至食譜 ID: ${recipeId}`);
-        const response = await uploadRecipeVideo(
-          parseInt(recipeId as string, 10),
-          videoFile,
-        );
+        // 將片段轉換為API需要的格式
+        const stepsForAPI = segments.map((segment) => ({
+          description: segment.description,
+          startTime: Math.round(segment.startTime),
+          endTime: Math.round(segment.endTime),
+        }));
 
-        console.log('影片上傳回應:', response);
+        console.log('準備更新步驟資訊:', stepsForAPI);
 
-        // 檢查回應是否成功
-        if (response.message && !response.videoUri) {
-          throw new Error(response.message);
+        // 更新步驟資訊
+        try {
+          const recipeIdNumber = parseInt(recipeId as string, 10);
+          const stepResponse = await updateRecipeSteps(
+            recipeIdNumber,
+            stepsForAPI,
+          );
+          console.log('步驟更新成功:', stepResponse);
+
+          if (stepResponse.StatusCode !== 200) {
+            console.warn('步驟更新回應狀態不是200:', stepResponse);
+          }
+        } catch (stepError) {
+          console.error('更新步驟失敗:', stepError);
+          // 不中斷流程，繼續導向到食譜草稿頁面
         }
 
-        // 上傳成功，導向到食譜草稿頁面
-        console.log('影片上傳成功，導向到草稿頁面');
+        // 導向到食譜草稿頁面
+        console.log('影片剪輯完成，導向到草稿頁面');
         router.push(`/recipe-draft?recipeId=${recipeId}`);
       } catch (error) {
-        console.error('影片上傳失敗:', error);
+        console.error('操作失敗:', error);
         setApiError(
-          error instanceof Error ? error.message : '影片上傳失敗，請稍後再試',
+          error instanceof Error ? error.message : '操作失敗，請稍後再試',
         );
 
         // 滾動到錯誤訊息
@@ -1016,7 +1070,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
           {/* API 錯誤訊息 */}
           {apiError && (
-            <div className="text-red-500 text-sm p-2 bg-red-50 border border-red-300 rounded-md flex items-center api-error">
+            <div className="text-red-500 text-sm p-2 bg-red-50 border border-red-300 rounded-md flex items-center api-error mt-2">
               <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
               {apiError}
             </div>

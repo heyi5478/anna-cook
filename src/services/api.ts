@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://13.71.34.213/api';
+import { apiConfig, authConfig } from '@/config';
 
 export type Recipe = {
   Id: number;
@@ -55,13 +55,134 @@ export type VideoUploadResponse = {
   newToken?: string;
 };
 
+export type RecipeDraftIngredient = {
+  ingredientId: number;
+  ingredientName: string;
+  ingredientAmount: number;
+  ingredientUnit: string;
+  isFlavoring: boolean;
+};
+
+export type RecipeDraftTag = {
+  tagId: number;
+  tagName: string;
+};
+
+export type RecipeDraftStep = {
+  stepId: number;
+  stepOrder: number;
+  stepDescription: string;
+  videoStart: number;
+  videoEnd: number;
+};
+
+export type RecipeDraft = {
+  id: number;
+  displayId: string;
+  recipeName: string;
+  isPublished: boolean;
+  coverPhoto: string;
+  description: string;
+  cookingTime: number;
+  portion: number;
+  videoId?: string;
+};
+
+export type RecipeDraftResponse = {
+  StatusCode: number;
+  msg: string;
+  recipe: RecipeDraft;
+  ingredients: RecipeDraftIngredient[];
+  tags: RecipeDraftTag[];
+  steps: RecipeDraftStep[];
+  newToken?: string;
+};
+
+export type UpdateStepsRequest = {
+  description: string;
+  startTime: number;
+  endTime: number;
+}[];
+
+export type UpdateStepsResponse = {
+  StatusCode: number;
+  msg: string;
+  stepCount: number;
+  newToken?: string;
+};
+
+export type SubmitDraftResponse = {
+  StatusCode: number;
+  msg: string;
+  recipeId?: number;
+  newToken?: string;
+  error?: string;
+};
+
+type SubmitDraftDetail = {
+  RecipeIntro: string;
+  CookingTime: number;
+  Portion: number;
+  Ingredients: {
+    IngredientName: string;
+    IngredientAmount: number;
+    IngredientUnit: string;
+    IsFlavoring: boolean;
+  }[];
+  Tags: string[];
+};
+
+type SubmitDraftStep = {
+  Description: string;
+  StartTime: number;
+  EndTime: number;
+};
+
+/**
+ * 從 Cookie 獲取 JWT Token
+ */
+export const getAuthToken = (): string | null => {
+  if (typeof document === 'undefined') return null;
+
+  const cookies = document.cookie.split(';');
+  const authCookie = cookies
+    .map((cookie) => cookie.trim().split('='))
+    .find(([name]) => name === authConfig.tokenCookieName);
+
+  if (authCookie) {
+    return decodeURIComponent(authCookie[1]);
+  }
+
+  // 開發環境下使用測試 token
+  if (process.env.NODE_ENV === 'development') {
+    console.log('開發環境：使用測試 token');
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xN1QwNTowODoxNi41NzgxMzM5WiJ9.ER_pZwZ_eHDWQmHWgq3dL7sGl_kMUBYYsgdose8mFBd0P2eIP5EvwspjqOKMWiZRZ5uhCJHTyDd0qLSqeGYbHw';
+  }
+
+  return null;
+};
+
+/**
+ * 更新 Cookie 中的 JWT Token
+ */
+export const updateAuthToken = (token: string): void => {
+  if (typeof document === 'undefined') return;
+
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + authConfig.tokenExpiryDays);
+
+  document.cookie = `${authConfig.tokenCookieName}=${encodeURIComponent(
+    token,
+  )}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+};
+
 /**
  * 獲取 Google 登入 URL
  */
 export const fetchGoogleAuthUrl = async (): Promise<string> => {
   try {
-    console.log(`發送請求: GET ${API_BASE_URL}/auth/google/auth`);
-    const res = await fetch(`${API_BASE_URL}/auth/google/auth`);
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/auth/google/auth`);
+    const res = await fetch(`${apiConfig.baseUrl}/auth/google/auth`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -82,8 +203,8 @@ export const fetchGoogleAuthUrl = async (): Promise<string> => {
  */
 export const fetchRecipes = async (): Promise<Recipe[]> => {
   try {
-    console.log(`發送請求: GET ${API_BASE_URL}/recipes`);
-    const res = await fetch(`${API_BASE_URL}/recipes`);
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes`);
+    const res = await fetch(`${apiConfig.baseUrl}/recipes`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -104,8 +225,8 @@ export const fetchRecipes = async (): Promise<Recipe[]> => {
  */
 export const fetchRecipeById = async (id: number): Promise<Recipe> => {
   try {
-    console.log(`發送請求: GET ${API_BASE_URL}/recipes/${id}`);
-    const res = await fetch(`${API_BASE_URL}/recipes/${id}`);
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes/${id}`);
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/${id}`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -122,51 +243,13 @@ export const fetchRecipeById = async (id: number): Promise<Recipe> => {
 };
 
 /**
- * 從 Cookie 獲取 JWT Token
- */
-export const getAuthToken = (): string | null => {
-  if (typeof document === 'undefined') return null;
-
-  const cookies = document.cookie.split(';');
-  const authCookie = cookies
-    .map((cookie) => cookie.trim().split('='))
-    .find(([name]) => name === 'token');
-
-  if (authCookie) {
-    return decodeURIComponent(authCookie[1]);
-  }
-
-  // 開發環境下使用測試 token
-  if (process.env.NODE_ENV === 'development') {
-    console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MiwiRGlzcGxheUlkIjoiTTAwMDAwMSIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xMVQwODo0MTowMy44NDM1NjcwWiJ9.PGu7Rc_kTZBU2RtzhPL7aRJeKVOCzTK2s_L1LfP3atgAGRaxdvvtbOeejNU5CUGzLGkXvIr4gUZJ0nIjq9ejyA';
-  }
-
-  return null;
-};
-
-/**
- * 更新 Cookie 中的 JWT Token
- */
-export const updateAuthToken = (token: string, expiresInDays = 7): void => {
-  if (typeof document === 'undefined') return;
-
-  const expirationDate = new Date();
-  expirationDate.setDate(expirationDate.getDate() + expiresInDays);
-
-  document.cookie = `token=${encodeURIComponent(
-    token,
-  )}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict`;
-};
-
-/**
  * 上傳食譜基本資料
  */
 export const uploadRecipeBasic = async (
   formData: RecipeFormData,
 ): Promise<RecipeCreateResponse> => {
   try {
-    console.log(`發送請求: POST ${API_BASE_URL}/recipes`);
+    console.log(`發送請求: POST ${apiConfig.baseUrl}/recipes`);
     console.log('請求資料:', formData);
 
     // 取得 JWT Token
@@ -203,7 +286,7 @@ export const uploadRecipeBasic = async (
     console.log('- Authorization: Bearer [token 已設置]');
 
     // 發送請求
-    const res = await fetch(`${API_BASE_URL}/recipes`, {
+    const res = await fetch(`${apiConfig.baseUrl}/recipes`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -258,11 +341,11 @@ export const exchangeGoogleCodeForToken = async (
 ): Promise<any> => {
   try {
     console.log(
-      `發送請求: GET ${API_BASE_URL}/auth/google/callback?code=${code}`,
+      `發送請求: GET ${apiConfig.baseUrl}/auth/google/callback?code=${code}`,
     );
 
     const res = await fetch(
-      `${API_BASE_URL}/auth/google/callback?code=${encodeURIComponent(code)}`,
+      `${apiConfig.baseUrl}/auth/google/callback?code=${encodeURIComponent(code)}`,
       {
         method: 'GET',
       },
@@ -291,7 +374,7 @@ export const updateRecipeStep2 = async (
   data: RecipeStep2Data,
 ): Promise<RecipeCreateResponse> => {
   try {
-    console.log(`發送請求: PUT ${API_BASE_URL}/recipes/step2/${recipeId}`);
+    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/step2/${recipeId}`);
     console.log('請求資料:', data);
 
     // 取得 JWT Token
@@ -302,7 +385,7 @@ export const updateRecipeStep2 = async (
     }
 
     // 發送請求
-    const res = await fetch(`${API_BASE_URL}/recipes/step2/${recipeId}`, {
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/step2/${recipeId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -351,6 +434,124 @@ export const updateRecipeStep2 = async (
 };
 
 /**
+ * 獲取尚未發佈的草稿食譜詳細資訊
+ */
+export const fetchRecipeDraft = async (
+  recipeId: number,
+): Promise<RecipeDraftResponse> => {
+  try {
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/draft`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/draft`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.StatusCode !== 200) {
+      return responseData;
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('獲取草稿食譜失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 批次更新食譜步驟（含影片起訖時間）
+ */
+export const updateRecipeSteps = async (
+  recipeId: number,
+  steps: UpdateStepsRequest,
+): Promise<UpdateStepsResponse> => {
+  try {
+    console.log(
+      `發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/steps/bulk`,
+    );
+    console.log('請求資料:', steps);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/steps/bulk`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(steps),
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('更新食譜步驟失敗:', error);
+    throw error;
+  }
+};
+
+/**
  * 上傳影片至指定食譜
  */
 export const uploadRecipeVideo = async (
@@ -358,7 +559,7 @@ export const uploadRecipeVideo = async (
   videoFile: File,
 ): Promise<VideoUploadResponse> => {
   try {
-    console.log(`發送請求: PUT ${API_BASE_URL}/recipes/${recipeId}/video`);
+    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/video`);
     console.log('上傳影片:', videoFile.name, videoFile.size, videoFile.type);
 
     // 取得 JWT Token
@@ -374,7 +575,7 @@ export const uploadRecipeVideo = async (
     formData.append('video', videoFile);
 
     // 發送請求
-    const res = await fetch(`${API_BASE_URL}/recipes/${recipeId}/video`, {
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/video`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -416,6 +617,145 @@ export const uploadRecipeVideo = async (
     return {
       message:
         error instanceof Error ? error.message : '上傳影片過程中發生錯誤',
+    };
+  }
+};
+
+/**
+ * 提交食譜草稿到後端並發布
+ */
+export const submitRecipeDraft = async (
+  recipeId: number,
+  data: {
+    recipeName: string;
+    coverImage?: File;
+    recipeIntro: string;
+    cookingTime: number;
+    portion: number;
+    ingredients: {
+      name: string;
+      amount: string;
+      isFlavoring: boolean;
+    }[];
+    tags: string[];
+    steps: {
+      description: string;
+      startTime: string;
+      endTime: string;
+    }[];
+  },
+): Promise<SubmitDraftResponse> => {
+  try {
+    console.log(
+      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/submit-draft`,
+    );
+    console.log('請求資料:', data);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 準備 detail JSON 內容
+    const detail: SubmitDraftDetail = {
+      RecipeIntro: data.recipeIntro,
+      CookingTime: data.cookingTime,
+      Portion: data.portion,
+      Ingredients: data.ingredients.map((item) => {
+        // 從格式 "100 g" 中提取數量和單位
+        const amountStr = item.amount.trim();
+        let amount = 0;
+        let unit = '';
+
+        // 嘗試解析數字和單位
+        const match = amountStr.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+        if (match) {
+          amount = parseFloat(match[1]);
+          unit = match[2].trim();
+        }
+
+        return {
+          IngredientName: item.name,
+          IngredientAmount: amount,
+          IngredientUnit: unit || '個',
+          IsFlavoring: item.isFlavoring,
+        };
+      }),
+      Tags: data.tags,
+    };
+
+    // 準備 steps JSON 內容
+    const steps: SubmitDraftStep[] = data.steps.map((step) => {
+      // 從格式 "1:30" 轉換為秒數
+      const convertTimeToSeconds = (timeStr: string): number => {
+        const parts = timeStr.split(':');
+        if (parts.length === 2) {
+          const minutes = parseInt(parts[0], 10);
+          const seconds = parseInt(parts[1], 10);
+          return minutes * 60 + seconds;
+        }
+        return 0;
+      };
+
+      return {
+        Description: step.description,
+        StartTime: convertTimeToSeconds(step.startTime),
+        EndTime: convertTimeToSeconds(step.endTime),
+      };
+    });
+
+    // 創建 FormData 物件
+    const formData = new FormData();
+    formData.append('recipeName', data.recipeName);
+    formData.append('detail', JSON.stringify(detail));
+    formData.append('steps', JSON.stringify(steps));
+
+    // 如果有封面圖片，添加到表單中
+    if (data.coverImage && data.coverImage instanceof File) {
+      formData.append('photo', data.coverImage);
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/submit-draft`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('提交食譜草稿失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: error instanceof Error ? error.message : '提交草稿時發生未知錯誤',
     };
   }
 };
