@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { VimeoPlayer } from '@/components/ui/VimeoPlayer';
@@ -32,12 +32,26 @@ interface Step {
  * 食譜視頻頁面組件
  */
 export default function RecipeVideoPage() {
+  console.log('RecipeVideoPage 重新渲染');
+  const mountCountRef = useRef<number>(0);
+
+  // 組件掛載次數追蹤
+  useEffect(() => {
+    mountCountRef.current += 1;
+    console.log(`RecipeVideoPage 已掛載 ${mountCountRef.current} 次`);
+
+    return () => {
+      console.log('RecipeVideoPage 準備卸載');
+    };
+  }, []);
+
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(2); // 從第三步開始，索引為2
   const [showRightPanel, setShowRightPanel] = useState<boolean>(true);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const prevPlayingStateRef = useRef<boolean>(false);
 
   // 模擬步驟數據 - 實際應用中應從 API 獲取
   const steps: Step[] = [
@@ -92,6 +106,7 @@ export default function RecipeVideoPage() {
    * 處理時間更新
    */
   const atTimeUpdate = (time: number) => {
+    console.log(`時間更新: ${time.toFixed(2)}秒`);
     setCurrentTime(time);
 
     // 查找當前步驟
@@ -100,6 +115,9 @@ export default function RecipeVideoPage() {
     );
 
     if (stepIndex !== -1 && stepIndex !== currentStepIndex) {
+      console.log(
+        `步驟變更: 從步驟 ${currentStepIndex + 1} 到步驟 ${stepIndex + 1}`,
+      );
       setCurrentStepIndex(stepIndex);
     }
   };
@@ -108,6 +126,7 @@ export default function RecipeVideoPage() {
    * 處理時長變更
    */
   const atDurationChange = (newDuration: number) => {
+    console.log(`視頻時長: ${newDuration.toFixed(2)}秒`);
     setDuration(newDuration);
   };
 
@@ -118,7 +137,8 @@ export default function RecipeVideoPage() {
     if (currentStepIndex < steps.length - 1) {
       const nextStep = steps[currentStepIndex + 1];
       setCurrentStepIndex(currentStepIndex + 1);
-      // 如果有播放器引用，則跳轉到下一步驟的起始時間
+      // 明確設置新的時間
+      console.log(`跳轉到下一步驟的開始時間: ${nextStep.startTime}秒`);
       setCurrentTime(nextStep.startTime);
     }
   };
@@ -130,7 +150,8 @@ export default function RecipeVideoPage() {
     if (currentStepIndex > 0) {
       const prevStep = steps[currentStepIndex - 1];
       setCurrentStepIndex(currentStepIndex - 1);
-      // 如果有播放器引用，則跳轉到上一步驟的起始時間
+      // 明確設置新的時間
+      console.log(`跳轉到上一步驟的開始時間: ${prevStep.startTime}秒`);
       setCurrentTime(prevStep.startTime);
     }
   };
@@ -139,6 +160,7 @@ export default function RecipeVideoPage() {
    * 切換播放狀態
    */
   const atTogglePlay = () => {
+    console.log(`切換播放狀態: ${!isPlaying ? '播放' : '暫停'}`);
     setIsPlaying(!isPlaying);
   };
 
@@ -147,6 +169,9 @@ export default function RecipeVideoPage() {
    */
   const atSelectStep = (index: number) => {
     setCurrentStepIndex(index);
+    console.log(
+      `跳轉到選擇的步驟 ${index + 1} 的開始時間: ${steps[index].startTime}秒`,
+    );
     setCurrentTime(steps[index].startTime);
     setDialogOpen(false); // 關閉步驟選單對話框
   };
@@ -206,6 +231,14 @@ export default function RecipeVideoPage() {
     return undefined;
   }, []);
 
+  // 監控播放狀態變化
+  useEffect(() => {
+    if (prevPlayingStateRef.current !== isPlaying) {
+      console.log(`播放狀態實際變更為: ${isPlaying ? '播放中' : '已暫停'}`);
+      prevPlayingStateRef.current = isPlaying;
+    }
+  }, [isPlaying]);
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       <Head>
@@ -224,7 +257,6 @@ export default function RecipeVideoPage() {
           <VimeoPlayer
             videoId={videoId}
             responsive
-            autoplay={false}
             muted={false}
             loop={false}
             isPlaying={isPlaying}
@@ -232,6 +264,11 @@ export default function RecipeVideoPage() {
             endTime={steps[currentStepIndex]?.endTime || undefined}
             onTimeUpdate={atTimeUpdate}
             onDurationChange={atDurationChange}
+            onLoaded={() => console.log('Vimeo 播放器加載完成')}
+            onPlay={() => console.log('Vimeo 播放器開始播放')}
+            onPause={() => console.log('Vimeo 播放器已暫停')}
+            onEnded={() => console.log('Vimeo 播放器播放結束')}
+            onError={(error) => console.error('Vimeo 播放器錯誤:', error)}
             className="w-full h-full"
           />
 
