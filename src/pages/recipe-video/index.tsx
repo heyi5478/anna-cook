@@ -5,6 +5,7 @@ import { VimeoPlayer } from '@/components/ui/VimeoPlayer';
 import {
   ArrowLeft,
   Play,
+  Pause,
   ListOrdered,
   StepBack,
   StepForward,
@@ -249,19 +250,24 @@ export default function RecipeVideoPage() {
             </div>
           </div>
 
-          {/* 播放按鈕覆蓋層 */}
-          {!isPlaying && (
-            <div
-              className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer"
-              onClick={atTogglePlay}
-            >
+          {/* 播放控制覆蓋層 - 總是顯示，但圖標根據播放狀態變化 */}
+          <div
+            className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer"
+            onClick={atTogglePlay}
+          >
+            {isPlaying ? (
+              <Pause
+                className="w-24 h-24 text-white opacity-80 hover:opacity-100 transition"
+                strokeWidth={1}
+              />
+            ) : (
               <Play
                 className="w-24 h-24 text-white opacity-80 hover:opacity-100 transition"
                 fill="white"
                 strokeWidth={1}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* 當面板收起時的展開按鈕 */}
