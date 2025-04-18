@@ -29,6 +29,15 @@ interface Step {
 }
 
 /**
+ * 格式化時間為 mm:ss 格式
+ */
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
  * 食譜視頻頁面組件
  */
 export default function RecipeVideoPage() {
@@ -105,14 +114,8 @@ export default function RecipeVideoPage() {
   const atTimeUpdate = (time: number) => {
     setCurrentTime(time);
 
-    // 查找當前步驟
-    const stepIndex = steps.findIndex(
-      (step) => time >= step.startTime && time < step.endTime,
-    );
-
-    if (stepIndex !== -1 && stepIndex !== currentStepIndex) {
-      setCurrentStepIndex(stepIndex);
-    }
+    // 不再自動切換步驟，讓使用者通過按鈕切換
+    // 只進行時間更新顯示
   };
 
   /**
@@ -130,6 +133,11 @@ export default function RecipeVideoPage() {
       const nextStep = steps[currentStepIndex + 1];
       setCurrentStepIndex(currentStepIndex + 1);
       setCurrentTime(nextStep.startTime);
+
+      // 確保開始播放
+      if (!isPlaying) {
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -141,6 +149,11 @@ export default function RecipeVideoPage() {
       const prevStep = steps[currentStepIndex - 1];
       setCurrentStepIndex(currentStepIndex - 1);
       setCurrentTime(prevStep.startTime);
+
+      // 確保開始播放
+      if (!isPlaying) {
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -158,6 +171,11 @@ export default function RecipeVideoPage() {
     setCurrentStepIndex(index);
     setCurrentTime(steps[index].startTime);
     setDialogOpen(false); // 關閉步驟選單對話框
+
+    // 確保開始播放
+    if (!isPlaying) {
+      setIsPlaying(true);
+    }
   };
 
   /**
@@ -215,6 +233,9 @@ export default function RecipeVideoPage() {
     return undefined;
   }, []);
 
+  // 獲取當前步驟
+  const currentStep = steps[currentStepIndex];
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       <Head>
@@ -234,10 +255,10 @@ export default function RecipeVideoPage() {
             videoId={videoId}
             responsive
             muted={false}
-            loop={false}
+            loop // 開啟循環播放功能
             isPlaying={isPlaying}
-            startTime={steps[currentStepIndex]?.startTime || 0}
-            endTime={steps[currentStepIndex]?.endTime || undefined}
+            startTime={currentStep.startTime}
+            endTime={currentStep.endTime}
             onTimeUpdate={atTimeUpdate}
             onDurationChange={atDurationChange}
             className="w-full h-full"
@@ -321,11 +342,13 @@ export default function RecipeVideoPage() {
                   </button>
                 </div>
                 <h2 className="text-xl font-semibold mb-2">
-                  {steps[currentStepIndex]?.title}
+                  {currentStep.title}
                 </h2>
-                <p className="text-gray-300">
-                  {steps[currentStepIndex]?.description}
-                </p>
+                <p className="text-gray-300">{currentStep.description}</p>
+                <div className="mt-4 text-sm text-gray-400">
+                  時間段: {formatTime(currentStep.startTime)} -{' '}
+                  {formatTime(currentStep.endTime)}
+                </div>
               </div>
             </div>
 
