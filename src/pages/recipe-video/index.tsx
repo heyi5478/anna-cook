@@ -10,6 +10,7 @@ import {
   StepForward,
   ChevronsLeft,
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 /**
  * 食譜視頻頁面的 Props 介面
@@ -35,8 +36,8 @@ export default function RecipeVideoPage() {
   const [, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(2); // 從第三步開始，索引為2
-  const [showStepsList, setShowStepsList] = useState<boolean>(false);
   const [showRightPanel, setShowRightPanel] = useState<boolean>(true);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   // 模擬步驟數據 - 實際應用中應從 API 獲取
   const steps: Step[] = [
@@ -139,6 +140,15 @@ export default function RecipeVideoPage() {
    */
   const atTogglePlay = () => {
     setIsPlaying(!isPlaying);
+  };
+
+  /**
+   * 選擇特定步驟
+   */
+  const atSelectStep = (index: number) => {
+    setCurrentStepIndex(index);
+    setCurrentTime(steps[index].startTime);
+    setDialogOpen(false); // 關閉步驟選單對話框
   };
 
   /**
@@ -300,52 +310,37 @@ export default function RecipeVideoPage() {
                   {steps[currentStepIndex]?.description}
                 </p>
               </div>
-
-              {/* 其他步驟說明 */}
-              {showStepsList && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-3">所有步驟</h3>
-                  <div className="space-y-4">
-                    {steps.map((step, index) => (
-                      <div
-                        key={step.id}
-                        className={`p-3 rounded cursor-pointer ${
-                          index === currentStepIndex
-                            ? 'bg-gray-700'
-                            : 'bg-gray-900 hover:bg-gray-700'
-                        }`}
-                        onClick={() => {
-                          setCurrentStepIndex(index);
-                          setCurrentTime(step.startTime);
-                        }}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold">
-                            步驟 {index + 1}
-                          </span>
-                          {index === currentStepIndex && (
-                            <span className="text-green-400 text-sm">當前</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-300 truncate">
-                          {step.title}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* 底部導航控制區域 */}
             <div className="mt-auto pt-4">
-              <button
-                className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center"
-                onClick={() => setShowStepsList(!showStepsList)}
-              >
-                <ListOrdered className="w-5 h-5 mr-2" />
-                {showStepsList ? '隱藏步驟列表' : '顯示步驟列表'}
-              </button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <button className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center">
+                    <ListOrdered className="w-5 h-5 mr-2" />
+                    步驟列表
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] bg-gray-800 border-none text-white">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-4 p-2">
+                    {steps.map((step, index) => (
+                      <div
+                        key={step.id}
+                        className={`p-4 rounded-lg cursor-pointer flex flex-col justify-center items-center border border-gray-700 transition ${
+                          index === currentStepIndex
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-white text-gray-800 hover:bg-gray-100'
+                        }`}
+                        onClick={() => atSelectStep(index)}
+                      >
+                        <span className="text-lg font-semibold">
+                          步驟{index + 1}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         )}
