@@ -8,6 +8,7 @@ import {
   ListOrdered,
   StepBack,
   StepForward,
+  ChevronsLeft,
 } from 'lucide-react';
 
 /**
@@ -35,6 +36,7 @@ export default function RecipeVideoPage() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(2); // 從第三步開始，索引為2
   const [showStepsList, setShowStepsList] = useState<boolean>(false);
+  const [showRightPanel, setShowRightPanel] = useState<boolean>(true);
 
   // 模擬步驟數據 - 實際應用中應從 API 獲取
   const steps: Step[] = [
@@ -208,7 +210,7 @@ export default function RecipeVideoPage() {
       {/* 視頻區域 */}
       <div className="relative flex h-full">
         {/* 視頻播放器 */}
-        <div className="flex-1 relative">
+        <div className={`relative ${showRightPanel ? 'flex-1' : 'w-full'}`}>
           <VimeoPlayer
             videoId={videoId}
             responsive
@@ -249,82 +251,104 @@ export default function RecipeVideoPage() {
           )}
         </div>
 
+        {/* 當面板收起時的展開按鈕 */}
+        {!showRightPanel && (
+          <button
+            className="absolute right-0 top-2 bg-gray-800 text-white p-1.5 rounded-l-lg z-20"
+            onClick={() => setShowRightPanel(true)}
+          >
+            <ChevronsLeft className="w-4 h-4" />
+          </button>
+        )}
+
         {/* 右側步驟說明區域 */}
-        <div className="w-[200px] bg-gray-800 text-white p-6 flex flex-col h-full overflow-auto">
-          <div className="flex-1">
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <button
-                  className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={atPrevStep}
-                  disabled={currentStepIndex === 0}
-                >
-                  <StepBack className="w-6 h-6" />
-                </button>
-                <div className="text-4xl font-bold">
-                  {currentStepIndex + 1}/{steps.length}
+        {showRightPanel && (
+          <div className="w-[200px] bg-gray-800 text-white p-6 flex flex-col h-full overflow-auto relative">
+            {/* 面板內的收起按鈕 */}
+            <button
+              className="absolute top-2 left-2 bg-gray-700 hover:bg-gray-600 text-white p-1.5 rounded-lg z-10"
+              onClick={() => setShowRightPanel(false)}
+            >
+              <ChevronsLeft className="w-4 h-4 rotate-180" />
+            </button>
+
+            <div className="flex-1 mt-6">
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={atPrevStep}
+                    disabled={currentStepIndex === 0}
+                  >
+                    <StepBack className="w-6 h-6" />
+                  </button>
+                  <div className="text-4xl font-bold">
+                    {currentStepIndex + 1}/{steps.length}
+                  </div>
+                  <button
+                    className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={atNextStep}
+                    disabled={currentStepIndex === steps.length - 1}
+                  >
+                    <StepForward className="w-6 h-6" />
+                  </button>
                 </div>
-                <button
-                  className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={atNextStep}
-                  disabled={currentStepIndex === steps.length - 1}
-                >
-                  <StepForward className="w-6 h-6" />
-                </button>
+                <h2 className="text-xl font-semibold mb-2">
+                  {steps[currentStepIndex]?.title}
+                </h2>
+                <p className="text-gray-300">
+                  {steps[currentStepIndex]?.description}
+                </p>
               </div>
-              <h2 className="text-xl font-semibold mb-2">
-                {steps[currentStepIndex]?.title}
-              </h2>
-              <p className="text-gray-300">
-                {steps[currentStepIndex]?.description}
-              </p>
+
+              {/* 其他步驟說明 */}
+              {showStepsList && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-3">所有步驟</h3>
+                  <div className="space-y-4">
+                    {steps.map((step, index) => (
+                      <div
+                        key={step.id}
+                        className={`p-3 rounded cursor-pointer ${
+                          index === currentStepIndex
+                            ? 'bg-gray-700'
+                            : 'bg-gray-900 hover:bg-gray-700'
+                        }`}
+                        onClick={() => {
+                          setCurrentStepIndex(index);
+                          setCurrentTime(step.startTime);
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold">
+                            步驟 {index + 1}
+                          </span>
+                          {index === currentStepIndex && (
+                            <span className="text-green-400 text-sm">當前</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-300 truncate">
+                          {step.title}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* 其他步驟說明 */}
-            {showStepsList && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-3">所有步驟</h3>
-                <div className="space-y-4">
-                  {steps.map((step, index) => (
-                    <div
-                      key={step.id}
-                      className={`p-3 rounded cursor-pointer ${
-                        index === currentStepIndex
-                          ? 'bg-gray-700'
-                          : 'bg-gray-900 hover:bg-gray-700'
-                      }`}
-                      onClick={() => {
-                        setCurrentStepIndex(index);
-                        setCurrentTime(step.startTime);
-                      }}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold">步驟 {index + 1}</span>
-                        {index === currentStepIndex && (
-                          <span className="text-green-400 text-sm">當前</span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-300 truncate">
-                        {step.title}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* 底部導航控制區域 */}
+            <div className="mt-auto pt-4">
+              <button
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center"
+                onClick={() => setShowStepsList(!showStepsList)}
+              >
+                <ListOrdered className="w-5 h-5 mr-2" />
+                {showStepsList ? '隱藏步驟列表' : '顯示步驟列表'}
+              </button>
+            </div>
           </div>
-
-          {/* 底部導航控制區域 */}
-          <div className="mt-auto pt-4">
-            <button
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg flex items-center justify-center"
-              onClick={() => setShowStepsList(!showStepsList)}
-            >
-              <ListOrdered className="w-5 h-5 mr-2" />
-              {showStepsList ? '隱藏步驟列表' : '顯示步驟列表'}
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
