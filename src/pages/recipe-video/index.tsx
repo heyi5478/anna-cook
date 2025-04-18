@@ -31,7 +31,6 @@ interface Step {
  * 食譜視頻頁面組件
  */
 export default function RecipeVideoPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -244,6 +243,10 @@ export default function RecipeVideoPage() {
               <ArrowLeft className="w-6 h-6 mr-2" />
               <span className="underline">回到食譜</span>
             </Link>
+            <div className="ml-auto text-white">
+              {Math.floor(currentTime / 60)}:
+              {(currentTime % 60).toFixed(0).padStart(2, '0')}
+            </div>
           </div>
 
           {/* 播放按鈕覆蓋層 */}
