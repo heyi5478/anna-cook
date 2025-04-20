@@ -1,5 +1,6 @@
 import { Star, MessageSquare, Heart } from 'lucide-react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 /**
  * 顯示草稿的食譜卡片
@@ -13,8 +14,8 @@ export function DraftRecipeCard({
   rating = 4.3,
 }) {
   return (
-    <div className="border rounded-lg p-4 flex">
-      <div className="w-36 h-36 bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
+    <div className="border rounded-lg p-4 flex relative">
+      <div className="w-28 h-28 bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
         <Image
           src={imageSrc || '/placeholder.svg'}
           alt={title}
@@ -24,29 +25,34 @@ export function DraftRecipeCard({
       </div>
 
       <div className="flex-1 ml-4 flex flex-col">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold">{title}</h3>
-          <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-md text-sm">
-            已儲存
-          </span>
-        </div>
+        <h3 className="text-lg font-medium mb-1">{title}</h3>
+        <p className="text-gray-500 text-sm mb-auto line-clamp-2">
+          {description}
+        </p>
 
-        <p className="text-gray-500 mb-auto line-clamp-2">{description}</p>
-
-        <div className="flex items-center gap-6 mt-2">
+        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
           <div className="flex items-center">
-            <Heart className="h-5 w-5 mr-1" />
-            <span>{likes}</span>
-          </div>
-          <div className="flex items-center">
-            <MessageSquare className="h-5 w-5 mr-1" />
+            <MessageSquare className="h-4 w-4 mr-1" />
             <span>{comments}</span>
           </div>
           <div className="flex items-center">
-            <Star className="h-5 w-5 mr-1" />
+            <Heart className="h-4 w-4 mr-1" />
+            <span>{likes}</span>
+          </div>
+          <div className="flex items-center">
+            <Star className="h-4 w-4 mr-1 text-amber-400" />
             <span>{rating}</span>
           </div>
         </div>
+      </div>
+
+      <div className="absolute top-4 right-4">
+        <Button
+          variant="outline"
+          className="px-4 py-1 h-8 rounded-md bg-white hover:bg-gray-50 text-gray-700 font-normal text-sm border-gray-200"
+        >
+          轉草稿
+        </Button>
       </div>
     </div>
   );
