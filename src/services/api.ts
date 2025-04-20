@@ -156,7 +156,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0xN1QwNTowODoxNi41NzgxMzM5WiJ9.ER_pZwZ_eHDWQmHWgq3dL7sGl_kMUBYYsgdose8mFBd0P2eIP5EvwspjqOKMWiZRZ5uhCJHTyDd0qLSqeGYbHw';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMFQxNTowMjozMi4yMjcyNTU5WiJ9.WM4S8qxSo8CESihutn0AU7vHdxb99ItsppEoFd4br9_x6vdYf1DetT4kLU4wBYmJYZ8zQrfswrJMtmMicS4RQw';
   }
 
   return null;
@@ -757,5 +757,64 @@ export const submitRecipeDraft = async (
       StatusCode: 500,
       msg: error instanceof Error ? error.message : '提交草稿時發生未知錯誤',
     };
+  }
+};
+
+/**
+ * 檢查使用者認證狀態並取得新的 Token
+ * @returns 包含新 Token 的回應，若未授權則回傳錯誤
+ */
+export const checkAuth = async (): Promise<{
+  message: string;
+  token: string;
+}> => {
+  try {
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/api/check`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/api/check`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果回應狀態不是成功
+    if (!res.ok) {
+      throw new Error(responseData?.msg || '身份驗證失敗');
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.token) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.token);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('檢查使用者認證狀態失敗:', error);
+    throw error;
   }
 };

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { getAuthToken } from '@/services/api';
+import { getAuthToken, checkAuth } from '@/services/api';
 
 export type AuthStatus = {
   isAuthenticated: boolean | null;
@@ -20,22 +20,40 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
   });
 
   useEffect(() => {
-    const token = getAuthToken();
+    const verifyAuth = async () => {
+      try {
+        const token = getAuthToken();
 
-    if (!token) {
-      // 若無 token，重定向到指定路徑
-      router.push(redirectTo);
-      setAuthStatus({
-        isAuthenticated: false,
-        isLoading: false,
-      });
-    } else {
-      // 有 token，設置身份已驗證
-      setAuthStatus({
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    }
+        if (!token) {
+          // 若無 token，重定向到指定路徑
+          router.push(redirectTo);
+          setAuthStatus({
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          return;
+        }
+
+        // 使用 API 驗證 token 有效性
+        await checkAuth();
+
+        // 驗證成功，設置身份已驗證
+        setAuthStatus({
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        // 驗證失敗，重定向到登入頁
+        console.error('身份驗證失敗:', error);
+        router.push(redirectTo);
+        setAuthStatus({
+          isAuthenticated: false,
+          isLoading: false,
+        });
+      }
+    };
+
+    verifyAuth();
   }, [router, redirectTo]);
 
   return authStatus;
