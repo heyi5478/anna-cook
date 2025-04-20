@@ -156,7 +156,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMFQxNTowMjozMi4yMjcyNTU5WiJ9.WM4S8qxSo8CESihutn0AU7vHdxb99ItsppEoFd4br9_x6vdYf1DetT4kLU4wBYmJYZ8zQrfswrJMtmMicS4RQw';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMFQxNTowODoyOS4yNTMwMzI3WiJ9.Yv3WHWkH6hywXU8rOQ1tebZeHZq3GRQr-APljwENENYUWty0rhI9rgXTCUpQHoZo8B6ngUbLIBagrSr1hhoYfQ';
   }
 
   return null;
@@ -769,7 +769,7 @@ export const checkAuth = async (): Promise<{
   token: string;
 }> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/api/check`);
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/check`);
 
     // 取得 JWT Token
     const token = getAuthToken();
@@ -779,7 +779,7 @@ export const checkAuth = async (): Promise<{
     }
 
     // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/api/check`, {
+    const res = await fetch(`${apiConfig.baseUrl}/check`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
