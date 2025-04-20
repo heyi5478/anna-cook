@@ -689,7 +689,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
         // 導向到食譜草稿頁面
         console.log('影片剪輯完成，導向到草稿頁面');
-        router.push(`/recipe-draft?recipeId=${recipeId}`);
+        router.push(`/user-center`);
       } catch (error) {
         console.error('操作失敗:', error);
         setApiError(
