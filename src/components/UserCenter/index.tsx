@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -56,6 +56,38 @@ function RecipeCard() {
 }
 
 export default function UserCenter() {
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
+
+  /**
+   * 處理刪除模式切換
+   */
+  const atToggleDeleteMode = () => {
+    setIsDeleteMode((prev) => !prev);
+    setSelectedDrafts([]);
+  };
+
+  /**
+   * 處理草稿選擇狀態變更
+   */
+  const atToggleDraftSelection = (draftId: number) => {
+    setSelectedDrafts((prev) =>
+      prev.includes(draftId)
+        ? prev.filter((id) => id !== draftId)
+        : [...prev, draftId],
+    );
+  };
+
+  /**
+   * 處理刪除所選草稿
+   */
+  const atConfirmDelete = () => {
+    // 實際應用中這裡會呼叫API刪除選中的草稿
+    console.log('刪除草稿：', selectedDrafts);
+    setIsDeleteMode(false);
+    setSelectedDrafts([]);
+  };
+
   return (
     <div className="bg-white p-4">
       <div className="flex items-center gap-3 mb-4">
@@ -113,6 +145,7 @@ export default function UserCenter() {
             <Button
               variant="outline"
               className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
+              onClick={atToggleDeleteMode}
             >
               <Trash2 className="h-5 w-5" />
               <span>刪除草稿</span>
@@ -266,8 +299,63 @@ export default function UserCenter() {
               <p className="text-gray-500 mb-2">共3篇食譜</p>
 
               {[1, 2, 3].map((item) => (
-                <DraftRecipeCard key={item} />
+                <div key={item} className="flex items-center">
+                  {isDeleteMode && (
+                    <div
+                      className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
+                        selectedDrafts.includes(item)
+                          ? 'bg-orange-500 border-orange-500 text-white'
+                          : 'border-gray-300'
+                      }`}
+                      onClick={() => atToggleDraftSelection(item)}
+                    >
+                      {selectedDrafts.includes(item) && (
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20 6L9 17L4 12"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                  <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
+                    <DraftRecipeCard key={item} />
+                  </div>
+                </div>
               ))}
+
+              {isDeleteMode && (
+                <div className="flex justify-between mt-6 space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={atToggleDeleteMode}
+                    className="flex-1 border border-gray-200"
+                  >
+                    取消刪除
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={atConfirmDelete}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600"
+                    disabled={selectedDrafts.length === 0}
+                  >
+                    確認刪除
+                    {selectedDrafts.length > 0
+                      ? `(${selectedDrafts.length})`
+                      : ''}
+                  </Button>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
