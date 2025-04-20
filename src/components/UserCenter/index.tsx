@@ -56,354 +56,312 @@ function RecipeCard() {
 }
 
 export default function UserCenter() {
-  //   const [activeTab, setActiveTab] = useState('總覽');
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* 使用者資料區 */}
-      <div className="bg-white p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <Link href="/" className="text-gray-600">
-            首頁
-          </Link>
-          <span className="text-gray-400">{' > '}</span>
-          <span className="text-gray-800">食譜中心</span>
-        </div>
-
-        <div className="flex flex-col items-center pb-4">
-          <Avatar className="w-16 h-16 mb-2">
-            <AvatarImage src="/placeholder.svg" alt="使用者頭像" />
-            <AvatarFallback>
-              <User className="h-8 w-8" />
-            </AvatarFallback>
-          </Avatar>
-          <h2 className="text-lg font-medium">古早味研究社</h2>
-
-          <div className="flex justify-center gap-6 my-2 text-sm text-gray-500">
-            <div className="text-center">
-              <div>1</div>
-              <div>追蹤中</div>
-            </div>
-            <div className="text-center">
-              <div>2</div>
-              <div>粉絲</div>
-            </div>
-            <div className="text-center">
-              <div>50</div>
-              <div>收藏</div>
-            </div>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full mt-2 rounded-lg font-normal text-gray-700"
-          >
-            編輯個人資料
-          </Button>
-        </div>
-
-        {/* 我的食譜區 */}
-        <div className="mt-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-medium">我的食譜</h3>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
-              >
-                <Plus className="h-5 w-5" />
-                <span>新增</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
-              >
-                <Trash2 className="h-5 w-5" />
-                <span>刪除草稿</span>
-              </Button>
-            </div>
-          </div>
-
-          <Tabs defaultValue="總覽" className="w-full">
-            <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
-              <TabsTrigger
-                value="總覽"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <rect x="3" y="3" width="7" height="7" />
-                  <rect x="14" y="3" width="7" height="7" />
-                  <rect x="14" y="14" width="7" height="7" />
-                  <rect x="3" y="14" width="7" height="7" />
-                </svg>
-                總覽
-              </TabsTrigger>
-              <TabsTrigger
-                value="數據"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-                數據
-              </TabsTrigger>
-              <TabsTrigger
-                value="已發布"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                  <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
-                </svg>
-                已發布
-              </TabsTrigger>
-              <TabsTrigger
-                value="草稿"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                  <path d="m15 5 4 4" />
-                </svg>
-                草稿
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="總覽" className="mt-4 px-0">
-              <Card className="border-0 shadow-none">
-                <CardContent className="p-0">
-                  <h4 className="font-medium mb-1">創作者總覽</h4>
-                  <p className="text-sm text-gray-500 mb-4">您的食譜表現情況</p>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-gray-500">總瀏覽次數</div>
-                      <div className="font-bold">330</div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-gray-500">總收讚次數</div>
-                      <div className="font-bold">12</div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-gray-500">平均評分</div>
-                      <div className="font-bold">4.2</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="數據" className="mt-4">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold mb-1">食譜數據</h3>
-                  <p className="text-gray-500">深入了解您的食譜表現</p>
-                </div>
-
-                {/* 食譜數據項目 */}
-                {[1, 2].map((item) => (
-                  <RecipeStatsItem key={item} />
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="已發布" className="mt-4">
-              <div className="space-y-4">
-                <p className="text-gray-500 mb-2">共3篇食譜</p>
-
-                {[1, 2, 3].map((item) => (
-                  <PublishedRecipeCard key={item} />
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="草稿" className="mt-4">
-              <div className="space-y-4">
-                <p className="text-gray-500 mb-2">共3篇食譜</p>
-
-                {[1, 2, 3].map((item) => (
-                  <DraftRecipeCard key={item} />
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* 我的最愛 */}
-        <div className="mt-8">
-          <div className="mb-4">
-            <h3 className="text-xl font-medium">我的最愛</h3>
-          </div>
-
-          <Tabs defaultValue="已追蹤" className="w-full">
-            <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
-              <TabsTrigger
-                value="已追蹤"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-                已追蹤
-              </TabsTrigger>
-              <TabsTrigger
-                value="已收藏"
-                className={cn(
-                  'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2"
-                >
-                  <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-                </svg>
-                已收藏
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="已追蹤" className="mt-4 px-0">
-              <div className="space-y-4">
-                <p className="text-sm text-gray-500 mb-1">共8位追蹤中</p>
-
-                {[1, 2, 3].map((item) => (
-                  <FollowedUserCard key={item} />
-                ))}
-
-                <Button
-                  variant="ghost"
-                  className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
-                >
-                  <span>更多追蹤</span>
-                </Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="已收藏" className="mt-4 px-0">
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500 mb-1">共12篇收藏食譜</p>
-
-                {[1, 2, 3].map((item) => (
-                  <RecipeCard key={item} />
-                ))}
-
-                <Button
-                  variant="ghost"
-                  className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
-                >
-                  <span>更多收藏</span>
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+    <div className="bg-white p-4">
+      <div className="flex items-center gap-3 mb-4">
+        <Link href="/" className="text-gray-600">
+          首頁
+        </Link>
+        <span className="text-gray-400">{' > '}</span>
+        <span className="text-gray-800">食譜中心</span>
       </div>
 
-      {/* 底部區域 */}
-      <div className="mt-auto bg-white py-4 border-t">
-        <div className="px-4">
-          <Link
-            href="/popular-recipes"
-            className="flex justify-between items-center py-2"
-          >
-            <span className="text-gray-800">人氣食譜</span>
-            <span className="text-gray-400">→</span>
-          </Link>
-          <div className="h-px bg-gray-100" />
-          <Link
-            href="/new-recipes"
-            className="flex justify-between items-center py-2"
-          >
-            <span className="text-gray-800">最新食譜</span>
-            <span className="text-gray-400">→</span>
-          </Link>
-          <div className="h-px bg-gray-100" />
-          <Link
-            href="/about-us"
-            className="flex justify-between items-center py-2"
-          >
-            <span className="text-gray-800">關於我們</span>
-            <span className="text-gray-400">→</span>
-          </Link>
+      <div className="flex flex-col items-center pb-4">
+        <Avatar className="w-16 h-16 mb-2">
+          <AvatarImage src="/placeholder.svg" alt="使用者頭像" />
+          <AvatarFallback>
+            <User className="h-8 w-8" />
+          </AvatarFallback>
+        </Avatar>
+        <h2 className="text-lg font-medium">古早味研究社</h2>
+
+        <div className="flex justify-center gap-6 my-2 text-sm text-gray-500">
+          <div className="text-center">
+            <div>1</div>
+            <div>追蹤中</div>
+          </div>
+          <div className="text-center">
+            <div>2</div>
+            <div>粉絲</div>
+          </div>
+          <div className="text-center">
+            <div>50</div>
+            <div>收藏</div>
+          </div>
         </div>
 
-        <div className="mt-4 text-center text-sm">
-          <p className="text-gray-800">
-            需要協助? <span className="text-orange-500">聯絡我們</span>
-          </p>
-          <p className="mt-2 text-gray-400 text-xs">
-            版權所有 © 食譜Anna Cook
-          </p>
+        <Button
+          variant="outline"
+          className="w-full mt-2 rounded-lg font-normal text-gray-700"
+        >
+          編輯個人資料
+        </Button>
+      </div>
+
+      {/* 我的食譜區 */}
+      <div className="mt-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-medium">我的食譜</h3>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
+            >
+              <Plus className="h-5 w-5" />
+              <span>新增</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
+            >
+              <Trash2 className="h-5 w-5" />
+              <span>刪除草稿</span>
+            </Button>
+          </div>
         </div>
+
+        <Tabs defaultValue="總覽" className="w-full">
+          <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
+            <TabsTrigger
+              value="總覽"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              總覽
+            </TabsTrigger>
+            <TabsTrigger
+              value="數據"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              數據
+            </TabsTrigger>
+            <TabsTrigger
+              value="已發布"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
+              </svg>
+              已發布
+            </TabsTrigger>
+            <TabsTrigger
+              value="草稿"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                <path d="m15 5 4 4" />
+              </svg>
+              草稿
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="總覽" className="mt-4 px-0">
+            <Card className="border-0 shadow-none">
+              <CardContent className="p-0">
+                <h4 className="font-medium mb-1">創作者總覽</h4>
+                <p className="text-sm text-gray-500 mb-4">您的食譜表現情況</p>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-500">總瀏覽次數</div>
+                    <div className="font-bold">330</div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-500">總收讚次數</div>
+                    <div className="font-bold">12</div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-500">平均評分</div>
+                    <div className="font-bold">4.2</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="數據" className="mt-4">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-bold mb-1">食譜數據</h3>
+                <p className="text-gray-500">深入了解您的食譜表現</p>
+              </div>
+
+              {/* 食譜數據項目 */}
+              {[1, 2].map((item) => (
+                <RecipeStatsItem key={item} />
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="已發布" className="mt-4">
+            <div className="space-y-4">
+              <p className="text-gray-500 mb-2">共3篇食譜</p>
+
+              {[1, 2, 3].map((item) => (
+                <PublishedRecipeCard key={item} />
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="草稿" className="mt-4">
+            <div className="space-y-4">
+              <p className="text-gray-500 mb-2">共3篇食譜</p>
+
+              {[1, 2, 3].map((item) => (
+                <DraftRecipeCard key={item} />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* 我的最愛 */}
+      <div className="mt-8">
+        <div className="mb-4">
+          <h3 className="text-xl font-medium">我的最愛</h3>
+        </div>
+
+        <Tabs defaultValue="已追蹤" className="w-full">
+          <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
+            <TabsTrigger
+              value="已追蹤"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              已追蹤
+            </TabsTrigger>
+            <TabsTrigger
+              value="已收藏"
+              className={cn(
+                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
+              )}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+              </svg>
+              已收藏
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="已追蹤" className="mt-4 px-0">
+            <div className="space-y-4">
+              <p className="text-sm text-gray-500 mb-1">共8位追蹤中</p>
+
+              {[1, 2, 3].map((item) => (
+                <FollowedUserCard key={item} />
+              ))}
+
+              <Button
+                variant="ghost"
+                className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+              >
+                <span>更多追蹤</span>
+              </Button>
+            </div>
+          </TabsContent>
+          <TabsContent value="已收藏" className="mt-4 px-0">
+            <div className="space-y-2">
+              <p className="text-sm text-gray-500 mb-1">共12篇收藏食譜</p>
+
+              {[1, 2, 3].map((item) => (
+                <RecipeCard key={item} />
+              ))}
+
+              <Button
+                variant="ghost"
+                className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+              >
+                <span>更多收藏</span>
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
