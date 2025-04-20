@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -56,10 +56,22 @@ function RecipeCard() {
   );
 }
 
-export default function UserCenter() {
+/**
+ * 用戶中心元件
+ * @param defaultTab 預設顯示的標籤，不提供則顯示"總覽"
+ */
+export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
   const router = useRouter();
+
+  // 當URL參數變化時更新activeTab
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   /**
    * 處理刪除模式切換
@@ -164,7 +176,12 @@ export default function UserCenter() {
           </div>
         </div>
 
-        <Tabs defaultValue="總覽" className="w-full">
+        <Tabs
+          value={activeTab}
+          defaultValue={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
             <TabsTrigger
               value="總覽"
