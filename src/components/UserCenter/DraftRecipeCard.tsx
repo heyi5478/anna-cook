@@ -1,6 +1,24 @@
-import { Star, MessageSquare, Heart } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { useState } from 'react';
+
+/**
+ * DraftRecipeCard 元件的 props 類型
+ */
+type DraftRecipeCardProps = {
+  title?: string;
+  description?: string;
+  imageSrc?: string;
+  onPublish?: () => void;
+};
 
 /**
  * 顯示草稿的食譜卡片
@@ -9,13 +27,23 @@ export function DraftRecipeCard({
   title = '馬鈴薯烤蛋',
   description = '食譜故事敘述食譜故事敘述食譜故事敘述...',
   imageSrc = '/placeholder.svg',
-  likes = 3,
-  comments = 2,
-  rating = 4.3,
-}) {
+  onPublish,
+}: DraftRecipeCardProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  /**
+   * 處理確認發佈的動作
+   */
+  const atConfirmPublish = () => {
+    if (onPublish) {
+      onPublish();
+    }
+    setDialogOpen(false);
+  };
+
   return (
-    <div className="border rounded-lg p-4 flex relative">
-      <div className="w-28 h-28 bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
+    <div className="border rounded-lg p-4 flex relative ">
+      <div className="w-[96px] h-[96px] bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
         <Image
           src={imageSrc || '/placeholder.svg'}
           alt={title}
@@ -26,34 +54,46 @@ export function DraftRecipeCard({
 
       <div className="flex-1 ml-4 flex flex-col">
         <h3 className="text-lg font-medium mb-1">{title}</h3>
-        <p className="text-gray-500 text-sm mb-auto line-clamp-2">
+        <p className="text-gray-500 text-sm mb-auto line-clamp-2 mt-3">
           {description}
         </p>
-
-        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-          <div className="flex items-center">
-            <MessageSquare className="h-4 w-4 mr-1" />
-            <span>{comments}</span>
-          </div>
-          <div className="flex items-center">
-            <Heart className="h-4 w-4 mr-1" />
-            <span>{likes}</span>
-          </div>
-          <div className="flex items-center">
-            <Star className="h-4 w-4 mr-1 text-amber-400" />
-            <span>{rating}</span>
-          </div>
-        </div>
       </div>
 
-      <div className="absolute top-4 right-4">
-        <Button
-          variant="outline"
-          className="px-4 py-1 h-8 rounded-md bg-white hover:bg-gray-50 text-gray-700 font-normal text-sm border-gray-200"
-        >
-          轉草稿
-        </Button>
-      </div>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="destructive"
+            className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white font-normal text-sm"
+          >
+            轉發佈
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md bg-white rounded-lg p-6">
+          <DialogHeader>
+            <DialogTitle className="text-center font-medium text-xl mb-2">
+              是否將所選食譜轉成發佈狀態?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-between mt-6 space-x-4">
+            <Button
+              variant="destructive"
+              onClick={atConfirmPublish}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+            >
+              確認
+            </Button>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+                className="flex-1 border border-gray-200"
+              >
+                取消
+              </Button>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
