@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/router';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -58,6 +59,7 @@ function RecipeCard() {
 export default function UserCenter() {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
+  const router = useRouter();
 
   /**
    * 處理刪除模式切換
@@ -86,6 +88,15 @@ export default function UserCenter() {
     console.log('刪除草稿：', selectedDrafts);
     setIsDeleteMode(false);
     setSelectedDrafts([]);
+  };
+
+  /**
+   * 處理食譜草稿卡片點擊事件
+   */
+  const atDraftCardClick = (id: number) => {
+    if (!isDeleteMode) {
+      router.push(`/recipe-draft?recipeId=${id}`);
+    }
   };
 
   return (
@@ -329,7 +340,11 @@ export default function UserCenter() {
                     </div>
                   )}
                   <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
-                    <DraftRecipeCard key={item} />
+                    <div
+                      onClick={() => !isDeleteMode && atDraftCardClick(item)}
+                    >
+                      <DraftRecipeCard key={item} />
+                    </div>
                   </div>
                 </div>
               ))}
