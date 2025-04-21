@@ -156,7 +156,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMFQxNTowODoyOS4yNTMwMzI3WiJ9.Yv3WHWkH6hywXU8rOQ1tebZeHZq3GRQr-APljwENENYUWty0rhI9rgXTCUpQHoZo8B6ngUbLIBagrSr1hhoYfQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMVQwODowMzoyNC45NzU1MjQ5WiJ9.GVjZz33VDHARjLiK1FkBLJzNCVuBjvn9jnpy-GdALB83GbzcwObL_rlq66UpD7cUHHNVzp3ii_x9soLG_rR7fw';
   }
 
   return null;
@@ -801,9 +801,9 @@ export const checkAuth = async (): Promise<{
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
-    // 如果回應狀態不是成功
-    if (!res.ok) {
-      throw new Error(responseData?.msg || '身份驗證失敗');
+    // 檢查回應是否成功
+    if (responseData.Status === false) {
+      throw new Error(responseData.Message || '身份驗證失敗');
     }
 
     // 如果有新的 Token，更新 Cookie

@@ -35,14 +35,14 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
         }
 
         // 在開發環境中，直接視為已授權（避免後端 API 未準備好的情況）
-        if (process.env.NODE_ENV === 'development') {
-          console.log('開發環境：略過 API 驗證，使用本地 Token 驗證');
-          setAuthStatus({
-            isAuthenticated: true,
-            isLoading: false,
-          });
-          return;
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        //   console.log('開發環境：略過 API 驗證，使用本地 Token 驗證');
+        //   setAuthStatus({
+        //     isAuthenticated: true,
+        //     isLoading: false,
+        //   });
+        //   return;
+        // }
 
         // 正式環境使用 API 驗證 token 有效性
         await checkAuth();
@@ -55,15 +55,15 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
       } catch (error) {
         console.error('身份驗證失敗:', error);
 
-        // 在開發環境中出錯時，仍然允許使用本地 Token 進行驗證
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('開發環境：API 驗證失敗，仍繼續使用本地 Token');
-          setAuthStatus({
-            isAuthenticated: true,
-            isLoading: false,
-          });
-          return;
-        }
+        // // 在開發環境中出錯時，仍然允許使用本地 Token 進行驗證
+        // if (process.env.NODE_ENV === 'development') {
+        //   console.warn('開發環境：API 驗證失敗，仍繼續使用本地 Token');
+        //   setAuthStatus({
+        //     isAuthenticated: true,
+        //     isLoading: false,
+        //   });
+        //   return;
+        // }
 
         // 正式環境下驗證失敗，重定向到登入頁
         router.push(redirectTo);
