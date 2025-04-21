@@ -1,20 +1,35 @@
+// index.tsx
 import type React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { ChevronRight, Globe } from 'lucide-react';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
-// 定義 footer 的基本樣式和變體
-const footerVariants = cva('w-full bg-gray-200 py-4 px-4', {
+// FooterProps 類型定義
+export type FooterProps = React.HTMLAttributes<HTMLElement> &
+  VariantProps<typeof footerVariants> & {
+    companyName?: string;
+    year?: number;
+    studioName?: string;
+  };
+
+type NavItem = {
+  label: string;
+  href: string;
+};
+
+// 將 footerVariants 的樣式修改為符合設計稿
+const footerVariants = cva('w-full py-6 px-4', {
   variants: {
     variant: {
-      default: 'border-t border-gray-300',
+      default: 'bg-gray-50',
       transparent: 'bg-transparent',
     },
     size: {
-      sm: 'py-2',
-      md: 'py-4',
-      lg: 'py-6',
+      sm: 'py-4',
+      md: 'py-6',
+      lg: 'py-8',
     },
   },
   defaultVariants: {
@@ -23,30 +38,14 @@ const footerVariants = cva('w-full bg-gray-200 py-4 px-4', {
   },
 });
 
-// 定義 footer 的 props 類型
-export type FooterProps = React.HTMLAttributes<HTMLDivElement> &
-  VariantProps<typeof footerVariants> & {
-    companyName?: string;
-    year?: number;
-    studioName?: string;
-  };
-
-// 定義導航項目類型
-type NavItem = {
-  label: string;
-  href: string;
-};
-
-/**
- * 應用程式頁腳元件，包含導航連結和版權信息
- */
+// 修改 Footer 元件的實現，使其符合設計稿
 export const Footer: React.FC<FooterProps> = ({
   className,
   variant,
   size,
-  companyName = '商標',
+  companyName = 'Anna Cook',
   year = new Date().getFullYear(),
-  studioName = 'Creative studio',
+  studioName = 'Anna Cook',
   ...props
 }) => {
   // 導航項目數據
@@ -61,36 +60,50 @@ export const Footer: React.FC<FooterProps> = ({
       className={cn(footerVariants({ variant, size, className }))}
       {...props}
     >
-      <div className="mb-4">
-        <div className="bg-gray-400 text-white py-1 px-3 inline-block rounded mb-4">
-          {companyName}
+      <div className="max-w-screen-xl mx-auto">
+        {/* Logo 區域 */}
+        <div className="flex justify-start mb-6">
+          <div className="w-16 h-16 relative">
+            <Image
+              src="/login-small-logo.svg"
+              alt="ANNA"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
         </div>
 
-        <nav className="space-y-2">
+        {/* 導航連結區域 */}
+        <nav className="space-y-0">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center justify-between py-2 border-b border-gray-300"
+              className="flex items-center justify-between py-4 border-t border-gray-200"
             >
-              <span className="text-gray-700">{item.label}</span>
-              <ChevronRight className="h-4 w-4 text-gray-500" />
+              <span className="text-[#737373] text-lg">{item.label}</span>
+              <ChevronRight className="h-5 w-5 text-[#737373]" />
             </Link>
           ))}
         </nav>
-      </div>
 
-      <div className="mt-6 text-center text-sm text-gray-600">
-        <p className="mb-2">
-          商業協助?{' '}
-          <Link href="/contact" className="underline">
+        {/* 最後一條分隔線 */}
+        <div className="border-t border-gray-200 mt-0" />
+
+        {/* 聯絡我們區域 */}
+        <div className="flex justify-center items-center gap-2 py-6">
+          <span className="text-gray-600">需要協助？</span>
+          <Link href="/contact" className="text-[#D83A00] font-medium">
             聯絡我們
           </Link>
-        </p>
-        <div className="flex items-center justify-center gap-1 text-xs">
-          <Globe className="h-3 w-3" />
+        </div>
+
+        {/* 版權資訊 */}
+        <div className="flex justify-center items-center text-sm text-gray-500 pb-4">
+          <span className="mr-2">©</span>
           <span>
-            © {year}年所有權 {studioName}
+            {year} {companyName} {studioName}
           </span>
         </div>
       </div>

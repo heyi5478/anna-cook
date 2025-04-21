@@ -13,17 +13,17 @@ export function FollowedUserCard({
 }) {
   return (
     <div className="border rounded-lg p-4 flex items-center">
-      <Avatar className="w-20 h-20">
+      <Avatar className="w-14 h-14 mr-3">
         <AvatarImage src={avatarSrc} alt={username} />
         <AvatarFallback>
-          <User className="h-8 w-8" />
+          <User className="h-6 w-6" />
         </AvatarFallback>
       </Avatar>
 
-      <div className="ml-4 flex-1">
-        <h3 className="text-xl font-bold mb-1">{username}</h3>
-        <p className="text-gray-500 line-clamp-1 mb-2">{bio}</p>
-        <div className="flex gap-4">
+      <div className="flex-1">
+        <h3 className="text-lg font-medium">{username}</h3>
+        <p className="text-gray-500 text-sm line-clamp-1 mb-1">{bio}</p>
+        <div className="flex gap-4 text-sm text-gray-500">
           <span>{recipesCount} 食譜</span>
           <span>{followersCount} 粉絲</span>
         </div>

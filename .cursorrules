@@ -83,6 +83,30 @@
       "description": "表單處理和資料驗證規範",
       "pattern": "src/**/*.{ts,tsx}",
       "guidance": "表單處理標準：\n1. 所有表單一律使用 react-hook-form 進行狀態管理\n2. 使用 zod 進行表單資料驗證\n3. 建立表單 schema 時使用 zod 的類型推導\n4. 使用 zodResolver 連接 react-hook-form 和 zod\n5. 為複雜表單創建可重用的 schema 和驗證邏輯"
+    },
+    {
+      "name": "Zustand 檔案結構與命名",
+      "description": "Zustand 狀態管理的檔案組織和命名規範",
+      "pattern": "src/stores/**/*.ts",
+      "guidance": "Zustand 檔案結構規範：\n1. 命名：使用 use{Feature}Store 格式，例如 useUserStore\n2. 共享 store 位置：放置於 src/stores 目錄下，依功能特性組織\n3. 元件專用 store：放置於元件目錄中，命名為 use{Feature}Store.ts\n4. 引入順序：\n   - zustand 及其中間件\n   - 外部庫\n   - 內部類型\n   - 服務\n   - 常量"
+    },
+    {
+      "name": "Zustand 商店定義與實現",
+      "description": "Zustand store 的定義與實現方式",
+      "pattern": "src/stores/**/*.ts",
+      "guidance": "Zustand store 定義規範：\n1. 類型定義：\n   - 使用獨立的類型定義：`type State = {...}` 和 `type Action = {...}`\n   - 返回類型使用 `State & Action`\n   - 使用顯式類型註解\n2. 狀態更新方式：\n   - 直接設置：`set({ property: value })`\n   - 基於當前狀態設置：`set((state) => ({ property: state.property + value }))`\n   - 獲取當前狀態：`get().property`\n3. 中間件使用：\n   - 常用中間件：devtools, persist, immer\n   - 標準使用格式：`create<Type>()(middleware((set) => ({ ... })))`"
+    },
+    {
+      "name": "Zustand 在元件中的使用方式",
+      "description": "在 React 元件中使用 Zustand 的最佳實踐",
+      "pattern": "src/**/*.tsx",
+      "guidance": "Zustand 使用規範：\n1. 選擇器使用方式：\n   - 單值選擇器：`useStore((state) => state.value)`\n   - 多值選擇器：`useStore((state) => ({ value1: state.value1, value2: state.value2 }), shallow)`\n   - 避免無選擇器使用：避免直接使用 `useStore()`\n   - 靜態訪問：`useStore.getState()`\n2. 優化技巧：\n   - 使用最小選擇器：只選擇需要的狀態\n   - 對物件使用 shallow 比較\n   - 避免不必要的重新渲染\n   - 使用 memo 包裝使用 store 的元件\n   - 使用 useCallback 記憶使用 store 的事件處理程序"
+    },
+    {
+      "name": "Zustand 狀態管理最佳實踐",
+      "description": "使用 Zustand 的狀態管理最佳實踐與進階技巧",
+      "pattern": "src/stores/**/*.ts",
+      "guidance": "Zustand 最佳實踐：\n1. 狀態設計：\n   - 維護狀態更新的不可變性\n   - 複雜數據使用扁平結構\n   - 避免跨 store 重複狀態\n2. 動作命名：\n   - 使用動詞命名動作（increment, setName）\n   - 事件處理程序使用 `on` 前綴（onQuantityChange）\n3. 非同步處理：\n   - 在動作中使用 async/await\n   - 使用 try/catch 處理錯誤並更新狀態\n   - 在 store 中追蹤載入狀態\n4. 進階技巧：\n   - 創建小型 store 並組合它們\n   - 在選擇器中計算衍生狀態\n   - 將大型 store 分割成切片\n   - 實現 store 重置功能\n5. 錯誤處理：\n   - 在 store 中追蹤錯誤狀態\n   - 在非同步動作中處理錯誤"
     }
   ]
 } 

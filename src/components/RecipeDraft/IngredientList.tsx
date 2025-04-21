@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Trash } from 'lucide-react';
+import { useId } from 'react';
 
 // 型別定義區塊
 type Ingredient = {
@@ -48,18 +49,17 @@ export const IngredientList = ({
   onRemoveSeasoning,
   onAddSeasoning,
 }: IngredientListProps) => {
+  // 生成唯一ID前綴用於穩定的key值
+  const uniqueIdPrefix = useId();
+
   /**
    * 渲染單個食材項目
    */
   const renderIngredientItem = (ingredient: Ingredient, index: number) => {
+    const itemKey = ingredient.id || `${uniqueIdPrefix}-ingredient-${index}`;
+
     return (
-      <div
-        key={
-          ingredient.id ||
-          `ingredient-${ingredient.name}-${ingredient.amount}-${index}`
-        }
-        className="flex items-center mb-2"
-      >
+      <div key={itemKey} className="flex items-center mb-2">
         <div className="flex items-center flex-1">
           <Input
             value={ingredient.name}
@@ -93,14 +93,10 @@ export const IngredientList = ({
    * 渲染單個調味料項目
    */
   const renderSeasoningItem = (seasoning: Seasoning, index: number) => {
+    const itemKey = seasoning.id || `${uniqueIdPrefix}-seasoning-${index}`;
+
     return (
-      <div
-        key={
-          seasoning.id ||
-          `seasoning-${seasoning.name}-${seasoning.amount}-${index}`
-        }
-        className="flex items-center mb-2"
-      >
+      <div key={itemKey} className="flex items-center mb-2">
         <div className="flex items-center flex-1">
           <Input
             value={seasoning.name}
@@ -161,6 +157,7 @@ export const IngredientList = ({
           size="sm"
           onClick={atHandleAddIngredient}
           className="mt-2"
+          type="button"
         >
           <Plus className="w-4 h-4 mr-1" /> 新增食材
         </Button>
@@ -183,6 +180,7 @@ export const IngredientList = ({
           size="sm"
           onClick={atHandleAddSeasoning}
           className="mt-2"
+          type="button"
         >
           <Plus className="w-4 h-4 mr-1" /> 新增調味料
         </Button>

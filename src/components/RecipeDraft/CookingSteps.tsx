@@ -41,8 +41,20 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   /**
    * 導航到影片編輯頁面
    */
-  const atNavigateToVideoEdit = () => {
-    router.push('/recipe-draft-video');
+  const atNavigateToVideoEdit = (e: React.MouseEvent) => {
+    // 阻止事件冒泡，防止觸發表單提交事件
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 保存當前的 recipeId，以便在影片編輯頁面使用
+    const { recipeId } = router.query;
+
+    // 如果有 recipeId，則帶著 recipeId 導航到影片編輯頁面
+    if (recipeId) {
+      router.push(`/recipe-draft-video?recipeId=${recipeId}`);
+    } else {
+      router.push('/recipe-draft-video');
+    }
   };
 
   /**
@@ -146,7 +158,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
         <h2 className="text-lg font-medium">料理步驟</h2>
         <button
           className="p-1"
-          aria-label="新增步驟"
+          aria-label="修改步驟"
           onClick={atNavigateToVideoEdit}
         >
           <Edit className="w-4 h-4" />

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import Player, { type Options } from '@vimeo/player';
 
 /**
@@ -11,7 +11,6 @@ export type VimeoPlayerProps = {
   height?: number;
   startTime?: number;
   endTime?: number;
-  autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
   responsive?: boolean;
@@ -35,7 +34,6 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
   height,
   startTime = 0,
   endTime,
-  autoplay = false,
   muted = true,
   loop = false,
   responsive = true,
@@ -53,14 +51,81 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
   const playerRef = useRef<Player | null>(null);
   const isLoopingRef = useRef<boolean>(false);
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
+  const lastVideoIdRef = useRef<string | number>(videoId);
+  const initializedRef = useRef<boolean>(false);
+  const shouldUpdateStartTimeRef = useRef<boolean>(true);
+  const lastSetStartTimeRef = useRef<number>(startTime);
+
+  // 監控 startTime 的變化
+  useEffect(() => {
+    // 只有當 startTime 與上次設置的不同時，才標記需要更新
+    if (startTime !== lastSetStartTimeRef.current) {
+      shouldUpdateStartTimeRef.current = true;
+      lastSetStartTimeRef.current = startTime;
+    }
+  }, [startTime]);
+
+  /**
+   * 處理影片時間更新事件
+   */
+  const atTimeUpdate = useCallback(
+    (data: { seconds: number }) => {
+      if (onTimeUpdate) {
+        onTimeUpdate(data.seconds);
+      }
+
+      // 時間範圍循環邏輯，如果設定了結束時間且已到達
+      if (endTime && data.seconds >= endTime && !isLoopingRef.current && loop) {
+        isLoopingRef.current = true;
+        playerRef.current
+          ?.setCurrentTime(startTime)
+          .then(() => {
+            isLoopingRef.current = false;
+          })
+          .catch((error: unknown) => {
+            if (onError) {
+              onError(error);
+            }
+            isLoopingRef.current = false;
+          });
+      }
+    },
+    [startTime, endTime, onTimeUpdate, loop, onError],
+  );
 
   /**
    * 初始化 Vimeo 播放器並設置事件監聽
    */
   useEffect(() => {
+    // 防止在已初始化的情況下重複創建播放器
+    if (initializedRef.current && lastVideoIdRef.current === videoId) {
+      return undefined;
+    }
+
+    shouldUpdateStartTimeRef.current = true;
+
+    // 如果已存在播放器，先清理
+    if (playerRef.current) {
+      try {
+        const currentPlayer = playerRef.current;
+        playerRef.current = null;
+        setIsPlayerReady(false);
+
+        currentPlayer.destroy().catch((error: unknown) => {
+          if (onError) {
+            onError(error);
+          }
+        });
+      } catch (error) {
+        if (onError) {
+          onError(error);
+        }
+      }
+    }
+
     let player: Player | undefined;
 
-    if (playerContainer.current && !playerRef.current) {
+    if (playerContainer.current) {
       try {
         // 計算高度，如果沒有提供高度，則採用 16:9 比例
         const calculatedHeight =
@@ -70,9 +135,11 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
           url: `https://vimeo.com/${videoId}`,
           width,
           height: calculatedHeight,
-          autoplay,
+          autoplay: false,
           muted,
           responsive,
+          playsinline: true,
+          dnt: true,
         };
 
         player = new Player(playerContainer.current, options);
@@ -83,9 +150,13 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
           .ready()
           .then(() => {
             setIsPlayerReady(true);
+            initializedRef.current = true;
+            lastVideoIdRef.current = videoId;
 
             // 設定初始時間點
             if (startTime > 0 && player) {
+              lastSetStartTimeRef.current = startTime;
+              shouldUpdateStartTimeRef.current = false;
               return player.setCurrentTime(startTime);
             }
             return undefined;
@@ -103,7 +174,6 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
             }
           })
           .catch((error: unknown) => {
-            console.error('播放器初始化失敗:', error);
             if (onError) {
               onError(error);
             }
@@ -133,48 +203,33 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
             onEnded();
           }
         });
+
+        player.on('error', (error) => {
+          if (onError) {
+            onError(error);
+          }
+        });
       } catch (error) {
-        console.error('創建播放器失敗:', error);
         if (onError) {
           onError(error);
         }
       }
     }
 
-    /**
-     * 清理函式：銷毀播放器實例
-     */
     return () => {
-      // 只在組件卸載時銷毀播放器
-      if (playerRef.current) {
-        const currentPlayer = playerRef.current;
-        playerRef.current = null;
-
-        // 使用 try-catch 避免銷毀時的錯誤
-        try {
-          currentPlayer.destroy().catch((error: unknown) => {
-            console.error('播放器銷毀失敗:', error);
-            if (onError) {
-              onError(error);
-            }
-          });
-        } catch (error) {
-          console.error('播放器銷毀過程中發生錯誤:', error);
-          if (onError) {
-            onError(error);
-          }
-        }
-      }
+      // 只在組件卸載或 videoId 改變時銷毀播放器
     };
   }, [
     videoId,
     width,
     height,
-    autoplay,
     muted,
     responsive,
     onDurationChange,
     onLoaded,
+    onPlay,
+    onPause,
+    onEnded,
     onError,
     startTime,
   ]);
@@ -183,87 +238,58 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
    * 設置影片播放時間範圍和時間更新事件
    */
   useEffect(() => {
-    if (!playerRef.current || !isPlayerReady) return;
+    if (!playerRef.current || !isPlayerReady) {
+      return;
+    }
 
     try {
-      // 設定影片從指定秒數開始播放
-      if (startTime > 0) {
+      // 移除之前的監聽器
+      playerRef.current.off('timeupdate');
+
+      // 添加新的監聽器
+      playerRef.current.on('timeupdate', atTimeUpdate);
+
+      // 設定影片從指定秒數開始播放，但只在需要時設置
+      if (startTime > 0 && shouldUpdateStartTimeRef.current) {
+        shouldUpdateStartTimeRef.current = false;
+        lastSetStartTimeRef.current = startTime;
+
         playerRef.current.setCurrentTime(startTime).catch((error: unknown) => {
-          console.error('設定起始時間失敗:', error);
           if (onError) {
             onError(error);
           }
         });
       }
-
-      // 移除之前的監聽器
-      playerRef.current.off('timeupdate');
-
-      /**
-       * 處理影片時間更新事件
-       */
-      const atTimeUpdate = (data: { seconds: number }) => {
-        if (onTimeUpdate) {
-          onTimeUpdate(data.seconds);
-        }
-
-        // 時間範圍循環邏輯，如果設定了結束時間且已到達
-        if (
-          endTime &&
-          data.seconds >= endTime &&
-          !isLoopingRef.current &&
-          loop
-        ) {
-          isLoopingRef.current = true;
-          playerRef.current
-            ?.setCurrentTime(startTime)
-            .then(() => {
-              isLoopingRef.current = false;
-            })
-            .catch((error: unknown) => {
-              console.error('循環播放段落失敗:', error);
-              isLoopingRef.current = false;
-              if (onError) {
-                onError(error);
-              }
-            });
-        }
-      };
-
-      // 添加新的監聽器
-      playerRef.current.on('timeupdate', atTimeUpdate);
     } catch (error) {
-      console.error('設置播放器時間或事件監聽失敗:', error);
       if (onError) {
         onError(error);
       }
     }
-  }, [startTime, endTime, onTimeUpdate, isPlayerReady, loop, onError]);
+  }, [isPlayerReady, atTimeUpdate, onError]);
 
   /**
    * 控制影片播放或暫停
    */
   useEffect(() => {
-    if (!playerRef.current || !isPlayerReady) return;
+    if (!playerRef.current || !isPlayerReady) {
+      return;
+    }
 
     try {
       if (isPlaying) {
         playerRef.current.play().catch((error: unknown) => {
-          console.error('播放失敗:', error);
           if (onError) {
             onError(error);
           }
         });
       } else {
         playerRef.current.pause().catch((error: unknown) => {
-          console.error('暫停失敗:', error);
           if (onError) {
             onError(error);
           }
         });
       }
     } catch (error) {
-      console.error('控制播放狀態失敗:', error);
       if (onError) {
         onError(error);
       }

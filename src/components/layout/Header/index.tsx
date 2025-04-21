@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
   className,
   variant,
   size,
-  isLoggedIn = true,
+  isLoggedIn = false,
   userName = '',
   userAvatar = '',
   atMenuClick,
