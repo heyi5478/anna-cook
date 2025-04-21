@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/router';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -55,9 +56,22 @@ function RecipeCard() {
   );
 }
 
-export default function UserCenter() {
+/**
+ * 用戶中心元件
+ * @param defaultTab 預設顯示的標籤，不提供則顯示"總覽"
+ */
+export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
+  const router = useRouter();
+
+  // 當URL參數變化時更新activeTab
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   /**
    * 處理刪除模式切換
@@ -86,6 +100,15 @@ export default function UserCenter() {
     console.log('刪除草稿：', selectedDrafts);
     setIsDeleteMode(false);
     setSelectedDrafts([]);
+  };
+
+  /**
+   * 處理食譜草稿卡片點擊事件
+   */
+  const atDraftCardClick = (id: number) => {
+    if (!isDeleteMode) {
+      router.push(`/recipe-draft?recipeId=${id}`);
+    }
   };
 
   return (
@@ -153,7 +176,12 @@ export default function UserCenter() {
           </div>
         </div>
 
-        <Tabs defaultValue="總覽" className="w-full">
+        <Tabs
+          value={activeTab}
+          defaultValue={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
             <TabsTrigger
               value="總覽"
@@ -329,7 +357,11 @@ export default function UserCenter() {
                     </div>
                   )}
                   <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
-                    <DraftRecipeCard key={item} />
+                    <div
+                      onClick={() => !isDeleteMode && atDraftCardClick(item)}
+                    >
+                      <DraftRecipeCard key={item} />
+                    </div>
                   </div>
                 </div>
               ))}

@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoryCard } from '@/components/ui/CategoryCard';
 import { RecipeCard } from '@/components/ui/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
+import { useRouter } from 'next/router';
 
 // 定義食譜類型
 type Recipe = {
@@ -33,6 +34,7 @@ type Category = {
  * 網站首頁組件
  */
 export default function HomePage() {
+  const router = useRouter();
   // 設定當前選中的標籤
   const [activeTab, setActiveTab] = useState('latest');
   // 控制浮動按鈕選單的顯示
@@ -286,6 +288,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               className="bg-white text-gray-800 border-orange-500 border hover:bg-orange-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
+              onClick={() => router.push('/upload-recipe-step1')}
             >
               新增食譜
             </Button>

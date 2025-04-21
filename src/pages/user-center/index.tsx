@@ -1,5 +1,6 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import UserCenter from '@/components/UserCenter';
 import { useAuth } from '@/hooks/auth';
 import { Header } from '@/components/layout/Header';
@@ -8,6 +9,8 @@ import { Footer } from '@/components/layout/Footer';
 const UserCenterPage: NextPage = () => {
   // 使用身份驗證 hook，未授權時自動導向登入頁
   const { isAuthenticated, isLoading } = useAuth('/login');
+  const router = useRouter();
+  const { tab } = router.query; // 從 URL 獲取 tab 參數
 
   // 當驗證中或未授權時不渲染
   if (isLoading || !isAuthenticated) {
@@ -28,7 +31,7 @@ const UserCenterPage: NextPage = () => {
 
         {/* 主內容區域 */}
         <main className="flex-1">
-          <UserCenter />
+          <UserCenter defaultTab={typeof tab === 'string' ? tab : undefined} />
         </main>
 
         {/* 底部區域 */}

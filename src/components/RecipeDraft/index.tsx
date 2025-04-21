@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
-const API_BASE_URL = 'http://13.71.34.213';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
 // 類型定義區塊
 type Step = {
