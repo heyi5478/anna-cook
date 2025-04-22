@@ -340,9 +340,9 @@ export const exchangeGoogleCodeForToken = async (
   code: string,
 ): Promise<any> => {
   try {
-    // 修改這裡 - 使用相對路徑而非絕對 URL，讓 Next.js API 路由處理
+    // 直接調用後端 API，而不是 Next.js API 路由
     const res = await fetch(
-      `/api/auth/google/callback?code=${encodeURIComponent(code)}`,
+      `${apiConfig.baseUrl}/auth/google/callback?code=${encodeURIComponent(code)}`,
       {
         method: 'GET',
       },
