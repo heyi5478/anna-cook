@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import cookie from 'cookie';
+import { serialize } from 'cookie';
 import { exchangeGoogleCodeForToken } from '@/services/api';
 
 /**
@@ -47,10 +47,7 @@ export default async function handler(
     };
 
     // 設置 cookie 頭
-    res.setHeader(
-      'Set-Cookie',
-      cookie.serialize('token', token, cookieOptions),
-    );
+    res.setHeader('Set-Cookie', serialize('token', token, cookieOptions));
 
     // 重定向到首頁
     res.writeHead(302, { Location: '/' });
