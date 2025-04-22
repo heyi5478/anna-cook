@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import cookie from 'cookie';
+import { serialize } from 'cookie';
 import { exchangeGoogleCodeForToken } from '@/services/api';
 
 /**
@@ -32,6 +32,7 @@ export default async function handler(
     // 使用 API 服務發送授權碼給後端
     const data = await exchangeGoogleCodeForToken(code as string);
     const { token } = data;
+    console.log('token', token);
 
     if (!token) {
       throw new Error('後端未提供 token');
@@ -40,18 +41,15 @@ export default async function handler(
     // 設置 cookie
     const cookieOptions = {
       httpOnly: true,
-      //   secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
       maxAge: 7 * 24 * 60 * 60, // 7 天（單位：秒）
       path: '/',
     };
 
     // 設置 cookie 頭
-    res.setHeader(
-      'Set-Cookie',
-      cookie.serialize('token', token, cookieOptions),
-    );
-
+    res.setHeader('Set-Cookie', serialize('token', token, cookieOptions));
+    console.log('cookie', serialize('token', token, cookieOptions));
     // 重定向到首頁
     res.writeHead(302, { Location: '/' });
     return res.end();
