@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -22,10 +23,10 @@ export default function VerifyEmailPage() {
     // 每秒減少倒數計時器
     const timer = setTimeout(() => {
       setCountdown((prev) => prev - 1);
-      return undefined;
     }, 1000);
 
     // 清理計時器
+    /* eslint-disable-next-line */
     return () => clearTimeout(timer);
   }, [countdown, router]);
 
