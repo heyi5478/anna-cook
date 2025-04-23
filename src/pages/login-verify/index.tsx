@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -17,7 +16,7 @@ export default function VerifyEmailPage() {
     // 如果計時結束，跳轉到登入頁面
     if (countdown <= 0) {
       router.push('/signin-email');
-      return;
+      return undefined;
     }
 
     // 每秒減少倒數計時器
@@ -26,7 +25,6 @@ export default function VerifyEmailPage() {
     }, 1000);
 
     // 清理計時器
-    /* eslint-disable-next-line */
     return () => clearTimeout(timer);
   }, [countdown, router]);
 
