@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { serialize } from 'cookie';
 import { exchangeGoogleCodeForToken } from '@/services/api';
+import { setServerCookie } from '@/lib/utils';
 
 /**
  * 處理 Google OAuth 登入回調
@@ -38,18 +38,9 @@ export default async function handler(
       throw new Error('後端未提供 token');
     }
 
-    // 設置 cookie
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      maxAge: 7 * 24 * 60 * 60, // 7 天（單位：秒）
-      path: '/',
-    };
+    // 使用 utils 中的函式設置 cookie
+    setServerCookie(res, token);
 
-    // 設置 cookie 頭
-    res.setHeader('Set-Cookie', serialize('token', token, cookieOptions));
-    console.log('cookie', serialize('token', token, cookieOptions));
     // 重定向到首頁
     res.writeHead(302, { Location: '/' });
     return res.end();

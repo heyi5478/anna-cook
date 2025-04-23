@@ -1,4 +1,5 @@
 import { apiConfig, authConfig } from '@/config';
+import { setClientCookie } from '@/lib/utils';
 
 export type Recipe = {
   Id: number;
@@ -178,7 +179,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMVQwODowMzoyNC45NzU1MjQ5WiJ9.GVjZz33VDHARjLiK1FkBLJzNCVuBjvn9jnpy-GdALB83GbzcwObL_rlq66UpD7cUHHNVzp3ii_x9soLG_rR7fw';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6NTUsIkRpc3BsYXlJZCI6Ik0wMDAwMjgiLCJBY2NvdW50RW1haWwiOiJqb2JzLnN0ZXZlNTRAZ21haWwuY29tIiwiQWNjb3VudE5hbWUiOiJIbyBTdGV2ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjJUMTI6NDg6NDcuNjMwNzIwNFoifQ.cf0KGHlrIX_UmgFS0EFwaM1IEC5q1ICeQGWWzQDZv0bHt12zSrtnlh73EJOI17cG1jNuc_7oTjQMeUQzVI7zWA';
   }
 
   return null;
@@ -932,7 +933,7 @@ export const loginWithEmail = async (
 
     // 如果登入成功且有 Token，儲存到 Cookie
     if (responseData.StatusCode === 200 && responseData.token) {
-      updateAuthToken(responseData.token);
+      setClientCookie(responseData.token);
     }
 
     return responseData;
