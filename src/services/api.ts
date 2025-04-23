@@ -1,5 +1,4 @@
 import { apiConfig, authConfig } from '@/config';
-import { setClientCookie } from '@/lib/utils';
 
 export type Recipe = {
   Id: number;
@@ -179,7 +178,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6NTUsIkRpc3BsYXlJZCI6Ik0wMDAwMjgiLCJBY2NvdW50RW1haWwiOiJqb2JzLnN0ZXZlNTRAZ21haWwuY29tIiwiQWNjb3VudE5hbWUiOiJIbyBTdGV2ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjJUMTI6NDg6NDcuNjMwNzIwNFoifQ.cf0KGHlrIX_UmgFS0EFwaM1IEC5q1ICeQGWWzQDZv0bHt12zSrtnlh73EJOI17cG1jNuc_7oTjQMeUQzVI7zWA';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTIzVDA5OjI3OjM3LjMyMTA1ODZaIn0.ZmcxOMcvPNGpB9ZKSypEr4k0sIrwrFqNdULvv11uXK4xoDVK8pSNYl-zJqbKYOI1hhXFwsKWLHPOa1z84Vcw6w';
   }
 
   return null;
@@ -929,11 +928,6 @@ export const loginWithEmail = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果登入成功且有 Token，儲存到 Cookie
-    if (responseData.StatusCode === 200 && responseData.token) {
-      setClientCookie(responseData.token);
     }
 
     return responseData;

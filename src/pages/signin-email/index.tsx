@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { loginWithEmail } from '@/services/api';
 
 // 定義表單驗證規則
 const formSchema = z.object({
@@ -52,16 +51,27 @@ export default function SignInWithEmail() {
     setErrorMessage('');
 
     try {
-      // 調用登入 API
-      const response = await loginWithEmail(data.email, data.password);
+      // 使用 API 路由進行登入
+      const response = await fetch('/api/auth/email/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
 
       // 檢查回應狀態
-      if (response.StatusCode === 200) {
+      if (result.StatusCode === 200) {
         // 登入成功，導向首頁
         router.push('/');
       } else {
         // 顯示錯誤訊息
-        setErrorMessage(response.msg || '登入失敗，請確認帳號密碼');
+        setErrorMessage(result.msg || '登入失敗，請確認帳號密碼');
       }
     } catch (error) {
       console.error('登入失敗:', error);
