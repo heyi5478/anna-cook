@@ -105,12 +105,14 @@ export const Header: React.FC<HeaderProps> = ({
    */
   const renderGuestMenu = () => (
     <>
-      <div className="flex flex-col items-center p-6 mb-4">
-        <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-2">
-          <User className="h-8 w-8 text-gray-500" />
+      <Link href="/login" className="w-full" onClick={atMenuItemClick}>
+        <div className="flex flex-col items-center p-6 mb-4">
+          <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+            <User className="h-8 w-8 text-gray-500" />
+          </div>
+          <h2 className="text-xl font-bold">登入/註冊</h2>
         </div>
-        <h2 className="text-xl font-bold">登入/註冊</h2>
-      </div>
+      </Link>
 
       <div className="w-full">
         <p className="px-4 py-2 text-gray-500">未登入</p>
