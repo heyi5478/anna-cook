@@ -138,6 +138,12 @@ type SubmitDraftStep = {
   EndTime: number;
 };
 
+// 定義註冊返回型別
+export type RegisterResponse = {
+  StatusCode: number;
+  msg: string;
+};
+
 /**
  * 從 Cookie 獲取 JWT Token
  */
@@ -813,5 +819,57 @@ export const checkAuth = async (): Promise<{
   } catch (error) {
     console.error('檢查使用者認證狀態失敗:', error);
     throw error;
+  }
+};
+
+/**
+ * 使用電子郵件註冊新帳號
+ */
+export const registerWithEmail = async (
+  email: string,
+  name: string,
+  password: string,
+): Promise<RegisterResponse> => {
+  try {
+    console.log(`發送請求: POST ${apiConfig.baseUrl}/auth/register`);
+
+    const requestData = {
+      AccountEmail: email,
+      AccountName: name,
+      Password: password,
+    };
+
+    console.log('請求資料:', { ...requestData, Password: '***' });
+
+    const res = await fetch(`${apiConfig.baseUrl}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('註冊失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: error instanceof Error ? error.message : '註冊過程中發生未知錯誤',
+    };
   }
 };

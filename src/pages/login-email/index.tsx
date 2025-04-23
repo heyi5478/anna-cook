@@ -5,6 +5,7 @@ import * as z from 'zod';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/router';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -16,11 +17,18 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { registerWithEmail } from '@/services/api';
 
 // 定義表單驗證規則
 const formSchema = z.object({
+  name: z.string().min(1, '請輸入您的姓名'),
   email: z.string().email('請輸入有效的電子郵件地址'),
-  password: z.string().min(8, '密碼至少需要8個字元'),
+  password: z
+    .string()
+    .min(8, '密碼至少需要8個字元')
+    .regex(/[A-Z]/, '密碼需要至少一個大寫字母')
+    .regex(/[0-9]/, '密碼需要至少一個數字')
+    .regex(/^[a-zA-Z0-9]+$/, '密碼只能包含英文字母和數字'),
   agreement: z.boolean().refine((val) => val === true, {
     message: '您必須同意條款才能繼續',
   }),
@@ -33,12 +41,15 @@ type FormData = z.infer<typeof formSchema>;
  * 電子郵件註冊頁面元件
  */
 export default function RegisterWithEmail() {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // 初始化表單
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
       agreement: false,
@@ -50,16 +61,27 @@ export default function RegisterWithEmail() {
    */
   const onSubmit = async (data: FormData) => {
     setSubmitting(true);
+    setErrorMessage('');
+
     try {
-      // 這裡實作註冊邏輯
-      console.log('註冊資料:', data);
-      // 模擬API請求
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1500);
-      });
-      // 成功後可以重定向到其他頁面
+      // 調用註冊 API
+      const response = await registerWithEmail(
+        data.email,
+        data.name,
+        data.password,
+      );
+
+      // 檢查回應狀態
+      if (response.StatusCode === 200) {
+        // 註冊成功，導向驗證頁面
+        router.push('/login-verify');
+      } else {
+        // 顯示錯誤訊息
+        setErrorMessage(response.msg || '註冊失敗，請稍後再試');
+      }
     } catch (error) {
       console.error('註冊失敗:', error);
+      setErrorMessage('系統錯誤，請稍後再試');
     } finally {
       setSubmitting(false);
     }
@@ -82,9 +104,49 @@ export default function RegisterWithEmail() {
           </h1>
         </div>
 
+        {/* 顯示錯誤訊息 */}
+        {errorMessage && (
+          <div className="p-3 bg-red-50 text-red-500 rounded-md text-sm">
+            {errorMessage}
+          </div>
+        )}
+
         {/* 表單區塊 */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* 姓名輸入區塊 */}
+            <div className="space-y-2">
+              <div className="text-gray-700">您的姓名</div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          placeholder="請輸入您的姓名"
+                          className="h-14 pl-4 pr-10 rounded-md bg-gray-50 text-base"
+                          {...field}
+                        />
+                        {field.value && (
+                          <button
+                            type="button"
+                            onClick={() => field.onChange('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                            aria-label="清除姓名"
+                          >
+                            <X className="h-6 w-6 text-gray-400" />
+                          </button>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             {/* 電子郵件輸入區塊 */}
             <div className="space-y-2">
               <div className="text-gray-700">電子郵件設定</div>
@@ -150,6 +212,9 @@ export default function RegisterWithEmail() {
                   </FormItem>
                 )}
               />
+              <div className="text-xs text-gray-500">
+                密碼需至少8碼，包含至少一個大寫英文字母與一個數字
+              </div>
             </div>
 
             {/* 同意條款勾選區塊 */}
