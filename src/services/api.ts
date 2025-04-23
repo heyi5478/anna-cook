@@ -178,7 +178,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MywiRGlzcGxheUlkIjoiTTAwMDAwMiIsIkFjY291bnRFbWFpbCI6ImpvYnMuc3RldmU1NEBnbWFpbC5jb20iLCJBY2NvdW50TmFtZSI6IkhvIFN0ZXZlIiwiUm9sZSI6MCwiTG9naW5Qcm92aWRlciI6MCwiRXhwIjoiMjAyNS0wNC0yMVQwODowMzoyNC45NzU1MjQ5WiJ9.GVjZz33VDHARjLiK1FkBLJzNCVuBjvn9jnpy-GdALB83GbzcwObL_rlq66UpD7cUHHNVzp3ii_x9soLG_rR7fw';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTIzVDA5OjI3OjM3LjMyMTA1ODZaIn0.ZmcxOMcvPNGpB9ZKSypEr4k0sIrwrFqNdULvv11uXK4xoDVK8pSNYl-zJqbKYOI1hhXFwsKWLHPOa1z84Vcw6w';
   }
 
   return null;
@@ -928,11 +928,6 @@ export const loginWithEmail = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果登入成功且有 Token，儲存到 Cookie
-    if (responseData.StatusCode === 200 && responseData.token) {
-      updateAuthToken(responseData.token);
     }
 
     return responseData;
