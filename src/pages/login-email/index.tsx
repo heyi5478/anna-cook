@@ -177,7 +177,7 @@ export default function RegisterWithEmail() {
             <div className="flex items-center justify-start">
               <span className="text-gray-700">已有帳號? </span>
               <Link
-                href="/login"
+                href="/signin-email"
                 className="ml-1 text-[#FF4500] hover:underline"
               >
                 登入帳號

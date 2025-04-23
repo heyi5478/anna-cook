@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { useState } from 'react';
  * 登入頁面組件
  */
 export default function LoginPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   /**
@@ -41,7 +43,7 @@ export default function LoginPage() {
    * 處理電子郵件登入
    */
   const atEmailLogin = () => {
-    console.log('電子郵件登入');
+    router.push('/login-email');
   };
 
   return (
