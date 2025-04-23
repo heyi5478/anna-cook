@@ -144,6 +144,22 @@ export type RegisterResponse = {
   msg: string;
 };
 
+// 定義登入回應型別
+export type LoginResponse = {
+  StatusCode: number;
+  msg: string;
+  token?: string;
+  userData?: {
+    userId: number;
+    userDisplayId: string;
+    accountEmail: string;
+    accountName: string;
+    profilePhoto: string;
+    role: number;
+    roleName: string;
+  };
+};
+
 /**
  * 從 Cookie 獲取 JWT Token
  */
@@ -870,6 +886,61 @@ export const registerWithEmail = async (
     return {
       StatusCode: 500,
       msg: error instanceof Error ? error.message : '註冊過程中發生未知錯誤',
+    };
+  }
+};
+
+/**
+ * 使用電子郵件與密碼登入帳號
+ */
+export const loginWithEmail = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
+  try {
+    console.log(`發送請求: POST ${apiConfig.baseUrl}/auth/login`);
+
+    const requestData = {
+      AccountEmail: email,
+      Password: password,
+    };
+
+    console.log('請求資料:', { ...requestData, Password: '***' });
+
+    const res = await fetch(`${apiConfig.baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果登入成功且有 Token，儲存到 Cookie
+    if (responseData.StatusCode === 200 && responseData.token) {
+      updateAuthToken(responseData.token);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('登入失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: error instanceof Error ? error.message : '登入過程中發生未知錯誤',
     };
   }
 };

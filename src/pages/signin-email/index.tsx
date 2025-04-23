@@ -5,6 +5,7 @@ import * as z from 'zod';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X, Lock } from 'lucide-react';
+import { useRouter } from 'next/router';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { loginWithEmail } from '@/services/api';
 
 // 定義表單驗證規則
 const formSchema = z.object({
@@ -29,7 +31,9 @@ type FormData = z.infer<typeof formSchema>;
  * 電子郵件登入頁面元件
  */
 export default function SignInWithEmail() {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // 初始化表單
   const form = useForm<FormData>({
@@ -45,16 +49,23 @@ export default function SignInWithEmail() {
    */
   const onSubmit = async (data: FormData) => {
     setSubmitting(true);
+    setErrorMessage('');
+
     try {
-      // 這裡實作登入邏輯
-      console.log('登入資料:', data);
-      // 模擬API請求
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1500);
-      });
-      // 成功後可以重定向到其他頁面
+      // 調用登入 API
+      const response = await loginWithEmail(data.email, data.password);
+
+      // 檢查回應狀態
+      if (response.StatusCode === 200) {
+        // 登入成功，導向首頁
+        router.push('/');
+      } else {
+        // 顯示錯誤訊息
+        setErrorMessage(response.msg || '登入失敗，請確認帳號密碼');
+      }
     } catch (error) {
       console.error('登入失敗:', error);
+      setErrorMessage('系統錯誤，請稍後再試');
     } finally {
       setSubmitting(false);
     }
@@ -76,6 +87,13 @@ export default function SignInWithEmail() {
             歡迎回來!
           </h1>
         </div>
+
+        {/* 顯示錯誤訊息 */}
+        {errorMessage && (
+          <div className="p-3 bg-red-50 text-red-500 rounded-md text-sm">
+            {errorMessage}
+          </div>
+        )}
 
         {/* 表單區塊 */}
         <Form {...form}>
