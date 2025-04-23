@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 /**
  * 登入頁面組件
@@ -58,14 +59,16 @@ export default function LoginPage() {
           <div className="bg-[#E84A00] py-16 flex justify-center items-center">
             <div className="container flex justify-center items-center">
               <div className="relative w-full max-w-md flex justify-center">
-                <Image
-                  src="/login-logo.svg"
-                  alt="安那煮 Logo"
-                  width={400}
-                  height={120}
-                  className="h-auto"
-                  priority
-                />
+                <Link href="/" className="cursor-pointer">
+                  <Image
+                    src="/login-logo.svg"
+                    alt="安那煮 Logo"
+                    width={400}
+                    height={120}
+                    className="h-auto"
+                    priority
+                  />
+                </Link>
               </div>
             </div>
           </div>
