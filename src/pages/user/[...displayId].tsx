@@ -6,7 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
-import { fetchUserProfile, getAuthToken } from '@/services/api';
+import { fetchUserProfile } from '@/services/api';
 import { mockAuthor, mockRecipes } from '@/components/AuthorProfile/types';
 
 interface UserPageProps {
@@ -39,26 +39,6 @@ interface UserPageProps {
 }
 
 /**
- * 解析 JWT Token 取得使用者資訊
- */
-const parseJWT = (token: string): { DisplayId: string } => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error('解析 JWT 失敗:', e);
-    return { DisplayId: '' };
-  }
-};
-
-/**
  * 使用者個人頁面
  */
 export default function UserPage({
@@ -81,16 +61,28 @@ export default function UserPage({
     // 從靜態生成的資料中先取得預設值
     setIsCurrentUser(userProfileData.isMe);
 
-    // 再從客戶端檢查是否為當前登入使用者
-    const token = getAuthToken();
-    if (token) {
+    // 使用 API 檢查是否為當前登入使用者
+    const checkCurrentUser = async () => {
       try {
-        const tokenData = parseJWT(token);
-        setIsCurrentUser(tokenData.DisplayId === displayId);
-      } catch (e) {
+        const response = await fetch('/api/user/check-current-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ displayId }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setIsCurrentUser(data.isCurrentUser);
+        }
+      } catch (error) {
+        console.error('檢查當前用戶時發生錯誤:', error);
         // 保持預設值不變
       }
-    }
+    };
+
+    checkCurrentUser();
   }, [displayId, userProfileData.isMe]);
 
   // 如果資料尚未載入或發生錯誤
