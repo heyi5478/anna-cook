@@ -178,7 +178,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6NTUsIkRpc3BsYXlJZCI6Ik0wMDAwMjgiLCJBY2NvdW50RW1haWwiOiJqb2JzLnN0ZXZlNTRAZ21haWwuY29tIiwiQWNjb3VudE5hbWUiOiJIbyBTdGV2ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjNUMTI6MDQ6NDkuMzczODQ5NFoifQ.124Nim0YvhMr8UycvJhdsqW615adrVZM-xIVGjI8niFR8qZtPhPoExCdOy4mYnOKdt4jo3mVSdWcV48WG7PBPQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI0VDA1OjIyOjI3LjIwMTc3ODJaIn0.FsDcam2olZZmALoN26KomjiucX2MxWJ4GTLxOoCuB91rjuauXZ0yKml7oDNGfrse4weLSchny2AHzIiOmVawfA';
   }
 
   return null;
@@ -937,5 +937,69 @@ export const loginWithEmail = async (
       StatusCode: 500,
       msg: error instanceof Error ? error.message : '登入過程中發生未知錯誤',
     };
+  }
+};
+
+/**
+ * 取得使用者個人頁資料
+ */
+export const fetchUserProfile = async (displayId: string): Promise<any> => {
+  try {
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/user/${displayId}`);
+
+    // 取得 JWT Token (如果有)
+    const token = getAuthToken();
+
+    // 設定請求頭，如果有 token 則加入授權資訊
+    const headers: HeadersInit = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/user/${displayId}`, {
+      method: 'GET',
+      headers,
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 處理 404 等錯誤
+    if (!res.ok) {
+      try {
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await res.json();
+          return {
+            StatusCode: res.status,
+            message: errorData.Message || '獲取使用者資料失敗',
+          };
+        }
+        return {
+          StatusCode: res.status,
+          message: '伺服器回應格式錯誤',
+        };
+      } catch (e) {
+        return {
+          StatusCode: res.status,
+          message: '處理錯誤回應時發生問題',
+        };
+      }
+    }
+
+    // 解析回應資料
+    const data = await res.json();
+    console.log('回應資料:', data);
+
+    // 如果有新的 Token，更新 Cookie
+    if (data.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(data.newToken);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('獲取使用者資料失敗:', error);
+    throw error;
   }
 };
