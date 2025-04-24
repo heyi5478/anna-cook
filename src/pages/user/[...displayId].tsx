@@ -135,7 +135,10 @@ export default function UserPage({
       <div className="min-h-screen bg-gray-50">
         {isCurrentUser ? (
           // 顯示使用者中心
-          <UserCenter defaultTab={activeTab} />
+          <UserCenter
+            defaultTab={activeTab}
+            userProfileData={userProfileData}
+          />
         ) : (
           // 顯示作者頁面
           <AuthorProfile author={author} recipes={mockRecipes} />

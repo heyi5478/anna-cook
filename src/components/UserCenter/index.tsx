@@ -59,12 +59,55 @@ function RecipeCard() {
 /**
  * 用戶中心元件
  * @param defaultTab 預設顯示的標籤，不提供則顯示"總覽"
+ * @param userProfileData 用戶資料，包含用戶基本資訊及作者數據
  */
-export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
+interface UserCenterProps {
+  defaultTab?: string;
+  userProfileData: {
+    StatusCode: number;
+    isMe: boolean;
+    userData: {
+      userId: number;
+      displayId: string;
+      isFollowing: boolean;
+      accountName: string;
+      profilePhoto: string;
+      userIntro: string;
+      recipeCount: number;
+      followerCount: number;
+    } | null;
+    authorData: {
+      userId: number;
+      displayId: string;
+      accountName: string;
+      followingCount: number;
+      followerCount: number;
+      favoritedTotal: number;
+      myFavoriteCount: number;
+      averageRating: number;
+      totalViewCount: number;
+    } | null;
+  };
+}
+
+export default function UserCenter({
+  defaultTab,
+  userProfileData,
+}: UserCenterProps) {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
   const router = useRouter();
+
+  // 從 userProfileData 中解構所需資料
+  const { userData, authorData } = userProfileData;
+  const userName = userData?.accountName || '用戶名稱';
+  const userAvatar = userData?.profilePhoto || '/placeholder.svg';
+  const followingCount = authorData?.followingCount || 0;
+  const followerCount = userData?.followerCount || 0;
+  const favoritedTotal = authorData?.favoritedTotal || 0;
+  const totalViewCount = authorData?.totalViewCount || 0;
+  const averageRating = authorData?.averageRating || 0;
 
   // 當URL參數變化時更新activeTab
   useEffect(() => {
@@ -123,24 +166,24 @@ export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
 
       <div className="flex flex-col items-center pb-4">
         <Avatar className="w-16 h-16 mb-2">
-          <AvatarImage src="/placeholder.svg" alt="使用者頭像" />
+          <AvatarImage src={userAvatar} alt={`${userName}的頭像`} />
           <AvatarFallback>
             <User className="h-8 w-8" />
           </AvatarFallback>
         </Avatar>
-        <h2 className="text-lg font-medium">古早味研究社</h2>
+        <h2 className="text-lg font-medium">{userName}</h2>
 
         <div className="flex justify-center gap-6 my-2 text-sm text-gray-500">
           <div className="text-center">
-            <div>1</div>
+            <div>{followingCount}</div>
             <div>追蹤中</div>
           </div>
           <div className="text-center">
-            <div>2</div>
+            <div>{followerCount}</div>
             <div>粉絲</div>
           </div>
           <div className="text-center">
-            <div>50</div>
+            <div>{favoritedTotal}</div>
             <div>收藏</div>
           </div>
         </div>
@@ -286,15 +329,15 @@ export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-gray-500">總瀏覽次數</div>
-                    <div className="font-bold">330</div>
+                    <div className="font-bold">{totalViewCount}</div>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-gray-500">總收讚次數</div>
-                    <div className="font-bold">12</div>
+                    <div className="font-bold">{favoritedTotal}</div>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-gray-500">平均評分</div>
-                    <div className="font-bold">4.2</div>
+                    <div className="font-bold">{averageRating.toFixed(1)}</div>
                   </div>
                 </div>
               </CardContent>
@@ -315,7 +358,9 @@ export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
           </TabsContent>
           <TabsContent value="已發布" className="mt-4">
             <div className="space-y-4">
-              <p className="text-gray-500 mb-2">共3篇食譜</p>
+              <p className="text-gray-500 mb-2">
+                共{userData?.recipeCount || 0}篇食譜
+              </p>
 
               {[1, 2, 3].map((item) => (
                 <PublishedRecipeCard key={item} />
@@ -451,7 +496,9 @@ export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
           </TabsList>
           <TabsContent value="已追蹤" className="mt-4 px-0">
             <div className="space-y-4">
-              <p className="text-sm text-gray-500 mb-1">共8位追蹤中</p>
+              <p className="text-sm text-gray-500 mb-1">
+                共{followingCount}位追蹤中
+              </p>
 
               {[1, 2, 3].map((item) => (
                 <FollowedUserCard key={item} />
@@ -467,7 +514,9 @@ export default function UserCenter({ defaultTab }: { defaultTab?: string }) {
           </TabsContent>
           <TabsContent value="已收藏" className="mt-4 px-0">
             <div className="space-y-2">
-              <p className="text-sm text-gray-500 mb-1">共12篇收藏食譜</p>
+              <p className="text-sm text-gray-500 mb-1">
+                共{authorData?.myFavoriteCount || 0}篇收藏食譜
+              </p>
 
               {[1, 2, 3].map((item) => (
                 <RecipeCard key={item} />
