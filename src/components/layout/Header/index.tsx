@@ -125,24 +125,39 @@ export const Header: React.FC<HeaderProps> = ({
   /**
    * 處理登出功能
    */
-  const atLogout = () => {
-    // 清除 localStorage 中的用戶資料
-    localStorage.removeItem('userData');
+  const atLogout = async () => {
+    try {
+      // 發送請求到 API route 處理登出
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // 清除 cookie 中的 token (視實作方式可能需要調整)
-    document.cookie =
-      'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      if (!response.ok) {
+        throw new Error('登出失敗');
+      }
 
-    // 更新狀態
-    setIsLoggedIn(false);
-    setUserData(null);
+      // 清除 localStorage 中的用戶資料
+      localStorage.removeItem('userData');
 
-    // 關閉選單
-    setIsSheetOpen(false);
+      // 更新狀態
+      setIsLoggedIn(false);
+      setUserData(null);
 
-    // 通知外部元件登入狀態已變更
-    if (onLoginStateChange) {
-      onLoginStateChange(false);
+      // 關閉選單
+      setIsSheetOpen(false);
+
+      // 通知外部元件登入狀態已變更
+      if (onLoginStateChange) {
+        onLoginStateChange(false);
+      }
+
+      // 可選：重新導向到首頁或登入頁
+      // window.location.href = '/';
+    } catch (error) {
+      console.error('登出處理失敗:', error);
     }
   };
 
