@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI0VDA1OjIyOjI3LjIwMTc3ODJaIn0.FsDcam2olZZmALoN26KomjiucX2MxWJ4GTLxOoCuB91rjuauXZ0yKml7oDNGfrse4weLSchny2AHzIiOmVawfA';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI0VDExOjQxOjM5Ljc1MzM2ODVaIn0.siBLp3IpnkxIS_FSqiUv18yepWEivnzormBhTSU5363O-Xz-dy_Q6jmUkyNqfKTDe1seO7Otsuj-qEWX56Y8jQ';
   }
 
   return null;
