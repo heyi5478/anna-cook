@@ -1,5 +1,5 @@
 import VideoUpload from '@/components/VideoUpload';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 
 /**

@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import RecipeDraft from '@/components/RecipeDraft';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * 食譜草稿頁面

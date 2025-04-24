@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import RecipeDraftVideo from '@/components/RecipeDraftVideo';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * 食譜草稿影片頁面
