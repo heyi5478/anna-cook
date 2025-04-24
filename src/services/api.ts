@@ -160,6 +160,20 @@ export type LoginResponse = {
   };
 };
 
+export type CheckAuthResponse = {
+  message: string;
+  token: string;
+  userData: {
+    id: number;
+    displayId: string;
+    accountEmail: string;
+    accountName: string;
+    profilePhoto: string;
+    role: number;
+    loginProvider: number;
+  };
+};
+
 /**
  * 從 Cookie 獲取 JWT Token
  */
@@ -780,13 +794,10 @@ export const submitRecipeDraft = async (
 };
 
 /**
- * 檢查使用者認證狀態並取得新的 Token
- * @returns 包含新 Token 的回應，若未授權則回傳錯誤
+ * 檢查使用者認證狀態並取得新的 Token 與使用者資料
+ * @returns 包含新 Token 和使用者資料的回應，若未授權則回傳錯誤
  */
-export const checkAuth = async (): Promise<{
-  message: string;
-  token: string;
-}> => {
+export const checkAuth = async (): Promise<CheckAuthResponse> => {
   try {
     console.log(`發送請求: GET ${apiConfig.baseUrl}/check`);
 
