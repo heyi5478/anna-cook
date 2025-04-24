@@ -249,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="w-full">
         <Link
-          href="/user/profile"
+          href={userData?.displayId ? `/user/${userData.displayId}` : '/login'}
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -257,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/create-recipe"
+          href="/upload-recipe-step1"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -265,7 +265,11 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/my-recipes"
+          href={
+            userData?.displayId
+              ? `/user/${userData.displayId}?tab=已發布`
+              : '/login'
+          }
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -273,7 +277,7 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/faq"
+          href="/fqa"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -281,7 +285,7 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/contact"
+          href="/contact-us"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
