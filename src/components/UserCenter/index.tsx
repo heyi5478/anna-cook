@@ -181,6 +181,12 @@ export default function UserCenter({
    * 處理刪除模式切換
    */
   const atToggleDeleteMode = () => {
+    // 如果當前不是草稿頁籤，先切換到草稿頁籤
+    if (activeTab !== '草稿') {
+      setActiveTab('草稿');
+    }
+
+    // 然後切換刪除模式
     setIsDeleteMode((prev) => !prev);
     setSelectedDrafts([]);
   };
