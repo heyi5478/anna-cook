@@ -1099,3 +1099,72 @@ export const fetchAuthorRecipes = async (
     throw error;
   }
 };
+
+/**
+ * 批量刪除食譜（軟刪除）
+ * @param recipeIds 要刪除的食譜 ID 陣列
+ * @returns 包含刪除結果的回應
+ */
+export type DeleteMultipleResponse = {
+  StatusCode: number;
+  msg: string;
+  deletedIds: number[];
+  newToken?: string;
+};
+
+export const deleteMultipleRecipes = async (
+  recipeIds: number[],
+): Promise<DeleteMultipleResponse> => {
+  try {
+    console.log(`發送請求: PATCH ${apiConfig.baseUrl}/recipes/delete-multiple`);
+    console.log('請求資料 (食譜 ID):', recipeIds);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/delete-multiple`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(recipeIds),
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.StatusCode !== 200) {
+      throw new Error(responseData.msg || '刪除食譜失敗');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('批量刪除食譜失敗:', error);
+    throw error;
+  }
+};

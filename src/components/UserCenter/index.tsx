@@ -17,7 +17,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
-import { fetchAuthorRecipes, type AuthorRecipesResponse } from '@/services/api';
+import {
+  fetchAuthorRecipes,
+  type AuthorRecipesResponse,
+  deleteMultipleRecipes,
+} from '@/services/api';
 import {
   Dialog,
   DialogContent,
@@ -141,6 +145,9 @@ export default function UserCenter({
   const [isLoadingPublished, setIsLoadingPublished] = useState(false);
   const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // 從 userProfileData 中解構所需資料
   const { userData, authorData } = userProfileData;
@@ -243,12 +250,33 @@ export default function UserCenter({
   /**
    * 處理刪除所選草稿
    */
-  const atConfirmDelete = () => {
-    // 實際應用中這裡會呼叫API刪除選中的草稿
-    console.log('刪除草稿：', selectedDrafts);
-    setIsDeleteMode(false);
-    setSelectedDrafts([]);
-    setDeleteDialogOpen(false);
+  const atConfirmDelete = async () => {
+    if (selectedDrafts.length === 0) return;
+
+    try {
+      setDeleteLoading(true);
+      setDeleteError(null);
+      setDeleteSuccess(null);
+
+      // 調用 API 刪除食譜
+      const response = await deleteMultipleRecipes(selectedDrafts);
+
+      // 設置成功訊息
+      setDeleteSuccess(`成功刪除 ${response.deletedIds.length} 個食譜`);
+
+      // 重新載入草稿列表
+      await loadDraftRecipes();
+
+      // 關閉刪除模式並清空選擇
+      setIsDeleteMode(false);
+      setSelectedDrafts([]);
+      setDeleteDialogOpen(false);
+    } catch (err) {
+      console.error('刪除食譜失敗:', err);
+      setDeleteError(err instanceof Error ? err.message : '刪除食譜失敗');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   /**
@@ -363,6 +391,18 @@ export default function UserCenter({
 
     return (
       <div className="space-y-4">
+        {deleteSuccess && (
+          <div className="p-3 rounded-md bg-green-50 text-green-700 mb-4">
+            {deleteSuccess}
+          </div>
+        )}
+
+        {deleteError && (
+          <div className="p-3 rounded-md bg-red-50 text-red-700 mb-4">
+            {deleteError}
+          </div>
+        )}
+
         <p className="text-gray-500 mb-2">共{draftRecipes.length || 0}篇食譜</p>
 
         {draftRecipes.map((recipe) => {
@@ -483,8 +523,9 @@ export default function UserCenter({
                       variant="destructive"
                       onClick={atConfirmDelete}
                       className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-normal"
+                      disabled={deleteLoading}
                     >
-                      確認
+                      {deleteLoading ? '處理中...' : '確認'}
                     </Button>
                   </div>
                 </div>
