@@ -349,52 +349,69 @@ export default function UserCenter({
       <div className="space-y-4">
         <p className="text-gray-500 mb-2">共{draftRecipes.length || 0}篇食譜</p>
 
-        {draftRecipes.map((recipe) => (
-          <div key={recipe.recipeId} className="flex items-center">
-            {isDeleteMode && (
-              <div
-                className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
-                  selectedDrafts.includes(recipe.recipeId)
-                    ? 'bg-orange-500 border-orange-500 text-white'
-                    : 'border-gray-300'
-                }`}
-                onClick={() => atToggleDraftSelection(recipe.recipeId)}
-              >
-                {selectedDrafts.includes(recipe.recipeId) && (
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M20 6L9 17L4 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </div>
-            )}
-            <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
-              <div
-                onClick={() =>
-                  !isDeleteMode && atDraftCardClick(recipe.recipeId)
-                }
-                className={`${!isDeleteMode ? 'hover:bg-gray-50 rounded-md transition-colors cursor-pointer' : ''}`}
-              >
-                <DraftRecipeCard
-                  title={recipe.title}
-                  description={recipe.description}
-                  imageSrc={getFullImageUrl(recipe.coverPhoto)}
-                />
+        {draftRecipes.map((recipe) => {
+          // 計算卡片的 className
+          let cardClassName =
+            'hover:bg-gray-50 active:bg-gray-100 cursor-pointer rounded-md transition-all';
+          if (isDeleteMode && selectedDrafts.includes(recipe.recipeId)) {
+            cardClassName =
+              'bg-orange-50 border border-orange-200 rounded-md cursor-pointer transition-all';
+          }
+
+          return (
+            <div key={recipe.recipeId} className="flex items-center">
+              {isDeleteMode && (
+                <div
+                  className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
+                    selectedDrafts.includes(recipe.recipeId)
+                      ? 'bg-orange-500 border-orange-500 text-white'
+                      : 'border-gray-300'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    atToggleDraftSelection(recipe.recipeId);
+                  }}
+                >
+                  {selectedDrafts.includes(recipe.recipeId) && (
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20 6L9 17L4 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+              )}
+              <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
+                <div
+                  onClick={() => {
+                    if (isDeleteMode) {
+                      atToggleDraftSelection(recipe.recipeId);
+                    } else {
+                      atDraftCardClick(recipe.recipeId);
+                    }
+                  }}
+                  className={cardClassName}
+                >
+                  <DraftRecipeCard
+                    title={recipe.title}
+                    description={recipe.description}
+                    imageSrc={getFullImageUrl(recipe.coverPhoto)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isDeleteMode && (
           <div className="flex justify-between mt-6 space-x-4">
