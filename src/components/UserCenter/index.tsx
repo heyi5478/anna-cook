@@ -273,16 +273,20 @@ export default function UserCenter({
         </div>
 
         {publishedRecipes.map((recipe) => (
-          <RecipeStatsItem
+          <div
             key={recipe.recipeId}
-            title={recipe.title}
-            imageSrc={getFullImageUrl(recipe.coverPhoto)}
-            views={recipe.viewCount}
-            shares={recipe.sharedCount}
-            bookmarks={recipe.favoritedCount}
-            comments={recipe.commentCount}
-            rating={recipe.averageRating}
-          />
+            className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+          >
+            <RecipeStatsItem
+              title={recipe.title}
+              imageSrc={getFullImageUrl(recipe.coverPhoto)}
+              views={recipe.viewCount}
+              shares={recipe.sharedCount}
+              bookmarks={recipe.favoritedCount}
+              comments={recipe.commentCount}
+              rating={recipe.averageRating}
+            />
+          </div>
         ))}
       </div>
     );
@@ -309,15 +313,19 @@ export default function UserCenter({
         </p>
 
         {publishedRecipes.map((recipe) => (
-          <PublishedRecipeCard
+          <div
             key={recipe.recipeId}
-            title={recipe.title}
-            description={recipe.description}
-            imageSrc={getFullImageUrl(recipe.coverPhoto)}
-            likes={recipe.favoritedCount}
-            comments={recipe.commentCount}
-            rating={recipe.averageRating}
-          />
+            className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+          >
+            <PublishedRecipeCard
+              title={recipe.title}
+              description={recipe.description}
+              imageSrc={getFullImageUrl(recipe.coverPhoto)}
+              likes={recipe.favoritedCount}
+              comments={recipe.commentCount}
+              rating={recipe.averageRating}
+            />
+          </div>
         ))}
       </div>
     );
@@ -376,6 +384,7 @@ export default function UserCenter({
                 onClick={() =>
                   !isDeleteMode && atDraftCardClick(recipe.recipeId)
                 }
+                className={`${!isDeleteMode ? 'hover:bg-gray-50 rounded-md transition-colors cursor-pointer' : ''}`}
               >
                 <DraftRecipeCard
                   title={recipe.title}
