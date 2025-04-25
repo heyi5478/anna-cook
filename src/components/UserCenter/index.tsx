@@ -22,6 +22,18 @@ import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
 import { FollowedUserCard } from './FollowedUserCard';
 
+// 獲取 API 基礎 URL
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
+
+/**
+ * 將相對路徑轉換為完整的圖片 URL
+ */
+const getFullImageUrl = (path: string) => {
+  if (!path) return '/placeholder.svg';
+  if (path.startsWith('http')) return path; // 已經是完整URL
+  return `${apiBaseUrl}${path}`;
+};
+
 /**
  * 顯示單一食譜卡片元件
  */
@@ -253,7 +265,7 @@ export default function UserCenter({
           <RecipeStatsItem
             key={recipe.recipeId}
             title={recipe.title}
-            imageSrc={recipe.coverPhoto}
+            imageSrc={getFullImageUrl(recipe.coverPhoto)}
             views={recipe.viewCount}
             shares={recipe.sharedCount}
             bookmarks={recipe.favoritedCount}
@@ -290,7 +302,7 @@ export default function UserCenter({
             key={recipe.recipeId}
             title={recipe.title}
             description={recipe.description}
-            imageSrc={recipe.coverPhoto}
+            imageSrc={getFullImageUrl(recipe.coverPhoto)}
             likes={recipe.favoritedCount}
             comments={recipe.commentCount}
             rating={recipe.averageRating}
@@ -357,7 +369,7 @@ export default function UserCenter({
                 <DraftRecipeCard
                   title={recipe.title}
                   description={recipe.description}
-                  imageSrc={recipe.coverPhoto}
+                  imageSrc={getFullImageUrl(recipe.coverPhoto)}
                 />
               </div>
             </div>
