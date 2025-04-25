@@ -67,6 +67,9 @@ export function DraftRecipeCard({
             <Button
               variant="destructive"
               className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white font-normal text-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               轉發佈
             </Button>
@@ -80,7 +83,10 @@ export function DraftRecipeCard({
             <div className="flex justify-between mt-6 space-x-4">
               <Button
                 variant="destructive"
-                onClick={atConfirmPublish}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  atConfirmPublish();
+                }}
                 className="flex-1 bg-orange-500 hover:bg-orange-600"
               >
                 確認
@@ -88,7 +94,10 @@ export function DraftRecipeCard({
               <DialogClose asChild>
                 <Button
                   variant="outline"
-                  onClick={() => setDialogOpen(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDialogOpen(false);
+                  }}
                   className="flex-1 border border-gray-200"
                 >
                   取消
