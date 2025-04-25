@@ -1618,3 +1618,95 @@ export const fetchUserRecipes = async (
     throw error;
   }
 };
+
+/**
+ * API 回應：追蹤/取消追蹤使用者
+ */
+export type FollowResponse = {
+  StatusCode: number;
+  msg: string;
+  Id: number;
+  newToken?: string;
+};
+
+/**
+ * 追蹤指定使用者
+ */
+export const followUser = async (userId: number): Promise<FollowResponse> => {
+  try {
+    console.log(`發送請求: POST ${apiConfig.baseUrl}/users/${userId}/follow`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const data = await res.json();
+    console.log('回應資料:', data);
+
+    // 如果有新的 Token，更新 Cookie
+    if (data.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(data.newToken);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('追蹤使用者失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 取消追蹤指定使用者
+ */
+export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
+  try {
+    console.log(`發送請求: DELETE ${apiConfig.baseUrl}/users/${userId}/follow`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const data = await res.json();
+    console.log('回應資料:', data);
+
+    // 如果有新的 Token，更新 Cookie
+    if (data.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(data.newToken);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('取消追蹤使用者失敗:', error);
+    throw error;
+  }
+};

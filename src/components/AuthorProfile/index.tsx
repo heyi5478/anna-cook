@@ -42,14 +42,6 @@ export const AuthorProfile = ({
   const effectiveDisplayId = displayId || urlDisplayId || author.id;
 
   /**
-   * 處理追蹤按鈕點擊事件
-   */
-  const atFollowClick = () => {
-    console.log('Follow clicked');
-    // 實際應用中會呼叫API進行追蹤/取消追蹤
-  };
-
-  /**
    * 處理分享按鈕點擊事件
    */
   const atShareClick = () => {
@@ -75,11 +67,7 @@ export const AuthorProfile = ({
       </div>
 
       {/* 作者資料區塊 */}
-      <AuthorInfo
-        author={author}
-        onFollowClick={atFollowClick}
-        onShareClick={atShareClick}
-      />
+      <AuthorInfo author={author} onShareClick={atShareClick} />
 
       {/* 食譜區塊 */}
       <AuthorRecipes displayId={effectiveDisplayId} isMe={isMe} />
