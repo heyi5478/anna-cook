@@ -35,6 +35,17 @@ const getFullImageUrl = (path: string) => {
 };
 
 /**
+ * 映射 API 回傳的資料到元件所需的格式
+ * 主要處理 id 欄位到 recipeId 的映射
+ */
+const mapApiRecipeData = (recipes: any[]) => {
+  return recipes.map((recipe) => ({
+    ...recipe,
+    recipeId: recipe.id, // 確保 recipeId 欄位存在
+  }));
+};
+
+/**
  * 顯示單一食譜卡片元件
  */
 function RecipeCard() {
@@ -162,7 +173,7 @@ export default function UserCenter({
       setError(null);
 
       const response = await fetchAuthorRecipes(displayId, true);
-      setPublishedRecipes(response.data);
+      setPublishedRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入已發佈食譜失敗:', err);
       setError(err instanceof Error ? err.message : '載入已發佈食譜失敗');
@@ -180,7 +191,7 @@ export default function UserCenter({
       setError(null);
 
       const response = await fetchAuthorRecipes(displayId, false);
-      setDraftRecipes(response.data);
+      setDraftRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入草稿食譜失敗:', err);
       setError(err instanceof Error ? err.message : '載入草稿食譜失敗');
