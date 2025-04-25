@@ -797,6 +797,7 @@ export default function UserCenter({
         <Button
           variant="outline"
           className="w-full mt-2 rounded-lg font-normal text-gray-700"
+          onClick={() => router.push('/user-center-edit')}
         >
           編輯個人資料
         </Button>
