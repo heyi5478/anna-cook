@@ -1352,3 +1352,77 @@ export const fetchUserFavoriteFollow = async (
     throw error;
   }
 };
+
+/**
+ * API 回應：使用者個人資料
+ */
+export type UserProfileResponse = {
+  StatusCode: number;
+  msg: string;
+  data: {
+    userId: number;
+    displayId: string;
+    accountName: string;
+    accountEmail: string;
+    profilePhoto: string;
+    description: string;
+  };
+  newToken?: string;
+};
+
+/**
+ * 獲取當前登入使用者的個人資料
+ * 只有登入的用戶可以使用此 API 查詢自身資料
+ */
+export const fetchCurrentUserProfile =
+  async (): Promise<UserProfileResponse> => {
+    try {
+      console.log(`發送請求: GET ${apiConfig.baseUrl}/user/profile`);
+
+      // 取得 JWT Token
+      const token = getAuthToken();
+      if (!token) {
+        console.error('認證錯誤: 未登入或 Token 不存在');
+        throw new Error('未登入或 Token 不存在');
+      }
+
+      // 發送請求
+      const res = await fetch(`${apiConfig.baseUrl}/user/profile`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log('回應狀態:', res.status, res.statusText);
+
+      // 解析回應資料
+      const responseText = await res.text();
+      console.log('回應原始文本:', responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log('解析後的回應資料:', responseData);
+      } catch (e) {
+        console.error('解析 JSON 失敗:', e);
+        throw new Error(`回應不是有效的 JSON: ${responseText}`);
+      }
+
+      // 如果有新的 Token，更新 Cookie
+      if (responseData.newToken) {
+        console.log('收到新的 Token，更新 Cookie');
+        updateAuthToken(responseData.newToken);
+      }
+
+      // 處理錯誤狀態碼
+      if (responseData.StatusCode !== 200) {
+        throw new Error(responseData.msg || '獲取用戶資料失敗');
+      }
+
+      return responseData;
+    } catch (error) {
+      console.error('獲取當前用戶資料失敗:', error);
+      throw error;
+    }
+  };

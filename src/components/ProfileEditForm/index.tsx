@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { fetchCurrentUserProfile } from '@/services/api';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -45,12 +46,14 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export default function ProfileEditForm() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 設定初始值
+  // 設定預設初始值
   const defaultValues: Partial<ProfileFormValues> = {
     nickname: '',
-    email: 'example@gmail.com', // 假設這是已驗證的郵件
-    bio: '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！食譜料理中加入花生醬燉煮',
+    email: '',
+    bio: '',
   };
 
   // 初始化表單
@@ -58,6 +61,37 @@ export default function ProfileEditForm() {
     resolver: zodResolver(profileFormSchema),
     defaultValues,
   });
+
+  // 從 API 獲取用戶資料
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetchCurrentUserProfile();
+
+        // 更新表單資料
+        form.reset({
+          nickname: response.data.accountName,
+          email: response.data.accountEmail,
+          bio: response.data.description || '',
+        });
+
+        // 設定頭像
+        if (response.data.profilePhoto) {
+          setAvatarUrl(response.data.profilePhoto);
+        }
+      } catch (err) {
+        console.error('載入用戶資料失敗:', err);
+        setError(err instanceof Error ? err.message : '載入用戶資料失敗');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, [form]);
 
   /**
    * 處理表單提交
@@ -100,6 +134,36 @@ export default function ProfileEditForm() {
     form.reset();
     setShowConfirmDialog(false);
   };
+
+  // 顯示載入中狀態
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p className="text-gray-600">載入個人資料中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 顯示錯誤狀態
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
+          <div className="text-red-500 text-xl mb-4">載入失敗</div>
+          <p className="text-gray-700 mb-4">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-red-500 hover:bg-red-600 text-white"
+          >
+            重新載入
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -198,7 +262,7 @@ export default function ProfileEditForm() {
                 <FormItem>
                   <FormLabel>暱稱</FormLabel>
                   <FormControl>
-                    <Input placeholder="Placeholder" {...field} />
+                    <Input placeholder="請輸入暱稱" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
