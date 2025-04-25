@@ -52,6 +52,7 @@ export default function ProfileEditForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userDisplayId, setUserDisplayId] = useState<string>('');
   const router = useRouter();
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -89,6 +90,9 @@ export default function ProfileEditForm() {
         if (response.data.profilePhoto) {
           setAvatarUrl(response.data.profilePhoto);
         }
+
+        // 儲存使用者 displayId
+        setUserDisplayId(response.data.displayId);
       } catch (err) {
         console.error('載入用戶資料失敗:', err);
         setError(err instanceof Error ? err.message : '載入用戶資料失敗');
@@ -129,8 +133,8 @@ export default function ProfileEditForm() {
 
       // 延遲導航以便用戶可以看到成功提示
       setTimeout(() => {
-        // 返回個人中心頁面
-        router.push('/user-center');
+        // 跳轉到用戶個人頁面
+        router.push(`/user/${userDisplayId}`);
       }, 1500);
     } catch (err) {
       console.error('更新失敗:', err);
@@ -217,8 +221,12 @@ export default function ProfileEditForm() {
 
     setShowConfirmDialog(false);
 
-    // 返回個人中心頁面
-    router.push('/user-center');
+    // 跳轉到用戶個人頁面
+    if (userDisplayId) {
+      router.push(`/user/${userDisplayId}`);
+    } else {
+      router.push('/');
+    }
   };
 
   // 顯示載入中狀態
@@ -255,7 +263,7 @@ export default function ProfileEditForm() {
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* 確認對話框 */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
+        <DialogContent className="bg-gray-100">
           <DialogHeader>
             <DialogTitle>確認取消變更</DialogTitle>
             <DialogDescription>
