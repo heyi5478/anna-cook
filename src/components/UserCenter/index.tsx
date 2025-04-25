@@ -406,6 +406,7 @@ export default function UserCenter({
                     title={recipe.title}
                     description={recipe.description}
                     imageSrc={getFullImageUrl(recipe.coverPhoto)}
+                    isDeleteMode={isDeleteMode}
                   />
                 </div>
               </div>

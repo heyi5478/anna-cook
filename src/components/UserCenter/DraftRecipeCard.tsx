@@ -18,6 +18,7 @@ type DraftRecipeCardProps = {
   description?: string;
   imageSrc?: string;
   onPublish?: () => void;
+  isDeleteMode?: boolean;
 };
 
 /**
@@ -28,6 +29,7 @@ export function DraftRecipeCard({
   description = '食譜故事敘述食譜故事敘述食譜故事敘述...',
   imageSrc = '/placeholder.svg',
   onPublish,
+  isDeleteMode = false,
 }: DraftRecipeCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -59,41 +61,43 @@ export function DraftRecipeCard({
         </p>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="destructive"
-            className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white font-normal text-sm"
-          >
-            轉發佈
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-white rounded-lg p-6">
-          <DialogHeader>
-            <DialogTitle className="text-center font-medium text-xl mb-2">
-              是否將所選食譜轉成發佈狀態?
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex justify-between mt-6 space-x-4">
+      {!isDeleteMode && (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
             <Button
               variant="destructive"
-              onClick={atConfirmPublish}
-              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white font-normal text-sm"
             >
-              確認
+              轉發佈
             </Button>
-            <DialogClose asChild>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md bg-white rounded-lg p-6">
+            <DialogHeader>
+              <DialogTitle className="text-center font-medium text-xl mb-2">
+                是否將所選食譜轉成發佈狀態?
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-between mt-6 space-x-4">
               <Button
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                className="flex-1 border border-gray-200"
+                variant="destructive"
+                onClick={atConfirmPublish}
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
               >
-                取消
+                確認
               </Button>
-            </DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="flex-1 border border-gray-200"
+                >
+                  取消
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
