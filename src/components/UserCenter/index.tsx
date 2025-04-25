@@ -660,6 +660,7 @@ export default function UserCenter({
           <div
             key={`followed-${user.id}`}
             className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+            onClick={() => router.push(`/user/${user.displayId}`)}
           >
             <FollowedUserCard
               username={user.name}
