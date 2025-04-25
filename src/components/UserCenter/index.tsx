@@ -9,6 +9,7 @@ import {
   Clock,
   Star,
   Trash2,
+  AlertCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,6 +18,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import { fetchAuthorRecipes, type AuthorRecipesResponse } from '@/services/api';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -121,6 +128,7 @@ export default function UserCenter({
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
 
   // 食譜資料狀態
@@ -226,6 +234,13 @@ export default function UserCenter({
   };
 
   /**
+   * 處理確認刪除對話框
+   */
+  const atShowDeleteConfirm = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  /**
    * 處理刪除所選草稿
    */
   const atConfirmDelete = () => {
@@ -233,6 +248,7 @@ export default function UserCenter({
     console.log('刪除草稿：', selectedDrafts);
     setIsDeleteMode(false);
     setSelectedDrafts([]);
+    setDeleteDialogOpen(false);
   };
 
   /**
@@ -423,15 +439,57 @@ export default function UserCenter({
             >
               取消刪除
             </Button>
-            <Button
-              variant="destructive"
-              onClick={atConfirmDelete}
-              className="flex-1 bg-orange-500 hover:bg-orange-600"
-              disabled={selectedDrafts.length === 0}
-            >
-              確認刪除
-              {selectedDrafts.length > 0 ? `(${selectedDrafts.length})` : ''}
-            </Button>
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (selectedDrafts.length > 0) {
+                      atShowDeleteConfirm();
+                    }
+                  }}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  disabled={selectedDrafts.length === 0}
+                >
+                  確認刪除
+                  {selectedDrafts.length > 0
+                    ? `(${selectedDrafts.length})`
+                    : ''}
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                className="sm:max-w-md bg-white rounded-lg p-6 border border-gray-200 shadow-lg"
+                style={{ maxWidth: '400px' }}
+              >
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className="w-12 h-12 rounded-full border-2 border-gray-400 flex items-center justify-center mb-4">
+                    <AlertCircle className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <h2 className="text-lg font-medium text-center mb-6">
+                    是否刪除所選食譜?
+                  </h2>
+                  <div className="flex justify-between w-full gap-4">
+                    <DialogClose asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => setDeleteDialogOpen(false)}
+                        className="flex-1 border border-gray-300 text-black font-normal"
+                      >
+                        取消
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      variant="destructive"
+                      onClick={atConfirmDelete}
+                      className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-normal"
+                    >
+                      確認
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
       </div>
