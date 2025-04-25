@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,7 +25,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { fetchCurrentUserProfile } from '@/services/api';
+import { fetchCurrentUserProfile, updateUserProfile } from '@/services/api';
+import { useRouter } from 'next/router';
+import { useToast } from '@/hooks/use-toast';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -45,9 +47,14 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfileEditForm() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // 設定預設初始值
   const defaultValues: Partial<ProfileFormValues> = {
@@ -96,10 +103,48 @@ export default function ProfileEditForm() {
   /**
    * 處理表單提交
    */
-  const onSubmit = (data: ProfileFormValues) => {
-    console.log('表單提交:', data);
-    // 這裡可以加入實際的提交邏輯
-    alert('個人資料已更新');
+  const onSubmit = async (data: ProfileFormValues) => {
+    try {
+      setIsSubmitting(true);
+
+      const updateData = {
+        accountName: data.nickname,
+        userIntro: data.bio || '',
+      };
+
+      // 發送更新請求
+      const response = await updateUserProfile(
+        updateData,
+        avatarFile || undefined,
+      );
+
+      console.log('更新成功:', response);
+
+      // 顯示成功提示
+      toast({
+        title: '更新成功',
+        description: '您的個人資料已成功更新',
+        variant: 'default',
+      });
+
+      // 延遲導航以便用戶可以看到成功提示
+      setTimeout(() => {
+        // 返回個人中心頁面
+        router.push('/user-center');
+      }, 1500);
+    } catch (err) {
+      console.error('更新失敗:', err);
+      const errorMessage = err instanceof Error ? err.message : '更新資料失敗';
+
+      // 顯示錯誤提示
+      toast({
+        title: '更新失敗',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+
+      setIsSubmitting(false);
+    }
   };
 
   /**
@@ -107,6 +152,13 @@ export default function ProfileEditForm() {
    */
   const onError = (errors: any) => {
     console.error('表單錯誤:', errors);
+
+    // 顯示表單錯誤提示
+    toast({
+      title: '表單填寫有誤',
+      description: '請檢查並修正表單中的錯誤',
+      variant: 'destructive',
+    });
   };
 
   /**
@@ -115,8 +167,32 @@ export default function ProfileEditForm() {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // 檢查檔案類型
+      if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+        toast({
+          title: '不支援的圖片格式',
+          description: '只允許上傳 JPG、JPEG 或 PNG 圖片',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // 檢查檔案大小 (限制為 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: '檔案太大',
+          description: '頭像圖片大小不能超過 5MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // 設定預覽
       const objectUrl = URL.createObjectURL(file);
       setAvatarUrl(objectUrl);
+
+      // 保存檔案以便上傳
+      setAvatarFile(file);
     }
   };
 
@@ -132,7 +208,17 @@ export default function ProfileEditForm() {
    */
   const confirmReset = () => {
     form.reset();
+
+    // 重置頭像選擇
+    if (avatarFileInputRef.current) {
+      avatarFileInputRef.current.value = '';
+    }
+    setAvatarFile(null);
+
     setShowConfirmDialog(false);
+
+    // 返回個人中心頁面
+    router.push('/user-center');
   };
 
   // 顯示載入中狀態
@@ -246,9 +332,10 @@ export default function ProfileEditForm() {
                   <input
                     id="avatar-upload"
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png"
                     className="hidden"
                     onChange={handleAvatarChange}
+                    ref={avatarFileInputRef}
                   />
                 </label>
               </div>
@@ -314,14 +401,16 @@ export default function ProfileEditForm() {
               <Button
                 type="submit"
                 className="w-full bg-gray-600 hover:bg-gray-700"
+                disabled={isSubmitting}
               >
-                儲存更新
+                {isSubmitting ? '儲存中...' : '儲存更新'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
                 onClick={handleCancel}
+                disabled={isSubmitting}
               >
                 取消變更
               </Button>

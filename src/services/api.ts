@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDA3OjI1OjEzLjM0OTY4ODNaIn0.cUDhpwc8vkdMZ6QzQr_UmNOcnvAzyUyrnnrTI5DMrYP28BDIqINwNFTz3JZU6rB99WpPyVhx220efMebGvxoCA';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDEwOjI5OjM1LjM2OTQzMDBaIn0.PZBJtVEdjUxp-F1fJVCZbuPOxJkLSMACwPovzo1CA0NG9oIRO4lTlfWOQIANxb6berouUIcdorqdzZGdCXstDQ';
   }
 
   return null;
@@ -1426,3 +1426,99 @@ export const fetchCurrentUserProfile =
       throw error;
     }
   };
+
+/**
+ * API 回應：更新使用者個人資料
+ */
+export type UpdateUserProfileResponse = {
+  StatusCode: number;
+  msg: string;
+  data: {
+    accountName: string;
+    userIntro: string;
+    profilePhoto: string;
+  };
+  newToken?: string;
+};
+
+/**
+ * 更新當前登入使用者的個人資料
+ * @param data 要更新的用戶資料
+ * @param profilePhoto 頭像照片檔案 (可選)
+ */
+export const updateUserProfile = async (
+  data: {
+    accountName?: string;
+    userIntro?: string;
+  },
+  profilePhoto?: File,
+): Promise<UpdateUserProfileResponse> => {
+  try {
+    console.log(`發送請求: PUT ${apiConfig.baseUrl}/user/profile`);
+    console.log('請求資料:', { ...data, profilePhoto: profilePhoto?.name });
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 創建 FormData 物件
+    const formData = new FormData();
+
+    // 添加資料
+    if (data.accountName) {
+      formData.append('accountName', data.accountName);
+    }
+
+    if (data.userIntro) {
+      formData.append('userIntro', data.userIntro);
+    }
+
+    // 添加頭像照片，如果有
+    if (profilePhoto instanceof File) {
+      formData.append('profilePhoto', profilePhoto);
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 處理錯誤狀態碼
+    if (responseData.StatusCode !== 200) {
+      throw new Error(responseData.msg || '更新用戶資料失敗');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('更新用戶資料失敗:', error);
+    throw error;
+  }
+};
