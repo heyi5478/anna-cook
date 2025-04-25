@@ -21,6 +21,9 @@ import {
   fetchAuthorRecipes,
   type AuthorRecipesResponse,
   deleteMultipleRecipes,
+  fetchUserFavoriteFollow,
+  type UserFavoriteResponse,
+  type UserFollowResponse,
 } from '@/services/api';
 import {
   Dialog,
@@ -55,41 +58,6 @@ const mapApiRecipeData = (recipes: any[]) => {
     recipeId: recipe.id, // 確保 recipeId 欄位存在
   }));
 };
-
-/**
- * 顯示單一食譜卡片元件
- */
-function RecipeCard() {
-  return (
-    <div className="flex border rounded-md overflow-hidden">
-      <div className="w-20 h-20 bg-gray-200 shrink-0 relative">
-        <Image
-          src="/placeholder.svg"
-          alt="食譜縮圖"
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="flex-1 p-2">
-        <div className="flex justify-between">
-          <h4 className="font-medium">馬鈴薯烤蛋</h4>
-          <BookmarkIcon className="h-4 w-4" />
-        </div>
-        <p className="text-xs text-gray-500 line-clamp-2">
-          食譜故事說明食譜故事說明食譜故事說明...
-        </p>
-        <div className="flex items-center mt-1 text-xs text-gray-500">
-          <Users className="h-3 w-3 mr-1" />
-          <span className="mr-2">2人份</span>
-          <Clock className="h-3 w-3 mr-1" />
-          <span className="mr-2">30分鐘</span>
-          <Star className="h-3 w-3 mr-1" />
-          <span>4.3</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /**
  * 用戶中心元件
@@ -133,6 +101,25 @@ export default function UserCenter({
   const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // 我的最愛相關狀態
+  const [favoriteTab, setFavoriteTab] = useState<'已追蹤' | '已收藏'>('已追蹤');
+  const [followData, setFollowData] = useState<UserFollowResponse['data']>([]);
+  const [favoriteData, setFavoriteData] = useState<
+    UserFavoriteResponse['data']
+  >([]);
+  const [followPage, setFollowPage] = useState(1);
+  const [favoritePage, setFavoritePage] = useState(1);
+  const [followHasMore, setFollowHasMore] = useState(false);
+  const [favoriteHasMore, setFavoriteHasMore] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [followError, setFollowError] = useState<string | null>(null);
+  const [favoriteError, setFavoriteError] = useState<string | null>(null);
+
   const router = useRouter();
 
   // 食譜資料狀態
@@ -145,9 +132,6 @@ export default function UserCenter({
   const [isLoadingPublished, setIsLoadingPublished] = useState(false);
   const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // 從 userProfileData 中解構所需資料
   const { userData, authorData } = userProfileData;
@@ -178,6 +162,17 @@ export default function UserCenter({
       }
     }
   }, [activeTab, displayId]);
+
+  // 當 favoriteTab 變化時載入資料
+  useEffect(() => {
+    if (displayId) {
+      if (favoriteTab === '已追蹤') {
+        loadFollowData(1);
+      } else {
+        loadFavoriteData(1);
+      }
+    }
+  }, [favoriteTab, displayId]);
 
   /**
    * 載入已發佈的食譜
@@ -212,6 +207,97 @@ export default function UserCenter({
       setError(err instanceof Error ? err.message : '載入草稿食譜失敗');
     } finally {
       setIsLoadingDrafts(false);
+    }
+  };
+
+  /**
+   * 載入追蹤的用戶資料
+   */
+  const loadFollowData = async (page: number) => {
+    if (!displayId) return;
+
+    try {
+      setFollowLoading(true);
+      setFollowError(null);
+
+      const response = await fetchUserFavoriteFollow(displayId, 'follow', page);
+
+      // 型別守衛：判斷回應是否為 UserFollowResponse
+      if (
+        'data' in response &&
+        response.data[0] &&
+        'name' in response.data[0]
+      ) {
+        const typedResponse = response as UserFollowResponse;
+        if (page === 1) {
+          // 第一頁：替換全部資料
+          setFollowData(typedResponse.data);
+        } else {
+          // 其他頁：添加到現有資料
+          setFollowData((prev) => [...prev, ...typedResponse.data]);
+        }
+        setFollowPage(page);
+        setFollowHasMore(typedResponse.hasMore);
+      }
+    } catch (err) {
+      console.error('載入追蹤的用戶失敗:', err);
+      setFollowError(err instanceof Error ? err.message : '載入追蹤的用戶失敗');
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  /**
+   * 載入收藏的食譜資料
+   */
+  const loadFavoriteData = async (page: number) => {
+    if (!displayId) return;
+
+    try {
+      setFavoriteLoading(true);
+      setFavoriteError(null);
+
+      const response = await fetchUserFavoriteFollow(
+        displayId,
+        'favorite',
+        page,
+      );
+
+      // 型別守衛：判斷回應是否為 UserFavoriteResponse
+      if (
+        'data' in response &&
+        response.data[0] &&
+        'recipeName' in response.data[0]
+      ) {
+        const typedResponse = response as UserFavoriteResponse;
+        if (page === 1) {
+          // 第一頁：替換全部資料
+          setFavoriteData(typedResponse.data);
+        } else {
+          // 其他頁：添加到現有資料
+          setFavoriteData((prev) => [...prev, ...typedResponse.data]);
+        }
+        setFavoritePage(page);
+        setFavoriteHasMore(typedResponse.hasMore);
+      }
+    } catch (err) {
+      console.error('載入收藏的食譜失敗:', err);
+      setFavoriteError(
+        err instanceof Error ? err.message : '載入收藏的食譜失敗',
+      );
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  /**
+   * 載入更多追蹤的用戶或收藏的食譜
+   */
+  const loadMore = () => {
+    if (favoriteTab === '已追蹤') {
+      loadFollowData(followPage + 1);
+    } else {
+      loadFavoriteData(favoritePage + 1);
     }
   };
 
@@ -541,6 +627,132 @@ export default function UserCenter({
     );
   };
 
+  // 處理「我的最愛」標籤切換
+  const handleFavoriteTabChange = (value: string) => {
+    setFavoriteTab(value as '已追蹤' | '已收藏');
+  };
+
+  // 渲染「已追蹤」標籤內容
+  const renderFollowContent = () => {
+    if (followLoading && followPage === 1) {
+      return <div className="text-center py-8">載入中...</div>;
+    }
+
+    if (followError) {
+      return <div className="text-center py-8 text-red-500">{followError}</div>;
+    }
+
+    if (followData.length === 0) {
+      return <div className="text-center py-8">目前沒有追蹤的用戶</div>;
+    }
+
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-500 mb-1">共{followingCount}位追蹤中</p>
+
+        {followData.map((user) => (
+          <div
+            key={`followed-${user.id}`}
+            className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+          >
+            <FollowedUserCard
+              username={user.name}
+              bio={user.description}
+              recipesCount={user.followedUserRecipeCount}
+              followersCount={user.followedUserFollowerCount}
+              avatarSrc={getFullImageUrl(user.profilePhoto)}
+            />
+          </div>
+        ))}
+
+        {followLoading && <div className="text-center py-4">載入更多中...</div>}
+
+        {followHasMore && !followLoading && (
+          <Button
+            variant="ghost"
+            className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+            onClick={loadMore}
+          >
+            <span>更多追蹤</span>
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  // 渲染「已收藏」標籤內容
+  const renderFavoriteContent = () => {
+    if (favoriteLoading && favoritePage === 1) {
+      return <div className="text-center py-8">載入中...</div>;
+    }
+
+    if (favoriteError) {
+      return (
+        <div className="text-center py-8 text-red-500">{favoriteError}</div>
+      );
+    }
+
+    if (favoriteData.length === 0) {
+      return <div className="text-center py-8">目前沒有收藏的食譜</div>;
+    }
+
+    return (
+      <div className="space-y-2">
+        <p className="text-sm text-gray-500 mb-1">
+          共{authorData?.myFavoriteCount || 0}篇收藏食譜
+        </p>
+
+        {favoriteData.map((recipe) => (
+          <div
+            key={`recipe-${recipe.id}`}
+            className="flex border rounded-md overflow-hidden hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => router.push(`/recipe/${recipe.displayId}`)}
+          >
+            <div className="w-20 h-20 bg-gray-200 shrink-0 relative">
+              <Image
+                src={getFullImageUrl(recipe.coverPhoto)}
+                alt={recipe.recipeName}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 p-2">
+              <div className="flex justify-between">
+                <h4 className="font-medium">{recipe.recipeName}</h4>
+                <BookmarkIcon className="h-4 w-4" />
+              </div>
+              <p className="text-xs text-gray-500 line-clamp-2">
+                {recipe.description}
+              </p>
+              <div className="flex items-center mt-1 text-xs text-gray-500">
+                <Users className="h-3 w-3 mr-1" />
+                <span className="mr-2">{recipe.portion}人份</span>
+                <Clock className="h-3 w-3 mr-1" />
+                <span className="mr-2">{recipe.cookingTime}</span>
+                <Star className="h-3 w-3 mr-1" />
+                <span>{recipe.rating.toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {favoriteLoading && (
+          <div className="text-center py-4">載入更多中...</div>
+        )}
+
+        {favoriteHasMore && !favoriteLoading && (
+          <Button
+            variant="ghost"
+            className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+            onClick={loadMore}
+          >
+            <span>更多收藏</span>
+          </Button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white p-4">
       <div className="flex items-center gap-3 mb-4">
@@ -749,7 +961,11 @@ export default function UserCenter({
           <h3 className="text-xl font-medium">我的最愛</h3>
         </div>
 
-        <Tabs defaultValue="已追蹤" className="w-full">
+        <Tabs
+          value={favoriteTab}
+          onValueChange={handleFavoriteTabChange}
+          className="w-full"
+        >
           <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
             <TabsTrigger
               value="已追蹤"
@@ -800,40 +1016,10 @@ export default function UserCenter({
             </TabsTrigger>
           </TabsList>
           <TabsContent value="已追蹤" className="mt-4 px-0">
-            <div className="space-y-4">
-              <p className="text-sm text-gray-500 mb-1">
-                共{followingCount}位追蹤中
-              </p>
-
-              {[1, 2, 3].map((item) => (
-                <FollowedUserCard key={`followed-${item}`} />
-              ))}
-
-              <Button
-                variant="ghost"
-                className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
-              >
-                <span>更多追蹤</span>
-              </Button>
-            </div>
+            {renderFollowContent()}
           </TabsContent>
           <TabsContent value="已收藏" className="mt-4 px-0">
-            <div className="space-y-2">
-              <p className="text-sm text-gray-500 mb-1">
-                共{authorData?.myFavoriteCount || 0}篇收藏食譜
-              </p>
-
-              {[1, 2, 3].map((item) => (
-                <RecipeCard key={`recipe-${item}`} />
-              ))}
-
-              <Button
-                variant="ghost"
-                className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
-              >
-                <span>更多收藏</span>
-              </Button>
-            </div>
+            {renderFavoriteContent()}
           </TabsContent>
         </Tabs>
       </div>

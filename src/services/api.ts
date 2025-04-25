@@ -1245,3 +1245,110 @@ export const toggleRecipePublishStatus = async (
     throw error;
   }
 };
+
+/**
+ * 取得使用者的收藏或追蹤清單
+ * @param displayId 使用者公開 ID
+ * @param table 要獲取的表格類型 (favorite: 收藏, follow: 追蹤)
+ * @param page 頁數，每頁固定 3 筆
+ * @returns 包含收藏或追蹤清單的回應
+ */
+export type UserFavoriteResponse = {
+  StatusCode: number;
+  hasMore: boolean;
+  msg: string;
+  totalCount: number;
+  data: {
+    id: number;
+    displayId: string;
+    recipeName: string;
+    description: string;
+    portion: number;
+    cookingTime: string;
+    rating: number;
+    coverPhoto: string;
+  }[];
+  newToken?: string;
+};
+
+export type UserFollowResponse = {
+  StatusCode: number;
+  hasMore: boolean;
+  msg: string;
+  totalCount: number;
+  data: {
+    id: number;
+    displayId: string;
+    name: string;
+    profilePhoto: string;
+    description: string;
+    followedUserRecipeCount: number;
+    followedUserFollowerCount: number;
+  }[];
+  newToken?: string;
+};
+
+export type UserFavoriteFollowResponse =
+  | UserFavoriteResponse
+  | UserFollowResponse;
+
+export const fetchUserFavoriteFollow = async (
+  displayId: string,
+  table: 'favorite' | 'follow' = 'favorite',
+  page: number = 1,
+): Promise<UserFavoriteFollowResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
+    );
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.StatusCode !== 200) {
+      throw new Error(responseData.msg || '獲取使用者的收藏或追蹤清單失敗');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('獲取使用者的收藏或追蹤清單失敗:', error);
+    throw error;
+  }
+};
