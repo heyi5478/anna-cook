@@ -119,6 +119,8 @@ export default function UserCenter({
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [followError, setFollowError] = useState<string | null>(null);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
+  const [followTotalCount, setFollowTotalCount] = useState(0);
+  const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
 
   const router = useRouter();
 
@@ -238,6 +240,7 @@ export default function UserCenter({
         }
         setFollowPage(page);
         setFollowHasMore(typedResponse.hasMore);
+        setFollowTotalCount(typedResponse.totalCount);
       }
     } catch (err) {
       console.error('載入追蹤的用戶失敗:', err);
@@ -279,6 +282,7 @@ export default function UserCenter({
         }
         setFavoritePage(page);
         setFavoriteHasMore(typedResponse.hasMore);
+        setFavoriteTotalCount(typedResponse.totalCount);
       }
     } catch (err) {
       console.error('載入收藏的食譜失敗:', err);
@@ -648,7 +652,9 @@ export default function UserCenter({
 
     return (
       <div className="space-y-4">
-        <p className="text-sm text-gray-500 mb-1">共{followingCount}位追蹤中</p>
+        <p className="text-sm text-gray-500 mb-1">
+          共{followTotalCount}位追蹤中
+        </p>
 
         {followData.map((user) => (
           <div
@@ -699,7 +705,7 @@ export default function UserCenter({
     return (
       <div className="space-y-2">
         <p className="text-sm text-gray-500 mb-1">
-          共{authorData?.myFavoriteCount || 0}篇收藏食譜
+          共{favoriteTotalCount}篇收藏食譜
         </p>
 
         {favoriteData.map((recipe) => (
