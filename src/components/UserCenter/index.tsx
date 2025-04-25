@@ -368,6 +368,8 @@ export default function UserCenter({
               likes={recipe.favoritedCount}
               comments={recipe.commentCount}
               rating={recipe.averageRating}
+              recipeId={recipe.recipeId}
+              onStatusChanged={loadPublishedRecipes}
             />
           </div>
         ))}
@@ -462,7 +464,9 @@ export default function UserCenter({
                     title={recipe.title}
                     description={recipe.description}
                     imageSrc={getFullImageUrl(recipe.coverPhoto)}
+                    recipeId={recipe.recipeId}
                     isDeleteMode={isDeleteMode}
+                    onStatusChanged={loadDraftRecipes}
                   />
                 </div>
               </div>

@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDA0OjEzOjUyLjg3ODk2MTRaIn0.bfsI8IU-IU3B4lRt3bmQULUXm_QTJqlO9rpIw22j3QurHH_H2t4WGBtU1Kf7zXNdhtOaYb-QBLfeSjOJ1RPUdA';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDA3OjI1OjEzLjM0OTY4ODNaIn0.cUDhpwc8vkdMZ6QzQr_UmNOcnvAzyUyrnnrTI5DMrYP28BDIqINwNFTz3JZU6rB99WpPyVhx220efMebGvxoCA';
   }
 
   return null;
@@ -1165,6 +1165,83 @@ export const deleteMultipleRecipes = async (
     return responseData;
   } catch (error) {
     console.error('批量刪除食譜失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 切換食譜發佈狀態
+ * @param recipeId 食譜 ID
+ * @param isPublished 是否發佈 (true 為發佈，false 為取消發佈)
+ * @returns 包含切換結果的回應
+ */
+export type TogglePublishResponse = {
+  StatusCode: number;
+  msg: string;
+  id: number;
+  isPublished: boolean;
+  token?: string;
+};
+
+export const toggleRecipePublishStatus = async (
+  recipeId: number,
+  isPublished: boolean,
+): Promise<TogglePublishResponse> => {
+  try {
+    console.log(
+      `發送請求: PATCH ${apiConfig.baseUrl}/recipes/${recipeId}/publish`,
+    );
+    console.log('請求資料:', { isPublished });
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/publish`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isPublished }),
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.token) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.token);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.StatusCode !== 200) {
+      throw new Error(responseData.msg || '更新食譜發佈狀態失敗');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('切換食譜發佈狀態失敗:', error);
     throw error;
   }
 };
