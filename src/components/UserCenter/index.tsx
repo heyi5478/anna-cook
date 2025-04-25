@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
+import { fetchAuthorRecipes, type AuthorRecipesResponse } from '@/services/api';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -99,6 +100,17 @@ export default function UserCenter({
   const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
   const router = useRouter();
 
+  // 食譜資料狀態
+  const [publishedRecipes, setPublishedRecipes] = useState<
+    AuthorRecipesResponse['data']
+  >([]);
+  const [draftRecipes, setDraftRecipes] = useState<
+    AuthorRecipesResponse['data']
+  >([]);
+  const [isLoadingPublished, setIsLoadingPublished] = useState(false);
+  const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   // 從 userProfileData 中解構所需資料
   const { userData, authorData } = userProfileData;
   const userName = userData?.accountName || '用戶名稱';
@@ -108,6 +120,7 @@ export default function UserCenter({
   const favoritedTotal = authorData?.favoritedTotal || 0;
   const totalViewCount = authorData?.totalViewCount || 0;
   const averageRating = authorData?.averageRating || 0;
+  const displayId = userData?.displayId || '';
 
   // 當URL參數變化時更新activeTab
   useEffect(() => {
@@ -115,6 +128,54 @@ export default function UserCenter({
       setActiveTab(defaultTab);
     }
   }, [defaultTab]);
+
+  // 當標籤變化時，根據不同的標籤載入相應的數據
+  useEffect(() => {
+    if (displayId) {
+      if (activeTab === '已發布' || activeTab === '數據') {
+        loadPublishedRecipes();
+      }
+      if (activeTab === '草稿') {
+        loadDraftRecipes();
+      }
+    }
+  }, [activeTab, displayId]);
+
+  /**
+   * 載入已發佈的食譜
+   */
+  const loadPublishedRecipes = async () => {
+    try {
+      setIsLoadingPublished(true);
+      setError(null);
+
+      const response = await fetchAuthorRecipes(displayId, true);
+      setPublishedRecipes(response.data);
+    } catch (err) {
+      console.error('載入已發佈食譜失敗:', err);
+      setError(err instanceof Error ? err.message : '載入已發佈食譜失敗');
+    } finally {
+      setIsLoadingPublished(false);
+    }
+  };
+
+  /**
+   * 載入草稿食譜
+   */
+  const loadDraftRecipes = async () => {
+    try {
+      setIsLoadingDrafts(true);
+      setError(null);
+
+      const response = await fetchAuthorRecipes(displayId, false);
+      setDraftRecipes(response.data);
+    } catch (err) {
+      console.error('載入草稿食譜失敗:', err);
+      setError(err instanceof Error ? err.message : '載入草稿食譜失敗');
+    } finally {
+      setIsLoadingDrafts(false);
+    }
+  };
 
   /**
    * 處理刪除模式切換
@@ -127,11 +188,11 @@ export default function UserCenter({
   /**
    * 處理草稿選擇狀態變更
    */
-  const atToggleDraftSelection = (draftId: number) => {
+  const atToggleDraftSelection = (recipeId: number) => {
     setSelectedDrafts((prev) =>
-      prev.includes(draftId)
-        ? prev.filter((id) => id !== draftId)
-        : [...prev, draftId],
+      prev.includes(recipeId)
+        ? prev.filter((id) => id !== recipeId)
+        : [...prev, recipeId],
     );
   };
 
@@ -152,6 +213,173 @@ export default function UserCenter({
     if (!isDeleteMode) {
       router.push(`/recipe-draft?recipeId=${id}`);
     }
+  };
+
+  /**
+   * 轉到新增食譜頁面
+   */
+  const atNewRecipe = () => {
+    router.push('/create-recipe');
+  };
+
+  // 數據標籤頁內容 - 顯示食譜統計資訊
+  const renderDataContent = () => {
+    if (isLoadingPublished) {
+      return <div className="text-center py-8">載入中...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center py-8 text-red-500">{error}</div>;
+    }
+
+    if (publishedRecipes.length === 0) {
+      return <div className="text-center py-8">目前沒有發布的食譜</div>;
+    }
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-bold mb-1">食譜數據</h3>
+          <p className="text-gray-500">深入了解您的食譜表現</p>
+        </div>
+
+        {publishedRecipes.map((recipe) => (
+          <RecipeStatsItem
+            key={recipe.recipeId}
+            title={recipe.title}
+            imageSrc={recipe.coverPhoto}
+            views={recipe.viewCount}
+            shares={recipe.sharedCount}
+            bookmarks={recipe.favoritedCount}
+            comments={recipe.commentCount}
+            rating={recipe.averageRating}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  // 已發布標籤頁內容
+  const renderPublishedContent = () => {
+    if (isLoadingPublished) {
+      return <div className="text-center py-8">載入中...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center py-8 text-red-500">{error}</div>;
+    }
+
+    if (publishedRecipes.length === 0) {
+      return <div className="text-center py-8">目前沒有發布的食譜</div>;
+    }
+
+    return (
+      <div className="space-y-4">
+        <p className="text-gray-500 mb-2">
+          共{publishedRecipes.length || 0}篇食譜
+        </p>
+
+        {publishedRecipes.map((recipe) => (
+          <PublishedRecipeCard
+            key={recipe.recipeId}
+            title={recipe.title}
+            description={recipe.description}
+            imageSrc={recipe.coverPhoto}
+            likes={recipe.favoritedCount}
+            comments={recipe.commentCount}
+            rating={recipe.averageRating}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  // 草稿標籤頁內容
+  const renderDraftContent = () => {
+    if (isLoadingDrafts) {
+      return <div className="text-center py-8">載入中...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center py-8 text-red-500">{error}</div>;
+    }
+
+    if (draftRecipes.length === 0) {
+      return <div className="text-center py-8">目前沒有草稿</div>;
+    }
+
+    return (
+      <div className="space-y-4">
+        <p className="text-gray-500 mb-2">共{draftRecipes.length || 0}篇食譜</p>
+
+        {draftRecipes.map((recipe) => (
+          <div key={recipe.recipeId} className="flex items-center">
+            {isDeleteMode && (
+              <div
+                className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
+                  selectedDrafts.includes(recipe.recipeId)
+                    ? 'bg-orange-500 border-orange-500 text-white'
+                    : 'border-gray-300'
+                }`}
+                onClick={() => atToggleDraftSelection(recipe.recipeId)}
+              >
+                {selectedDrafts.includes(recipe.recipeId) && (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 6L9 17L4 12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </div>
+            )}
+            <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
+              <div
+                onClick={() =>
+                  !isDeleteMode && atDraftCardClick(recipe.recipeId)
+                }
+              >
+                <DraftRecipeCard
+                  title={recipe.title}
+                  description={recipe.description}
+                  imageSrc={recipe.coverPhoto}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {isDeleteMode && (
+          <div className="flex justify-between mt-6 space-x-4">
+            <Button
+              variant="outline"
+              onClick={atToggleDeleteMode}
+              className="flex-1 border border-gray-200"
+            >
+              取消刪除
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={atConfirmDelete}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              disabled={selectedDrafts.length === 0}
+            >
+              確認刪除
+              {selectedDrafts.length > 0 ? `(${selectedDrafts.length})` : ''}
+            </Button>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -204,6 +432,7 @@ export default function UserCenter({
             <Button
               variant="outline"
               className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
+              onClick={atNewRecipe}
             >
               <Plus className="h-5 w-5" />
               <span>新增</span>
@@ -344,96 +573,13 @@ export default function UserCenter({
             </Card>
           </TabsContent>
           <TabsContent value="數據" className="mt-4">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-bold mb-1">食譜數據</h3>
-                <p className="text-gray-500">深入了解您的食譜表現</p>
-              </div>
-
-              {/* 食譜數據項目 */}
-              {[1, 2].map((item) => (
-                <RecipeStatsItem key={item} />
-              ))}
-            </div>
+            {renderDataContent()}
           </TabsContent>
           <TabsContent value="已發布" className="mt-4">
-            <div className="space-y-4">
-              <p className="text-gray-500 mb-2">
-                共{userData?.recipeCount || 0}篇食譜
-              </p>
-
-              {[1, 2, 3].map((item) => (
-                <PublishedRecipeCard key={item} />
-              ))}
-            </div>
+            {renderPublishedContent()}
           </TabsContent>
           <TabsContent value="草稿" className="mt-4">
-            <div className="space-y-4">
-              <p className="text-gray-500 mb-2">共3篇食譜</p>
-
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center">
-                  {isDeleteMode && (
-                    <div
-                      className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
-                        selectedDrafts.includes(item)
-                          ? 'bg-orange-500 border-orange-500 text-white'
-                          : 'border-gray-300'
-                      }`}
-                      onClick={() => atToggleDraftSelection(item)}
-                    >
-                      {selectedDrafts.includes(item) && (
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M20 6L9 17L4 12"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  )}
-                  <div className={`flex-1 ${isDeleteMode ? 'ml-1' : ''}`}>
-                    <div
-                      onClick={() => !isDeleteMode && atDraftCardClick(item)}
-                    >
-                      <DraftRecipeCard key={item} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {isDeleteMode && (
-                <div className="flex justify-between mt-6 space-x-4">
-                  <Button
-                    variant="outline"
-                    onClick={atToggleDeleteMode}
-                    className="flex-1 border border-gray-200"
-                  >
-                    取消刪除
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={atConfirmDelete}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600"
-                    disabled={selectedDrafts.length === 0}
-                  >
-                    確認刪除
-                    {selectedDrafts.length > 0
-                      ? `(${selectedDrafts.length})`
-                      : ''}
-                  </Button>
-                </div>
-              )}
-            </div>
+            {renderDraftContent()}
           </TabsContent>
         </Tabs>
       </div>

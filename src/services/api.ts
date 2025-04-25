@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI0VDExOjQxOjM5Ljc1MzM2ODVaIn0.siBLp3IpnkxIS_FSqiUv18yepWEivnzormBhTSU5363O-Xz-dy_Q6jmUkyNqfKTDe1seO7Otsuj-qEWX56Y8jQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDA0OjEzOjUyLjg3ODk2MTRaIn0.bfsI8IU-IU3B4lRt3bmQULUXm_QTJqlO9rpIw22j3QurHH_H2t4WGBtU1Kf7zXNdhtOaYb-QBLfeSjOJ1RPUdA';
   }
 
   return null;
@@ -1011,6 +1011,91 @@ export const fetchUserProfile = async (displayId: string): Promise<any> => {
     return data;
   } catch (error) {
     console.error('獲取使用者資料失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 取得作者食譜列表
+ * @param displayId 作者的顯示 ID (例如 U000001)
+ * @param isPublished 是否只查詢已發布的食譜，false 為草稿
+ * @returns 包含作者食譜列表的回應
+ */
+export type AuthorRecipesResponse = {
+  statusCode: number;
+  totalCount: number;
+  data: {
+    recipeId: number;
+    title: string;
+    description: string;
+    isPublished: boolean;
+    sharedCount: number;
+    rating: number;
+    viewCount: number;
+    averageRating: number;
+    commentCount: number;
+    favoritedCount: number;
+    coverPhoto: string;
+  }[];
+  newToken?: string;
+};
+
+export const fetchAuthorRecipes = async (
+  displayId: string,
+  isPublished: boolean = true,
+): Promise<AuthorRecipesResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
+    );
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    // 如果回應狀態不是成功
+    if (responseData.statusCode !== 200) {
+      throw new Error(responseData.msg || '獲取作者食譜失敗');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('獲取作者食譜失敗:', error);
     throw error;
   }
 };
