@@ -665,7 +665,7 @@ export default function UserCenter({
               </p>
 
               {[1, 2, 3].map((item) => (
-                <FollowedUserCard key={item} />
+                <FollowedUserCard key={`followed-${item}`} />
               ))}
 
               <Button
@@ -683,7 +683,7 @@ export default function UserCenter({
               </p>
 
               {[1, 2, 3].map((item) => (
-                <RecipeCard key={item} />
+                <RecipeCard key={`recipe-${item}`} />
               ))}
 
               <Button
