@@ -1522,3 +1522,99 @@ export const updateUserProfile = async (
     throw error;
   }
 };
+
+/**
+ * API 回應：使用者食譜列表
+ */
+export type UserRecipesResponse = {
+  statusCode: number;
+  hasMore: boolean;
+  recipeCount: number;
+  recipes: {
+    recipeId: number;
+    title: string;
+    description: string;
+    portion: number;
+    cookTime: number;
+    rating: number;
+    coverPhoto: string | null;
+  }[];
+  message?: string;
+};
+
+/**
+ * 取得使用者的公開食譜列表
+ */
+export const fetchUserRecipes = async (
+  displayId: string,
+  page: number = 1,
+): Promise<UserRecipesResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+    );
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      {
+        method: 'GET',
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 處理 404 或其他錯誤狀態
+    if (!res.ok) {
+      if (res.status === 404) {
+        console.warn(`找不到使用者 ${displayId} 的食譜資料`);
+        // 返回空資料而非拋出錯誤
+        return {
+          statusCode: 404,
+          hasMore: false,
+          recipeCount: 0,
+          recipes: [],
+        };
+      }
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // 讀取回應文字以便檢查和除錯
+    const responseText = await res.text();
+    if (!responseText.trim()) {
+      console.warn('API 回應內容為空');
+      return {
+        statusCode: 200,
+        hasMore: false,
+        recipeCount: 0,
+        recipes: [],
+      };
+    }
+
+    // 解析回應資料
+    try {
+      const data = JSON.parse(responseText);
+      console.log('回應資料:', data);
+
+      // 如果回應狀態不是成功
+      if (data.statusCode !== 200) {
+        console.warn(`API 回應狀態碼非 200: ${data.statusCode}`);
+        return {
+          statusCode: data.statusCode,
+          hasMore: false,
+          recipeCount: 0,
+          recipes: [],
+          message: data.msg || '獲取使用者食譜失敗',
+        };
+      }
+
+      return data;
+    } catch (parseError) {
+      console.error('解析 JSON 失敗:', parseError, '原始文本:', responseText);
+      throw new Error('解析回應資料失敗');
+    }
+  } catch (error) {
+    console.error('獲取使用者食譜失敗:', error);
+    throw error;
+  }
+};

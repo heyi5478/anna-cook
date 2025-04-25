@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
 import { fetchUserProfile } from '@/services/api';
-import { mockAuthor, mockRecipes } from '@/components/AuthorProfile/types';
+import { mockAuthor } from '@/components/AuthorProfile/types';
 
 interface UserPageProps {
   userProfileData: {
@@ -141,7 +141,7 @@ export default function UserPage({
           />
         ) : (
           // 顯示作者頁面
-          <AuthorProfile author={author} recipes={mockRecipes} />
+          <AuthorProfile author={author} isMe={false} displayId={displayId} />
         )}
       </div>
       <Footer />
