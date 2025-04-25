@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import ProfileEditForm from '@/components/ProfileEditForm';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * 用戶中心編輯頁面
