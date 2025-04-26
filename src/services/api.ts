@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDEwOjI5OjM1LjM2OTQzMDBaIn0.PZBJtVEdjUxp-F1fJVCZbuPOxJkLSMACwPovzo1CA0NG9oIRO4lTlfWOQIANxb6berouUIcdorqdzZGdCXstDQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI2VDA3OjE3OjU4LjAxNDI1MjFaIn0.vr_8K9m54xnSlqgNdtUs7DQDICT0o8dSzVNykYXDBWjOBaMIV7E0kC27YxQ5OkMh8SsShv9STJUTn8SJgCw7GQ';
   }
 
   return null;
@@ -1435,7 +1435,7 @@ export type UpdateUserProfileResponse = {
   msg: string;
   data: {
     accountName: string;
-    userIntro: string;
+    description: string;
     profilePhoto: string;
   };
   newToken?: string;
@@ -1449,7 +1449,7 @@ export type UpdateUserProfileResponse = {
 export const updateUserProfile = async (
   data: {
     accountName?: string;
-    userIntro?: string;
+    description?: string;
   },
   profilePhoto?: File,
 ): Promise<UpdateUserProfileResponse> => {
@@ -1472,8 +1472,8 @@ export const updateUserProfile = async (
       formData.append('accountName', data.accountName);
     }
 
-    if (data.userIntro) {
-      formData.append('userIntro', data.userIntro);
+    if (data.description) {
+      formData.append('description', data.description);
     }
 
     // 添加頭像照片，如果有

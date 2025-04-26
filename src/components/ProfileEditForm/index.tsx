@@ -113,7 +113,7 @@ export default function ProfileEditForm() {
 
       const updateData = {
         accountName: data.nickname,
-        userIntro: data.bio || '',
+        description: data.bio || '',
       };
 
       // 發送更新請求

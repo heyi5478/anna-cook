@@ -27,6 +27,10 @@ export const AuthorProfile = ({
   // 從 URL 獲取 displayId (如果沒有直接傳入)
   const router = useRouter();
 
+  // 顯示 author 的值，Debug 用
+  console.log('AuthorProfile/index.tsx - author:', author);
+  console.log('AuthorProfile/index.tsx - displayId:', displayId);
+
   // 獲取 URL 中的 displayId
   let urlDisplayId: string | undefined;
   if (router.query.displayId) {
