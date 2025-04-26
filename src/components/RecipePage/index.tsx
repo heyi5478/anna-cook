@@ -33,19 +33,89 @@ import {
   tagsContainerStyles,
 } from './styles';
 
+interface RecipePageProps {
+  recipeData: {
+    isAuthor: boolean;
+    author: {
+      id: number;
+      displayId: string;
+      name: string;
+      followersCount: number;
+    };
+    isFavorite: boolean;
+    isFollowing: boolean;
+    recipe: {
+      id: number;
+      displayId: string;
+      isPublished: boolean;
+      viewCount: number;
+      recipeName: string;
+      coverPhoto: string | null;
+      description: string;
+      cookingTime: number;
+      portion: number;
+      rating: number;
+      videoId: string | null;
+    };
+    ingredients: {
+      ingredientId: number;
+      ingredientName: string;
+      amount: number;
+      unit: string;
+      isFlavoring: boolean;
+    }[];
+    tags: {
+      id: number;
+      tag: string;
+    }[];
+  };
+}
+
+/**
+ * 處理圖片URL，如果不是絕對URL則加上API基礎URL
+ */
+const getImageUrl = (coverPhoto: string | null | undefined): string => {
+  if (!coverPhoto) {
+    return '/placeholder.svg?height=500&width=500';
+  }
+
+  // 檢查是否已經是絕對URL (以 http:// 或 https:// 開頭)
+  if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
+    return coverPhoto;
+  }
+
+  // 檢查是否已經是完整的相對路徑 (以 / 開頭)
+  if (coverPhoto.startsWith('/')) {
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${coverPhoto}`;
+  }
+
+  // 其他情況，確保路徑前有 /
+  return `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}/${coverPhoto}`;
+};
+
 /**
  * 食譜詳情頁面元件，顯示食譜的完整資訊、社交互動和評論
  */
-export default function RecipePage() {
+export default function RecipePageComponent({ recipeData }: RecipePageProps) {
+  // 從 props 獲取食譜資料
+  const { recipe, author, ingredients, tags, isFavorite, isFollowing } =
+    recipeData;
+
+  // 分離普通食材和調味料
+  const regularIngredients = ingredients.filter((item) => !item.isFlavoring);
+  const flavorings = ingredients.filter((item) => item.isFlavoring);
+
   // 狀態管理
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(isFavorite);
+  const [following, setFollowing] = useState(isFollowing);
   const [showReview, setShowReview] = useState(false);
 
   /**
-   * 處理按讚事件
+   * 處理收藏事件
    */
   const atLikeClick = () => {
     setLiked(!liked);
+    // 此處可添加 API 呼叫來更新收藏狀態
   };
 
   /**
@@ -56,12 +126,19 @@ export default function RecipePage() {
   };
 
   /**
+   * 處理追蹤/取消追蹤事件
+   */
+  const atFollowClick = () => {
+    setFollowing(!following);
+    // 此處可添加 API 呼叫來更新追蹤狀態
+  };
+
+  /**
    * 處理分享事件，使用 Web Share API
    */
   const atShareClick = async () => {
-    const recipeTitle = '家傳滷五花肉';
-    const recipeDesc =
-      '這是我家傳的五花肉滷肉食譜，香氣四溢，肉質軟嫩多汁。醬汁經過多年改良，滋味濃郁！';
+    const recipeTitle = recipe.recipeName;
+    const recipeDesc = recipe.description;
 
     // 檢查瀏覽器是否支援 Web Share API
     if (typeof navigator !== 'undefined' && navigator.share) {
@@ -99,17 +176,15 @@ export default function RecipePage() {
    * 渲染食譜標籤列表
    */
   const renderRecipeTags = () => {
-    const tags = ['五花肉', '滷味', '家常菜', '醬油', '簡單'];
-
     return (
       <div className={tagsContainerStyles}>
         {tags.map((tag) => (
           <Badge
-            key={tag}
+            key={tag.id}
             variant="outline"
             className="rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700"
           >
-            {tag}
+            {tag.tag}
           </Badge>
         ))}
       </div>
@@ -128,15 +203,15 @@ export default function RecipePage() {
           經典食譜
         </Link>
         <span className="mx-1">&gt;</span>
-        <span className="text-gray-700">家傳滷五花肉</span>
+        <span className="text-gray-700">{recipe.recipeName}</span>
       </div>
 
       <main className="flex-1">
         {/* 食譜主圖 */}
         <div className={mainImageStyles}>
           <Image
-            src="/placeholder.svg?height=500&width=500"
-            alt="家傳滷五花肉"
+            src={getImageUrl(recipe.coverPhoto)}
+            alt={recipe.recipeName}
             fill
             className="object-cover"
             priority
@@ -145,7 +220,9 @@ export default function RecipePage() {
 
         {/* 食譜標題 */}
         <div className={cardStyles({ spacing: 'none' })}>
-          <h1 className={headingStyles({ size: 'large' })}>家傳滷五花肉</h1>
+          <h1 className={headingStyles({ size: 'large' })}>
+            {recipe.recipeName}
+          </h1>
 
           <div className="flex items-center justify-between mb-3">
             <div className={recipeInfoItemStyles}>
@@ -166,17 +243,23 @@ export default function RecipePage() {
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <span className="text-sm text-gray-600">2人份</span>
+              <span className="text-sm text-gray-600">
+                {recipe.portion}人份
+              </span>
             </div>
 
             <div className={recipeInfoItemStyles}>
               <Clock className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-600">25分鐘</span>
+              <span className="text-sm text-gray-600">
+                {recipe.cookingTime}分鐘
+              </span>
             </div>
 
             <div className={recipeInfoItemStyles}>
               <Star className="w-4 h-4 text-[#FF5722] fill-[#FF5722]" />
-              <span className="text-sm text-gray-600">4.5</span>
+              <span className="text-sm text-gray-600">
+                {recipe.rating.toFixed(1)}
+              </span>
             </div>
           </div>
 
@@ -196,16 +279,25 @@ export default function RecipePage() {
             <Avatar className="w-10 h-10">
               <AvatarImage
                 src="/placeholder.svg?height=40&width=40"
-                alt="作者頭像"
+                alt={`${author.name}的頭像`}
               />
-              <AvatarFallback>AC</AvatarFallback>
+              <AvatarFallback>
+                {author.name.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="font-medium">料理達人</p>
-              <p className="text-xs text-gray-500">10,000 粉絲</p>
+              <p className="font-medium">{author.name}</p>
+              <p className="text-xs text-gray-500">
+                {author.followersCount} 粉絲
+              </p>
             </div>
-            <Button variant="outline" size="sm" className="text-xs h-8">
-              關注
+            <Button
+              variant="outline"
+              size="sm"
+              className={`text-xs h-8 ${following ? 'bg-gray-100' : ''}`}
+              onClick={atFollowClick}
+            >
+              {following ? '取消追蹤' : '追蹤'}
             </Button>
           </div>
         </div>
@@ -213,77 +305,57 @@ export default function RecipePage() {
         {/* 食譜描述 */}
         <div className={cardStyles()}>
           <p className="text-sm text-gray-700 leading-relaxed">
-            這是我家傳的五花肉滷肉食譜，香氣四溢，肉質軟嫩多汁。醬汁經過多年改良，滋味濃郁，搭配白飯絕配！這道料理簡單易做，但口味卻非常豐富。醬汁可以保存起來重複使用，越滷越香。希望大家喜歡這道家常美味！
+            {recipe.description}
           </p>
         </div>
 
         {/* 食譜標籤 */}
-        <div className={cardStyles()}>
-          <h3 className={headingStyles()}>料理標籤</h3>
-          {renderRecipeTags()}
-        </div>
+        {tags.length > 0 && (
+          <div className={cardStyles()}>
+            <h3 className={headingStyles()}>料理標籤</h3>
+            {renderRecipeTags()}
+          </div>
+        )}
 
         {/* 食材清單 */}
-        <div className={cardStyles()}>
-          <h3 className={headingStyles({ size: 'small' })}>食材清單</h3>
-          <div className={ingredientListStyles}>
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">五花肉</span>
-              <span className="text-sm text-gray-500">500 克</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">大蒜</span>
-              <span className="text-sm text-gray-500">4 粒</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">薑片</span>
-              <span className="text-sm text-gray-500">2 片</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">紅蔥頭</span>
-              <span className="text-sm text-gray-500">2 個</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">蔥段</span>
-              <span className="text-sm text-gray-500">2 根</span>
+        {regularIngredients.length > 0 && (
+          <div className={cardStyles()}>
+            <h3 className={headingStyles({ size: 'small' })}>食材清單</h3>
+            <div className={ingredientListStyles}>
+              {regularIngredients.map((ingredient, index) => (
+                <div key={ingredient.ingredientId}>
+                  <div className={separatedItemStyles()}>
+                    <span className="text-sm">{ingredient.ingredientName}</span>
+                    <span className="text-sm text-gray-500">
+                      {ingredient.amount} {ingredient.unit}
+                    </span>
+                  </div>
+                  {index < regularIngredients.length - 1 && <Separator />}
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* 調味料 */}
-        <div className={cardStyles()}>
-          <h3 className={headingStyles({ size: 'small' })}>調味料</h3>
-          <div className={ingredientListStyles}>
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">醬油</span>
-              <span className="text-sm text-gray-500">3 大匙</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">冰糖</span>
-              <span className="text-sm text-gray-500">2 大匙</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">料酒</span>
-              <span className="text-sm text-gray-500">2 大匙</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">五香粉</span>
-              <span className="text-sm text-gray-500">1/2 小匙</span>
-            </div>
-            <Separator />
-            <div className={separatedItemStyles()}>
-              <span className="text-sm">清水</span>
-              <span className="text-sm text-gray-500">400 毫升</span>
+        {flavorings.length > 0 && (
+          <div className={cardStyles()}>
+            <h3 className={headingStyles({ size: 'small' })}>調味料</h3>
+            <div className={ingredientListStyles}>
+              {flavorings.map((flavor, index) => (
+                <div key={flavor.ingredientId}>
+                  <div className={separatedItemStyles()}>
+                    <span className="text-sm">{flavor.ingredientName}</span>
+                    <span className="text-sm text-gray-500">
+                      {flavor.amount} {flavor.unit}
+                    </span>
+                  </div>
+                  {index < flavorings.length - 1 && <Separator />}
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* 推薦產品 */}
         <div className={cardStyles()}>
@@ -452,14 +524,15 @@ export default function RecipePage() {
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#FF5722"
+              stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="text-gray-500"
             >
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
-            <span className="text-xs text-[#FF5722]">收藏</span>
+            <span className="text-xs text-gray-500">收藏</span>
           </button>
           <button className={footerNavItemStyles} aria-label="我的">
             <svg
@@ -474,9 +547,8 @@ export default function RecipePage() {
               strokeLinejoin="round"
               className="text-gray-500"
             >
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="10" r="3" />
-              <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
             <span className="text-xs text-gray-500">我的</span>
           </button>

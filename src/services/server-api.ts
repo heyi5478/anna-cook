@@ -285,3 +285,99 @@ export const fetchAuthorRecipesServer = async (
     };
   }
 };
+
+/**
+ * API 回應：單筆食譜詳細資料
+ */
+export interface RecipeDetailResponse {
+  StatusCode: number;
+  msg?: string;
+  data?: {
+    isAuthor: boolean;
+    author: {
+      id: number;
+      displayId: string;
+      name: string;
+      followersCount: number;
+    };
+    isFavorite: boolean;
+    isFollowing: boolean;
+    recipe: {
+      id: number;
+      displayId: string;
+      isPublished: boolean;
+      viewCount: number;
+      recipeName: string;
+      coverPhoto: string;
+      description: string;
+      cookingTime: number;
+      portion: number;
+      rating: number;
+      videoId: string | null;
+    };
+    ingredients: {
+      ingredientId: number;
+      ingredientName: string;
+      amount: number;
+      unit: string;
+      isFlavoring: boolean;
+    }[];
+    tags: {
+      id: number;
+      tag: string;
+    }[];
+  };
+  newToken?: string;
+}
+
+/**
+ * 伺服器端獲取單筆食譜詳細資料
+ * @param recipeId 食譜ID
+ * @param req 伺服器端請求物件
+ * @returns 食譜詳細資料回應
+ */
+export const fetchRecipeDetailServer = async (
+  recipeId: number,
+  req?: IncomingMessage,
+): Promise<RecipeDetailResponse> => {
+  try {
+    console.log(
+      `伺服器端發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}`,
+    );
+
+    // 獲取 token (若有)
+    const token = req ? getAuthTokenForServer(req) : null;
+
+    // 準備請求標頭
+    const headers: HeadersInit = {};
+    if (token) {
+      // 如果有 token，加入授權標頭
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 發送請求
+    const response = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}`, {
+      method: 'GET',
+      headers,
+    });
+
+    console.log('伺服器端回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        StatusCode: response.status,
+        msg: response.status === 400 ? '找不到該食譜' : '獲取食譜資料失敗',
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('伺服器端獲取食譜資料失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '伺服器端獲取食譜資料失敗',
+    };
+  }
+};
