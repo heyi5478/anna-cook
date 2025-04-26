@@ -1,178 +1,32 @@
 import { apiConfig, authConfig } from '@/config';
-
-export type Recipe = {
-  Id: number;
-  RecipeName: string;
-  RecipeIntro: string;
-  Portion: number;
-  CookingTime: number;
-  Rating: number;
-};
-
-export type RecipeFormData = {
-  recipeName: string;
-  coverImage?: File;
-};
-
-export type ApiResponse<T> = {
-  StatusCode: number;
-  msg: string;
-  data: T;
-};
-
-export type GoogleAuthResponse = {
-  StatusCode: number;
-  msg: string;
-  redirectUri: string;
-};
-
-export type RecipeCreateResponse = {
-  StatusCode: number;
-  msg: string;
-  Id: number;
-  newToken?: string;
-};
-
-export type IngredientInput = {
-  ingredientName: string;
-  ingredientAmount: number;
-  ingredientUnit: string;
-  isFlavoring: boolean;
-};
-
-export type RecipeStep2Data = {
-  recipeIntro: string;
-  cookingTime: number;
-  portion: number;
-  ingredients: IngredientInput[];
-  tags?: string[];
-};
-
-export type VideoUploadResponse = {
-  message: string;
-  videoUri?: string;
-  status?: string;
-  newToken?: string;
-};
-
-export type RecipeDraftIngredient = {
-  ingredientId: number;
-  ingredientName: string;
-  ingredientAmount: number;
-  ingredientUnit: string;
-  isFlavoring: boolean;
-};
-
-export type RecipeDraftTag = {
-  tagId: number;
-  tagName: string;
-};
-
-export type RecipeDraftStep = {
-  stepId: number;
-  stepOrder: number;
-  stepDescription: string;
-  videoStart: number;
-  videoEnd: number;
-};
-
-export type RecipeDraft = {
-  id: number;
-  displayId: string;
-  recipeName: string;
-  isPublished: boolean;
-  coverPhoto: string;
-  description: string;
-  cookingTime: number;
-  portion: number;
-  videoId?: string;
-};
-
-export type RecipeDraftResponse = {
-  StatusCode: number;
-  msg: string;
-  recipe: RecipeDraft;
-  ingredients: RecipeDraftIngredient[];
-  tags: RecipeDraftTag[];
-  steps: RecipeDraftStep[];
-  newToken?: string;
-};
-
-export type UpdateStepsRequest = {
-  description: string;
-  startTime: number;
-  endTime: number;
-}[];
-
-export type UpdateStepsResponse = {
-  StatusCode: number;
-  msg: string;
-  stepCount: number;
-  newToken?: string;
-};
-
-export type SubmitDraftResponse = {
-  StatusCode: number;
-  msg: string;
-  recipeId?: number;
-  newToken?: string;
-  error?: string;
-};
-
-type SubmitDraftDetail = {
-  RecipeIntro: string;
-  CookingTime: number;
-  Portion: number;
-  Ingredients: {
-    IngredientName: string;
-    IngredientAmount: number;
-    IngredientUnit: string;
-    IsFlavoring: boolean;
-  }[];
-  Tags: string[];
-};
-
-type SubmitDraftStep = {
-  Description: string;
-  StartTime: number;
-  EndTime: number;
-};
-
-// 定義註冊返回型別
-export type RegisterResponse = {
-  StatusCode: number;
-  msg: string;
-};
-
-// 定義登入回應型別
-export type LoginResponse = {
-  StatusCode: number;
-  msg: string;
-  token?: string;
-  userData?: {
-    userId: number;
-    userDisplayId: string;
-    accountEmail: string;
-    accountName: string;
-    profilePhoto: string;
-    role: number;
-    roleName: string;
-  };
-};
-
-export type CheckAuthResponse = {
-  message: string;
-  token: string;
-  userData: {
-    id: number;
-    displayId: string;
-    accountEmail: string;
-    accountName: string;
-    profilePhoto: string;
-    role: number;
-    loginProvider: number;
-  };
-};
+import {
+  Recipe,
+  RecipeFormData,
+  ApiResponse,
+  GoogleAuthResponse,
+  RecipeCreateResponse,
+  RecipeStep2Data,
+  VideoUploadResponse,
+  RecipeDraftResponse,
+  UpdateStepsRequest,
+  UpdateStepsResponse,
+  SubmitDraftResponse,
+  SubmitDraftDetail,
+  SubmitDraftStep,
+  RegisterResponse,
+  LoginResponse,
+  CheckAuthResponse,
+  UserProfileResponse,
+  CurrentUserProfileResponse,
+  UpdateUserProfileResponse,
+  AuthorRecipesResponse,
+  DeleteMultipleResponse,
+  TogglePublishResponse,
+  UserFavoriteFollowResponse,
+  UserRecipesResponse,
+  FollowResponse,
+  FavoriteRecipeResponse,
+} from '@/types/api';
 
 /**
  * 從 Cookie 獲取 JWT Token
@@ -954,40 +808,6 @@ export const loginWithEmail = async (
 };
 
 /**
- * API 回應：使用者個人檔案
- */
-export type UserProfileResponse = {
-  StatusCode: number;
-  isMe?: boolean;
-  userData?: {
-    userId: number;
-    displayId: string;
-    isFollowing: boolean;
-    accountName: string;
-    profilePhoto: string;
-    description: string;
-    recipeCount: number;
-    followerCount: number;
-  } | null;
-  authorData?: {
-    userId: number;
-    displayId: string;
-    accountName: string;
-    accountEmail: string;
-    profilePhoto: string;
-    description: string;
-    followingCount: number;
-    followerCount: number;
-    favoritedTotal: number;
-    myFavoriteCount: number;
-    averageRating: number;
-    totalViewCount: number;
-  } | null;
-  msg?: string;
-  newToken?: string;
-};
-
-/**
  * 取得使用者個人檔案資料
  */
 export const fetchUserProfile = async (
@@ -1040,23 +860,6 @@ export const fetchUserProfile = async (
     console.error('獲取使用者資料失敗:', error);
     throw error;
   }
-};
-
-/**
- * API 回應：當前使用者個人資料
- */
-export type CurrentUserProfileResponse = {
-  StatusCode: number;
-  msg: string;
-  data: {
-    userId: number;
-    displayId: string;
-    accountName: string;
-    accountEmail: string;
-    profilePhoto: string;
-    description: string;
-  };
-  newToken?: string;
 };
 
 /**
@@ -1115,20 +918,6 @@ export const fetchCurrentUserProfile =
       throw error;
     }
   };
-
-/**
- * API 回應：更新使用者個人資料
- */
-export type UpdateUserProfileResponse = {
-  StatusCode: number;
-  msg: string;
-  data: {
-    accountName: string;
-    description: string;
-    profilePhoto: string;
-  };
-  newToken?: string;
-};
 
 /**
  * 更新當前登入使用者的個人資料
@@ -1218,25 +1007,6 @@ export const updateUserProfile = async (
  * @param isPublished 是否只查詢已發布的食譜，false 為草稿
  * @returns 包含作者食譜列表的回應
  */
-export type AuthorRecipesResponse = {
-  statusCode: number;
-  totalCount: number;
-  data: {
-    recipeId: number;
-    title: string;
-    description: string;
-    isPublished: boolean;
-    sharedCount: number;
-    rating: number;
-    viewCount: number;
-    averageRating: number;
-    commentCount: number;
-    favoritedCount: number;
-    coverPhoto: string;
-  }[];
-  newToken?: string;
-};
-
 export const fetchAuthorRecipes = async (
   displayId: string,
   isPublished: boolean = true,
@@ -1302,13 +1072,6 @@ export const fetchAuthorRecipes = async (
  * @param recipeIds 要刪除的食譜 ID 陣列
  * @returns 包含刪除結果的回應
  */
-export type DeleteMultipleResponse = {
-  StatusCode: number;
-  msg: string;
-  deletedIds: number[];
-  newToken?: string;
-};
-
 export const deleteMultipleRecipes = async (
   recipeIds: number[],
 ): Promise<DeleteMultipleResponse> => {
@@ -1372,14 +1135,6 @@ export const deleteMultipleRecipes = async (
  * @param isPublished 是否發佈 (true 為發佈，false 為取消發佈)
  * @returns 包含切換結果的回應
  */
-export type TogglePublishResponse = {
-  StatusCode: number;
-  msg: string;
-  id: number;
-  isPublished: boolean;
-  token?: string;
-};
-
 export const toggleRecipePublishStatus = async (
   recipeId: number,
   isPublished: boolean,
@@ -1450,45 +1205,6 @@ export const toggleRecipePublishStatus = async (
  * @param page 頁數，每頁固定 3 筆
  * @returns 包含收藏或追蹤清單的回應
  */
-export type UserFavoriteResponse = {
-  StatusCode: number;
-  hasMore: boolean;
-  msg: string;
-  totalCount: number;
-  data: {
-    id: number;
-    displayId: string;
-    recipeName: string;
-    description: string;
-    portion: number;
-    cookingTime: string;
-    rating: number;
-    coverPhoto: string;
-  }[];
-  newToken?: string;
-};
-
-export type UserFollowResponse = {
-  StatusCode: number;
-  hasMore: boolean;
-  msg: string;
-  totalCount: number;
-  data: {
-    id: number;
-    displayId: string;
-    name: string;
-    profilePhoto: string;
-    description: string;
-    followedUserRecipeCount: number;
-    followedUserFollowerCount: number;
-  }[];
-  newToken?: string;
-};
-
-export type UserFavoriteFollowResponse =
-  | UserFavoriteResponse
-  | UserFollowResponse;
-
 export const fetchUserFavoriteFollow = async (
   displayId: string,
   table: 'favorite' | 'follow' = 'favorite',
@@ -1548,25 +1264,6 @@ export const fetchUserFavoriteFollow = async (
     console.error('獲取使用者的收藏或追蹤清單失敗:', error);
     throw error;
   }
-};
-
-/**
- * API 回應：使用者食譜列表
- */
-export type UserRecipesResponse = {
-  statusCode: number;
-  hasMore: boolean;
-  recipeCount: number;
-  recipes: {
-    recipeId: number;
-    title: string;
-    description: string;
-    portion: number;
-    cookTime: number;
-    rating: number;
-    coverPhoto: string | null;
-  }[];
-  message?: string;
 };
 
 /**
@@ -1644,16 +1341,6 @@ export const fetchUserRecipes = async (
     console.error('獲取使用者食譜失敗:', error);
     throw error;
   }
-};
-
-/**
- * API 回應：追蹤/取消追蹤使用者
- */
-export type FollowResponse = {
-  StatusCode: number;
-  msg: string;
-  Id: number;
-  newToken?: string;
 };
 
 /**
@@ -1736,17 +1423,6 @@ export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
     console.error('取消追蹤使用者失敗:', error);
     throw error;
   }
-};
-
-/**
- * API 回應：收藏/取消收藏食譜
- */
-export type FavoriteRecipeResponse = {
-  StatusCode: number;
-  msg: string;
-  Id?: number;
-  id?: number;
-  newToken?: string;
 };
 
 /**
