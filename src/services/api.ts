@@ -26,6 +26,7 @@ import {
   UserRecipesResponse,
   FollowResponse,
   FavoriteRecipeResponse,
+  RecipeRatingCommentResponse,
 } from '@/types/api';
 
 /**
@@ -1536,5 +1537,68 @@ export const unfavoriteRecipe = async (
   } catch (error) {
     console.error('取消收藏食譜失敗:', error);
     throw error;
+  }
+};
+
+/**
+ * 獲取食譜留言與評分
+ * @param recipeId 食譜ID
+ * @param page 頁碼，預設為1
+ * @returns 包含留言和評分的回應
+ */
+export const fetchRecipeRatingComments = async (
+  recipeId: number,
+  page: number = 1,
+): Promise<RecipeRatingCommentResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
+    );
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
+      {
+        method: 'GET',
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 如果回應狀態不是成功
+    if (!res.ok) {
+      if (res.status === 400) {
+        return {
+          StatusCode: 400,
+          msg: '未找到任何留言',
+          totalCount: 0,
+          hasMore: false,
+          data: [],
+        };
+      }
+      if (res.status === 404) {
+        return {
+          StatusCode: 404,
+          msg: '找不到該食譜或無法進行此操作',
+          totalCount: 0,
+          hasMore: false,
+          data: [],
+        };
+      }
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // 解析回應資料
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('獲取食譜留言與評分失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '獲取食譜留言與評分失敗',
+      totalCount: 0,
+      hasMore: false,
+      data: [],
+    };
   }
 };

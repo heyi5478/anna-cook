@@ -1,7 +1,7 @@
 import { Star } from 'lucide-react';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
-type ReviewDisplayProps = {
+export type ReviewDisplayProps = {
   /**
    * 評論內容
    */
@@ -15,6 +15,10 @@ type ReviewDisplayProps = {
    */
   userRating?: number;
   /**
+   * 使用者頭像圖片URL
+   */
+  userAvatar?: string;
+  /**
    * 自定義類別
    */
   className?: string;
@@ -27,13 +31,18 @@ export function ReviewDisplay({
   comment,
   username = '使用者名稱',
   userRating = 4.3,
+  userAvatar,
   className = '',
 }: ReviewDisplayProps) {
+  // 獲取頭像顯示文字（使用者名稱的前兩個字）
+  const avatarText = username.substring(0, 2).toUpperCase();
+
   return (
     <div className={`bg-gray-50 p-4 rounded-lg ${className}`}>
       <div className="flex items-start gap-3">
         <Avatar className="h-12 w-12 bg-gray-300">
-          <span className="sr-only">{username}</span>
+          {userAvatar ? <AvatarImage src={userAvatar} alt={username} /> : null}
+          <AvatarFallback>{avatarText}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
           <h3 className="font-medium">{username}</h3>

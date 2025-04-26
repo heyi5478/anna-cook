@@ -335,3 +335,19 @@ export type FavoriteRecipeResponse = {
   id?: number;
   newToken?: string;
 };
+
+// 評論相關類型
+export type RecipeRatingCommentResponse = {
+  StatusCode: number;
+  msg: string;
+  totalCount: number;
+  hasMore: boolean;
+  data: {
+    commentId: number;
+    displayId: string;
+    authorName: string;
+    authorPhoto: string | null;
+    comment: string;
+    rating: number;
+  }[];
+};

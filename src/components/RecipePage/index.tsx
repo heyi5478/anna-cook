@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,12 @@ import { ProductCard } from '@/components/ui/adCard';
 import FollowButton from '@/components/common/FollowButton';
 
 // 引入 API 服務
-import { favoriteRecipe, unfavoriteRecipe } from '@/services/api';
+import {
+  favoriteRecipe,
+  unfavoriteRecipe,
+  fetchRecipeRatingComments,
+} from '@/services/api';
+import { RecipeRatingCommentResponse } from '@/types/api';
 
 // 引入樣式
 import {
@@ -112,6 +117,73 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
   const [liked, setLiked] = useState(isFavorite);
   const [likeLoading, setLikeLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
+
+  // 評論相關狀態
+  const [comments, setComments] = useState<RecipeRatingCommentResponse['data']>(
+    [],
+  );
+  const [totalComments, setTotalComments] = useState(0);
+  const [hasMoreComments, setHasMoreComments] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentError, setCommentError] = useState('');
+
+  // 獲取評論資料
+  useEffect(() => {
+    /**
+     * 獲取食譜評論
+     */
+    const fetchComments = async () => {
+      setIsLoadingComments(true);
+      setCommentError('');
+
+      try {
+        const response = await fetchRecipeRatingComments(recipe.id, 1);
+
+        if (response.StatusCode === 200) {
+          setComments(response.data);
+          setTotalComments(response.totalCount);
+          setHasMoreComments(response.hasMore);
+        } else {
+          setCommentError(response.msg);
+        }
+      } catch (error) {
+        console.error('獲取評論失敗:', error);
+        setCommentError('獲取評論失敗，請稍後再試');
+      } finally {
+        setIsLoadingComments(false);
+      }
+    };
+
+    fetchComments();
+  }, [recipe.id]);
+
+  /**
+   * 載入更多評論
+   */
+  const atLoadMoreComments = async () => {
+    if (!hasMoreComments || isLoadingComments) return;
+
+    setIsLoadingComments(true);
+
+    try {
+      const nextPage = currentPage + 1;
+      const response = await fetchRecipeRatingComments(recipe.id, nextPage);
+
+      if (response.StatusCode === 200) {
+        setComments((prevComments) => [...prevComments, ...response.data]);
+        setHasMoreComments(response.hasMore);
+        setCurrentPage(nextPage);
+      } else {
+        setCommentError(response.msg);
+      }
+    } catch (error) {
+      console.error('載入更多評論失敗:', error);
+      setCommentError('載入更多評論失敗，請稍後再試');
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
 
   /**
    * 處理收藏事件
@@ -431,7 +503,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               />
               <span>留言</span>
               <span className="ml-1 text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
-                24
+                {totalComments}
               </span>
             </button>
             <button
@@ -455,39 +527,52 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         <div className={cardStyles()}>
           <div className="flex items-center justify-between mb-4">
             <h3 className={headingStyles()}>用戶評論</h3>
+            <span className="text-sm text-gray-500">
+              共 {totalComments} 則評論
+            </span>
           </div>
 
           <div className={reviewListStyles}>
-            <ReviewDisplay
-              comment="我嘗試了這個食譜，真的非常美味！肉質軟嫩，醬汁香濃，全家人都很喜歡！我會再做一次，100%！"
-              username="料理愛好者"
-              userRating={4.5}
-            />
+            {commentError && (
+              <p className="text-sm text-red-500 text-center py-4">
+                {commentError}
+              </p>
+            )}
 
-            <ReviewDisplay
-              comment="這個食譜很棒，但我建議多加一點五香粉，會讓味道更豐富。整體來說非常推薦！"
-              username="美食探險家"
-              userRating={4.0}
-            />
+            {!commentError && comments.length === 0 && !isLoadingComments && (
+              <p className="text-sm text-gray-500 text-center py-4">暫無評論</p>
+            )}
 
-            <ReviewDisplay
-              comment="步驟清晰明瞭，即使是新手也能輕鬆完成。成品美味可口，朋友們都讚不絕口！"
-              username="烹飪新手"
-              userRating={5.0}
-            />
+            {isLoadingComments && comments.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">
+                載入評論中...
+              </p>
+            )}
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs text-gray-500"
-            >
-              查看更多
-            </Button>
+            {comments.map((comment) => (
+              <ReviewDisplay
+                key={comment.commentId}
+                comment={comment.comment}
+                username={comment.authorName}
+                userRating={comment.rating}
+                userAvatar={comment.authorPhoto || undefined}
+              />
+            ))}
+
+            {hasMoreComments && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-gray-500"
+                onClick={atLoadMoreComments}
+                disabled={isLoadingComments}
+              >
+                {isLoadingComments ? '載入中...' : '查看更多'}
+              </Button>
+            )}
           </div>
         </div>
       </main>
-
-      {/* 底部導航 */}
     </div>
   );
 }
