@@ -16,6 +16,9 @@ import Review from '@/components/RecipePage/Review';
 import { ProductCard } from '@/components/ui/adCard';
 import FollowButton from '@/components/common/FollowButton';
 
+// 引入 API 服務
+import { favoriteRecipe, unfavoriteRecipe } from '@/services/api';
+
 // 引入樣式
 import {
   cardStyles,
@@ -107,14 +110,32 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
   // 狀態管理
   const [liked, setLiked] = useState(isFavorite);
+  const [likeLoading, setLikeLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
 
   /**
    * 處理收藏事件
    */
-  const atLikeClick = () => {
-    setLiked(!liked);
-    // 此處可添加 API 呼叫來更新收藏狀態
+  const atLikeClick = async () => {
+    try {
+      setLikeLoading(true);
+
+      if (liked) {
+        // 取消收藏
+        await unfavoriteRecipe(recipe.id);
+      } else {
+        // 收藏食譜
+        await favoriteRecipe(recipe.id);
+      }
+
+      // 成功後更新UI狀態
+      setLiked(!liked);
+    } catch (error) {
+      console.error('收藏操作失敗:', error);
+      // 保持原狀態，不變更UI
+    } finally {
+      setLikeLoading(false);
+    }
   };
 
   /**
@@ -389,12 +410,13 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 liked && interactionButtonStyles({ state: 'active' }),
               )}
               onClick={atLikeClick}
+              disabled={likeLoading}
               aria-label="點收藏"
             >
               <Bookmark
                 className={`w-5 h-5 ${liked ? 'fill-[#FF5722] text-[#FF5722]' : ''}`}
               />
-              <span>收藏</span>
+              <span>{likeLoading ? '處理中...' : '收藏'}</span>
             </button>
             <button
               className={cn(

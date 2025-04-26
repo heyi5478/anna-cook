@@ -1737,3 +1737,128 @@ export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
     throw error;
   }
 };
+
+/**
+ * API 回應：收藏/取消收藏食譜
+ */
+export type FavoriteRecipeResponse = {
+  StatusCode: number;
+  msg: string;
+  Id?: number;
+  id?: number;
+  newToken?: string;
+};
+
+/**
+ * 收藏食譜
+ */
+export const favoriteRecipe = async (
+  recipeId: number,
+): Promise<FavoriteRecipeResponse> => {
+  try {
+    console.log(
+      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
+    );
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('收藏食譜失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 取消收藏食譜
+ */
+export const unfavoriteRecipe = async (
+  recipeId: number,
+): Promise<FavoriteRecipeResponse> => {
+  try {
+    console.log(
+      `發送請求: DELETE ${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
+    );
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('取消收藏食譜失敗:', error);
+    throw error;
+  }
+};
