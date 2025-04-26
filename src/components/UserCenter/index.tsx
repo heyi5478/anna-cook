@@ -75,7 +75,7 @@ interface UserCenterProps {
       isFollowing: boolean;
       accountName: string;
       profilePhoto: string;
-      userIntro: string;
+      description: string;
       recipeCount: number;
       followerCount: number;
     } | null;

@@ -192,7 +192,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI1VDEwOjI5OjM1LjM2OTQzMDBaIn0.PZBJtVEdjUxp-F1fJVCZbuPOxJkLSMACwPovzo1CA0NG9oIRO4lTlfWOQIANxb6berouUIcdorqdzZGdCXstDQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI2VDA3OjE3OjU4LjAxNDI1MjFaIn0.vr_8K9m54xnSlqgNdtUs7DQDICT0o8dSzVNykYXDBWjOBaMIV7E0kC27YxQ5OkMh8SsShv9STJUTn8SJgCw7GQ';
   }
 
   return null;
@@ -1435,7 +1435,7 @@ export type UpdateUserProfileResponse = {
   msg: string;
   data: {
     accountName: string;
-    userIntro: string;
+    description: string;
     profilePhoto: string;
   };
   newToken?: string;
@@ -1449,7 +1449,7 @@ export type UpdateUserProfileResponse = {
 export const updateUserProfile = async (
   data: {
     accountName?: string;
-    userIntro?: string;
+    description?: string;
   },
   profilePhoto?: File,
 ): Promise<UpdateUserProfileResponse> => {
@@ -1472,8 +1472,8 @@ export const updateUserProfile = async (
       formData.append('accountName', data.accountName);
     }
 
-    if (data.userIntro) {
-      formData.append('userIntro', data.userIntro);
+    if (data.description) {
+      formData.append('description', data.description);
     }
 
     // 添加頭像照片，如果有
@@ -1519,6 +1519,194 @@ export const updateUserProfile = async (
     return responseData;
   } catch (error) {
     console.error('更新用戶資料失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * API 回應：使用者食譜列表
+ */
+export type UserRecipesResponse = {
+  statusCode: number;
+  hasMore: boolean;
+  recipeCount: number;
+  recipes: {
+    recipeId: number;
+    title: string;
+    description: string;
+    portion: number;
+    cookTime: number;
+    rating: number;
+    coverPhoto: string | null;
+  }[];
+  message?: string;
+};
+
+/**
+ * 取得使用者的公開食譜列表
+ */
+export const fetchUserRecipes = async (
+  displayId: string,
+  page: number = 1,
+): Promise<UserRecipesResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+    );
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      {
+        method: 'GET',
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 處理 404 或其他錯誤狀態
+    if (!res.ok) {
+      if (res.status === 404) {
+        console.warn(`找不到使用者 ${displayId} 的食譜資料`);
+        // 返回空資料而非拋出錯誤
+        return {
+          statusCode: 404,
+          hasMore: false,
+          recipeCount: 0,
+          recipes: [],
+        };
+      }
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // 讀取回應文字以便檢查和除錯
+    const responseText = await res.text();
+    if (!responseText.trim()) {
+      console.warn('API 回應內容為空');
+      return {
+        statusCode: 200,
+        hasMore: false,
+        recipeCount: 0,
+        recipes: [],
+      };
+    }
+
+    // 解析回應資料
+    try {
+      const data = JSON.parse(responseText);
+      console.log('回應資料:', data);
+
+      // 如果回應狀態不是成功
+      if (data.statusCode !== 200) {
+        console.warn(`API 回應狀態碼非 200: ${data.statusCode}`);
+        return {
+          statusCode: data.statusCode,
+          hasMore: false,
+          recipeCount: 0,
+          recipes: [],
+          message: data.msg || '獲取使用者食譜失敗',
+        };
+      }
+
+      return data;
+    } catch (parseError) {
+      console.error('解析 JSON 失敗:', parseError, '原始文本:', responseText);
+      throw new Error('解析回應資料失敗');
+    }
+  } catch (error) {
+    console.error('獲取使用者食譜失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * API 回應：追蹤/取消追蹤使用者
+ */
+export type FollowResponse = {
+  StatusCode: number;
+  msg: string;
+  Id: number;
+  newToken?: string;
+};
+
+/**
+ * 追蹤指定使用者
+ */
+export const followUser = async (userId: number): Promise<FollowResponse> => {
+  try {
+    console.log(`發送請求: POST ${apiConfig.baseUrl}/users/${userId}/follow`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const data = await res.json();
+    console.log('回應資料:', data);
+
+    // 如果有新的 Token，更新 Cookie
+    if (data.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(data.newToken);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('追蹤使用者失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 取消追蹤指定使用者
+ */
+export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
+  try {
+    console.log(`發送請求: DELETE ${apiConfig.baseUrl}/users/${userId}/follow`);
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const data = await res.json();
+    console.log('回應資料:', data);
+
+    // 如果有新的 Token，更新 Cookie
+    if (data.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(data.newToken);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('取消追蹤使用者失敗:', error);
     throw error;
   }
 };

@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
 import { fetchUserProfile } from '@/services/api';
-import { mockAuthor, mockRecipes } from '@/components/AuthorProfile/types';
+import { mockAuthor } from '@/components/AuthorProfile/types';
 
 interface UserPageProps {
   userProfileData: {
@@ -19,7 +19,7 @@ interface UserPageProps {
       isFollowing: boolean;
       accountName: string;
       profilePhoto: string;
-      userIntro: string;
+      description: string;
       recipeCount: number;
       followerCount: number;
     } | null;
@@ -103,12 +103,18 @@ export default function UserPage({
         id: userData.userId.toString(),
         name: userData.accountName,
         avatar: userData.profilePhoto,
-        bio: userData.userIntro || '',
+        bio: userData.description || '',
         recipeCount: userData.recipeCount,
         followerCount: userData.followerCount,
         isFollowing: userData.isFollowing,
       }
     : mockAuthor;
+
+  // 顯示 author 的值，Debug 用
+  console.log('[...displayId].tsx - author:', {
+    ...author,
+    isFollowing: router.query.following === 'true' ? true : author.isFollowing,
+  });
 
   // 在客戶端渲染前可能未確定是否為本人
   if (isCurrentUser === null) {
@@ -141,7 +147,15 @@ export default function UserPage({
           />
         ) : (
           // 顯示作者頁面
-          <AuthorProfile author={author} recipes={mockRecipes} />
+          <AuthorProfile
+            author={{
+              ...author,
+              // 使用 URL 參數模擬 isFollowing 狀態，方便測試
+              isFollowing: router.query.following === 'true',
+            }}
+            isMe={false}
+            displayId={displayId}
+          />
         )}
       </div>
       <Footer />
