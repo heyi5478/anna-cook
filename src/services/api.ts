@@ -181,7 +181,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI2VDA3OjE3OjU4LjAxNDI1MjFaIn0.vr_8K9m54xnSlqgNdtUs7DQDICT0o8dSzVNykYXDBWjOBaMIV7E0kC27YxQ5OkMh8SsShv9STJUTn8SJgCw7GQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI2VDEwOjIzOjQ3LjIyNDk2MjFaIn0.oRobZ3meYKMx8MdvwY83arwbSiogdJt0E1ZG9xDjlWE6oSp4xhSupEGy3ZWV_Hf_j2my4THBkiTTBzoZX_utNQ';
   }
 
   // 在伺服器端 document 不存在

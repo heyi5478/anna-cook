@@ -123,7 +123,6 @@ export default function UserPage({
   // 顯示 author 的值，Debug 用
   console.log('[...displayId].tsx - author:', {
     ...author,
-    isFollowing: router.query.following === 'true' ? true : author.isFollowing,
   });
 
   // 在客戶端渲染前可能未確定是否為本人
@@ -165,8 +164,8 @@ export default function UserPage({
           <AuthorProfile
             author={{
               ...author,
-              // 使用 URL 參數模擬 isFollowing 狀態，方便測試
-              isFollowing: router.query.following === 'true',
+              // 移除 URL 參數模擬，使用 API 返回的實際 isFollowing 狀態
+              isFollowing: author.isFollowing,
             }}
             isMe={false}
             displayId={displayId}
