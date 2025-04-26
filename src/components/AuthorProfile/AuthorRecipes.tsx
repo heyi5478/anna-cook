@@ -7,7 +7,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
 interface AuthorRecipesProps {
   displayId: string;
-  isMe?: boolean; // 保留但不會在此元件中使用，由父元件判斷是否顯示此元件
+  isMe?: boolean; // 表示是否為當前登入使用者
 }
 
 /**
@@ -15,9 +15,7 @@ interface AuthorRecipesProps {
  */
 export const AuthorRecipes = ({
   displayId,
-  // isMe 參數由父元件傳入，決定是否要顯示此區塊
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isMe,
+  isMe = false, // 預設值為 false
 }: AuthorRecipesProps) => {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [recipeCount, setRecipeCount] = useState(0);
@@ -107,9 +105,11 @@ export const AuthorRecipes = ({
   };
 
   return (
-    <div className="mt-6">
+    <div className={`mt-6 ${isMe ? 'bg-gray-50' : 'bg-white'}`}>
       <div className="bg-white px-4 py-3 mb-2">
-        <h2 className="text-lg font-medium">個人食譜</h2>
+        <h2 className="text-lg font-medium">
+          {isMe ? '我的食譜' : '個人食譜'}
+        </h2>
       </div>
 
       <div className="px-4">
