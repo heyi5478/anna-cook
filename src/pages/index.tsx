@@ -9,6 +9,8 @@ import { CategoryCard } from '@/components/ui/CategoryCard';
 import { RecipeCard } from '@/components/ui/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
+import { GetStaticProps } from 'next';
+import { fetchHomeFeatures, HomeFeatureResponse } from '@/services/server-api';
 
 // 定義食譜類型
 type Recipe = {
@@ -30,10 +32,41 @@ type Category = {
   description: string;
 };
 
+// 首頁 props 介面
+interface HomePageProps {
+  featureSections: HomeFeatureResponse['data'];
+}
+
+/**
+ * 獲取首頁靜態資料 (SSG)
+ */
+export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
+  try {
+    const featuresData = await fetchHomeFeatures();
+
+    return {
+      props: {
+        featureSections: featuresData.data || [],
+      },
+      // 每小時重新產生頁面
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error('獲取首頁資料失敗:', error);
+    return {
+      props: {
+        featureSections: [],
+      },
+      // 出錯時，每5分鐘重試
+      revalidate: 300,
+    };
+  }
+};
+
 /**
  * 網站首頁組件
  */
-export default function HomePage() {
+export default function HomePage({ featureSections }: HomePageProps) {
   const router = useRouter();
   // 設定當前選中的標籤
   const [activeTab, setActiveTab] = useState('latest');
@@ -44,86 +77,6 @@ export default function HomePage() {
   const toggleFloatingMenu = () => {
     setShowFloatingMenu(!showFloatingMenu);
   };
-
-  // 季節食譜分類
-  const seasonalCategories: Category[] = [
-    {
-      id: '1',
-      title: '馬鈴薯烤蛋',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '2',
-      title: '馬鈴薯烤蛋',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '3',
-      title: '番茄燉湯',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '4',
-      title: '香煎鱈魚',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '5',
-      title: '蘑菇燉飯',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '6',
-      title: '花椰菜燉湯',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-  ];
-
-  // 特色食譜分類
-  const specialCategories: Category[] = [
-    {
-      id: '7',
-      title: '馬鈴薯烤蛋',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '8',
-      title: '滷肉飯',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '台式料理',
-    },
-    {
-      id: '9',
-      title: '泡菜鍋',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '韓式料理',
-    },
-    {
-      id: '10',
-      title: '牛肉麵',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '家常創意',
-    },
-    {
-      id: '11',
-      title: '壽司捲',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '日式料理',
-    },
-    {
-      id: '12',
-      title: '蒜蓉蝦',
-      image: '/placeholder.svg?height=150&width=150',
-      description: '粵式料理',
-    },
-  ];
 
   // 食譜列表
   const recipes: Recipe[] = [
@@ -193,6 +146,28 @@ export default function HomePage() {
     console.log('Search submitted:', query);
   };
 
+  /**
+   * 將 API 資料轉換為 CategoryCard 所需格式
+   */
+  const mapToCategoryCard = (
+    recipe: {
+      recipeName: string;
+      rating: number;
+      coverPhoto: string;
+      author: string;
+    },
+    index: number,
+  ): Category => {
+    return {
+      id: index.toString(),
+      title: recipe.recipeName,
+      image: recipe.coverPhoto
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
+        : '/placeholder.svg?height=150&width=150',
+      description: recipe.author,
+    };
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header
@@ -208,27 +183,18 @@ export default function HomePage() {
           <div className="text-gray-400">圖片區域</div>
         </div>
 
-        {/* 季節食譜區塊 - Netflix風格輪播 */}
-        <section className="py-3">
-          <Carousel
-            title="季節食譜"
-            items={seasonalCategories}
-            renderItem={(category) => (
-              <CategoryCard key={category.id} category={category} />
-            )}
-          />
-        </section>
-
-        {/* 特色食譜區塊 */}
-        <section className="py-3">
-          <Carousel
-            title="特色食譜"
-            items={specialCategories}
-            renderItem={(category) => (
-              <CategoryCard key={category.id} category={category} />
-            )}
-          />
-        </section>
+        {/* 特色區塊 - 使用 API 資料渲染 */}
+        {featureSections.map((section) => (
+          <section key={section.sectionPos} className="py-3">
+            <Carousel
+              title={section.sectionName}
+              items={section.recipes.map(mapToCategoryCard)}
+              renderItem={(category) => (
+                <CategoryCard key={category.id} category={category} />
+              )}
+            />
+          </section>
+        ))}
 
         {/* 標籤欄 */}
         <Tabs

@@ -382,3 +382,56 @@ export const fetchRecipeDetailServer = async (
     };
   }
 };
+
+/**
+ * API 回應：首頁主題區塊與對應食譜卡片
+ */
+export interface HomeFeatureResponse {
+  statusCode: number;
+  msg?: string;
+  data: {
+    sectionPos: number;
+    sectionName: string;
+    tags: string[];
+    recipes: {
+      recipeName: string;
+      rating: number;
+      coverPhoto: string;
+      author: string;
+    }[];
+  }[];
+}
+
+/**
+ * 獲取首頁主題區塊與對應食譜卡片
+ * @returns 首頁主題區塊與食譜卡片資料
+ */
+export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
+  try {
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/home/features`);
+
+    // 發送請求 (不需要 token)
+    const response = await fetch(`${apiConfig.baseUrl}/home/features`);
+
+    console.log('回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        msg: '獲取首頁特色區塊失敗',
+        data: [],
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('獲取首頁特色區塊失敗:', error);
+    return {
+      statusCode: 500,
+      msg: '獲取首頁特色區塊失敗',
+      data: [],
+    };
+  }
+};
