@@ -41,8 +41,6 @@ type Category = {
 interface HomePageProps {
   featureSections: HomeFeatureResponse['data'];
   latestRecipes: HomeRecipesResponse['data'];
-  popularRecipes: HomeRecipesResponse['data'];
-  classicRecipes: HomeRecipesResponse['data'];
   hasMoreRecipes: {
     latest: boolean;
     popular: boolean;
@@ -58,21 +56,21 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
     // 獲取特色區塊資料
     const featuresData = await fetchHomeFeatures();
 
-    // 獲取不同類型的食譜列表
+    // 獲取最新食譜
     const latestRecipesData = await fetchHomeRecipes('latest', 1);
-    const popularRecipesData = await fetchHomeRecipes('popular', 1);
-    const classicRecipesData = await fetchHomeRecipes('classic', 1);
+
+    // 檢查其他類型是否有更多
+    const hasMorePopular = true; // 假設有更多人氣食譜
+    const hasMoreClassic = true; // 假設有更多超商食譜
 
     return {
       props: {
         featureSections: featuresData.data || [],
         latestRecipes: latestRecipesData.data || [],
-        popularRecipes: popularRecipesData.data || [],
-        classicRecipes: classicRecipesData.data || [],
         hasMoreRecipes: {
           latest: latestRecipesData.hasMore || false,
-          popular: popularRecipesData.hasMore || false,
-          classic: classicRecipesData.hasMore || false,
+          popular: hasMorePopular,
+          classic: hasMoreClassic,
         },
       },
       // 每小時重新產生頁面
@@ -84,8 +82,6 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
       props: {
         featureSections: [],
         latestRecipes: [],
-        popularRecipes: [],
-        classicRecipes: [],
         hasMoreRecipes: {
           latest: false,
           popular: false,
@@ -104,8 +100,6 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
 export default function HomePage({
   featureSections,
   latestRecipes,
-  popularRecipes,
-  classicRecipes,
   hasMoreRecipes,
 }: HomePageProps) {
   const router = useRouter();
@@ -124,17 +118,64 @@ export default function HomePage({
     Record<string, HomeRecipesResponse['data']>
   >({
     latest: latestRecipes,
-    popular: popularRecipes,
-    classic: classicRecipes,
+    popular: [], // 延遲載入
+    classic: [], // 延遲載入
   });
   // 加載狀態
   const [isLoading, setIsLoading] = useState(false);
+  // 標籤頁是否已初始化過
+  const [tabInitialized, setTabInitialized] = useState<Record<string, boolean>>(
+    {
+      latest: true, // 初始頁簽預載入了
+      popular: false,
+      classic: false,
+    },
+  );
   // 是否還有更多
   const [hasMoreState, setHasMoreState] = useState<Record<string, boolean>>({
     latest: hasMoreRecipes.latest,
     popular: hasMoreRecipes.popular,
     classic: hasMoreRecipes.classic,
   });
+
+  // 在標籤切換時檢查是否需要載入數據
+  const handleTabChange = async (value: string) => {
+    setActiveTab(value);
+
+    // 將convenience對應到classic
+    const type = value === 'convenience' ? 'classic' : value;
+
+    // 如果標籤頁尚未初始化，則載入數據
+    if (!tabInitialized[type]) {
+      setIsLoading(true);
+      try {
+        // 獲取該標籤的初始數據
+        const data = await fetchHomeRecipes(type, 1);
+
+        // 更新已載入的食譜列表
+        setLoadedRecipes((prev) => ({
+          ...prev,
+          [type]: data.data || [],
+        }));
+
+        // 更新更多按鈕狀態
+        setHasMoreState((prev) => ({
+          ...prev,
+          [type]: data.hasMore || false,
+        }));
+
+        // 標記標籤頁已初始化
+        setTabInitialized((prev) => ({
+          ...prev,
+          [type]: true,
+        }));
+      } catch (error) {
+        console.error(`載入${type}食譜失敗:`, error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   // 切換浮動選單顯示狀態
   const toggleFloatingMenu = () => {
@@ -287,7 +328,7 @@ export default function HomePage({
         {/* 標籤欄 */}
         <Tabs
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={handleTabChange}
           className="w-full border-b"
         >
           <TabsList className="w-full justify-start bg-transparent h-auto p-0">
@@ -312,12 +353,22 @@ export default function HomePage({
           </TabsList>
         </Tabs>
 
+        {/* 食譜列表載入中狀態 */}
+        {isLoading && (
+          <div className="py-8 text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            <p className="mt-2 text-gray-500">載入中...</p>
+          </div>
+        )}
+
         {/* 食譜列表 - 根據選中的標籤顯示不同的食譜 */}
-        <div className="py-2">
-          {getCurrentRecipes().map((recipe) => (
-            <RecipeCard key={`${recipe.id}-${activeTab}`} recipe={recipe} />
-          ))}
-        </div>
+        {!isLoading && (
+          <div className="py-2">
+            {getCurrentRecipes().map((recipe) => (
+              <RecipeCard key={`${recipe.id}-${activeTab}`} recipe={recipe} />
+            ))}
+          </div>
+        )}
 
         {/* 載入更多按鈕 - 只在有更多資料時顯示 */}
         {hasMore() && (
