@@ -7,8 +7,9 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { uploadRecipeBasic, type RecipeFormData } from '@/services/api';
+import { uploadRecipeBasic } from '@/services/api';
 import StepIndicator from '@/components/ui/StepIndicator';
+import { RecipeFormData } from '@/types/api';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({

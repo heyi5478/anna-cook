@@ -19,12 +19,14 @@ import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import {
   fetchAuthorRecipes,
-  type AuthorRecipesResponse,
   deleteMultipleRecipes,
   fetchUserFavoriteFollow,
-  type UserFavoriteResponse,
-  type UserFollowResponse,
 } from '@/services/api';
+import {
+  AuthorRecipesResponse,
+  UserFavoriteResponse,
+  UserFollowResponse,
+} from '@/types/api';
 import {
   Dialog,
   DialogContent,
@@ -236,7 +238,10 @@ export default function UserCenter({
           setFollowData(typedResponse.data);
         } else {
           // 其他頁：添加到現有資料
-          setFollowData((prev) => [...prev, ...typedResponse.data]);
+          setFollowData((prev: UserFollowResponse['data']) => [
+            ...prev,
+            ...typedResponse.data,
+          ]);
         }
         setFollowPage(page);
         setFollowHasMore(typedResponse.hasMore);
@@ -278,7 +283,10 @@ export default function UserCenter({
           setFavoriteData(typedResponse.data);
         } else {
           // 其他頁：添加到現有資料
-          setFavoriteData((prev) => [...prev, ...typedResponse.data]);
+          setFavoriteData((prev: UserFavoriteResponse['data']) => [
+            ...prev,
+            ...typedResponse.data,
+          ]);
         }
         setFavoritePage(page);
         setFavoriteHasMore(typedResponse.hasMore);
@@ -406,7 +414,7 @@ export default function UserCenter({
           <p className="text-gray-500">深入了解您的食譜表現</p>
         </div>
 
-        {publishedRecipes.map((recipe) => (
+        {publishedRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => (
           <div
             key={recipe.recipeId}
             className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
@@ -446,7 +454,7 @@ export default function UserCenter({
           共{publishedRecipes.length || 0}篇食譜
         </p>
 
-        {publishedRecipes.map((recipe) => (
+        {publishedRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => (
           <div
             key={recipe.recipeId}
             className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
@@ -497,7 +505,7 @@ export default function UserCenter({
 
         <p className="text-gray-500 mb-2">共{draftRecipes.length || 0}篇食譜</p>
 
-        {draftRecipes.map((recipe) => {
+        {draftRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => {
           // 計算卡片的 className
           let cardClassName =
             'hover:bg-gray-50 active:bg-gray-100 cursor-pointer rounded-md transition-all';
@@ -656,7 +664,7 @@ export default function UserCenter({
           共{followTotalCount}位追蹤中
         </p>
 
-        {followData.map((user) => (
+        {followData.map((user: UserFollowResponse['data'][0]) => (
           <div
             key={`followed-${user.id}`}
             className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
@@ -709,7 +717,7 @@ export default function UserCenter({
           共{favoriteTotalCount}篇收藏食譜
         </p>
 
-        {favoriteData.map((recipe) => (
+        {favoriteData.map((recipe: UserFavoriteResponse['data'][0]) => (
           <div
             key={`recipe-${recipe.id}`}
             className="flex border rounded-md overflow-hidden hover:bg-gray-50 transition-colors cursor-pointer"

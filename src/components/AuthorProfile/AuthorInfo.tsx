@@ -1,19 +1,8 @@
 import { Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { followUser, unfollowUser } from '@/services/api';
+import { FollowButton } from '@/components/common/FollowButton';
 import { Author } from './types';
-
-// Toast 樣式
-const toastStyles = {
-  background: 'white',
-  color: '#1F2937',
-  border: '1px solid #E5E7EB',
-  boxShadow:
-    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-};
 
 interface AuthorInfoProps {
   author: Author;
@@ -29,8 +18,6 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
 
   // 使用從 props 傳入的 isFollowing 狀態
   const [isFollowing, setIsFollowing] = useState(author.isFollowing);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   // 顯示追蹤狀態初始值
   console.log('AuthorInfo.tsx - author.isFollowing:', author.isFollowing);
@@ -46,99 +33,15 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
   }, [author.isFollowing]);
 
   /**
-   * 處理追蹤/取消追蹤按鈕點擊
+   * 處理追蹤狀態變更
    */
-  const atFollowClick = async () => {
-    if (loading) return;
-
-    try {
-      setLoading(true);
-      const userId = parseInt(author.id, 10);
-
-      console.log('AuthorInfo.tsx - 點擊追蹤按鈕 - 當前狀態:', isFollowing);
-      console.log('AuthorInfo.tsx - 點擊追蹤按鈕 - userId:', userId);
-
-      if (isFollowing) {
-        // 已追蹤狀態，調用取消追蹤 API
-        console.log('AuthorInfo.tsx - 準備調用取消追蹤 API');
-        const response = await unfollowUser(userId);
-        console.log('AuthorInfo.tsx - 取消追蹤 API 回應:', response);
-
-        if (response.StatusCode === 200) {
-          setIsFollowing(false);
-          console.log('AuthorInfo.tsx - 取消追蹤成功，更新狀態為 false');
-          toast({
-            title: '成功',
-            description: '已取消追蹤該作者',
-            style: toastStyles,
-          });
-        } else {
-          console.log('AuthorInfo.tsx - 取消追蹤失敗:', response.msg);
-          toast({
-            title: '錯誤',
-            description: response.msg || '取消追蹤失敗',
-            variant: 'destructive',
-            style: toastStyles,
-          });
-        }
-      } else {
-        // 未追蹤狀態，調用追蹤 API
-        console.log('AuthorInfo.tsx - 準備調用追蹤 API');
-        const response = await followUser(userId);
-        console.log('AuthorInfo.tsx - 追蹤 API 回應:', response);
-
-        if (response.StatusCode === 200) {
-          setIsFollowing(true);
-          console.log('AuthorInfo.tsx - 追蹤成功，更新狀態為 true');
-          toast({
-            title: '成功',
-            description: '已成功追蹤該作者',
-            style: toastStyles,
-          });
-        } else {
-          console.log('AuthorInfo.tsx - 追蹤失敗:', response.msg);
-          toast({
-            title: '錯誤',
-            description: response.msg || '追蹤失敗',
-            variant: 'destructive',
-            style: toastStyles,
-          });
-        }
-      }
-    } catch (error) {
-      console.error('AuthorInfo.tsx - 追蹤操作失敗:', error);
-      toast({
-        title: '錯誤',
-        description: '操作失敗，請稍後再試',
-        variant: 'destructive',
-        style: toastStyles,
-      });
-    } finally {
-      setLoading(false);
-    }
+  const atFollowChange = (newFollowingState: boolean) => {
+    setIsFollowing(newFollowingState);
+    console.log('AuthorInfo.tsx - 追蹤狀態變更為:', newFollowingState);
   };
 
-  // 根據追蹤狀態決定按鈕樣式
-  const buttonVariant = isFollowing ? 'outline' : 'default';
-  const buttonClassName = isFollowing
-    ? 'w-28 rounded-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
-    : 'w-28 rounded-sm bg-gray-800 text-white hover:bg-gray-700';
-
-  // 根據追蹤狀態和載入狀態決定按鈕文字
-  let buttonText = '追蹤';
-  if (loading) {
-    buttonText = '處理中...';
-  } else if (isFollowing) {
-    buttonText = '取消追蹤';
-  }
-
   // 在渲染時輸出 log，便於確認
-  console.log('AuthorInfo.tsx - 渲染按鈕狀態:', {
-    isFollowing,
-    buttonText,
-    buttonVariant,
-    buttonClassName,
-  });
+  console.log('AuthorInfo.tsx - 渲染按鈕狀態:', { isFollowing });
 
   return (
     <div className="bg-white p-4">
@@ -168,15 +71,18 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
           <span>{author.followerCount} 粉絲</span>
         </div>
 
-        {/* 追蹤按鈕 - 根據追蹤狀態切換樣式 */}
-        <Button
-          variant={buttonVariant}
-          className={buttonClassName}
-          onClick={atFollowClick}
-          disabled={loading}
-        >
-          {buttonText}
-        </Button>
+        {/* 追蹤按鈕 - 使用通用的 FollowButton 元件 */}
+        <FollowButton
+          userId={parseInt(author.id, 10)}
+          initialIsFollowing={isFollowing}
+          variant={isFollowing ? 'outline' : 'default'}
+          className={
+            isFollowing
+              ? 'w-28 rounded-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+              : 'w-28 rounded-sm bg-gray-800 text-white hover:bg-gray-700'
+          }
+          onFollowChange={atFollowChange}
+        />
       </div>
 
       {/* 作者簡介 */}

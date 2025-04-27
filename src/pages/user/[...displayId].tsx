@@ -1,41 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { GetStaticProps, GetStaticPaths } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
-import { fetchUserProfile } from '@/services/api';
 import { mockAuthor } from '@/components/AuthorProfile/types';
+import { fetchUserProfileServer, ServerUserProfileResponse } from '@/services';
 
 interface UserPageProps {
-  userProfileData: {
-    StatusCode: number;
-    isMe: boolean;
-    userData: {
-      userId: number;
-      displayId: string;
-      isFollowing: boolean;
-      accountName: string;
-      profilePhoto: string;
-      description: string;
-      recipeCount: number;
-      followerCount: number;
-    } | null;
-    authorData: {
-      userId: number;
-      displayId: string;
-      accountName: string;
-      followingCount: number;
-      followerCount: number;
-      favoritedTotal: number;
-      myFavoriteCount: number;
-      averageRating: number;
-      totalViewCount: number;
-    } | null;
-  };
-  displayId: string;
+  userProfileData?: ServerUserProfileResponse;
+  displayId?: string;
+  errorMessage?: string;
+  statusCode?: number;
 }
 
 /**
@@ -44,6 +22,8 @@ interface UserPageProps {
 export default function UserPage({
   userProfileData,
   displayId,
+  errorMessage,
+  statusCode,
 }: UserPageProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
@@ -56,10 +36,12 @@ export default function UserPage({
     }
   }, [router.query]);
 
-  // 在客戶端判斷是否為當前登入使用者
+  // 從伺服器生成的資料中獲取預設值
   useEffect(() => {
-    // 從靜態生成的資料中先取得預設值
-    setIsCurrentUser(userProfileData.isMe);
+    // 若有使用者資料則設定初始值
+    if (userProfileData?.isMe !== undefined) {
+      setIsCurrentUser(userProfileData.isMe);
+    }
 
     // 使用 API 檢查是否為當前登入使用者
     const checkCurrentUser = async () => {
@@ -83,14 +65,42 @@ export default function UserPage({
     };
 
     checkCurrentUser();
-  }, [displayId, userProfileData.isMe]);
+  }, [displayId, userProfileData?.isMe]);
 
-  // 如果資料尚未載入或發生錯誤
-  if (!userProfileData || userProfileData.StatusCode !== 200) {
+  // 如果有錯誤，顯示錯誤頁面
+  if (errorMessage) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>找不到該使用者資料</p>
-      </div>
+      <>
+        <Header />
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+          <div className="text-center p-6 rounded-lg shadow-md bg-white">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">
+              錯誤 {statusCode}
+            </h2>
+            <p className="text-gray-700 mb-6">{errorMessage}</p>
+            <button
+              onClick={() => router.push('/')}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            >
+              返回首頁
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // 確保有用戶資料
+  if (!userProfileData || !displayId) {
+    return (
+      <>
+        <Header />
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+          <p>找不到該使用者資料</p>
+        </div>
+        <Footer />
+      </>
     );
   }
 
@@ -113,7 +123,6 @@ export default function UserPage({
   // 顯示 author 的值，Debug 用
   console.log('[...displayId].tsx - author:', {
     ...author,
-    isFollowing: router.query.following === 'true' ? true : author.isFollowing,
   });
 
   // 在客戶端渲染前可能未確定是否為本人
@@ -143,15 +152,20 @@ export default function UserPage({
           // 顯示使用者中心
           <UserCenter
             defaultTab={activeTab}
-            userProfileData={userProfileData}
+            userProfileData={{
+              StatusCode: userProfileData.StatusCode,
+              isMe: userProfileData.isMe,
+              userData: userProfileData.userData ?? null,
+              authorData: userProfileData.authorData ?? null,
+            }}
           />
         ) : (
           // 顯示作者頁面
           <AuthorProfile
             author={{
               ...author,
-              // 使用 URL 參數模擬 isFollowing 狀態，方便測試
-              isFollowing: router.query.following === 'true',
+              // 移除 URL 參數模擬，使用 API 返回的實際 isFollowing 狀態
+              isFollowing: author.isFollowing,
             }}
             isMe={false}
             displayId={displayId}
@@ -164,9 +178,13 @@ export default function UserPage({
 }
 
 /**
- * 靜態生成頁面的資料
+ * 伺服器端渲染頁面的資料
+ * 使用專門為伺服器端設計的 API 函數
  */
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  params,
+  req,
+}) => {
   const { displayId } = params || {};
 
   // 確保 displayId 是陣列且有至少一個元素
@@ -177,12 +195,25 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   try {
-    // 呼叫 API 獲取使用者資料
-    const userProfileData = await fetchUserProfile(displayId[0]);
+    // 使用專門的伺服器端 API 函數獲取使用者資料
+    const userProfileData = await fetchUserProfileServer(displayId[0], req);
 
+    // 檢查回應狀態碼
     if (userProfileData.StatusCode !== 200) {
+      // 如果是 400 代表查無此使用者，回傳 notFound
+      if (userProfileData.StatusCode === 400) {
+        console.log(`查無使用者 ${displayId[0]}`);
+        return {
+          notFound: true,
+        };
+      }
+
+      // 其他錯誤則返回錯誤頁面
       return {
-        notFound: true,
+        props: {
+          errorMessage: userProfileData.msg || '獲取使用者資料失敗',
+          statusCode: userProfileData.StatusCode,
+        },
       };
     }
 
@@ -191,26 +222,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         userProfileData,
         displayId: displayId[0],
       },
-      // 每小時重新生成頁面
-      revalidate: 3600,
     };
   } catch (error) {
     console.error('獲取使用者資料時發生錯誤:', error);
     return {
-      notFound: true,
+      props: {
+        errorMessage: '發生未預期的錯誤',
+        statusCode: 500,
+      },
     };
   }
-};
-
-/**
- * 定義哪些頁面需要預先生成
- */
-export const getStaticPaths: GetStaticPaths = async () => {
-  // 這裡可以獲取熱門用戶來預先生成
-  // 目前僅預先生成一個範例用戶頁面
-  return {
-    paths: [{ params: { displayId: ['M000002'] } }],
-    // 對未預先生成的路徑，等待生成後再顯示
-    fallback: 'blocking',
-  };
 };
