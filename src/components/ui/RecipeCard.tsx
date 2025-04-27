@@ -65,7 +65,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
   }
 
   return (
-    <Link href={`/recipe/${recipe.id}`} className="block">
+    <Link href={`/recipe-page/${recipe.id}`} className="block">
       <Card className={`overflow-hidden w-full mb-4 ${className || ''}`}>
         <div className="flex flex-row items-center bg-[#FAFAFA]">
           {renderImage()}
