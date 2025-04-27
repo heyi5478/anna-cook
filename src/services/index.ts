@@ -3,7 +3,7 @@ export * from './api';
 
 // 伺服器端 API - 明確匯出函數
 export {
-  getTokenFromServerRequest,
+  getServerToken,
   getAuthTokenForServer,
   fetchUserProfileServer,
   fetchUserRecipesServer,
