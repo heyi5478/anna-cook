@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { ReviewDisplay } from '@/components/RecipePage/ReviewDisplay';
 import Review from '@/components/RecipePage/Review';
 import { ProductCard } from '@/components/ui/adCard';
-import FollowButton from '@/components/common/FollowButton';
+import { FollowButton } from '@/components/common/FollowButton';
 
 // 引入 API 服務
 import {
@@ -518,7 +518,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
           {showReview && (
             <div className="mt-4">
-              <Review />
+              <Review recipeId={recipe.id} />
             </div>
           )}
         </div>

@@ -36,7 +36,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI2VDEwOjIzOjQ3LjIyNDk2MjFaIn0.oRobZ3meYKMx8MdvwY83arwbSiogdJt0E1ZG9xDjlWE6oSp4xhSupEGy3ZWV_Hf_j2my4THBkiTTBzoZX_utNQ';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MzEsIkRpc3BsYXlJZCI6Ik0wMDAwMDQiLCJBY2NvdW50RW1haWwiOiJjMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQ2F0ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjdUMDg6MDI6NTUuMDQ0MjkzNloifQ.oUdyf094IAMPbDyVIndA65r2v24fzsUbenLIxycx-D8Xyd0aLrJFhUX2TqAhRkUCWreEJF-RojQTUwLs2blXrg';
   }
 
   // 在伺服器端 document 不存在
@@ -1600,5 +1600,67 @@ export const fetchRecipeRatingComments = async (
       hasMore: false,
       data: [],
     };
+  }
+};
+
+/**
+ * 提交食譜評分與留言
+ */
+export const submitRecipeRatingComment = async (
+  recipeId: number,
+  rating: number,
+  commentContent: string,
+): Promise<any> => {
+  try {
+    console.log(
+      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment`,
+    );
+    console.log('請求資料:', { rating, commentContent });
+
+    // 取得 JWT Token
+    const token = getAuthToken();
+    if (!token) {
+      console.error('認證錯誤: 未登入或 Token 不存在');
+      throw new Error('未登入或 Token 不存在');
+    }
+
+    // 發送請求
+    const res = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating, commentContent }),
+      },
+    );
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
+    }
+
+    // 如果有新的 Token，更新 Cookie
+    if (responseData.data?.newToken) {
+      console.log('收到新的 Token，更新 Cookie');
+      updateAuthToken(responseData.data.newToken);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('提交評分與留言失敗:', error);
+    throw error;
   }
 };
