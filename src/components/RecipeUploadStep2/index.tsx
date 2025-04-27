@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/ui/StepIndicator';
-import { updateRecipeStep2, type RecipeStep2Data } from '@/services/api';
+import { updateRecipeStep2 } from '@/services/api';
+import { RecipeStep2Data } from '@/types/api';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
