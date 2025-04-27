@@ -1,15 +1,21 @@
 import { IncomingMessage } from 'http';
 import { apiConfig, authConfig } from '@/config';
+import { getServerToken as getNextApiServerToken } from '@/lib/auth-middleware';
+import type { NextApiRequest } from 'next';
 
 /**
- * 從請求 Cookie 中獲取 JWT Token
+ * 從 IncomingMessage 請求 Cookie 中獲取 JWT Token
  * @param req 伺服器端請求物件
  * @returns JWT Token 或 null
  */
-export const getTokenFromServerRequest = (
-  req: IncomingMessage,
-): string | null => {
-  // 從請求標頭中獲取 cookie 字串
+export const getServerToken = (req: IncomingMessage): string | null => {
+  // 判斷是否為 NextApiRequest
+  if ('cookies' in req) {
+    // 如果是 NextApiRequest，直接使用 cookies 屬性
+    return getNextApiServerToken(req as unknown as NextApiRequest);
+  }
+
+  // 否則從請求標頭中獲取 cookie 字串
   const cookies = req.headers.cookie || '';
 
   // 使用正則表達式尋找 token
@@ -28,7 +34,7 @@ export const getTokenFromServerRequest = (
  */
 export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
   // 先從請求 Cookie 中獲取 token
-  const tokenFromCookie = getTokenFromServerRequest(req);
+  const tokenFromCookie = getServerToken(req);
 
   if (tokenFromCookie) {
     return tokenFromCookie;
@@ -37,7 +43,7 @@ export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
   // 在開發環境中使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('伺服器端開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MzEsIkRpc3BsYXlJZCI6Ik0wMDAwMDQiLCJBY2NvdW50RW1haWwiOiJjMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQ2F0ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjdUMDg6MDI6NTUuMDQ0MjkzNloifQ.oUdyf094IAMPbDyVIndA65r2v24fzsUbenLIxycx-D8Xyd0aLrJFhUX2TqAhRkUCWreEJF-RojQTUwLs2blXrg';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
   }
 
   // 生產環境中沒有 token，返回 null

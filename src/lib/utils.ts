@@ -29,9 +29,13 @@ export function setClientCookie(
     ...options,
   };
 
+  defaultOptions.httpOnly = true;
+
   const cookieString = serialize(name, value, defaultOptions);
   document.cookie = cookieString;
-  console.log('已設定 cookie:', cookieString);
+  console.log(
+    '警告：HttpOnly cookie 無法透過客戶端 JavaScript 設置，請使用 API 路由',
+  );
 
   return cookieString;
 }
