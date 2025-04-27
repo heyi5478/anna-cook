@@ -37,7 +37,7 @@ export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
     console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MzEsIkRpc3BsYXlJZCI6Ik0wMDAwMDQiLCJBY2NvdW50RW1haWwiOiJjMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQ2F0ZSIsIlJvbGUiOjAsIkxvZ2luUHJvdmlkZXIiOjAsIkV4cCI6IjIwMjUtMDQtMjdUMDg6MDI6NTUuMDQ0MjkzNloifQ.oUdyf094IAMPbDyVIndA65r2v24fzsUbenLIxycx-D8Xyd0aLrJFhUX2TqAhRkUCWreEJF-RojQTUwLs2blXrg';
+    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
   }
 
   // 在伺服器端 document 不存在
@@ -657,47 +657,23 @@ export const submitRecipeDraft = async (
  */
 export const checkAuth = async (): Promise<CheckAuthResponse> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/check`);
+    console.log('發送請求: GET /api/auth/check');
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/check`, {
+    // 使用 Next.js API 路由而不是直接呼叫後端 API
+    const res = await fetch('/api/auth/check', {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
     });
 
     console.log('回應狀態:', res.status, res.statusText);
 
     // 解析回應資料
-    const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
-
-    let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-      console.log('解析後的回應資料:', responseData);
-    } catch (e) {
-      console.error('解析 JSON 失敗:', e);
-      throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
+    const responseData = await res.json();
+    console.log('解析後的回應資料:', responseData);
 
     // 檢查回應是否成功
     if (responseData.Status === false) {
       throw new Error(responseData.Message || '身份驗證失敗');
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.token) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.token);
     }
 
     return responseData;
@@ -871,43 +847,19 @@ export const fetchUserProfile = async (
 export const fetchCurrentUserProfile =
   async (): Promise<CurrentUserProfileResponse> => {
     try {
-      console.log(`發送請求: GET ${apiConfig.baseUrl}/user/profile`);
+      console.log('發送請求: GET /api/user/profile');
 
-      // 取得 JWT Token
-      const token = getAuthToken();
-      if (!token) {
-        console.error('認證錯誤: 未登入或 Token 不存在');
-        throw new Error('未登入或 Token 不存在');
-      }
-
-      // 發送請求
-      const res = await fetch(`${apiConfig.baseUrl}/user/profile`, {
+      // 使用 Next.js API 路由而不是直接呼叫後端 API
+      const res = await fetch('/api/user/profile', {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include', // 包含 Cookie
       });
 
       console.log('回應狀態:', res.status, res.statusText);
 
       // 解析回應資料
-      const responseText = await res.text();
-      console.log('回應原始文本:', responseText);
-
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-        console.log('解析後的回應資料:', responseData);
-      } catch (e) {
-        console.error('解析 JSON 失敗:', e);
-        throw new Error(`回應不是有效的 JSON: ${responseText}`);
-      }
-
-      // 如果有新的 Token，更新 Cookie
-      if (responseData.newToken) {
-        console.log('收到新的 Token，更新 Cookie');
-        updateAuthToken(responseData.newToken);
-      }
+      const responseData = await res.json();
+      console.log('解析後的回應資料:', responseData);
 
       // 處理錯誤狀態碼
       if (responseData.StatusCode !== 200) {
