@@ -2,7 +2,7 @@ import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import RecipePageComponent from '@/components/RecipePage';
-import Layout from '@/components/layout';
+import { Layout } from '@/components/layout';
 import {
   fetchRecipeDetailServer,
   RecipeDetailResponse,
