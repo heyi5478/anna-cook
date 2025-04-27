@@ -58,7 +58,7 @@ export default function RecipeListPage({
 
           // 轉換為前端使用的格式
           const newRecipes = data.data.map((item: any) => ({
-            id: item.displayId || `recipe-${item.id}`,
+            id: String(item.id),
             title: item.recipeName,
             image: item.coverPhoto
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
@@ -376,7 +376,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
     // 將 API 資料轉換為前端可用的格式
     const recipes: RecipeCardType[] = searchResults.data.map((item) => ({
-      id: item.displayId || `recipe-${item.id}`, // 使用 displayId 或生成 ID 字串
+      id: String(item.id),
       title: item.recipeName,
       image: item.coverPhoto
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
