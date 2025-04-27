@@ -502,3 +502,81 @@ export const fetchHomeRecipes = async (
     };
   }
 };
+
+/**
+ * API 回應：食譜搜尋結果
+ */
+export interface RecipeSearchResponse {
+  StatusCode: number;
+  msg: string;
+  number: string;
+  hasMore: boolean;
+  totalCount: number;
+  data: {
+    id: number;
+    authorId: number;
+    displayId: string;
+    isPublished: boolean;
+    recipeName: string;
+    description: string;
+    cookingTime: number;
+    portion: number;
+    rating: number;
+    createdAt: string;
+    coverPhoto: string | null;
+  }[];
+}
+
+/**
+ * 伺服器端搜尋食譜
+ * @param searchData 搜尋關鍵字
+ * @param type 排序方式（createdAt 或 popular）
+ * @param number 頁碼
+ * @returns 食譜搜尋結果
+ */
+export const searchRecipesServer = async (
+  searchData: string = '',
+  type: string = 'createdAt',
+  number: number = 1,
+): Promise<RecipeSearchResponse> => {
+  try {
+    // 構建查詢參數
+    const queryParams = new URLSearchParams();
+    if (searchData) queryParams.append('searchData', searchData);
+    queryParams.append('type', type);
+    queryParams.append('number', number.toString());
+
+    const url = `${apiConfig.baseUrl}/recipes/search?${queryParams.toString()}`;
+    console.log(`伺服器端發送請求: GET ${url}`);
+
+    // 發送請求 (不需要 token)
+    const response = await fetch(url);
+
+    console.log('伺服器端回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        StatusCode: response.status,
+        msg: '搜尋食譜失敗',
+        number: `page ${number}`,
+        hasMore: false,
+        totalCount: 0,
+        data: [],
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('伺服器端搜尋食譜失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '伺服器端搜尋食譜失敗',
+      number: `page ${number}`,
+      hasMore: false,
+      totalCount: 0,
+      data: [],
+    };
+  }
+};

@@ -1,92 +1,191 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { RecipeCard, Recipe } from '@/components/ui/RecipeCard';
+import {
+  RecipeCard,
+  Recipe as RecipeCardType,
+} from '@/components/ui/RecipeCard';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Search, Settings2 } from 'lucide-react';
 import { Layout } from '@/components/layout';
+import { searchRecipesServer } from '@/services/server-api';
+import { GetStaticProps } from 'next';
 
-// 模擬的食譜資料
-const MOCK_RECIPES: Recipe[] = Array(10)
-  .fill(null)
-  .map((_, i) => ({
-    id: `recipe-${i + 1}`,
-    title: '家傳滷五花',
-    image: '/images/recipes/pork-belly.jpg',
-    category: '豬肉',
-    time: 30,
-    servings: 2,
-    rating: 4.5,
-    description: '使用五香粉和醬油等調味料，燉煮肉質鮮嫩多汁的五花肉',
-  }));
-
-/**
- * 處理搜尋結果排序的函數
- */
-function sortRecipes(recipes: Recipe[], sortBy: string): Recipe[] {
-  const sorted = [...recipes];
-
-  switch (sortBy) {
-    case 'latest':
-      return sorted; // 已經按照最新排序
-    case 'popular':
-      return sorted.sort((a, b) => b.rating - a.rating);
-    default:
-      return sorted;
-  }
+// 定義頁面 props 介面
+interface RecipeListPageProps {
+  initialRecipes: RecipeCardType[];
+  searchQuery: string;
+  totalCount: number;
+  hasMore: boolean;
+  pageNumber: number;
 }
 
-export default function RecipeListPage() {
+export default function RecipeListPage({
+  initialRecipes,
+  searchQuery,
+  totalCount,
+  hasMore,
+  pageNumber,
+}: RecipeListPageProps) {
   const router = useRouter();
-  const { q: queryParam } = router.query;
-  const [query, setQuery] = useState<string>('');
+  const { q: queryParam, type: sortType, page } = router.query;
+  const [query, setQuery] = useState<string>(searchQuery);
   const [showSortOptions, setShowSortOptions] = useState<boolean>(false);
-  const [sortBy, setSortBy] = useState<string>('latest');
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [sortBy, setSortBy] = useState<string>(
+    sortType ? String(sortType) : 'latest',
+  );
+  const [recipes, setRecipes] = useState<RecipeCardType[]>(initialRecipes);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(pageNumber);
 
-  // 初始化搜尋查詢
+  // 當路由參數變化時，動態加載對應的數據
+  const loadRecipesByQuery = useCallback(
+    async (q: string, sort: string, pg: number) => {
+      if (router.isReady) {
+        setLoading(true);
+        try {
+          // 轉換為API需要的參數格式
+          const apiSortType = sort === 'latest' ? 'createdAt' : 'popular';
+
+          // 獲取新的搜尋結果
+          const response = await fetch(
+            `/api/recipes/search?searchData=${encodeURIComponent(q)}&type=${apiSortType}&number=${pg}`,
+          );
+          const data = await response.json();
+
+          // 轉換為前端使用的格式
+          const newRecipes = data.data.map((item: any) => ({
+            id: item.displayId || `recipe-${item.id}`,
+            title: item.recipeName,
+            image: item.coverPhoto
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
+              : '/images/recipe-placeholder.jpg',
+            category: '',
+            time: item.cookingTime,
+            servings: item.portion,
+            rating: item.rating,
+            description: item.description,
+          }));
+
+          setRecipes(newRecipes);
+        } catch (error) {
+          console.error('獲取食譜數據失敗:', error);
+          setRecipes([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
+    [router.isReady],
+  );
+
+  // 當 URL 查詢參數變化時更新狀態
   useEffect(() => {
     if (queryParam) {
-      setQuery(Array.isArray(queryParam) ? queryParam[0] : queryParam);
-    }
-  }, [queryParam]);
+      const newQuery = Array.isArray(queryParam) ? queryParam[0] : queryParam;
+      if (newQuery !== query) {
+        setQuery(newQuery);
 
-  // 模擬搜尋 API 呼叫
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      if (query) {
-        // 過濾模擬資料，標題包含查詢詞的食譜
-        if (query === '塑膠') {
-          setRecipes([]); // 模擬無結果
-        } else {
-          setRecipes(
-            MOCK_RECIPES.filter(
-              (recipe) =>
-                recipe.category.includes(query) ||
-                recipe.title.includes(query) ||
-                recipe.description.includes(query),
-            ),
-          );
-        }
-      } else {
-        setRecipes(MOCK_RECIPES);
+        // 重新導向到新的 URL，保留排序方式但重置頁碼
+        router.push(
+          {
+            pathname: '/recipe-list',
+            query: {
+              q: newQuery,
+              type: sortBy === 'latest' ? 'createdAt' : 'popular',
+              page: 1,
+            },
+          },
+          undefined,
+          { shallow: true },
+        );
+
+        // 加載新的食譜數據
+        loadRecipesByQuery(newQuery, sortBy, 1);
       }
-      setLoading(false);
-    }, 500);
+    }
 
-    return () => clearTimeout(timer);
-  }, [query]);
+    if (sortType) {
+      const newSortType = Array.isArray(sortType) ? sortType[0] : sortType;
+      const mappedSortType = newSortType === 'createdAt' ? 'latest' : 'popular';
+
+      if (mappedSortType !== sortBy) {
+        setSortBy(mappedSortType);
+
+        // 加載新的食譜數據
+        const newQuery = Array.isArray(queryParam)
+          ? queryParam[0]
+          : queryParam || '';
+        loadRecipesByQuery(newQuery, mappedSortType, currentPage);
+      }
+    }
+
+    if (page) {
+      const newPage = parseInt(Array.isArray(page) ? page[0] : page, 10);
+      if (newPage !== currentPage) {
+        setCurrentPage(newPage || 1);
+
+        // 加載新的食譜數據
+        const newQuery = Array.isArray(queryParam)
+          ? queryParam[0]
+          : queryParam || '';
+        loadRecipesByQuery(newQuery, sortBy, newPage || 1);
+      }
+    }
+  }, [
+    queryParam,
+    sortType,
+    page,
+    router,
+    query,
+    sortBy,
+    currentPage,
+    loadRecipesByQuery,
+  ]);
 
   /**
-   * 處理排序變更
+   * 處理搜尋結果排序的函數
    */
   function handleSortChange(newSortBy: string) {
     setSortBy(newSortBy);
     setShowSortOptions(false);
+
+    // 重新導向到新的 URL，保留搜尋詞但更新排序方式並重置頁碼
+    router.push(
+      {
+        pathname: '/recipe-list',
+        query: {
+          q: query,
+          type: newSortBy === 'latest' ? 'createdAt' : 'popular',
+          page: 1,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
+  }
+
+  /**
+   * 處理頁碼變更
+   */
+  function handlePageChange(newPage: number) {
+    setCurrentPage(newPage);
+
+    // 重新導向到新的 URL，保留搜尋詞和排序方式但更新頁碼
+    router.push(
+      {
+        pathname: '/recipe-list',
+        query: {
+          q: query,
+          type: sortBy === 'latest' ? 'createdAt' : 'popular',
+          page: newPage,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
   }
 
   /**
@@ -135,17 +234,10 @@ export default function RecipeListPage() {
             <Search className="w-4 h-4" />
             回首頁重新搜尋
           </Button>
-          <p className="text-gray-500 mb-8">或者參考以下食譜</p>
-
-          {MOCK_RECIPES.slice(0, 5).map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
+          <p className="text-gray-500 mb-8">查詢「{query}」無結果</p>
         </div>
       );
     }
-
-    // 排序食譜
-    const sortedRecipes = sortRecipes(recipes, sortBy);
 
     /**
      * 渲染廣告區塊
@@ -171,36 +263,53 @@ export default function RecipeListPage() {
         {renderSortOptions()}
 
         {/* 前4個食譜 */}
-        {sortedRecipes.slice(0, 4).map((recipe) => (
+        {recipes.slice(0, 4).map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
 
         {/* 在第4和第5個食譜之間插入廣告 */}
-        {sortedRecipes.length > 4 && renderAdBlock()}
+        {recipes.length > 4 && renderAdBlock()}
 
         {/* 剩餘食譜 */}
-        {sortedRecipes.slice(4).map((recipe) => (
+        {recipes.slice(4).map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
 
-        <div className="flex justify-center items-center gap-2 my-4">
-          <Button
-            variant="default"
-            size="sm"
-            className="bg-orange-500 hover:bg-orange-600 w-8 h-8 p-0"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm" className="w-8 h-8 p-0">
-            2
-          </Button>
-          <Button variant="outline" size="sm" className="w-8 h-8 p-0">
-            3
-          </Button>
-          <Button variant="outline" size="sm" className="w-8 h-8 p-0">
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+        {/* 分頁控制 */}
+        {totalCount > 0 && (
+          <div className="flex justify-center items-center gap-2 my-4">
+            {Array.from({
+              length: Math.min(5, Math.ceil(totalCount / 10)),
+            }).map((_, i) => (
+              <Button
+                key={`page-${i + 1}`}
+                variant={i + 1 === currentPage ? 'default' : 'outline'}
+                size="sm"
+                className={
+                  i + 1 === currentPage
+                    ? 'bg-orange-500 hover:bg-orange-600 w-8 h-8 p-0'
+                    : 'w-8 h-8 p-0'
+                }
+                onClick={() => handlePageChange(i + 1)}
+                disabled={i + 1 === currentPage}
+              >
+                {i + 1}
+              </Button>
+            ))}
+
+            {Math.ceil(totalCount / 10) > 5 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-8 h-8 p-0"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={!hasMore}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        )}
       </>
     );
   }
@@ -208,7 +317,7 @@ export default function RecipeListPage() {
   return (
     <Layout>
       <Head>
-        <title>{query ? `${query} - 搜尋結果` : '食譜搜尋'} | Anna Cook</title>
+        <title>{`${query ? `${query} - 搜尋結果` : '食譜搜尋'} | Anna Cook`}</title>
       </Head>
 
       {/* 次導覽列 */}
@@ -224,7 +333,7 @@ export default function RecipeListPage() {
       <div className="border-b p-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">{query || '全部食譜'}</h1>
-          <span className="text-gray-500 text-sm">{recipes.length} 道食譜</span>
+          <span className="text-gray-500 text-sm">{totalCount} 道食譜</span>
         </div>
         <Button
           variant="ghost"
@@ -242,3 +351,60 @@ export default function RecipeListPage() {
     </Layout>
   );
 }
+
+/**
+ * 獲取靜態生成的數據
+ */
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    // 從搜尋參數中獲取資料，或使用預設值
+    const searchQuery = '';
+    const sortType = 'createdAt';
+    const page = 1;
+
+    // 呼叫 API 獲取食譜搜尋結果
+    const searchResults = await searchRecipesServer(
+      searchQuery,
+      sortType,
+      page,
+    );
+
+    // 將 API 資料轉換為前端可用的格式
+    const recipes: RecipeCardType[] = searchResults.data.map((item) => ({
+      id: item.displayId || `recipe-${item.id}`, // 使用 displayId 或生成 ID 字串
+      title: item.recipeName,
+      image: item.coverPhoto
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
+        : '/images/recipe-placeholder.jpg',
+      category: '', // 填入空字串，因為這個欄位是必須的
+      time: item.cookingTime,
+      servings: item.portion,
+      rating: item.rating,
+      description: item.description,
+    }));
+
+    return {
+      props: {
+        initialRecipes: recipes,
+        searchQuery,
+        totalCount: searchResults.totalCount,
+        hasMore: searchResults.hasMore,
+        pageNumber: page,
+      },
+      // 每 1 小時重新生成頁面
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error('獲取靜態資料失敗:', error);
+    return {
+      props: {
+        initialRecipes: [],
+        searchQuery: '',
+        totalCount: 0,
+        hasMore: false,
+        pageNumber: 1,
+      },
+      revalidate: 3600,
+    };
+  }
+};
