@@ -387,13 +387,14 @@ export const fetchRecipeDetailServer = async (
  * API 回應：首頁主題區塊與對應食譜卡片
  */
 export interface HomeFeatureResponse {
-  statusCode: number;
+  StatusCode: number;
   msg?: string;
   data: {
     sectionPos: number;
     sectionName: string;
     tags: string[];
     recipes: {
+      id: number;
       recipeName: string;
       rating: number;
       coverPhoto: string;
@@ -417,7 +418,7 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
 
     if (!response.ok) {
       return {
-        statusCode: response.status,
+        StatusCode: response.status,
         msg: '獲取首頁特色區塊失敗',
         data: [],
       };
@@ -429,7 +430,7 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
   } catch (error) {
     console.error('獲取首頁特色區塊失敗:', error);
     return {
-      statusCode: 500,
+      StatusCode: 500,
       msg: '獲取首頁特色區塊失敗',
       data: [],
     };

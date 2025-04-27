@@ -71,7 +71,7 @@ export function CategoryCard({
 }: CategoryCardProps) {
   return (
     <Link
-      href={`/category/${category.id}`}
+      href={`/recipe-page/${category.id}`}
       className={cn(categoryLinkVariants({ size }), linkClassName)}
     >
       <Card className={cn(categoryCardVariants({ size, intent }), className)}>

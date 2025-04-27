@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CategoryCard } from '@/components/ui/CategoryCard';
+import { CategoryCard } from '@/components/common/CategoryCard';
 import { RecipeCard } from '@/components/ui/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
@@ -149,17 +149,15 @@ export default function HomePage({ featureSections }: HomePageProps) {
   /**
    * 將 API 資料轉換為 CategoryCard 所需格式
    */
-  const mapToCategoryCard = (
-    recipe: {
-      recipeName: string;
-      rating: number;
-      coverPhoto: string;
-      author: string;
-    },
-    index: number,
-  ): Category => {
+  const mapToCategoryCard = (recipe: {
+    id: number;
+    recipeName: string;
+    rating: number;
+    coverPhoto: string;
+    author: string;
+  }): Category => {
     return {
-      id: index.toString(),
+      id: recipe.id.toString(),
       title: recipe.recipeName,
       image: recipe.coverPhoto
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
