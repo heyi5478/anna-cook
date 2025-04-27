@@ -31,7 +31,7 @@ import {
 } from '@/types/api';
 
 // 重新導出需要的類型
-export type { RecipeDraftStep };
+export type { RecipeDraftStep, RecipeFormData };
 
 /**
  * 從 Cookie 獲取 JWT Token
