@@ -185,6 +185,12 @@ export const Header: React.FC<HeaderProps> = ({
    */
   const atSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (searchQuery.trim()) {
+      // 導向到食譜清單頁面並傳遞搜尋參數
+      window.location.href = `/recipe-list?q=${encodeURIComponent(searchQuery)}`;
+    }
+
+    // 仍然執行外部傳入的處理函數（若有）
     if (atSearchSubmit) {
       atSearchSubmit(searchQuery);
     }
