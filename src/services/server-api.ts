@@ -372,6 +372,7 @@ export const fetchRecipeDetailServer = async (
 
     // 解析回應資料
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
     return data;
   } catch (error) {
     console.error('伺服器端獲取食譜資料失敗:', error);

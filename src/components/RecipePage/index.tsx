@@ -360,21 +360,26 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         {/* 作者資訊 */}
         <div className={cardStyles()}>
           <div className={authorContainerStyles}>
-            <Avatar className="w-10 h-10">
-              <AvatarImage
-                src="/placeholder.svg?height=40&width=40"
-                alt={`${author.name}的頭像`}
-              />
-              <AvatarFallback>
-                {author.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="font-medium">{author.name}</p>
-              <p className="text-xs text-gray-500">
-                {author.followersCount} 粉絲
-              </p>
-            </div>
+            <Link
+              href={`/user/${author.displayId}`}
+              className="flex items-center flex-1 cursor-pointer"
+            >
+              <Avatar className="w-10 h-10">
+                <AvatarImage
+                  src="/placeholder.svg?height=40&width=40"
+                  alt={`${author.name}的頭像`}
+                />
+                <AvatarFallback>
+                  {author.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 ml-3">
+                <p className="font-medium">{author.name}</p>
+                <p className="text-xs text-gray-500">
+                  {author.followersCount} 粉絲
+                </p>
+              </div>
+            </Link>
             <FollowButton
               userId={author.id}
               initialIsFollowing={isFollowing}

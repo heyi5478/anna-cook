@@ -39,6 +39,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   }
 
   const { recipe } = recipeData.data;
+  console.log('食譜資料:', recipeData.data);
 
   return (
     <Layout>
