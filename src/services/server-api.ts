@@ -382,3 +382,123 @@ export const fetchRecipeDetailServer = async (
     };
   }
 };
+
+/**
+ * API 回應：首頁主題區塊與對應食譜卡片
+ */
+export interface HomeFeatureResponse {
+  StatusCode: number;
+  msg?: string;
+  data: {
+    sectionPos: number;
+    sectionName: string;
+    tags: string[];
+    recipes: {
+      id: number;
+      recipeName: string;
+      rating: number;
+      coverPhoto: string;
+      author: string;
+    }[];
+  }[];
+}
+
+/**
+ * 獲取首頁主題區塊與對應食譜卡片
+ * @returns 首頁主題區塊與食譜卡片資料
+ */
+export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
+  try {
+    console.log(`發送請求: GET ${apiConfig.baseUrl}/home/features`);
+
+    // 發送請求 (不需要 token)
+    const response = await fetch(`${apiConfig.baseUrl}/home/features`);
+
+    console.log('回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        StatusCode: response.status,
+        msg: '獲取首頁特色區塊失敗',
+        data: [],
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('獲取首頁特色區塊失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '獲取首頁特色區塊失敗',
+      data: [],
+    };
+  }
+};
+
+/**
+ * API 回應：首頁推薦食譜列表
+ */
+export interface HomeRecipesResponse {
+  StatusCode: number;
+  msg?: string;
+  totalCount: number;
+  hasMore: boolean;
+  data: {
+    id: number;
+    recipeName: string;
+    coverPhoto: string | null;
+    description: string | null;
+    portion: number;
+    cookingTime: number;
+    rating: number;
+  }[];
+}
+
+/**
+ * 獲取首頁推薦食譜列表
+ * @param type 排序方式 (latest/popular/classic)
+ * @param number 頁碼
+ * @returns 首頁推薦食譜列表資料
+ */
+export const fetchHomeRecipes = async (
+  type: string = 'latest',
+  number: number = 1,
+): Promise<HomeRecipesResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
+    );
+
+    // 發送請求 (不需要 token)
+    const response = await fetch(
+      `${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
+    );
+
+    console.log('回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        StatusCode: response.status,
+        msg: '獲取首頁推薦食譜失敗',
+        totalCount: 0,
+        hasMore: false,
+        data: [],
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('獲取首頁推薦食譜失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '獲取首頁推薦食譜失敗',
+      totalCount: 0,
+      hasMore: false,
+      data: [],
+    };
+  }
+};
