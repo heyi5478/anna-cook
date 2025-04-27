@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import RecipeUploadForm from '@/components/RecipeUploadStep1';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * 上傳食譜第一步頁面

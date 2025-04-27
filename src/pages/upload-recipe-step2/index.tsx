@@ -1,5 +1,5 @@
 import RecipeUploadStep2 from '@/components/RecipeUploadStep2';
-import { useAuth } from '@/hooks/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * 上傳食譜第二步頁面
