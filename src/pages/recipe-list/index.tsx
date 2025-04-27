@@ -25,7 +25,7 @@ interface RecipeListPageProps {
 export default function RecipeListPage({
   initialRecipes,
   searchQuery,
-  totalCount,
+  totalCount: initialTotalCount,
   hasMore,
   pageNumber,
 }: RecipeListPageProps) {
@@ -39,6 +39,7 @@ export default function RecipeListPage({
   const [recipes, setRecipes] = useState<RecipeCardType[]>(initialRecipes);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(pageNumber);
+  const [totalCount, setTotalCount] = useState<number>(initialTotalCount);
 
   // 當路由參數變化時，動態加載對應的數據
   const loadRecipesByQuery = useCallback(
@@ -69,10 +70,14 @@ export default function RecipeListPage({
             description: item.description,
           }));
 
+          // 更新食譜列表和總筆數
           setRecipes(newRecipes);
+          // 從 API 回應更新總筆數
+          setTotalCount(data.totalCount);
         } catch (error) {
           console.error('獲取食譜數據失敗:', error);
           setRecipes([]);
+          setTotalCount(0); // 出錯時重置筆數
         } finally {
           setLoading(false);
         }

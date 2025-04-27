@@ -29,6 +29,7 @@ export default async function handler(
 
     const response = await fetch(apiUrl);
     const data = await response.json();
+    console.log('後端回應:', data);
 
     // 將後端回應轉發給前端
     return res.status(response.status).json(data);
