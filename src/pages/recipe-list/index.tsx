@@ -144,11 +144,42 @@ export default function RecipeListPage() {
       );
     }
 
+    // 排序食譜
+    const sortedRecipes = sortRecipes(recipes, sortBy);
+
+    /**
+     * 渲染廣告區塊
+     */
+    const renderAdBlock = () => (
+      <div className="my-4 h-20 bg-gray-100 flex items-center justify-between px-4 rounded-md">
+        <div>
+          <p className="text-gray-900 font-medium">廚房攪拌機</p>
+          <p className="text-gray-900 font-bold">$3,490</p>
+        </div>
+        <Image
+          src="/images/kitchen-mixer.jpg"
+          alt="廚房攪拌機"
+          width={80}
+          height={80}
+          className="object-contain"
+        />
+      </div>
+    );
+
     return (
       <>
         {renderSortOptions()}
 
-        {sortRecipes(recipes, sortBy).map((recipe) => (
+        {/* 前4個食譜 */}
+        {sortedRecipes.slice(0, 4).map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
+
+        {/* 在第4和第5個食譜之間插入廣告 */}
+        {sortedRecipes.length > 4 && renderAdBlock()}
+
+        {/* 剩餘食譜 */}
+        {sortedRecipes.slice(4).map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
 
@@ -207,23 +238,6 @@ export default function RecipeListPage() {
       {/* 主要內容 */}
       <main className="flex-1 container mx-auto px-4 py-2">
         {renderSearchResults()}
-
-        {/* 廣告區塊 */}
-        {recipes.length > 0 && (
-          <div className="my-4 h-20 bg-gray-100 flex items-center justify-between px-4 rounded-md">
-            <div>
-              <p className="text-gray-900 font-medium">廚房攪拌機</p>
-              <p className="text-gray-900 font-bold">$3,490</p>
-            </div>
-            <Image
-              src="/images/kitchen-mixer.jpg"
-              alt="廚房攪拌機"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
-          </div>
-        )}
       </main>
     </Layout>
   );
