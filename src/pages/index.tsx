@@ -10,7 +10,12 @@ import { RecipeCard } from '@/components/ui/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
-import { fetchHomeFeatures, HomeFeatureResponse } from '@/services/server-api';
+import {
+  fetchHomeFeatures,
+  HomeFeatureResponse,
+  fetchHomeRecipes,
+  HomeRecipesResponse,
+} from '@/services/server-api';
 
 // 定義食譜類型
 type Recipe = {
@@ -35,6 +40,14 @@ type Category = {
 // 首頁 props 介面
 interface HomePageProps {
   featureSections: HomeFeatureResponse['data'];
+  latestRecipes: HomeRecipesResponse['data'];
+  popularRecipes: HomeRecipesResponse['data'];
+  classicRecipes: HomeRecipesResponse['data'];
+  hasMoreRecipes: {
+    latest: boolean;
+    popular: boolean;
+    classic: boolean;
+  };
 }
 
 /**
@@ -42,11 +55,25 @@ interface HomePageProps {
  */
 export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
   try {
+    // 獲取特色區塊資料
     const featuresData = await fetchHomeFeatures();
+
+    // 獲取不同類型的食譜列表
+    const latestRecipesData = await fetchHomeRecipes('latest', 1);
+    const popularRecipesData = await fetchHomeRecipes('popular', 1);
+    const classicRecipesData = await fetchHomeRecipes('classic', 1);
 
     return {
       props: {
         featureSections: featuresData.data || [],
+        latestRecipes: latestRecipesData.data || [],
+        popularRecipes: popularRecipesData.data || [],
+        classicRecipes: classicRecipesData.data || [],
+        hasMoreRecipes: {
+          latest: latestRecipesData.hasMore || false,
+          popular: popularRecipesData.hasMore || false,
+          classic: classicRecipesData.hasMore || false,
+        },
       },
       // 每小時重新產生頁面
       revalidate: 3600,
@@ -56,6 +83,14 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
     return {
       props: {
         featureSections: [],
+        latestRecipes: [],
+        popularRecipes: [],
+        classicRecipes: [],
+        hasMoreRecipes: {
+          latest: false,
+          popular: false,
+          classic: false,
+        },
       },
       // 出錯時，每5分鐘重試
       revalidate: 300,
@@ -66,71 +101,45 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
 /**
  * 網站首頁組件
  */
-export default function HomePage({ featureSections }: HomePageProps) {
+export default function HomePage({
+  featureSections,
+  latestRecipes,
+  popularRecipes,
+  classicRecipes,
+  hasMoreRecipes,
+}: HomePageProps) {
   const router = useRouter();
   // 設定當前選中的標籤
   const [activeTab, setActiveTab] = useState('latest');
   // 控制浮動按鈕選單的顯示
   const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  // 各種類型的食譜頁碼
+  const [currentPage, setCurrentPage] = useState<Record<string, number>>({
+    latest: 1,
+    popular: 1,
+    classic: 1,
+  });
+  // 存儲已加載的食譜列表
+  const [loadedRecipes, setLoadedRecipes] = useState<
+    Record<string, HomeRecipesResponse['data']>
+  >({
+    latest: latestRecipes,
+    popular: popularRecipes,
+    classic: classicRecipes,
+  });
+  // 加載狀態
+  const [isLoading, setIsLoading] = useState(false);
+  // 是否還有更多
+  const [hasMoreState, setHasMoreState] = useState<Record<string, boolean>>({
+    latest: hasMoreRecipes.latest,
+    popular: hasMoreRecipes.popular,
+    classic: hasMoreRecipes.classic,
+  });
 
   // 切換浮動選單顯示狀態
   const toggleFloatingMenu = () => {
     setShowFloatingMenu(!showFloatingMenu);
   };
-
-  // 食譜列表
-  const recipes: Recipe[] = [
-    {
-      id: '1',
-      title: '家傳滷五花',
-      image: '/placeholder.svg?height=80&width=80',
-      category: 'meat',
-      time: 30,
-      servings: 2,
-      rating: 4.5,
-      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
-    },
-    {
-      id: '2',
-      title: '家傳滷五花',
-      image: '/placeholder.svg?height=80&width=80',
-      category: 'meat',
-      time: 30,
-      servings: 2,
-      rating: 4.5,
-      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
-    },
-    {
-      id: '3',
-      title: '家傳滷五花',
-      image: '/placeholder.svg?height=80&width=80',
-      category: 'meat',
-      time: 30,
-      servings: 2,
-      rating: 4.5,
-      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
-    },
-    {
-      id: '4',
-      title: '家傳滷五花',
-      image: '/placeholder.svg?height=80&width=80',
-      category: 'meat',
-      time: 30,
-      servings: 2,
-      rating: 4.5,
-      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
-    },
-    {
-      id: '5',
-      title: '家傳滷五花',
-      image: '/placeholder.svg?height=80&width=80',
-      category: 'meat',
-      time: 30,
-      servings: 2,
-      rating: 4.5,
-      description: '使用五香和和柱頭油等調味料料，讓豬肉一...',
-    },
-  ];
 
   /**
    * 處理選單按鈕點擊事件
@@ -164,6 +173,87 @@ export default function HomePage({ featureSections }: HomePageProps) {
         : '/placeholder.svg?height=150&width=150',
       description: recipe.author,
     };
+  };
+
+  /**
+   * 將 API 返回的食譜資料轉換為 RecipeCard 所需格式
+   */
+  const mapToRecipeCardData = (
+    recipe: HomeRecipesResponse['data'][0],
+  ): Recipe => {
+    return {
+      id: recipe.id.toString(),
+      title: recipe.recipeName,
+      image: recipe.coverPhoto
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
+        : '/placeholder.svg?height=80&width=80',
+      category: '',
+      time: recipe.cookingTime,
+      servings: recipe.portion,
+      rating: recipe.rating,
+      description: recipe.description || '',
+    };
+  };
+
+  /**
+   * 根據當前活動標籤獲取對應的食譜列表
+   */
+  const getCurrentRecipes = () => {
+    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    return loadedRecipes[type].map(mapToRecipeCardData);
+  };
+
+  /**
+   * 獲取當前標籤的更多按鈕狀態
+   */
+  const hasMore = () => {
+    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    return hasMoreState[type];
+  };
+
+  /**
+   * 處理載入更多按鈕點擊事件
+   */
+  const onLoadMore = async () => {
+    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    const nextPage = currentPage[type] + 1;
+
+    // 設置加載狀態
+    setIsLoading(true);
+
+    try {
+      // 獲取下一頁數據
+      const newRecipesData = await fetchHomeRecipes(type, nextPage);
+
+      // 更新頁碼
+      setCurrentPage({
+        ...currentPage,
+        [type]: nextPage,
+      });
+
+      // 更新是否還有更多
+      setHasMoreState({
+        ...hasMoreState,
+        [type]: newRecipesData.hasMore,
+      });
+
+      // 合併已加載的數據並去除重複項
+      const existingIds = new Set(
+        loadedRecipes[type].map((recipe) => recipe.id),
+      );
+      const uniqueNewRecipes = newRecipesData.data.filter(
+        (recipe) => !existingIds.has(recipe.id),
+      );
+
+      setLoadedRecipes({
+        ...loadedRecipes,
+        [type]: [...loadedRecipes[type], ...uniqueNewRecipes],
+      });
+    } catch (error) {
+      console.error(`載入更多${type}食譜失敗:`, error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -222,22 +312,27 @@ export default function HomePage({ featureSections }: HomePageProps) {
           </TabsList>
         </Tabs>
 
-        {/* 食譜列表 */}
+        {/* 食譜列表 - 根據選中的標籤顯示不同的食譜 */}
         <div className="py-2">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+          {getCurrentRecipes().map((recipe) => (
+            <RecipeCard key={`${recipe.id}-${activeTab}`} recipe={recipe} />
           ))}
         </div>
 
-        {/* 載入更多按鈕 */}
-        <div className="flex justify-center py-4">
-          <Button
-            variant="ghost"
-            className="text-gray-500 flex items-center gap-1"
-          >
-            更多食譜 <ChevronDown size={16} />
-          </Button>
-        </div>
+        {/* 載入更多按鈕 - 只在有更多資料時顯示 */}
+        {hasMore() && (
+          <div className="flex justify-center py-4">
+            <Button
+              variant="ghost"
+              className="text-gray-500 flex items-center gap-1"
+              onClick={onLoadMore}
+              disabled={isLoading}
+            >
+              {isLoading ? '載入中...' : '更多食譜'}{' '}
+              {!isLoading && <ChevronDown size={16} />}
+            </Button>
+          </div>
+        )}
       </main>
 
       <Footer companyName="版權所有" studioName="來自安那煮 Anna Cook" />

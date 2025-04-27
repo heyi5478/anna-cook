@@ -436,3 +436,69 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
     };
   }
 };
+
+/**
+ * API 回應：首頁推薦食譜列表
+ */
+export interface HomeRecipesResponse {
+  StatusCode: number;
+  msg?: string;
+  totalCount: number;
+  hasMore: boolean;
+  data: {
+    id: number;
+    recipeName: string;
+    coverPhoto: string | null;
+    description: string | null;
+    portion: number;
+    cookingTime: number;
+    rating: number;
+  }[];
+}
+
+/**
+ * 獲取首頁推薦食譜列表
+ * @param type 排序方式 (latest/popular/classic)
+ * @param number 頁碼
+ * @returns 首頁推薦食譜列表資料
+ */
+export const fetchHomeRecipes = async (
+  type: string = 'latest',
+  number: number = 1,
+): Promise<HomeRecipesResponse> => {
+  try {
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
+    );
+
+    // 發送請求 (不需要 token)
+    const response = await fetch(
+      `${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
+    );
+
+    console.log('回應狀態:', response.status);
+
+    if (!response.ok) {
+      return {
+        StatusCode: response.status,
+        msg: '獲取首頁推薦食譜失敗',
+        totalCount: 0,
+        hasMore: false,
+        data: [],
+      };
+    }
+
+    // 解析回應資料
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('獲取首頁推薦食譜失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '獲取首頁推薦食譜失敗',
+      totalCount: 0,
+      hasMore: false,
+      data: [],
+    };
+  }
+};
