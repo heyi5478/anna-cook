@@ -8,7 +8,7 @@ import {
   RecipeStep2Data,
   VideoUploadResponse,
   RecipeDraftResponse,
-  RecipeDraftStep,
+  // RecipeDraftStep,
   UpdateStepsRequest,
   UpdateStepsResponse,
   SubmitDraftResponse,
@@ -29,9 +29,6 @@ import {
   FavoriteRecipeResponse,
   RecipeRatingCommentResponse,
 } from '@/types/api';
-
-// 重新導出需要的類型
-export type { RecipeDraftStep, RecipeFormData, RecipeStep2Data };
 
 /**
  * 從 Cookie 獲取 JWT Token
