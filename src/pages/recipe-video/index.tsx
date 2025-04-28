@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { VimeoPlayer } from '@/components/ui/VimeoPlayer';
 import {
   ArrowLeft,
@@ -10,8 +11,11 @@ import {
   StepBack,
   StepForward,
   ChevronsLeft,
+  AlertCircle,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { fetchRecipeTeaching } from '@/services/api';
+import { RecipeTeachingResponse } from '@/types/api';
 
 /**
  * 食譜視頻頁面的 Props 介面
@@ -22,8 +26,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
  */
 interface Step {
   id: number;
-  title: string;
   description: string;
+  stepOrder: number;
   startTime: number;
   endTime: number;
 }
@@ -41,7 +45,77 @@ function formatTime(seconds: number): string {
  * 食譜視頻頁面組件
  */
 export default function RecipeVideoPage() {
+  const router = useRouter();
+  const { id } = router.query;
+  const recipeId = typeof id === 'string' ? parseInt(id, 10) : undefined;
+
   const mountCountRef = useRef<number>(0);
+
+  // 組件狀態
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [, setDuration] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [showRightPanel, setShowRightPanel] = useState<boolean>(true);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+  // API 狀態
+  const [loading, setLoading] = useState<boolean>(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [teachingData, setTeachingData] = useState<
+    RecipeTeachingResponse['data'] | null
+  >(null);
+  const [videoId, setVideoId] = useState<string>('');
+  const [steps, setSteps] = useState<Step[]>([]);
+
+  // 獲取食譜教學資訊
+  useEffect(() => {
+    /**
+     * 獲取教學資訊
+     */
+    const fetchTeachingData = async () => {
+      if (!recipeId) return;
+
+      try {
+        setLoading(true);
+        setApiError(null);
+
+        const response = await fetchRecipeTeaching(recipeId);
+
+        if (response.StatusCode === 200 && response.data) {
+          setTeachingData(response.data);
+          setSteps(response.data.steps);
+
+          // 從視頻URL提取Vimeo視頻ID
+          if (response.data.video) {
+            const videoPath = response.data.video;
+            // 假設視頻路徑格式為 "/videos/12345" 或包含完整Vimeo URL
+            const videoIdMatch =
+              videoPath.match(/\/(\d+)(?:\/|$)/) ||
+              videoPath.match(/vimeo\.com\/(\d+)/);
+
+            if (videoIdMatch && videoIdMatch[1]) {
+              setVideoId(videoIdMatch[1]);
+            } else {
+              // 如果無法提取，使用完整路徑
+              setVideoId(videoPath);
+            }
+          }
+        } else {
+          setApiError(response.msg || '無法加載教學資訊');
+        }
+      } catch (err) {
+        console.error('獲取教學資訊失敗:', err);
+        setApiError('無法加載教學資訊，請稍後再試');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (recipeId) {
+      fetchTeachingData();
+    }
+  }, [recipeId]);
 
   // 移除組件掛載次數追蹤相關代碼
   useEffect(() => {
@@ -52,70 +126,11 @@ export default function RecipeVideoPage() {
     };
   }, []);
 
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [, setDuration] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(2); // 從第三步開始，索引為2
-  const [showRightPanel, setShowRightPanel] = useState<boolean>(true);
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-
-  // 模擬步驟數據 - 實際應用中應從 API 獲取
-  const steps: Step[] = [
-    {
-      id: 1,
-      title: '準備食材',
-      description: '準備所有需要的食材和調味料',
-      startTime: 0,
-      endTime: 30,
-    },
-    {
-      id: 2,
-      title: '清洗食材',
-      description: '將所有食材徹底清洗乾淨',
-      startTime: 30,
-      endTime: 60,
-    },
-    {
-      id: 3,
-      title: '醃製肉類',
-      description: '將五花肉切 3~4 公分冷水下鍋氽燙去除血水與雜質',
-      startTime: 60,
-      endTime: 90,
-    },
-    {
-      id: 4,
-      title: '烹飪步驟 1',
-      description: '開始烹飪主菜',
-      startTime: 90,
-      endTime: 120,
-    },
-    {
-      id: 5,
-      title: '烹飪步驟 2',
-      description: '繼續烹飪，注意火候',
-      startTime: 120,
-      endTime: 150,
-    },
-    {
-      id: 6,
-      title: '完成',
-      description: '裝盤並準備上菜',
-      startTime: 150,
-      endTime: 180,
-    },
-  ];
-
-  // Vimeo 視頻 ID - 實際應用中應從 API 獲取
-  const videoId = '115189988'; // 示例 ID
-
   /**
    * 處理時間更新
    */
   const atTimeUpdate = (time: number) => {
     setCurrentTime(time);
-
-    // 不再自動切換步驟，讓使用者通過按鈕切換
-    // 只進行時間更新顯示
   };
 
   /**
@@ -193,9 +208,11 @@ export default function RecipeVideoPage() {
         const screenAPI = window.screen as any;
 
         if ('orientation' in screenAPI && 'lock' in screenAPI.orientation) {
-          screenAPI.orientation.lock('landscape').catch((error: unknown) => {
-            console.error('無法鎖定螢幕方向:', error);
-          });
+          screenAPI.orientation
+            .lock('landscape')
+            .catch((orientationError: unknown) => {
+              console.error('無法鎖定螢幕方向:', orientationError);
+            });
         }
 
         // 監聽方向變化，嘗試再次強制橫向
@@ -208,8 +225,8 @@ export default function RecipeVideoPage() {
             if ('lock' in screenAPI.orientation) {
               screenAPI.orientation
                 .lock('landscape')
-                .catch((error: unknown) => {
-                  console.error('無法鎖定螢幕方向:', error);
+                .catch((orientationError: unknown) => {
+                  console.error('無法鎖定螢幕方向:', orientationError);
                 });
             }
           }
@@ -224,8 +241,8 @@ export default function RecipeVideoPage() {
             screenAPI.orientation.unlock();
           }
         };
-      } catch (error) {
-        console.error('螢幕方向 API 不支援:', error);
+      } catch (screenError) {
+        console.error('螢幕方向 API 不支援:', screenError);
         return undefined;
       }
     }
@@ -234,13 +251,72 @@ export default function RecipeVideoPage() {
   }, []);
 
   // 獲取當前步驟
-  const currentStep = steps[currentStepIndex];
+  const currentStep = steps[currentStepIndex] || {
+    id: 0,
+    description: '',
+    stepOrder: 0,
+    startTime: 0,
+    endTime: 0,
+  };
+
+  // 如果正在載入或沒有ID，顯示載入中狀態
+  if (loading || !recipeId) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-4" />
+          <p>載入教學資訊中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果發生錯誤，顯示錯誤信息
+  if (apiError || !teachingData) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black">
+        <div className="text-white text-center p-6 bg-gray-800 rounded-lg max-w-md">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+          <h2 className="text-xl font-bold mb-2">無法載入教學資訊</h2>
+          <p className="mb-4">{apiError || '未知錯誤'}</p>
+          <Link
+            href={recipeId ? `/recipe-page/${recipeId}` : '/'}
+            className="bg-white text-black px-4 py-2 rounded-md inline-block"
+          >
+            返回食譜頁面
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果食譜沒有視頻，顯示提示
+  if (!videoId) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black">
+        <div className="text-white text-center p-6 bg-gray-800 rounded-lg max-w-md">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+          <h2 className="text-xl font-bold mb-2">{teachingData.recipeName}</h2>
+          <p className="mb-4">此食譜尚未上傳教學視頻</p>
+          <Link
+            href={`/recipe-page/${recipeId}`}
+            className="bg-white text-black px-4 py-2 rounded-md inline-block"
+          >
+            返回食譜頁面
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       <Head>
-        <title>食譜視頻 | Anna Cook</title>
-        <meta name="description" content="跟著視頻學習美味料理" />
+        <title>{teachingData.recipeName} - 教學視頻 | Anna Cook</title>
+        <meta
+          name="description"
+          content={`${teachingData.recipeName} 的製作教學`}
+        />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -255,7 +331,7 @@ export default function RecipeVideoPage() {
             videoId={videoId}
             responsive
             muted={false}
-            loop // 開啟循環播放功能
+            loop
             isPlaying={isPlaying}
             startTime={currentStep.startTime}
             endTime={currentStep.endTime}
@@ -265,9 +341,9 @@ export default function RecipeVideoPage() {
           />
 
           {/* 上方導航欄 */}
-          <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/70 to-transparent p-4 flex items-center z-10">
+          <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/70 to-transparent p-4 flex items-center z-20">
             <Link
-              href="/recipe-page"
+              href={`/recipe-page/${recipeId}`}
               className="flex items-center text-white hover:text-gray-300 transition"
             >
               <ArrowLeft className="w-6 h-6 mr-2" />
@@ -342,7 +418,7 @@ export default function RecipeVideoPage() {
                   </button>
                 </div>
                 <h2 className="text-xl font-semibold mb-2">
-                  {currentStep.title}
+                  步驟 {currentStep.stepOrder}
                 </h2>
                 <p className="text-gray-300">{currentStep.description}</p>
                 <div className="mt-4 text-sm text-gray-400">
@@ -374,7 +450,7 @@ export default function RecipeVideoPage() {
                         onClick={() => atSelectStep(index)}
                       >
                         <span className="text-lg font-semibold">
-                          步驟{index + 1}
+                          步驟{step.stepOrder}
                         </span>
                       </div>
                     ))}
