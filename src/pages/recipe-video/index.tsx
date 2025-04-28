@@ -340,7 +340,7 @@ export default function RecipeVideoPage() {
           />
 
           {/* 上方導航欄 */}
-          <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/70 to-transparent p-4 flex items-center z-10">
+          <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/70 to-transparent p-4 flex items-center z-20">
             <Link
               href={`/recipe-page/${recipeId}`}
               className="flex items-center text-white hover:text-gray-300 transition"
