@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { getAuthToken, checkAuth } from '@/services/api';
+import { checkAuth } from '@/services/api';
 
 export type AuthStatus = {
   isAuthenticated: boolean | null;
   isLoading: boolean;
+  userData?: any;
 };
 
 /**
@@ -20,53 +21,53 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
   });
 
   useEffect(() => {
+    // 防止在 SSR 中執行
+    if (typeof window === 'undefined') return;
+
     const verifyAuth = async () => {
       try {
-        const token = getAuthToken();
-
-        if (!token) {
-          // 若無 token，重定向到指定路徑
-          router.push(redirectTo);
-          setAuthStatus({
-            isAuthenticated: false,
-            isLoading: false,
-          });
-          return;
+        // 檢查 localStorage 是否有用戶資料（提供更快的初始狀態）
+        const storedUserData = localStorage.getItem('userData');
+        if (storedUserData) {
+          try {
+            const userData = JSON.parse(storedUserData);
+            setAuthStatus({
+              isAuthenticated: true,
+              isLoading: false,
+              userData,
+            });
+          } catch (e) {
+            console.error('解析儲存的用戶資料失敗:', e);
+          }
         }
 
-        // 在開發環境中，直接視為已授權（避免後端 API 未準備好的情況）
-        // if (process.env.NODE_ENV === 'development') {
-        //   console.log('開發環境：略過 API 驗證，使用本地 Token 驗證');
-        //   setAuthStatus({
-        //     isAuthenticated: true,
-        //     isLoading: false,
-        //   });
-        //   return;
-        // }
+        // 使用 API 驗證身份 (無需檢查 token 存在性)
+        console.log('驗證身份中...');
+        const response = await checkAuth();
 
-        // 正式環境使用 API 驗證 token 有效性
-        await checkAuth();
+        console.log('身份驗證成功:', response);
 
         // 驗證成功，設置身份已驗證
         setAuthStatus({
           isAuthenticated: true,
           isLoading: false,
+          userData: response.userData,
         });
+
+        // 更新 localStorage 中的用戶資料
+        localStorage.setItem('userData', JSON.stringify(response.userData));
       } catch (error) {
         console.error('身份驗證失敗:', error);
 
-        // // 在開發環境中出錯時，仍然允許使用本地 Token 進行驗證
-        // if (process.env.NODE_ENV === 'development') {
-        //   console.warn('開發環境：API 驗證失敗，仍繼續使用本地 Token');
-        //   setAuthStatus({
-        //     isAuthenticated: true,
-        //     isLoading: false,
-        //   });
-        //   return;
-        // }
+        // 清除 localStorage 中可能過期的資料
+        localStorage.removeItem('userData');
 
-        // 正式環境下驗證失敗，重定向到登入頁
-        router.push(redirectTo);
+        // 驗證失敗，重定向到登入頁
+        if (router.pathname !== redirectTo) {
+          console.log(`重定向到 ${redirectTo}`);
+          router.push(redirectTo);
+        }
+
         setAuthStatus({
           isAuthenticated: false,
           isLoading: false,
@@ -81,10 +82,13 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
 };
 
 /**
- * 判斷使用者是否已登入
- * @returns boolean 是否已登入
+ * 判斷使用者是否已登入（僅用於客戶端快速檢查，不可靠）
+ * @returns boolean 是否可能已登入
  */
 export const isUserLoggedIn = (): boolean => {
-  const token = getAuthToken();
-  return !!token;
+  if (typeof window === 'undefined') return false;
+
+  // 檢查 localStorage 是否有用戶資料
+  const userData = localStorage.getItem('userData');
+  return !!userData;
 };
