@@ -1617,3 +1617,63 @@ export const submitRecipeRatingComment = async (
     throw error;
   }
 };
+
+export interface RecipeTeachingResponse {
+  StatusCode: number;
+  msg: string;
+  data?: {
+    recipeId: number;
+    recipeName: string;
+    video: string | null;
+    steps: {
+      id: number;
+      description: string;
+      stepOrder: number;
+      startTime: number;
+      endTime: number;
+    }[];
+  };
+}
+
+export const fetchRecipeTeaching = async (
+  recipeId: number,
+): Promise<RecipeTeachingResponse> => {
+  const url = `${apiConfig.baseUrl}/recipes/${recipeId}/teaching`;
+
+  try {
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          StatusCode: 404,
+          msg: '找不到該食譜的教學資訊',
+        };
+      }
+
+      throw new Error(`API請求失敗: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('獲取食譜教學資訊回應:', data);
+    return data;
+  } catch (error) {
+    console.error('獲取食譜教學資訊失敗:', error);
+    return {
+      StatusCode: 500,
+      msg: '獲取食譜教學資訊失敗，請稍後再試',
+    };
+  }
+};
