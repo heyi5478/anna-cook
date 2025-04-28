@@ -21,8 +21,14 @@ export default async function handler(
   }
 
   try {
-    // 使用通用代理函數處理請求
-    return proxyAuthRequest(req, res, `/recipes/${recipeId}/steps/bulk`, 'PUT');
+    // 使用通用代理函數處理請求，並傳遞請求體
+    return proxyAuthRequest(
+      req,
+      res,
+      `/recipes/${recipeId}/steps/bulk`,
+      'PUT',
+      req.body,
+    );
   } catch (error) {
     console.error('處理批次更新食譜步驟請求失敗:', error);
     return res.status(500).json({
