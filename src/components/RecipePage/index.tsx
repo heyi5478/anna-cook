@@ -348,12 +348,14 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           </div>
 
           <div className="flex justify-between">
-            <Button
-              variant="outline"
-              className="flex-1 bg-[#E64300] text-[#FAFAFA] border-[#E64300] hover:bg-[#FFE0D9]"
-            >
-              教學開始
-            </Button>
+            <Link href={`/recipe-video?id=${recipe.id}`} className="flex-1">
+              <Button
+                variant="outline"
+                className="w-full bg-[#E64300] text-[#FAFAFA] border-[#E64300] hover:bg-[#FFE0D9]"
+              >
+                教學開始
+              </Button>
+            </Link>
           </div>
         </div>
 

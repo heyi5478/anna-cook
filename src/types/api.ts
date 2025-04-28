@@ -351,3 +351,21 @@ export type RecipeRatingCommentResponse = {
     rating: number;
   }[];
 };
+
+// 教學影片相關類型
+export type RecipeTeachingResponse = {
+  StatusCode: number;
+  msg: string;
+  data?: {
+    recipeId: number;
+    recipeName: string;
+    video: string | null;
+    steps: {
+      id: number;
+      description: string;
+      stepOrder: number;
+      startTime: number;
+      endTime: number;
+    }[];
+  };
+};
