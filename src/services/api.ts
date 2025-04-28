@@ -28,6 +28,7 @@ import {
   FollowResponse,
   FavoriteRecipeResponse,
   RecipeRatingCommentResponse,
+  RecipeTeachingResponse,
 } from '@/types/api';
 
 /**
@@ -1617,23 +1618,6 @@ export const submitRecipeRatingComment = async (
     throw error;
   }
 };
-
-export interface RecipeTeachingResponse {
-  StatusCode: number;
-  msg: string;
-  data?: {
-    recipeId: number;
-    recipeName: string;
-    video: string | null;
-    steps: {
-      id: number;
-      description: string;
-      stepOrder: number;
-      startTime: number;
-      endTime: number;
-    }[];
-  };
-}
 
 export const fetchRecipeTeaching = async (
   recipeId: number,

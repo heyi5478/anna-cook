@@ -14,7 +14,8 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { fetchRecipeTeaching, RecipeTeachingResponse } from '@/services/api';
+import { fetchRecipeTeaching } from '@/services/api';
+import { RecipeTeachingResponse } from '@/types/api';
 
 /**
  * 食譜視頻頁面的 Props 介面
