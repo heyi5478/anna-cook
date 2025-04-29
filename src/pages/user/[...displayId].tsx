@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
 import { mockAuthor } from '@/components/AuthorProfile/types';
@@ -70,37 +68,29 @@ export default function UserPage({
   // 如果有錯誤，顯示錯誤頁面
   if (errorMessage) {
     return (
-      <>
-        <Header />
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-          <div className="text-center p-6 rounded-lg shadow-md bg-white">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">
-              錯誤 {statusCode}
-            </h2>
-            <p className="text-gray-700 mb-6">{errorMessage}</p>
-            <button
-              onClick={() => router.push('/')}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-            >
-              返回首頁
-            </button>
-          </div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-6 rounded-lg shadow-md bg-white">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            錯誤 {statusCode}
+          </h2>
+          <p className="text-gray-700 mb-6">{errorMessage}</p>
+          <button
+            onClick={() => router.push('/')}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            返回首頁
+          </button>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   // 確保有用戶資料
   if (!userProfileData || !displayId) {
     return (
-      <>
-        <Header />
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-          <p>找不到該使用者資料</p>
-        </div>
-        <Footer />
-      </>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <p>找不到該使用者資料</p>
+      </div>
     );
   }
 
@@ -146,7 +136,6 @@ export default function UserPage({
         />
       </Head>
 
-      <Header />
       <div className="min-h-screen bg-gray-50">
         {isCurrentUser ? (
           // 顯示使用者中心
@@ -172,7 +161,6 @@ export default function UserPage({
           />
         )}
       </div>
-      <Footer />
     </>
   );
 }

@@ -2,7 +2,7 @@ import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import RecipePageComponent from '@/components/RecipePage';
-import { Layout } from '@/components/layout';
+// import { Layout } from '@/components/layout';
 import {
   fetchRecipeDetailServer,
   RecipeDetailResponse,
@@ -17,24 +17,18 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
 
   // 如果頁面正在建立，顯示載入中狀態
   if (router.isFallback) {
-    return (
-      <Layout>
-        <div className="container mx-auto py-10 text-center">載入中...</div>
-      </Layout>
-    );
+    return <div className="container mx-auto py-10 text-center">載入中...</div>;
   }
 
   // 如果沒有成功獲取食譜資料
   if (recipeData.StatusCode !== 200 || !recipeData.data) {
     return (
-      <Layout>
-        <div className="container mx-auto py-10 text-center">
-          <h2 className="text-xl font-semibold mb-4">找不到該食譜</h2>
-          <p className="text-gray-600">
-            {recipeData.msg || '食譜可能已被刪除或尚未發布'}
-          </p>
-        </div>
-      </Layout>
+      <div className="container mx-auto py-10 text-center">
+        <h2 className="text-xl font-semibold mb-4">找不到該食譜</h2>
+        <p className="text-gray-600">
+          {recipeData.msg || '食譜可能已被刪除或尚未發布'}
+        </p>
+      </div>
     );
   }
 
@@ -42,7 +36,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   console.log('食譜資料:', recipeData.data);
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>{`${recipe.recipeName} - 食譜詳情`}</title>
         <meta
@@ -52,7 +46,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <RecipePageComponent recipeData={recipeData.data} />
-    </Layout>
+    </>
   );
 };
 
