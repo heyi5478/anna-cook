@@ -50,9 +50,9 @@ export const Footer: React.FC<FooterProps> = ({
 }) => {
   // 導航項目數據
   const navItems: NavItem[] = [
-    { label: '人氣食譜', href: '/popular' },
-    { label: '最新食譜', href: '/latest' },
-    { label: '關於我們', href: '/about' },
+    { label: '人氣食譜', href: '/' },
+    { label: '最新食譜', href: '/' },
+    { label: '關於我們', href: '/about-us' },
   ];
 
   return (
