@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
  */
 const RecipeDraftVideoPage: NextPage = () => {
   // 檢查用戶是否已登入，未登入則重定向到登入頁
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const { recipeId } = router.query;
   const parsedRecipeId = recipeId ? Number(recipeId) : undefined;
@@ -19,8 +19,17 @@ const RecipeDraftVideoPage: NextPage = () => {
     console.log('頁面取得食譜 ID:', parsedRecipeId);
   }, [router.query, parsedRecipeId]);
 
-  // 載入中顯示空白內容
+  // 載入中顯示載入提示
   if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-lg text-gray-600">載入中...</div>
+      </div>
+    );
+  }
+
+  // 未認證的情況（理論上不會顯示，因為 useAuth 會自動重定向）
+  if (!isAuthenticated) {
     return null;
   }
 

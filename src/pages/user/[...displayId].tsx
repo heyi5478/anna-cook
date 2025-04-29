@@ -217,6 +217,46 @@ export const getServerSideProps: GetServerSideProps = async ({
       };
     }
 
+    // 在伺服器端記錄資料，方便調試
+    console.log('伺服器端獲取的用戶資料:', {
+      isMe: userProfileData.isMe,
+      userData: userProfileData.userData ? '存在' : '不存在',
+      authorData: userProfileData.authorData ? '存在' : '不存在',
+      userDisplayId: userProfileData.userData?.displayId || '無',
+    });
+
+    // 確保 userData 和 authorData 至少為空物件而非 null
+    // 這樣在 client-side 元件中不會有解構錯誤
+    if (!userProfileData.userData) {
+      userProfileData.userData = {
+        userId: 0,
+        displayId: displayId[0],
+        isFollowing: false,
+        accountName: '',
+        profilePhoto: '',
+        description: '',
+        recipeCount: 0,
+        followerCount: 0,
+      };
+    }
+
+    if (!userProfileData.authorData) {
+      userProfileData.authorData = {
+        userId: 0,
+        displayId: displayId[0],
+        accountName: '',
+        accountEmail: '',
+        profilePhoto: '',
+        description: '',
+        followingCount: 0,
+        followerCount: 0,
+        favoritedTotal: 0,
+        myFavoriteCount: 0,
+        averageRating: 0,
+        totalViewCount: 0,
+      };
+    }
+
     return {
       props: {
         userProfileData,
