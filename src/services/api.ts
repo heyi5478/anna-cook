@@ -32,7 +32,7 @@ import {
 } from '@/types/api';
 
 /**
- * 從 Cookie 獲取 JWT Token
+ * 從 Cookie 或 localStorage 獲取 JWT Token
  */
 export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
@@ -42,9 +42,15 @@ export const getAuthToken = (): string | null => {
   }
 
   // 在伺服器端 document 不存在
-  if (typeof document === 'undefined') return null;
+  if (typeof window === 'undefined') return null;
 
-  // 客戶端從 Cookie 獲取 Token
+  // 1. 嘗試從 localStorage 獲取 token (如果存在)
+  const localToken = localStorage.getItem('authToken');
+  if (localToken) {
+    return localToken;
+  }
+
+  // 2. 嘗試從 Cookie 獲取 Token (可能無法獲取 HttpOnly Cookie)
   const cookies = document.cookie.split(';');
   const authCookie = cookies
     .map((cookie) => cookie.trim().split('='))
@@ -58,17 +64,21 @@ export const getAuthToken = (): string | null => {
 };
 
 /**
- * 更新 Cookie 中的 JWT Token
+ * 更新 Cookie 和 localStorage 中的 JWT Token
  */
 export const updateAuthToken = (token: string): void => {
-  if (typeof document === 'undefined') return;
+  if (typeof window === 'undefined') return;
 
+  // 1. 更新 Cookie (可能由服務器設置為 HttpOnly)
   const expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + authConfig.tokenExpiryDays);
 
   document.cookie = `${authConfig.tokenCookieName}=${encodeURIComponent(
     token,
   )}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+
+  // 2. 同時存儲到 localStorage 以便客戶端讀取
+  localStorage.setItem('authToken', token);
 };
 
 /**
@@ -144,15 +154,8 @@ export const uploadRecipeBasic = async (
   formData: RecipeFormData,
 ): Promise<RecipeCreateResponse> => {
   try {
-    console.log(`發送請求: POST ${apiConfig.baseUrl}/recipes`);
+    console.log(`發送請求: POST /api/recipes/create`);
     console.log('請求資料:', formData);
-
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
 
     // 創建 FormData 物件
     const multipartFormData = new FormData();
@@ -160,7 +163,7 @@ export const uploadRecipeBasic = async (
     // 添加食譜名稱
     multipartFormData.append('recipeName', formData.recipeName);
 
-    // 如果有封面圖片，添加到表單中 - 使用 'photo' 作為欄位名稱（根據新文件）
+    // 如果有封面圖片，添加到表單中
     if (formData.coverImage && formData.coverImage instanceof File) {
       console.log(
         '添加圖片到 FormData:',
@@ -174,24 +177,16 @@ export const uploadRecipeBasic = async (
       throw new Error('請上傳圖片：圖片為必填欄位');
     }
 
-    // 遍歷 FormData 檢查內容 (僅用於調試)
-    console.log('FormData 內容驗證:');
-    console.log('- recipeName:', formData.recipeName);
-    console.log('- photo:', formData.coverImage.name);
-    console.log('- Authorization: Bearer [token 已設置]');
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/recipes`, {
+    // 發送請求到 Next.js API 路由，由其代理到後端 API
+    const res = await fetch(`/api/recipes/create`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
       body: multipartFormData,
     });
 
     console.log('回應狀態:', res.status, res.statusText);
 
-    // 無論回應是否成功，嘗試解析 JSON
+    // 解析回應資料
     const responseText = await res.text();
     console.log('回應原始文本:', responseText);
 
@@ -202,12 +197,6 @@ export const uploadRecipeBasic = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (data.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(data.newToken);
     }
 
     // 如果回應狀態不是成功，但我們有 JSON 回應，返回該回應
@@ -266,23 +255,16 @@ export const updateRecipeStep2 = async (
   data: RecipeStep2Data,
 ): Promise<RecipeCreateResponse> => {
   try {
-    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/step2/${recipeId}`);
+    console.log(`發送請求: PUT /api/recipes/step2/${recipeId}`);
     console.log('請求資料:', data);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/step2/${recipeId}`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/step2/${recipeId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include', // 包含 Cookie
       body: JSON.stringify(data),
     });
 
@@ -299,12 +281,6 @@ export const updateRecipeStep2 = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 如果回應狀態不是成功，但我們有 JSON 回應，返回該回應
@@ -332,21 +308,12 @@ export const fetchRecipeDraft = async (
   recipeId: number,
 ): Promise<RecipeDraftResponse> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/draft`);
+    console.log(`發送請求: GET /api/recipes/${recipeId}/draft`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/draft`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/draft`, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
     });
 
     console.log('回應狀態:', res.status, res.statusText);
@@ -362,12 +329,6 @@ export const fetchRecipeDraft = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 如果回應狀態不是成功
@@ -390,89 +351,17 @@ export const updateRecipeSteps = async (
   steps: UpdateStepsRequest,
 ): Promise<UpdateStepsResponse> => {
   try {
-    console.log(
-      `發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/steps/bulk`,
-    );
+    console.log(`發送請求: PUT /api/recipes/${recipeId}/steps/bulk`);
     console.log('請求資料:', steps);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/steps/bulk`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(steps),
-      },
-    );
-
-    console.log('回應狀態:', res.status, res.statusText);
-
-    // 解析回應資料
-    const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
-
-    let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-      console.log('解析後的回應資料:', responseData);
-    } catch (e) {
-      console.error('解析 JSON 失敗:', e);
-      throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
-    }
-
-    return responseData;
-  } catch (error) {
-    console.error('更新食譜步驟失敗:', error);
-    throw error;
-  }
-};
-
-/**
- * 上傳影片至指定食譜
- */
-export const uploadRecipeVideo = async (
-  recipeId: number,
-  videoFile: File,
-): Promise<VideoUploadResponse> => {
-  try {
-    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/video`);
-    console.log('上傳影片:', videoFile.name, videoFile.size, videoFile.type);
-
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 創建 FormData 物件
-    const formData = new FormData();
-    // 添加影片檔案 - 使用 'video' 作為欄位名稱（根據 API 文件要求）
-    formData.append('video', videoFile);
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/video`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/steps/bulk`, {
       method: 'PUT',
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      body: formData,
+      credentials: 'include', // 包含 Cookie
+      body: JSON.stringify(steps),
     });
 
     console.log('回應狀態:', res.status, res.statusText);
@@ -490,10 +379,49 @@ export const uploadRecipeVideo = async (
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
+    return responseData;
+  } catch (error) {
+    console.error('更新食譜步驟失敗:', error);
+    throw error;
+  }
+};
+
+/**
+ * 上傳影片至指定食譜
+ */
+export const uploadRecipeVideo = async (
+  recipeId: number,
+  videoFile: File,
+): Promise<VideoUploadResponse> => {
+  try {
+    console.log(`發送請求: PUT /api/recipes/${recipeId}/video`);
+    console.log('上傳影片:', videoFile.name, videoFile.size, videoFile.type);
+
+    // 創建 FormData 物件
+    const formData = new FormData();
+    // 添加影片檔案 - 使用 'video' 作為欄位名稱（根據 API 文件要求）
+    formData.append('video', videoFile);
+
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/video`, {
+      method: 'PUT',
+      credentials: 'include', // 包含 Cookie
+      body: formData,
+    });
+
+    console.log('回應狀態:', res.status, res.statusText);
+
+    // 解析回應資料
+    const responseText = await res.text();
+    console.log('回應原始文本:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('解析後的回應資料:', responseData);
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
     // 如果回應狀態不是成功
@@ -538,17 +466,8 @@ export const submitRecipeDraft = async (
   },
 ): Promise<SubmitDraftResponse> => {
   try {
-    console.log(
-      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/submit-draft`,
-    );
+    console.log(`發送請求: POST /api/recipes/${recipeId}/submit-draft`);
     console.log('請求資料:', data);
-
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
 
     // 準備 detail JSON 內容
     const detail: SubmitDraftDetail = {
@@ -609,17 +528,12 @@ export const submitRecipeDraft = async (
       formData.append('photo', data.coverImage);
     }
 
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/submit-draft`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      },
-    );
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/submit-draft`, {
+      method: 'POST',
+      credentials: 'include', // 包含 Cookie
+      body: formData,
+    });
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -634,12 +548,6 @@ export const submitRecipeDraft = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     return responseData;
@@ -776,6 +684,22 @@ export const loginWithEmail = async (
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
+    // 如果登入成功，將 token 存儲到 localStorage
+    if (responseData.StatusCode === 200 && responseData.token) {
+      // 檢查是否在瀏覽器環境
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', responseData.token);
+
+        // 如果有用戶資料，也存儲到 localStorage
+        if (responseData.userData) {
+          localStorage.setItem(
+            'userData',
+            JSON.stringify(responseData.userData),
+          );
+        }
+      }
+    }
+
     return responseData;
   } catch (error) {
     console.error('登入失敗:', error);
@@ -793,24 +717,12 @@ export const fetchUserProfile = async (
   displayId: string,
 ): Promise<UserProfileResponse> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/user/${displayId}`);
+    console.log(`發送請求: GET /api/user/${displayId}/profile`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      return {
-        StatusCode: 12345,
-        msg: 'token不見啦!!!!!!',
-      };
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/user/${displayId}`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/user/${displayId}/profile`, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
     });
 
     console.log('回應狀態:', res.status, res.statusText);
@@ -826,12 +738,6 @@ export const fetchUserProfile = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     return responseData;
@@ -887,15 +793,8 @@ export const updateUserProfile = async (
   profilePhoto?: File,
 ): Promise<UpdateUserProfileResponse> => {
   try {
-    console.log(`發送請求: PUT ${apiConfig.baseUrl}/user/profile`);
+    console.log(`發送請求: PUT /api/user/profile`);
     console.log('請求資料:', { ...data, profilePhoto: profilePhoto?.name });
-
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
 
     // 創建 FormData 物件
     const formData = new FormData();
@@ -914,12 +813,10 @@ export const updateUserProfile = async (
       formData.append('profilePhoto', profilePhoto);
     }
 
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/user/profile`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/user/profile`, {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
       body: formData,
     });
 
@@ -936,12 +833,6 @@ export const updateUserProfile = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 處理錯誤狀態碼
@@ -968,24 +859,15 @@ export const fetchAuthorRecipes = async (
 ): Promise<AuthorRecipesResponse> => {
   try {
     console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
+      `發送請求: GET /api/user/${displayId}/author-recipes?isPublished=${isPublished}`,
     );
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
+    // 發送請求到 Next.js API 路由
     const res = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
+      `/api/user/${displayId}/author-recipes?isPublished=${isPublished}`,
       {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include', // 包含 Cookie
       },
     );
 
@@ -1002,12 +884,6 @@ export const fetchAuthorRecipes = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 如果回應狀態不是成功
@@ -1031,23 +907,16 @@ export const deleteMultipleRecipes = async (
   recipeIds: number[],
 ): Promise<DeleteMultipleResponse> => {
   try {
-    console.log(`發送請求: PATCH ${apiConfig.baseUrl}/recipes/delete-multiple`);
+    console.log(`發送請求: PATCH /api/recipes/delete-multiple`);
     console.log('請求資料 (食譜 ID):', recipeIds);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/delete-multiple`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/delete-multiple`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
+      credentials: 'include', // 包含 Cookie
       body: JSON.stringify(recipeIds),
     });
 
@@ -1064,12 +933,6 @@ export const deleteMultipleRecipes = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 如果回應狀態不是成功
@@ -1095,30 +958,19 @@ export const toggleRecipePublishStatus = async (
   isPublished: boolean,
 ): Promise<TogglePublishResponse> => {
   try {
-    console.log(
-      `發送請求: PATCH ${apiConfig.baseUrl}/recipes/${recipeId}/publish`,
-    );
+    console.log(`發送請求: PATCH /api/recipes/${recipeId}/publish`);
     console.log('請求資料:', { isPublished });
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/publish`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ isPublished }),
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/publish`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
-    );
+      credentials: 'include', // 包含 Cookie
+      body: JSON.stringify({ isPublished }),
+    });
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -1133,12 +985,6 @@ export const toggleRecipePublishStatus = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.token) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.token);
     }
 
     // 如果回應狀態不是成功
@@ -1167,24 +1013,15 @@ export const fetchUserFavoriteFollow = async (
 ): Promise<UserFavoriteFollowResponse> => {
   try {
     console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
+      `發送請求: GET /api/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
     );
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
+    // 發送請求到 Next.js API 路由
     const res = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
+      `/api/user/${displayId}/author-favorite-follow?table=${table}&page=${page}`,
       {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include', // 包含 Cookie
       },
     );
 
@@ -1201,12 +1038,6 @@ export const fetchUserFavoriteFollow = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     // 如果回應狀態不是成功
@@ -1303,21 +1134,12 @@ export const fetchUserRecipes = async (
  */
 export const followUser = async (userId: number): Promise<FollowResponse> => {
   try {
-    console.log(`發送請求: POST ${apiConfig.baseUrl}/users/${userId}/follow`);
+    console.log(`發送請求: POST /api/users/${userId}/follow`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/users/${userId}/follow`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
     });
 
     console.log('回應狀態:', res.status, res.statusText);
@@ -1325,12 +1147,6 @@ export const followUser = async (userId: number): Promise<FollowResponse> => {
     // 解析回應資料
     const data = await res.json();
     console.log('回應資料:', data);
-
-    // 如果有新的 Token，更新 Cookie
-    if (data.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(data.newToken);
-    }
 
     return data;
   } catch (error) {
@@ -1344,21 +1160,12 @@ export const followUser = async (userId: number): Promise<FollowResponse> => {
  */
 export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
   try {
-    console.log(`發送請求: DELETE ${apiConfig.baseUrl}/users/${userId}/follow`);
+    console.log(`發送請求: DELETE /api/users/${userId}/follow`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(`${apiConfig.baseUrl}/users/${userId}/follow`, {
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/users/${userId}/follow`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include', // 包含 Cookie
     });
 
     console.log('回應狀態:', res.status, res.statusText);
@@ -1366,12 +1173,6 @@ export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
     // 解析回應資料
     const data = await res.json();
     console.log('回應資料:', data);
-
-    // 如果有新的 Token，更新 Cookie
-    if (data.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(data.newToken);
-    }
 
     return data;
   } catch (error) {
@@ -1387,27 +1188,13 @@ export const favoriteRecipe = async (
   recipeId: number,
 ): Promise<FavoriteRecipeResponse> => {
   try {
-    console.log(
-      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
-    );
+    console.log(`發送請求: POST /api/recipes/${recipeId}/favorite`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/favorite`, {
+      method: 'POST',
+      credentials: 'include', // 包含 Cookie
+    });
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -1422,12 +1209,6 @@ export const favoriteRecipe = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     return responseData;
@@ -1444,27 +1225,13 @@ export const unfavoriteRecipe = async (
   recipeId: number,
 ): Promise<FavoriteRecipeResponse> => {
   try {
-    console.log(
-      `發送請求: DELETE ${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
-    );
+    console.log(`發送請求: DELETE /api/recipes/${recipeId}/favorite`);
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/favorite`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/favorite`, {
+      method: 'DELETE',
+      credentials: 'include', // 包含 Cookie
+    });
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -1479,12 +1246,6 @@ export const unfavoriteRecipe = async (
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
-    }
-
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.newToken);
     }
 
     return responseData;
@@ -1566,30 +1327,18 @@ export const submitRecipeRatingComment = async (
   commentContent: string,
 ): Promise<any> => {
   try {
-    console.log(
-      `發送請求: POST ${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment`,
-    );
+    console.log(`發送請求: POST /api/recipes/${recipeId}/rating-comment`);
     console.log('請求資料:', { rating, commentContent });
 
-    // 取得 JWT Token
-    const token = getAuthToken();
-    if (!token) {
-      console.error('認證錯誤: 未登入或 Token 不存在');
-      throw new Error('未登入或 Token 不存在');
-    }
-
-    // 發送請求
-    const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ rating, commentContent }),
+    // 發送請求到 Next.js API 路由
+    const res = await fetch(`/api/recipes/${recipeId}/rating-comment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      credentials: 'include', // 包含 Cookie
+      body: JSON.stringify({ rating, commentContent }),
+    });
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -1606,12 +1355,6 @@ export const submitRecipeRatingComment = async (
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
-    // 如果有新的 Token，更新 Cookie
-    if (responseData.data?.newToken) {
-      console.log('收到新的 Token，更新 Cookie');
-      updateAuthToken(responseData.data.newToken);
-    }
-
     return responseData;
   } catch (error) {
     console.error('提交評分與留言失敗:', error);
@@ -1622,21 +1365,13 @@ export const submitRecipeRatingComment = async (
 export const fetchRecipeTeaching = async (
   recipeId: number,
 ): Promise<RecipeTeachingResponse> => {
-  const url = `${apiConfig.baseUrl}/recipes/${recipeId}/teaching`;
-
   try {
-    const token = getAuthToken();
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+    console.log(`發送請求: GET /api/recipes/${recipeId}/teaching`);
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(url, {
+    // 發送請求到 Next.js API 路由
+    const response = await fetch(`/api/recipes/${recipeId}/teaching`, {
       method: 'GET',
-      headers,
+      credentials: 'include', // 包含 Cookie
     });
 
     if (!response.ok) {

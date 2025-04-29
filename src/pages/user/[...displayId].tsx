@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import UserCenter from '@/components/UserCenter';
 import { AuthorProfile } from '@/components/AuthorProfile';
 import { mockAuthor } from '@/components/AuthorProfile/types';
@@ -70,37 +68,29 @@ export default function UserPage({
   // 如果有錯誤，顯示錯誤頁面
   if (errorMessage) {
     return (
-      <>
-        <Header />
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-          <div className="text-center p-6 rounded-lg shadow-md bg-white">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">
-              錯誤 {statusCode}
-            </h2>
-            <p className="text-gray-700 mb-6">{errorMessage}</p>
-            <button
-              onClick={() => router.push('/')}
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-            >
-              返回首頁
-            </button>
-          </div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-6 rounded-lg shadow-md bg-white">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            錯誤 {statusCode}
+          </h2>
+          <p className="text-gray-700 mb-6">{errorMessage}</p>
+          <button
+            onClick={() => router.push('/')}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            返回首頁
+          </button>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   // 確保有用戶資料
   if (!userProfileData || !displayId) {
     return (
-      <>
-        <Header />
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-          <p>找不到該使用者資料</p>
-        </div>
-        <Footer />
-      </>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <p>找不到該使用者資料</p>
+      </div>
     );
   }
 
@@ -146,7 +136,6 @@ export default function UserPage({
         />
       </Head>
 
-      <Header />
       <div className="min-h-screen bg-gray-50">
         {isCurrentUser ? (
           // 顯示使用者中心
@@ -172,7 +161,6 @@ export default function UserPage({
           />
         )}
       </div>
-      <Footer />
     </>
   );
 }
@@ -214,6 +202,46 @@ export const getServerSideProps: GetServerSideProps = async ({
           errorMessage: userProfileData.msg || '獲取使用者資料失敗',
           statusCode: userProfileData.StatusCode,
         },
+      };
+    }
+
+    // 在伺服器端記錄資料，方便調試
+    console.log('伺服器端獲取的用戶資料:', {
+      isMe: userProfileData.isMe,
+      userData: userProfileData.userData ? '存在' : '不存在',
+      authorData: userProfileData.authorData ? '存在' : '不存在',
+      userDisplayId: userProfileData.userData?.displayId || '無',
+    });
+
+    // 確保 userData 和 authorData 至少為空物件而非 null
+    // 這樣在 client-side 元件中不會有解構錯誤
+    if (!userProfileData.userData) {
+      userProfileData.userData = {
+        userId: 0,
+        displayId: displayId[0],
+        isFollowing: false,
+        accountName: '',
+        profilePhoto: '',
+        description: '',
+        recipeCount: 0,
+        followerCount: 0,
+      };
+    }
+
+    if (!userProfileData.authorData) {
+      userProfileData.authorData = {
+        userId: 0,
+        displayId: displayId[0],
+        accountName: '',
+        accountEmail: '',
+        profilePhoto: '',
+        description: '',
+        followingCount: 0,
+        followerCount: 0,
+        favoritedTotal: 0,
+        myFavoriteCount: 0,
+        averageRating: 0,
+        totalViewCount: 0,
       };
     }
 

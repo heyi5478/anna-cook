@@ -12,14 +12,14 @@ export const config = {
 };
 
 /**
- * 處理更新用戶個人資料請求，將請求代理到後端 API
+ * 處理食譜創建請求，將請求代理到後端 API
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  // 只允許 PUT 請求
-  if (req.method !== 'PUT') {
+  // 只允許 POST 請求
+  if (req.method !== 'POST') {
     return res.status(405).json({ error: '方法不允許' });
   }
 
@@ -31,33 +31,32 @@ export default async function handler(
     // 創建一個新的 FormData 對象來發送到後端
     const formData = new FormData();
 
-    // 添加帳號名稱
-    if (fields.accountName && fields.accountName[0]) {
-      formData.append('accountName', fields.accountName[0]);
+    // 添加食譜名稱
+    if (fields.recipeName && fields.recipeName[0]) {
+      formData.append('recipeName', fields.recipeName[0]);
+    } else {
+      return res.status(400).json({ error: '食譜名稱為必填欄位' });
     }
 
-    // 添加描述
-    if (fields.description && fields.description[0]) {
-      formData.append('description', fields.description[0]);
-    }
-
-    // 添加頭像照片，如果有
-    if (files.profilePhoto && files.profilePhoto[0]) {
-      const file = files.profilePhoto[0];
+    // 添加封面圖片
+    if (files.photo && files.photo[0]) {
+      const file = files.photo[0];
       const fileContent = fs.readFileSync(file.filepath);
       formData.append(
-        'profilePhoto',
+        'photo',
         new Blob([fileContent], {
-          type: file.mimetype || 'image/jpeg',
+          type: file.mimetype || 'application/octet-stream',
         }),
-        file.originalFilename || 'profile.jpg',
+        file.originalFilename || 'image.jpg',
       );
+    } else {
+      return res.status(400).json({ error: '請上傳圖片：圖片為必填欄位' });
     }
 
     // 使用通用代理函數處理請求
-    return proxyAuthRequest(req, res, '/user/profile', 'PUT', formData);
+    return proxyAuthRequest(req, res, '/recipes', 'POST', formData);
   } catch (error) {
-    console.error('處理更新用戶個人資料請求失敗:', error);
+    console.error('處理食譜創建請求失敗:', error);
     return res.status(500).json({
       error: '處理請求時發生錯誤',
       message: error instanceof Error ? error.message : String(error),

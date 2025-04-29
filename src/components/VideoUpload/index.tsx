@@ -687,9 +687,27 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           // 不中斷流程，繼續導向到食譜草稿頁面
         }
 
-        // 導向到食譜草稿頁面
-        console.log('影片剪輯完成，導向到草稿頁面');
-        router.push(`/user-center`);
+        // 從 localStorage 獲取用戶 displayId
+        let userDisplayId = null;
+        try {
+          const userData = localStorage.getItem('userData');
+          if (userData) {
+            const parsedUserData = JSON.parse(userData);
+            userDisplayId = parsedUserData.displayId || null;
+          }
+        } catch (error) {
+          console.error('獲取用戶資料失敗:', error);
+        }
+
+        // 導向到用戶頁面
+        console.log('影片剪輯完成，導向到用戶頁面');
+        if (userDisplayId) {
+          router.push(`/user/${userDisplayId}`);
+        } else {
+          // 如果沒有取得 displayId，則導向首頁
+          router.push('/');
+          console.warn('未能獲取用戶 displayId，導向到首頁');
+        }
       } catch (error) {
         console.error('操作失敗:', error);
         setApiError(

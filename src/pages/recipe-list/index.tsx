@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/RecipeCard';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Search, Settings2 } from 'lucide-react';
-import { Layout } from '@/components/layout';
+// import { Layout } from '@/components/layout';
 import { searchRecipesServer } from '@/services/server-api';
 import { GetStaticProps } from 'next';
 
@@ -320,7 +320,7 @@ export default function RecipeListPage({
   }
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>{`${query ? `${query} - 搜尋結果` : '食譜搜尋'} | Anna Cook`}</title>
       </Head>
@@ -353,7 +353,7 @@ export default function RecipeListPage({
       <main className="flex-1 container mx-auto px-4 py-2">
         {renderSearchResults()}
       </main>
-    </Layout>
+    </>
   );
 }
 

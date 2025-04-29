@@ -1,7 +1,6 @@
 import type React from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+// import { Footer } from '@/components/layout/Footer';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,29 +14,8 @@ import {
  * 隱私權政策頁面元件
  */
 const PrivacyPolicyPage: React.FC = () => {
-  /**
-   * 處理選單點擊事件
-   */
-  const atMenuClick = () => {
-    console.log('Menu clicked');
-  };
-
-  /**
-   * 處理搜尋提交事件
-   */
-  const atSearchSubmit = (query: string) => {
-    console.log('Search submitted:', query);
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
-      <Header
-        variant="default"
-        size="lg"
-        atMenuClick={atMenuClick}
-        atSearchSubmit={atSearchSubmit}
-      />
-
       <main className="flex-1 bg-gray-50">
         {/* 麵包屑導航 */}
         <div className="px-4 py-3 bg-white">
@@ -165,8 +143,6 @@ const PrivacyPolicyPage: React.FC = () => {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

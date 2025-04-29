@@ -115,24 +115,86 @@ export const proxyAuthRequest = async (
     const options: RequestInit = {
       method,
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     };
 
+    // 如果沒有明確傳入 body 但原始請求有 body，則使用原始請求的 body
+    const requestBody = body !== null ? body : req.body;
+
     // 如果提供了請求體且非 GET 請求，添加到請求選項
-    if (body && method !== 'GET') {
-      options.body = JSON.stringify(body);
+    if (requestBody && method !== 'GET') {
+      if (requestBody instanceof FormData) {
+        // 如果是 FormData，直接使用，不設置 Content-Type
+        // 讓瀏覽器自動加上包含 boundary 的 multipart/form-data
+        options.body = requestBody;
+      } else {
+        // 如果是普通 JSON 物件，設置 Content-Type 並序列化
+        options.headers = {
+          ...(options.headers as Record<string, string>),
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        };
+        options.body = JSON.stringify(requestBody);
+      }
     }
 
-    // 發送請求到後端 API
-    const apiResponse = await fetch(`${apiConfig.baseUrl}${url}`, options);
+    // 從原始請求中獲取並附加查詢參數（若有）
+    let apiUrl = `${apiConfig.baseUrl}${url}`;
+    const queryString = Object.keys(req.query)
+      .filter((key) => !['recipeId', 'userId', 'displayId'].includes(key)) // 排除路徑參數
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(req.query[key] as string)}`,
+      )
+      .join('&');
 
-    // 讀取並解析回應
-    const data = await apiResponse.json();
+    if (queryString) {
+      apiUrl += (apiUrl.includes('?') ? '&' : '?') + queryString;
+    }
+
+    // 建立日誌用的 headers 物件，安全地提取 Content-Type
+    const logHeaders = options.headers
+      ? { ...(options.headers as Record<string, string>) }
+      : {};
+    const contentType = logHeaders['Content-Type'] || '未設定';
+
+    console.log(`代理請求到 ${apiUrl}`, {
+      method,
+      hasBody: !!requestBody,
+      bodyType: requestBody ? typeof requestBody : 'none',
+      contentType,
+    });
+
+    // 發送請求到後端 API
+    const apiResponse = await fetch(apiUrl, options);
+
+    // 先獲取回應文本
+    const responseText = await apiResponse.text();
+
+    // 嘗試解析回應為 JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('解析回應 JSON 失敗:', {
+        status: apiResponse.status,
+        text:
+          responseText.substring(0, 200) +
+          (responseText.length > 200 ? '...' : ''),
+        error: e,
+      });
+
+      // 如果無法解析為 JSON，返回原始錯誤
+      return res.status(500).json({
+        Status: false,
+        Message: '從後端 API 接收到無效的回應格式',
+        error: `無法解析回應為 JSON: ${responseText.substring(0, 100)}${responseText.length > 100 ? '...' : ''}`,
+      });
+    }
 
     // 如果後端返回了新的 token，更新 cookie
-    if (data.token || data.newToken) {
+    if (data && (data.token || data.newToken)) {
       const newToken = data.token || data.newToken;
       setServerCookie(res, newToken);
     }
