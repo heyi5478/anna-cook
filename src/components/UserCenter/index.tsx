@@ -458,6 +458,7 @@ export default function UserCenter({
           <div
             key={recipe.recipeId}
             className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+            onClick={() => router.push(`/recipe-page/${recipe.recipeId}`)}
           >
             <PublishedRecipeCard
               title={recipe.title}

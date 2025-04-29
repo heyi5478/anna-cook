@@ -966,6 +966,7 @@ export const toggleRecipePublishStatus = async (
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
       credentials: 'include', // 包含 Cookie
       body: JSON.stringify({ isPublished }),
