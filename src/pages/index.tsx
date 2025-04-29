@@ -1,8 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { Plus, ChevronDown, X } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+// import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoryCard } from '@/components/common/CategoryCard';
@@ -183,20 +182,6 @@ export default function HomePage({
   };
 
   /**
-   * 處理選單按鈕點擊事件
-   */
-  const atMenuClick = () => {
-    console.log('Menu clicked');
-  };
-
-  /**
-   * 處理搜尋提交事件
-   */
-  const atSearchSubmit = (query: string) => {
-    console.log('Search submitted:', query);
-  };
-
-  /**
    * 將 API 資料轉換為 CategoryCard 所需格式
    */
   const mapToCategoryCard = (recipe: {
@@ -299,12 +284,12 @@ export default function HomePage({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header
+      {/* <Header
         variant="default"
         size="lg"
         atMenuClick={atMenuClick}
         atSearchSubmit={atSearchSubmit}
-      />
+      /> */}
 
       {/* 頁面其他內容將在這裡 */}
       <main className="flex-1 p-4">
@@ -386,7 +371,9 @@ export default function HomePage({
         )}
       </main>
 
-      <Footer companyName="版權所有" studioName="來自安那煮 Anna Cook" />
+      {/* Footer 由 Layout 元件處理，移除此處引用 */}
+      {/* <Footer companyName="版權所有" studioName="來自安那煮 Anna Cook" /> */}
+
       {/* 浮動按鈕和選單 */}
       <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
         {/* 浮動選單 */}

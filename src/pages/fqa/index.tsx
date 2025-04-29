@@ -9,8 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 
 // FAQ 資料類型定義
 type FAQItem = {
@@ -75,8 +73,6 @@ const FAQPage: React.FC = () => {
         <meta name="description" content="安那煮 Anna Cook 常見問題解答" />
       </Head>
 
-      <Header />
-
       <main className="flex-1 bg-white">
         {/* 麵包屑導航 */}
         <div className="px-4 py-3 border-b">
@@ -116,8 +112,6 @@ const FAQPage: React.FC = () => {
           ))}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

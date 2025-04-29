@@ -10,8 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+// import { Footer } from '@/components/layout/Footer';
 
 const AboutUsPage: NextPage = () => {
   return (
@@ -22,8 +21,6 @@ const AboutUsPage: NextPage = () => {
       </Head>
 
       <div className="flex min-h-screen flex-col">
-        <Header />
-
         <main className="flex-1 flex flex-col">
           {/* 麵包屑導航 */}
           <div className="container mx-auto px-4 py-4">
@@ -107,8 +104,6 @@ const AboutUsPage: NextPage = () => {
             </div>
           </div>
         </main>
-
-        <Footer />
       </div>
     </>
   );
