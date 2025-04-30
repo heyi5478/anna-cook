@@ -96,6 +96,7 @@ export default function UserPage({
 
   // 判斷是顯示個人中心還是作者頁面
   const { userData } = userProfileData;
+  console.log('[...displayId].tsx - userData:', userData);
 
   // 轉換 API 資料為 AuthorProfile 所需的格式
   const author = userData
@@ -215,7 +216,19 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     // 確保 userData 和 authorData 至少為空物件而非 null
     // 這樣在 client-side 元件中不會有解構錯誤
-    if (!userProfileData.userData) {
+    if (!userProfileData.userData && userProfileData.authorData) {
+      // 如果 userData 不存在但 authorData 存在，使用 authorData 填充 userData
+      userProfileData.userData = {
+        userId: userProfileData.authorData.userId,
+        displayId: userProfileData.authorData.displayId,
+        isFollowing: false,
+        accountName: userProfileData.authorData.accountName,
+        profilePhoto: userProfileData.authorData.profilePhoto,
+        description: userProfileData.authorData.description,
+        recipeCount: 0,
+        followerCount: userProfileData.authorData.followerCount,
+      };
+    } else if (!userProfileData.userData) {
       userProfileData.userData = {
         userId: 0,
         displayId: displayId[0],
