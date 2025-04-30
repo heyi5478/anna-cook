@@ -136,8 +136,6 @@ npm run dev
   - 分支名稱
   - 用 md 格式描述這次 PR 做了什麼
 
----
-
 ## eslint 規範
 
 ### 程式碼風格與格式
@@ -197,8 +195,6 @@ npm run dev
 
 - 使用 VS Code 或其他編輯器的 ESLint 插件，獲取即時錯誤和警告提示
 - 提交代碼前運行 `npm run lint` 確保無錯誤
-
----
 
 ## typescript 規範
 本專案採用嚴格的 TypeScript 配置，旨在提供型別安全性和開發效率。以下是您需要了解的 TypeScript 規範：
@@ -272,19 +268,13 @@ npm run dev
 - **包含範圍**
     - 僅包含 `next.config.ts`，確保 Node.js 環境設定獨立管理。
 
----
-
 ## 授權資訊
 
 本專案採用 MIT 授權，詳細條款請參考 `LICENSE` 文件。
 
----
-
 ## 貢獻者
 
 - [@heyi5478](https://github.com/heyi5478)
-
----
 
 ## 聯絡方式
 
