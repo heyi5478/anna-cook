@@ -48,6 +48,7 @@ interface RecipePageProps {
       id: number;
       displayId: string;
       name: string;
+      authorPhoto?: string;
       followersCount: number;
     };
     isFavorite: boolean;
@@ -368,7 +369,9 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
             >
               <Avatar className="w-10 h-10">
                 <AvatarImage
-                  src="/placeholder.svg?height=40&width=40"
+                  src={
+                    author.authorPhoto || '/placeholder.svg?height=40&width=40'
+                  }
                   alt={`${author.name}的頭像`}
                 />
                 <AvatarFallback>
