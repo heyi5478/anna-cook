@@ -13,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
     '/login-email',
     '/login-verify',
     '/signin-email',
+    '/recipe-video',
   ];
   const shouldUseLayout = !noLayoutPages.includes(router.pathname);
 
