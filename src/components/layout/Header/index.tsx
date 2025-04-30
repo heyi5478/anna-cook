@@ -222,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({
         <p className="px-4 py-2 text-gray-500">未登入</p>
 
         <Link
-          href="/create-recipe"
+          href="/upload-recipe-step1"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/faq"
+          href="/fqa"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
@@ -238,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({
         </Link>
 
         <Link
-          href="/contact"
+          href="/contact-us"
           className={cn(menuItemVariants({}))}
           onClick={atMenuItemClick}
         >
