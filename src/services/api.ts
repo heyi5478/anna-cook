@@ -1366,19 +1366,30 @@ export const fetchRecipeTeaching = async (
   recipeId: number,
 ): Promise<RecipeTeachingResponse> => {
   try {
-    console.log(`發送請求: GET /api/recipes/${recipeId}/teaching`);
+    console.log(
+      `發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/teaching`,
+    );
 
-    // 發送請求到 Next.js API 路由
-    const response = await fetch(`/api/recipes/${recipeId}/teaching`, {
-      method: 'GET',
-      credentials: 'include', // 包含 Cookie
-    });
+    // 直接使用 apiConfig.baseUrl 發起請求，而不是經過 Next.js API 路由
+    // 因為根據 API 文檔，公開食譜不需要授權，所以不要直接添加 credentials
+    const response = await fetch(
+      `${apiConfig.baseUrl}/recipes/${recipeId}/teaching`,
+      {
+        method: 'GET',
+      },
+    );
 
     if (!response.ok) {
       if (response.status === 404) {
         return {
           StatusCode: 404,
           msg: '找不到該食譜的教學資訊',
+        };
+      }
+      if (response.status === 401) {
+        return {
+          StatusCode: 401,
+          msg: '尚未公開的食譜無法觀看教學',
         };
       }
 
