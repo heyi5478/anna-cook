@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -58,6 +58,17 @@ export default function RecipeUploadStep2() {
   const [customTag, setCustomTag] = useState('');
   const [tags, setTags] = useState<string[]>([]);
 
+  // 從 localStorage 取得食譜名稱
+  const [recipeName, setRecipeName] = useState<string>('');
+
+  // 在元件載入時從 localStorage 讀取食譜名稱
+  useEffect(() => {
+    const storedRecipeName = localStorage.getItem('recipeName');
+    if (storedRecipeName) {
+      setRecipeName(storedRecipeName);
+    }
+  }, []);
+
   // 初始化 react-hook-form
   const {
     register,
@@ -67,7 +78,7 @@ export default function RecipeUploadStep2() {
   } = useForm<RecipeStep2Values>({
     resolver: zodResolver(recipeStep2Schema),
     defaultValues: {
-      recipeTitle: '馬鈴薯燉肉',
+      recipeTitle: recipeName || '馬鈴薯燉肉',
       recipeDescription:
         '食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！',
       ingredients: [
@@ -242,7 +253,9 @@ export default function RecipeUploadStep2() {
         {/* 食譜標題 */}
         <div className="mb-6 border-t border-b border-dashed border-gray-300 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">馬鈴薯燉肉</h2>
+            <h2 className="text-lg font-medium">
+              {recipeName || '馬鈴薯燉肉'}
+            </h2>
             <button
               type="button"
               className="text-gray-500"
