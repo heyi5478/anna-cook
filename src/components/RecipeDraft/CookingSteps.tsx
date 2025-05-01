@@ -60,7 +60,11 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   /**
    * 切換步驟影片的播放狀態
    */
-  const atTogglePlay = (stepId: string) => {
+  const atTogglePlay = (stepId: string, e: React.MouseEvent) => {
+    // 阻止事件冒泡和默認行為，防止觸發表單提交
+    e.preventDefault();
+    e.stopPropagation();
+
     setPlayingSteps((prev) => ({
       ...prev,
       [stepId]: !prev[stepId],
@@ -115,7 +119,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => atTogglePlay(stepId)}
+                onClick={(e) => atTogglePlay(stepId, e)}
                 className="text-xs"
               >
                 {isPlaying ? (
