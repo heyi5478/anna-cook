@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,7 +32,7 @@ const recipeStep2Schema = z.object({
       unit: z.string().optional(),
     }),
   ),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).min(1, { message: '至少需要一個標籤' }),
   cookingTime: z.string().min(1, { message: '請輸入烹調時間' }),
   servings: z.string().min(1, { message: '請輸入人份數' }),
 });
@@ -58,26 +58,41 @@ export default function RecipeUploadStep2() {
   const [customTag, setCustomTag] = useState('');
   const [tags, setTags] = useState<string[]>([]);
 
+  // 從 localStorage 取得食譜名稱
+  const [recipeName, setRecipeName] = useState<string>('');
+
+  // 在元件載入時從 localStorage 讀取食譜名稱
+  useEffect(() => {
+    const storedRecipeName = localStorage.getItem('recipeName');
+    if (storedRecipeName) {
+      setRecipeName(storedRecipeName);
+    }
+  }, []);
+
   // 初始化 react-hook-form
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
   } = useForm<RecipeStep2Values>({
     resolver: zodResolver(recipeStep2Schema),
     defaultValues: {
-      recipeTitle: '馬鈴薯燉肉',
-      recipeDescription:
-        '食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！',
-      ingredients: [
-        { name: '馬鈴薯', amount: '2', unit: '顆', isFlavoring: false },
-      ],
-      seasonings: [{ name: '初榨醬油', amount: '1', unit: '小匙' }],
+      recipeTitle: recipeName || '馬鈴薯燉肉',
+      recipeDescription: '',
+      ingredients: [{ name: '', amount: '', unit: '', isFlavoring: false }],
+      seasonings: [{ name: '', amount: '', unit: '' }],
+      tags: [],
       cookingTime: '120',
       servings: '4',
     },
   });
+
+  // 同步 tags state 和表單值
+  useEffect(() => {
+    setValue('tags', tags);
+  }, [tags, setValue]);
 
   // 使用 useFieldArray 管理動態食材列表
   const {
@@ -136,7 +151,7 @@ export default function RecipeUploadStep2() {
             isFlavoring: true,
           })),
         ],
-        tags: tags.length > 0 ? tags : undefined,
+        tags: data.tags,
       };
 
       console.log('API 請求資料:', apiData);
@@ -190,7 +205,9 @@ export default function RecipeUploadStep2() {
       !tags.includes(customTag.trim()) &&
       tags.length < 5
     ) {
-      setTags([...tags, customTag.trim()]);
+      const newTags = [...tags, customTag.trim()];
+      setTags(newTags);
+      setValue('tags', newTags); // 同步更新表單值
       setCustomTag('');
     }
   };
@@ -199,7 +216,9 @@ export default function RecipeUploadStep2() {
    * 移除標籤
    */
   const atRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(newTags);
+    setValue('tags', newTags); // 同步更新表單值
   };
 
   /**
@@ -242,8 +261,10 @@ export default function RecipeUploadStep2() {
         {/* 食譜標題 */}
         <div className="mb-6 border-t border-b border-dashed border-gray-300 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">馬鈴薯燉肉</h2>
-            <button
+            <h2 className="text-lg font-medium">
+              {recipeName || '馬鈴薯燉肉'}
+            </h2>
+            {/* <button
               type="button"
               className="text-gray-500"
               aria-label="編輯食譜標題"
@@ -261,7 +282,7 @@ export default function RecipeUploadStep2() {
               >
                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
               </svg>
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -277,6 +298,7 @@ export default function RecipeUploadStep2() {
           <textarea
             id="recipeDescription"
             rows={10}
+            placeholder="食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！"
             className={cn(
               'w-full p-3 border rounded-md bg-gray-50',
               errors.recipeDescription ? 'border-red-500' : 'border-gray-300',
@@ -469,7 +491,12 @@ export default function RecipeUploadStep2() {
         {/* 食譜標籤 */}
         <div className="mb-6">
           <h2 className="text-lg font-medium mb-2">食譜標籤</h2>
-          <div className="bg-gray-50 p-3 rounded-md border border-gray-300">
+          <div
+            className={cn(
+              'bg-gray-50 p-3 rounded-md border',
+              errors.tags ? 'border-red-500' : 'border-gray-300',
+            )}
+          >
             <div className="flex justify-between items-center mb-2">
               <span>增加新標籤 ({tags.length}/5)</span>
             </div>
@@ -526,6 +553,10 @@ export default function RecipeUploadStep2() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {errors.tags && (
+              <p className="mt-1 text-sm text-red-500">{errors.tags.message}</p>
             )}
           </div>
         </div>

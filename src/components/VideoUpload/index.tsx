@@ -2,7 +2,6 @@ import type React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import {
   Play,
@@ -48,9 +47,11 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
   // 影片檔案狀態
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
+  const [fileName, setFileName] = useState<string>('videoexample.avi');
+
+  // 上傳進度狀態
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [fileName, setFileName] = useState<string>('videoexample.avi');
 
   // 影片播放狀態
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -64,10 +65,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
   // 縮圖狀態
   const [thumbnails, setThumbnails] = useState<string[]>([]);
-
-  // 說明文字狀態
-  // 移除這一行
-  // const [description, setDescription] = useState<string>("食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！食譜料理中加入花生醬燉煮");
 
   // 驗證狀態
   const [errors, setErrors] = useState<{
@@ -104,30 +101,32 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
       // 開始上傳進度動畫
       setIsUploading(true);
+      setUploadProgress(0);
       setVideoFile(file);
       setFileName(file.name);
+
+      // 模擬初始進度更新
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressInterval);
+            return 95;
+          }
+          return prev + Math.random() * 5;
+        });
+      }, 300);
 
       try {
         // 確認 recipeId 存在
         if (!recipeId) {
+          clearInterval(progressInterval);
+          setIsUploading(false);
           throw new Error(
             '無法取得食譜 ID，請確認網址中包含正確的 recipeId 參數',
           );
         }
 
-        // 立即將影片上傳到後端
         console.log(`開始上傳影片至食譜 ID: ${recipeId}`);
-
-        // 模擬進度更新
-        const progressInterval = setInterval(() => {
-          setUploadProgress((prev) => {
-            if (prev >= 90) {
-              clearInterval(progressInterval);
-              return 90;
-            }
-            return prev + 5;
-          });
-        }, 300);
 
         // 實際上傳到後端
         const response = await uploadRecipeVideo(
@@ -137,45 +136,52 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
 
         console.log('影片上傳回應:', response);
 
-        // 完成進度更新
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-
         // 檢查回應是否成功
         if (response.message && !response.videoUri) {
-          throw new Error(response.message);
+          throw new Error(response.message || '上傳失敗，伺服器回應錯誤');
         }
 
+        // API 成功回傳後，停止進度模擬並設為 100%
+        clearInterval(progressInterval);
+        setUploadProgress(100);
         console.log('影片上傳成功，可繼續剪輯操作');
         setApiError(null);
+
+        // 短暫延遲後關閉上傳狀態並顯示預覽
+        setTimeout(() => {
+          setIsUploading(false);
+
+          // 創建本地URL以預覽影片
+          const url = URL.createObjectURL(file);
+          setVideoUrl(url);
+
+          // 預先創建一個默認片段
+          const initialSegment: Segment = {
+            id: generateId(),
+            startTime: 0,
+            endTime: 0, // 稍後由 atVideoLoaded 更新實際時長
+            startPercent: 0,
+            endPercent: 100,
+            description: '',
+          };
+          setSegments([initialSegment]);
+          setCurrentSegmentIndex(0);
+        }, 800); // 稍微延遲以展示 100% 完成進度
       } catch (error) {
+        // 停止進度更新
+        clearInterval(progressInterval);
+
         console.error('影片上傳失敗:', error);
         setApiError(
           error instanceof Error ? error.message : '影片上傳失敗，請稍後再試',
         );
-      } finally {
-        // 無論成功或失敗，結束上傳狀態
+
+        // 重置進度條狀態
         setTimeout(() => {
           setIsUploading(false);
+          setUploadProgress(0);
         }, 500);
       }
-
-      // 創建本地URL以預覽影片
-      const url = URL.createObjectURL(file);
-      setVideoUrl(url);
-
-      // 預先創建一個默認片段
-      const initialSegment: Segment = {
-        id: generateId(),
-        startTime: 0,
-        endTime: 0, // 稍後由 atVideoLoaded 更新實際時長
-        startPercent: 0,
-        endPercent: 100,
-        description:
-          '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
-      };
-      setSegments([initialSegment]);
-      setCurrentSegmentIndex(0);
     }
   };
 
@@ -314,8 +320,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
                 endTime: videoDuration,
                 startPercent: 0,
                 endPercent: 100,
-                description:
-                  '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
+                description: '',
               },
             ];
 
@@ -801,20 +806,11 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           fileName={fileName}
           error={errors.video}
           onUpload={atFileUpload}
+          progress={uploadProgress}
+          isUploading={isUploading}
         />
       ) : (
         <div className="px-4 space-y-4">
-          {/* 上傳進度 */}
-          {isUploading && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>上傳中...</span>
-                <span>{uploadProgress}%</span>
-              </div>
-              <Progress value={uploadProgress} className="h-2" />
-            </div>
-          )}
-
           {/* 影片預覽 */}
           <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
             {videoUrl ? (
@@ -858,51 +854,40 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           </div>
 
           {/* 時間顯示 */}
-          <div className="flex justify-between text-sm text-gray-700">
-            <span>當前: {formatTime(currentTime)} 秒</span>
-            <span>總長: {formatTime(duration)} 秒</span>
+          <div className="flex justify-between px-4 py-2 text-sm">
+            <div>當前: {formatTime(currentTime)} 秒</div>
+            <div>總長: {formatTime(duration)} 秒</div>
           </div>
 
           {/* 片段導航 */}
-          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
-            <Button
-              variant="ghost"
-              size="icon"
+          <div className="flex items-center justify-between px-4 py-2">
+            <button
               onClick={atGoPreviousSegment}
-              className="h-8 w-8 text-gray-700"
+              className="p-2 text-gray-600"
+              disabled={currentSegmentIndex === 0}
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium text-gray-700">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="text-sm">
               步驟 {currentSegmentIndex + 1}/{segments.length}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={atGoNextSegment}
-              className="h-8 w-8 text-gray-700"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={atAddSegment}
-                className="h-8 w-8 text-gray-700"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={atDeleteCurrentSegment}
-                disabled={segments.length <= 1}
-                className="h-8 w-8 text-gray-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
             </div>
+            <button
+              onClick={atGoNextSegment}
+              className="p-2 text-gray-600"
+              disabled={currentSegmentIndex === segments.length - 1}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <button onClick={atTogglePlayPause} className="p-2 text-gray-600">
+              {isPlaying ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )}
+            </button>
+            <button onClick={atAddSegment} className="p-2 text-gray-600">
+              <Plus className="h-5 w-5" />
+            </button>
           </div>
 
           {/* 雙滑桿剪輯 (YouTube 風格) */}
@@ -1047,6 +1032,69 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             </Button>
           </div>
 
+          {/* 紅綠燈警示 */}
+          <div className="mt-3 mb-1">
+            {(() => {
+              const segmentDuration =
+                currentSegment.endTime - currentSegment.startTime;
+              let statusColor = '';
+              let statusText = '';
+
+              if (segmentDuration < 5 || segmentDuration > 30) {
+                statusColor = 'bg-red-500';
+                statusText =
+                  segmentDuration < 5
+                    ? '時間太短 (建議至少5秒)'
+                    : '時間太長 (建議不超過30秒)';
+              } else if (
+                (segmentDuration >= 5 && segmentDuration < 10) ||
+                (segmentDuration > 25 && segmentDuration <= 30)
+              ) {
+                statusColor = 'bg-yellow-500';
+                statusText =
+                  segmentDuration < 10
+                    ? '時間略短 (適中為10-25秒)'
+                    : '時間略長 (適中為10-25秒)';
+              } else {
+                statusColor = 'bg-green-500';
+                statusText = '時間長度適中';
+              }
+
+              return (
+                <div className="flex items-center">
+                  <div className={`w-4 h-4 rounded-full ${statusColor} mr-2`} />
+                  <div className="text-sm text-gray-700">
+                    <span>步驟時長: {segmentDuration.toFixed(2)} 秒</span>
+                    <span className="ml-2 text-xs text-gray-500">
+                      {statusText}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* 重置按鈕 */}
+          <Button
+            onClick={atResetCurrentSegment}
+            variant="outline"
+            className="w-full flex items-center justify-center"
+          >
+            <span className="mr-2">↻</span>
+            該步驟重置
+          </Button>
+
+          {/* 刪除步驟按鈕 */}
+          <Button
+            onClick={atDeleteCurrentSegment}
+            variant="outline"
+            disabled={segments.length <= 1}
+            className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center mt-2"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            刪除此步驟
+          </Button>
+
           {/* 說明文字 */}
           <div className="mt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
@@ -1075,16 +1123,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
               </div>
             )}
           </div>
-
-          {/* 重置按鈕 */}
-          <Button
-            onClick={atResetCurrentSegment}
-            variant="outline"
-            className="w-full flex items-center justify-center"
-          >
-            <span className="mr-2">↻</span>
-            重置
-          </Button>
 
           {/* API 錯誤訊息 */}
           {apiError && (
