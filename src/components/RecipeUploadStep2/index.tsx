@@ -32,7 +32,7 @@ const recipeStep2Schema = z.object({
       unit: z.string().optional(),
     }),
   ),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).min(1, { message: '至少需要一個標籤' }),
   cookingTime: z.string().min(1, { message: '請輸入烹調時間' }),
   servings: z.string().min(1, { message: '請輸入人份數' }),
 });
@@ -75,6 +75,7 @@ export default function RecipeUploadStep2() {
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
   } = useForm<RecipeStep2Values>({
     resolver: zodResolver(recipeStep2Schema),
     defaultValues: {
@@ -82,10 +83,16 @@ export default function RecipeUploadStep2() {
       recipeDescription: '',
       ingredients: [{ name: '', amount: '', unit: '', isFlavoring: false }],
       seasonings: [{ name: '', amount: '', unit: '' }],
+      tags: [],
       cookingTime: '120',
       servings: '4',
     },
   });
+
+  // 同步 tags state 和表單值
+  useEffect(() => {
+    setValue('tags', tags);
+  }, [tags, setValue]);
 
   // 使用 useFieldArray 管理動態食材列表
   const {
@@ -144,7 +151,7 @@ export default function RecipeUploadStep2() {
             isFlavoring: true,
           })),
         ],
-        tags: tags.length > 0 ? tags : undefined,
+        tags: data.tags,
       };
 
       console.log('API 請求資料:', apiData);
@@ -198,7 +205,9 @@ export default function RecipeUploadStep2() {
       !tags.includes(customTag.trim()) &&
       tags.length < 5
     ) {
-      setTags([...tags, customTag.trim()]);
+      const newTags = [...tags, customTag.trim()];
+      setTags(newTags);
+      setValue('tags', newTags); // 同步更新表單值
       setCustomTag('');
     }
   };
@@ -207,7 +216,9 @@ export default function RecipeUploadStep2() {
    * 移除標籤
    */
   const atRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(newTags);
+    setValue('tags', newTags); // 同步更新表單值
   };
 
   /**
@@ -480,7 +491,12 @@ export default function RecipeUploadStep2() {
         {/* 食譜標籤 */}
         <div className="mb-6">
           <h2 className="text-lg font-medium mb-2">食譜標籤</h2>
-          <div className="bg-gray-50 p-3 rounded-md border border-gray-300">
+          <div
+            className={cn(
+              'bg-gray-50 p-3 rounded-md border',
+              errors.tags ? 'border-red-500' : 'border-gray-300',
+            )}
+          >
             <div className="flex justify-between items-center mb-2">
               <span>增加新標籤 ({tags.length}/5)</span>
             </div>
@@ -537,6 +553,10 @@ export default function RecipeUploadStep2() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {errors.tags && (
+              <p className="mt-1 text-sm text-red-500">{errors.tags.message}</p>
             )}
           </div>
         </div>
