@@ -573,8 +573,13 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       } else {
         goToNextStep();
       }
+
+      // 添加計時器，確保在步驟切換後重置 isStepChanging 狀態
+      setTimeout(() => {
+        completeStepChange();
+      }, 500);
     },
-    [isPlaying, goToPrevStep, goToNextStep],
+    [isPlaying, goToPrevStep, goToNextStep, completeStepChange],
   );
 
   /**
