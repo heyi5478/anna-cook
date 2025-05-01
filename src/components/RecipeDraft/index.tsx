@@ -309,8 +309,27 @@ export default function RecipeDraft() {
       if (response.StatusCode === 200) {
         console.log('草稿提交成功:', response);
 
-        // 跳轉到用戶中心頁面
-        router.push('/user-center');
+        // 從 localStorage 中獲取 userData 的 displayId
+        let displayId = '';
+        if (typeof window !== 'undefined') {
+          try {
+            const userDataStr = localStorage.getItem('userData');
+            if (userDataStr) {
+              const userData = JSON.parse(userDataStr);
+              displayId = userData.displayId || '';
+            }
+          } catch (err) {
+            console.error('解析 localStorage 中的 userData 失敗:', err);
+          }
+        }
+
+        // 使用 displayId 導轉到用戶頁面，若無 displayId 則導轉到首頁
+        if (displayId) {
+          router.push(`/user/${displayId}`);
+        } else {
+          console.warn('未找到用戶 displayId，導轉到首頁');
+          router.push('/');
+        }
       } else {
         console.error('草稿提交失敗:', response);
       }
