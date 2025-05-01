@@ -79,12 +79,9 @@ export default function RecipeUploadStep2() {
     resolver: zodResolver(recipeStep2Schema),
     defaultValues: {
       recipeTitle: recipeName || '馬鈴薯燉肉',
-      recipeDescription:
-        '食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！',
-      ingredients: [
-        { name: '馬鈴薯', amount: '2', unit: '顆', isFlavoring: false },
-      ],
-      seasonings: [{ name: '初榨醬油', amount: '1', unit: '小匙' }],
+      recipeDescription: '',
+      ingredients: [{ name: '', amount: '', unit: '', isFlavoring: false }],
+      seasonings: [{ name: '', amount: '', unit: '' }],
       cookingTime: '120',
       servings: '4',
     },
@@ -256,7 +253,7 @@ export default function RecipeUploadStep2() {
             <h2 className="text-lg font-medium">
               {recipeName || '馬鈴薯燉肉'}
             </h2>
-            <button
+            {/* <button
               type="button"
               className="text-gray-500"
               aria-label="編輯食譜標題"
@@ -274,7 +271,7 @@ export default function RecipeUploadStep2() {
               >
                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
               </svg>
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -290,6 +287,7 @@ export default function RecipeUploadStep2() {
           <textarea
             id="recipeDescription"
             rows={10}
+            placeholder="食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！"
             className={cn(
               'w-full p-3 border rounded-md bg-gray-50',
               errors.recipeDescription ? 'border-red-500' : 'border-gray-300',
