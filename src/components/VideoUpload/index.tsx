@@ -1034,6 +1034,69 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             </Button>
           </div>
 
+          {/* 紅綠燈警示 */}
+          <div className="mt-3 mb-1">
+            {(() => {
+              const segmentDuration =
+                currentSegment.endTime - currentSegment.startTime;
+              let statusColor = '';
+              let statusText = '';
+
+              if (segmentDuration < 5 || segmentDuration > 30) {
+                statusColor = 'bg-red-500';
+                statusText =
+                  segmentDuration < 5
+                    ? '時間太短 (建議至少5秒)'
+                    : '時間太長 (建議不超過30秒)';
+              } else if (
+                (segmentDuration >= 5 && segmentDuration < 10) ||
+                (segmentDuration > 25 && segmentDuration <= 30)
+              ) {
+                statusColor = 'bg-yellow-500';
+                statusText =
+                  segmentDuration < 10
+                    ? '時間略短 (適中為10-25秒)'
+                    : '時間略長 (適中為10-25秒)';
+              } else {
+                statusColor = 'bg-green-500';
+                statusText = '時間長度適中';
+              }
+
+              return (
+                <div className="flex items-center">
+                  <div className={`w-4 h-4 rounded-full ${statusColor} mr-2`} />
+                  <div className="text-sm text-gray-700">
+                    <span>步驟時長: {segmentDuration.toFixed(2)} 秒</span>
+                    <span className="ml-2 text-xs text-gray-500">
+                      {statusText}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* 重置按鈕 */}
+          <Button
+            onClick={atResetCurrentSegment}
+            variant="outline"
+            className="w-full flex items-center justify-center"
+          >
+            <span className="mr-2">↻</span>
+            該步驟重置
+          </Button>
+
+          {/* 刪除步驟按鈕 */}
+          <Button
+            onClick={atDeleteCurrentSegment}
+            variant="outline"
+            disabled={segments.length <= 1}
+            className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center mt-2"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            刪除此步驟
+          </Button>
+
           {/* 說明文字 */}
           <div className="mt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
@@ -1062,27 +1125,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
               </div>
             )}
           </div>
-
-          {/* 重置按鈕 */}
-          <Button
-            onClick={atResetCurrentSegment}
-            variant="outline"
-            className="w-full flex items-center justify-center"
-          >
-            <span className="mr-2">↻</span>
-            該步驟重置
-          </Button>
-
-          {/* 刪除步驟按鈕 */}
-          <Button
-            onClick={atDeleteCurrentSegment}
-            variant="outline"
-            disabled={segments.length <= 1}
-            className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center mt-2"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            刪除此步驟
-          </Button>
 
           {/* API 錯誤訊息 */}
           {apiError && (
