@@ -162,8 +162,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             endTime: 0, // 稍後由 atVideoLoaded 更新實際時長
             startPercent: 0,
             endPercent: 100,
-            description:
-              '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
+            description: '',
           };
           setSegments([initialSegment]);
           setCurrentSegmentIndex(0);
@@ -321,8 +320,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
                 endTime: videoDuration,
                 startPercent: 0,
                 endPercent: 100,
-                description:
-                  '食譜簡介料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！',
+                description: '',
               },
             ];
 
