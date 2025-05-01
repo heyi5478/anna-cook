@@ -404,7 +404,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
  * 食譜影片編輯器元件，用於切割食譜影片並添加步驟說明
  */
 const VideoEditor: React.FC<VideoEditorProps> = ({
-  videoId = '1062288466',
+  videoId = '',
   totalDuration = 0,
   recipeId,
 }) => {

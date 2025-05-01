@@ -9,6 +9,14 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Badge } from '@/components/ui/badge';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
@@ -64,6 +72,7 @@ export default function RecipeDraft() {
   const [recipeImage, setRecipeImage] = useState<string | null>(null);
   const [recipeSteps, setRecipeSteps] = useState<Step[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [userDisplayId, setUserDisplayId] = useState('');
 
   // 初始化表單
   const {
@@ -221,6 +230,21 @@ export default function RecipeDraft() {
     loadRecipeDraft();
   }, [recipeId, setValue]);
 
+  // 從 localStorage 獲取用戶 displayId
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const userDataStr = localStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          setUserDisplayId(userData.displayId || '');
+        }
+      } catch (err) {
+        console.error('解析 localStorage 中的 userData 失敗:', err);
+      }
+    }
+  }, []);
+
   /**
    * 將秒數格式化為 MM:SS 格式
    */
@@ -363,53 +387,27 @@ export default function RecipeDraft() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* 頂部導航 */}
-      <header className="flex items-center justify-between p-4 bg-white border-b">
-        <div className="flex items-center space-x-4">
-          <span className="font-bold">Logo</span>
-          <span className="text-gray-500">關鍵字搜尋</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button className="p-2 rounded-full" aria-label="搜尋">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-          <button className="p-2 rounded-full" aria-label="個人資料">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
-
       {/* 麵包屑導航 */}
-      <div className="flex items-center p-4 text-sm text-gray-500 bg-white">
-        <span>首頁</span>
-        <span className="mx-2">{'>'}</span>
-        <span>建立食譜</span>
-        <span className="mx-2">{'>'}</span>
-        <span>基礎設定</span>
+      <div className="bg-white p-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href={userDisplayId ? `/user/${userDisplayId}` : '/'}
+              >
+                會員中心
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>草稿確認</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       {/* 主要內容 */}
