@@ -17,7 +17,7 @@ import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/ui/VimeoPlayer';
-import { fetchRecipeDraft } from '@/services/api';
+import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { RecipeDraftStep } from '@/types/api';
 import { useRouter } from 'next/router';
 import {
@@ -29,6 +29,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * 步驟資料型別
@@ -424,6 +425,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   const [error, setError] = useState<string>('');
   const [actualVideoId, setActualVideoId] = useState<string | number>(videoId);
   const userDisplayId = useUserDisplayId();
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [recipeData, setRecipeData] = useState<any>(null);
 
   const { currentTime, videoDuration, updateDuration, updateCurrentTime } =
     useVideoTime(totalDuration);
@@ -475,6 +478,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         if (response.StatusCode !== 200) {
           throw new Error(response.msg || '獲取食譜草稿失敗');
         }
+
+        // 保存完整的食譜資料
+        setRecipeData(response);
 
         // 設置影片 ID
         if (response.recipe.videoId) {
@@ -612,6 +618,107 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     ],
   );
 
+  /**
+   * 提交步驟編輯結果
+   */
+  const atSubmitSteps = async () => {
+    try {
+      const recipeIdValue = Number(urlRecipeId) || recipeId;
+
+      if (!recipeIdValue) {
+        toast({
+          title: '錯誤',
+          description: '找不到食譜 ID，無法提交',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!recipeData) {
+        toast({
+          title: '錯誤',
+          description: '食譜資料不完整，無法提交',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setSubmitting(true);
+
+      // 然後準備提交草稿的資料
+      const { recipe, ingredients, tags } = recipeData;
+
+      // 定義食材和標籤的類型
+      type Ingredient = {
+        ingredientName: string;
+        ingredientAmount: number;
+        ingredientUnit: string;
+        isFlavoring: boolean;
+      };
+
+      type Tag = {
+        tagName: string;
+      };
+
+      // 構建提交資料
+      const submitData = {
+        recipeName: recipe.recipeName,
+        recipeIntro: recipe.description || '',
+        cookingTime: recipe.cookingTime || 0,
+        portion: recipe.portion || 0,
+        ingredients: [
+          // 食材列表 (非調味料)
+          ...ingredients
+            .filter((item: Ingredient) => !item.isFlavoring)
+            .map((item: Ingredient) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              isFlavoring: false,
+            })),
+          // 調味料列表
+          ...ingredients
+            .filter((item: Ingredient) => item.isFlavoring)
+            .map((item: Ingredient) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              isFlavoring: true,
+            })),
+        ],
+        tags: tags.map((tag: Tag) => tag.tagName),
+        steps: steps.map((step) => ({
+          description: step.description,
+          startTime: formatSec(step.startTime),
+          endTime: formatSec(step.endTime),
+        })),
+      };
+
+      // 提交草稿
+      const response = await submitRecipeDraft(recipeIdValue, submitData);
+
+      if (response.StatusCode === 200) {
+        toast({
+          title: '成功',
+          description: '草稿已提交成功',
+        });
+
+        // 導轉到食譜草稿頁面，帶上 recipeId 參數
+        router.push(`/recipe-draft?recipeId=${recipeIdValue}`);
+      } else {
+        throw new Error(response.msg || '提交草稿失敗');
+      }
+    } catch (err) {
+      console.error('提交步驟編輯結果失敗:', err);
+      toast({
+        title: '錯誤',
+        description:
+          err instanceof Error ? err.message : '提交草稿時發生未知錯誤',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">載入中...</div>
@@ -741,9 +848,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         <Button
           variant="default"
           className="w-full bg-gray-500 text-white rounded-md py-2 flex items-center justify-center"
+          onClick={atSubmitSteps}
+          disabled={submitting}
         >
           <Check className="h-4 w-4 mr-2" />
-          完成草稿
+          {submitting ? '提交中...' : '完成草稿'}
         </Button>
       </div>
     </div>
