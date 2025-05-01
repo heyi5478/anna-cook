@@ -386,9 +386,9 @@ export default function RecipeDraft() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* 麵包屑導航 */}
-      <div className="bg-white p-4">
+      <div className="p-4">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -462,7 +462,7 @@ export default function RecipeDraft() {
               render={({ field }) => (
                 <Textarea
                   {...field}
-                  className="w-full min-h-[100px]"
+                  className="bg-[#FAFAFA] w-full min-h-[64px]"
                   placeholder="請輸入食譜簡介"
                   aria-label="食譜簡介"
                 />
@@ -487,7 +487,7 @@ export default function RecipeDraft() {
                     render={({ field }) => (
                       <Input
                         {...field}
-                        className="flex-1 mr-2"
+                        className="bg-[#FAFAFA] flex-1 mr-2"
                         placeholder="食材名稱"
                         aria-label={`食材名稱 ${index + 1}`}
                       />
@@ -499,7 +499,7 @@ export default function RecipeDraft() {
                     render={({ field: amountField }) => (
                       <Input
                         {...amountField}
-                        className="w-16 mr-2"
+                        className="bg-[#FAFAFA] w-16 mr-2"
                         placeholder="數量"
                         aria-label={`食材數量 ${index + 1}`}
                       />
@@ -523,7 +523,7 @@ export default function RecipeDraft() {
               onClick={() => appendIngredient({ name: '', amount: '' })}
               className="mt-2"
             >
-              <Plus className="w-4 h-4 mr-1" /> 新增食材
+              <Plus className=" w-4 h-4 mr-1" /> 新增食材
             </Button>
           </div>
 
@@ -541,7 +541,7 @@ export default function RecipeDraft() {
                     render={({ field }) => (
                       <Input
                         {...field}
-                        className="flex-1 mr-2"
+                        className="bg-[#FAFAFA] flex-1 mr-2"
                         placeholder="調味料名稱"
                         aria-label={`調味料名稱 ${index + 1}`}
                         aria-labelledby="seasonings-heading"
@@ -554,7 +554,7 @@ export default function RecipeDraft() {
                     render={({ field: amountField }) => (
                       <Input
                         {...amountField}
-                        className="w-16 mr-2"
+                        className="bg-[#FAFAFA] w-16 mr-2"
                         placeholder="數量"
                         aria-label={`調味料數量 ${index + 1}`}
                         aria-labelledby="seasonings-heading"
@@ -607,7 +607,7 @@ export default function RecipeDraft() {
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
-                className="flex-1 mr-2"
+                className="bg-[#FAFAFA] flex-1 mr-2"
                 placeholder="輸入標籤"
                 aria-labelledby="tags-heading"
               />
@@ -635,7 +635,7 @@ export default function RecipeDraft() {
                     <Input
                       {...field}
                       type="text"
-                      className="w-20 mr-2"
+                      className="bg-[#FAFAFA] w-20 mr-2"
                       placeholder="時間"
                       aria-label="烹飪時間"
                     />
@@ -659,7 +659,7 @@ export default function RecipeDraft() {
                     <Input
                       {...field}
                       type="text"
-                      className="w-20 mr-2"
+                      className="bg-[#FAFAFA] w-20 mr-2"
                       placeholder="份量"
                       aria-label="份量"
                     />
