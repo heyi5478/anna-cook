@@ -856,51 +856,40 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           </div>
 
           {/* 時間顯示 */}
-          <div className="flex justify-between text-sm text-gray-700">
-            <span>當前: {formatTime(currentTime)} 秒</span>
-            <span>總長: {formatTime(duration)} 秒</span>
+          <div className="flex justify-between px-4 py-2 text-sm">
+            <div>當前: {formatTime(currentTime)} 秒</div>
+            <div>總長: {formatTime(duration)} 秒</div>
           </div>
 
           {/* 片段導航 */}
-          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
-            <Button
-              variant="ghost"
-              size="icon"
+          <div className="flex items-center justify-between px-4 py-2">
+            <button
               onClick={atGoPreviousSegment}
-              className="h-8 w-8 text-gray-700"
+              className="p-2 text-gray-600"
+              disabled={currentSegmentIndex === 0}
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium text-gray-700">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="text-sm">
               步驟 {currentSegmentIndex + 1}/{segments.length}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={atGoNextSegment}
-              className="h-8 w-8 text-gray-700"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={atAddSegment}
-                className="h-8 w-8 text-gray-700"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={atDeleteCurrentSegment}
-                disabled={segments.length <= 1}
-                className="h-8 w-8 text-gray-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
             </div>
+            <button
+              onClick={atGoNextSegment}
+              className="p-2 text-gray-600"
+              disabled={currentSegmentIndex === segments.length - 1}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <button onClick={atTogglePlayPause} className="p-2 text-gray-600">
+              {isPlaying ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )}
+            </button>
+            <button onClick={atAddSegment} className="p-2 text-gray-600">
+              <Plus className="h-5 w-5" />
+            </button>
           </div>
 
           {/* 雙滑桿剪輯 (YouTube 風格) */}
@@ -1081,7 +1070,18 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             className="w-full flex items-center justify-center"
           >
             <span className="mr-2">↻</span>
-            重置
+            該步驟重置
+          </Button>
+
+          {/* 刪除步驟按鈕 */}
+          <Button
+            onClick={atDeleteCurrentSegment}
+            variant="outline"
+            disabled={segments.length <= 1}
+            className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center mt-2"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            刪除此步驟
           </Button>
 
           {/* API 錯誤訊息 */}

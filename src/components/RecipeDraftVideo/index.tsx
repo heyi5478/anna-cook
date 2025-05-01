@@ -714,7 +714,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
           className="w-full bg-gray-500 text-white rounded-md py-2 flex items-center justify-center"
         >
           <Check className="h-4 w-4 mr-2" />
-          全部完成
+          完成草稿
         </Button>
       </div>
     </div>
