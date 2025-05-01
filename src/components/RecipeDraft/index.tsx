@@ -17,6 +17,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
@@ -72,7 +73,7 @@ export default function RecipeDraft() {
   const [recipeImage, setRecipeImage] = useState<string | null>(null);
   const [recipeSteps, setRecipeSteps] = useState<Step[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [userDisplayId, setUserDisplayId] = useState('');
+  const userDisplayId = useUserDisplayId();
 
   // 初始化表單
   const {
@@ -230,21 +231,6 @@ export default function RecipeDraft() {
     loadRecipeDraft();
   }, [recipeId, setValue]);
 
-  // 從 localStorage 獲取用戶 displayId
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const userDataStr = localStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          setUserDisplayId(userData.displayId || '');
-        }
-      } catch (err) {
-        console.error('解析 localStorage 中的 userData 失敗:', err);
-      }
-    }
-  }, []);
-
   /**
    * 將秒數格式化為 MM:SS 格式
    */
@@ -333,23 +319,9 @@ export default function RecipeDraft() {
       if (response.StatusCode === 200) {
         console.log('草稿提交成功:', response);
 
-        // 從 localStorage 中獲取 userData 的 displayId
-        let displayId = '';
-        if (typeof window !== 'undefined') {
-          try {
-            const userDataStr = localStorage.getItem('userData');
-            if (userDataStr) {
-              const userData = JSON.parse(userDataStr);
-              displayId = userData.displayId || '';
-            }
-          } catch (err) {
-            console.error('解析 localStorage 中的 userData 失敗:', err);
-          }
-        }
-
         // 使用 displayId 導轉到用戶頁面，若無 displayId 則導轉到首頁
-        if (displayId) {
-          router.push(`/user/${displayId}`);
+        if (userDisplayId) {
+          router.push(`/user/${userDisplayId}`);
         } else {
           console.warn('未找到用戶 displayId，導轉到首頁');
           router.push('/');

@@ -20,6 +20,15 @@ import {
 import { fetchRecipeDraft } from '@/services/api';
 import { RecipeDraftStep } from '@/types/api';
 import { useRouter } from 'next/router';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 
 /**
  * 步驟資料型別
@@ -414,6 +423,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [actualVideoId, setActualVideoId] = useState<string | number>(videoId);
+  const userDisplayId = useUserDisplayId();
 
   const { currentTime, videoDuration, updateDuration, updateCurrentTime } =
     useVideoTime(totalDuration);
@@ -608,14 +618,28 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   }
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
+    <div className="flex flex-col w-full max-w-md mx-auto bg-white">
       {/* 麵包屑導航 */}
-      <div className="flex items-center p-2 text-sm text-gray-600">
-        <span>首頁</span>
-        <ChevronRight className="h-4 w-4 mx-1" />
-        <span>建立食譜</span>
-        <ChevronRight className="h-4 w-4 mx-1" />
-        <span>切割食譜影片</span>
+      <div className="p-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href={userDisplayId ? `/user/${userDisplayId}` : '/'}
+              >
+                會員中心
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>影片步驟確認</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
       {/* 影片預覽 */}
       <div className="bg-gray-100 aspect-video flex items-center justify-center my-2">
