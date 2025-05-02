@@ -17,9 +17,19 @@ import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/ui/VimeoPlayer';
-import { fetchRecipeDraft } from '@/services/api';
+import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { RecipeDraftStep } from '@/types/api';
 import { useRouter } from 'next/router';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { useUserDisplayId } from '@/hooks/useUserDisplayId';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * 步驟資料型別
@@ -404,7 +414,7 @@ function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
  * 食譜影片編輯器元件，用於切割食譜影片並添加步驟說明
  */
 const VideoEditor: React.FC<VideoEditorProps> = ({
-  videoId = '1062288466',
+  videoId = '',
   totalDuration = 0,
   recipeId,
 }) => {
@@ -414,6 +424,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [actualVideoId, setActualVideoId] = useState<string | number>(videoId);
+  const userDisplayId = useUserDisplayId();
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [recipeData, setRecipeData] = useState<any>(null);
 
   const { currentTime, videoDuration, updateDuration, updateCurrentTime } =
     useVideoTime(totalDuration);
@@ -465,6 +478,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         if (response.StatusCode !== 200) {
           throw new Error(response.msg || '獲取食譜草稿失敗');
         }
+
+        // 保存完整的食譜資料
+        setRecipeData(response);
 
         // 設置影片 ID
         if (response.recipe.videoId) {
@@ -563,8 +579,13 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       } else {
         goToNextStep();
       }
+
+      // 添加計時器，確保在步驟切換後重置 isStepChanging 狀態
+      setTimeout(() => {
+        completeStepChange();
+      }, 500);
     },
-    [isPlaying, goToPrevStep, goToNextStep],
+    [isPlaying, goToPrevStep, goToNextStep, completeStepChange],
   );
 
   /**
@@ -597,6 +618,107 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     ],
   );
 
+  /**
+   * 提交步驟編輯結果
+   */
+  const atSubmitSteps = async () => {
+    try {
+      const recipeIdValue = Number(urlRecipeId) || recipeId;
+
+      if (!recipeIdValue) {
+        toast({
+          title: '錯誤',
+          description: '找不到食譜 ID，無法提交',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!recipeData) {
+        toast({
+          title: '錯誤',
+          description: '食譜資料不完整，無法提交',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setSubmitting(true);
+
+      // 然後準備提交草稿的資料
+      const { recipe, ingredients, tags } = recipeData;
+
+      // 定義食材和標籤的類型
+      type Ingredient = {
+        ingredientName: string;
+        ingredientAmount: number;
+        ingredientUnit: string;
+        isFlavoring: boolean;
+      };
+
+      type Tag = {
+        tagName: string;
+      };
+
+      // 構建提交資料
+      const submitData = {
+        recipeName: recipe.recipeName,
+        recipeIntro: recipe.description || '',
+        cookingTime: recipe.cookingTime || 0,
+        portion: recipe.portion || 0,
+        ingredients: [
+          // 食材列表 (非調味料)
+          ...ingredients
+            .filter((item: Ingredient) => !item.isFlavoring)
+            .map((item: Ingredient) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              isFlavoring: false,
+            })),
+          // 調味料列表
+          ...ingredients
+            .filter((item: Ingredient) => item.isFlavoring)
+            .map((item: Ingredient) => ({
+              name: item.ingredientName,
+              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+              isFlavoring: true,
+            })),
+        ],
+        tags: tags.map((tag: Tag) => tag.tagName),
+        steps: steps.map((step) => ({
+          description: step.description,
+          startTime: formatSec(step.startTime),
+          endTime: formatSec(step.endTime),
+        })),
+      };
+
+      // 提交草稿
+      const response = await submitRecipeDraft(recipeIdValue, submitData);
+
+      if (response.StatusCode === 200) {
+        toast({
+          title: '成功',
+          description: '草稿已提交成功',
+        });
+
+        // 導轉到食譜草稿頁面，帶上 recipeId 參數
+        router.push(`/recipe-draft?recipeId=${recipeIdValue}`);
+      } else {
+        throw new Error(response.msg || '提交草稿失敗');
+      }
+    } catch (err) {
+      console.error('提交步驟編輯結果失敗:', err);
+      toast({
+        title: '錯誤',
+        description:
+          err instanceof Error ? err.message : '提交草稿時發生未知錯誤',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">載入中...</div>
@@ -608,14 +730,28 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   }
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto bg-gray-50">
+    <div className="flex flex-col w-full max-w-md mx-auto bg-white">
       {/* 麵包屑導航 */}
-      <div className="flex items-center p-2 text-sm text-gray-600">
-        <span>首頁</span>
-        <ChevronRight className="h-4 w-4 mx-1" />
-        <span>建立食譜</span>
-        <ChevronRight className="h-4 w-4 mx-1" />
-        <span>切割食譜影片</span>
+      <div className="p-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href={userDisplayId ? `/user/${userDisplayId}` : '/'}
+              >
+                會員中心
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>影片步驟確認</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
       {/* 影片預覽 */}
       <div className="bg-gray-100 aspect-video flex items-center justify-center my-2">
@@ -712,9 +848,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         <Button
           variant="default"
           className="w-full bg-gray-500 text-white rounded-md py-2 flex items-center justify-center"
+          onClick={atSubmitSteps}
+          disabled={submitting}
         >
           <Check className="h-4 w-4 mr-2" />
-          完成草稿
+          {submitting ? '提交中...' : '完成草稿'}
         </Button>
       </div>
     </div>
