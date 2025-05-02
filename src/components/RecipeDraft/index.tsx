@@ -9,6 +9,15 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Badge } from '@/components/ui/badge';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
@@ -64,6 +73,7 @@ export default function RecipeDraft() {
   const [recipeImage, setRecipeImage] = useState<string | null>(null);
   const [recipeSteps, setRecipeSteps] = useState<Step[]>([]);
   const [newTag, setNewTag] = useState('');
+  const userDisplayId = useUserDisplayId();
 
   // 初始化表單
   const {
@@ -309,8 +319,13 @@ export default function RecipeDraft() {
       if (response.StatusCode === 200) {
         console.log('草稿提交成功:', response);
 
-        // 跳轉到用戶中心頁面
-        router.push('/user-center');
+        // 使用 displayId 導轉到用戶頁面，若無 displayId 則導轉到首頁
+        if (userDisplayId) {
+          router.push(`/user/${userDisplayId}`);
+        } else {
+          console.warn('未找到用戶 displayId，導轉到首頁');
+          router.push('/');
+        }
       } else {
         console.error('草稿提交失敗:', response);
       }
@@ -343,54 +358,28 @@ export default function RecipeDraft() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* 頂部導航 */}
-      <header className="flex items-center justify-between p-4 bg-white border-b">
-        <div className="flex items-center space-x-4">
-          <span className="font-bold">Logo</span>
-          <span className="text-gray-500">關鍵字搜尋</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button className="p-2 rounded-full" aria-label="搜尋">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-          <button className="p-2 rounded-full" aria-label="個人資料">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
-
+    <div className="flex flex-col min-h-screen bg-white">
       {/* 麵包屑導航 */}
-      <div className="flex items-center p-4 text-sm text-gray-500 bg-white">
-        <span>首頁</span>
-        <span className="mx-2">{'>'}</span>
-        <span>建立食譜</span>
-        <span className="mx-2">{'>'}</span>
-        <span>基礎設定</span>
+      <div className="p-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href={userDisplayId ? `/user/${userDisplayId}` : '/'}
+              >
+                會員中心
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>草稿確認</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       {/* 主要內容 */}
@@ -445,7 +434,7 @@ export default function RecipeDraft() {
               render={({ field }) => (
                 <Textarea
                   {...field}
-                  className="w-full min-h-[100px]"
+                  className="bg-[#FAFAFA] w-full min-h-[64px]"
                   placeholder="請輸入食譜簡介"
                   aria-label="食譜簡介"
                 />
@@ -470,7 +459,7 @@ export default function RecipeDraft() {
                     render={({ field }) => (
                       <Input
                         {...field}
-                        className="flex-1 mr-2"
+                        className="bg-[#FAFAFA] flex-1 mr-2"
                         placeholder="食材名稱"
                         aria-label={`食材名稱 ${index + 1}`}
                       />
@@ -482,7 +471,7 @@ export default function RecipeDraft() {
                     render={({ field: amountField }) => (
                       <Input
                         {...amountField}
-                        className="w-16 mr-2"
+                        className="bg-[#FAFAFA] w-16 mr-2"
                         placeholder="數量"
                         aria-label={`食材數量 ${index + 1}`}
                       />
@@ -506,7 +495,7 @@ export default function RecipeDraft() {
               onClick={() => appendIngredient({ name: '', amount: '' })}
               className="mt-2"
             >
-              <Plus className="w-4 h-4 mr-1" /> 新增食材
+              <Plus className=" w-4 h-4 mr-1" /> 新增食材
             </Button>
           </div>
 
@@ -524,7 +513,7 @@ export default function RecipeDraft() {
                     render={({ field }) => (
                       <Input
                         {...field}
-                        className="flex-1 mr-2"
+                        className="bg-[#FAFAFA] flex-1 mr-2"
                         placeholder="調味料名稱"
                         aria-label={`調味料名稱 ${index + 1}`}
                         aria-labelledby="seasonings-heading"
@@ -537,7 +526,7 @@ export default function RecipeDraft() {
                     render={({ field: amountField }) => (
                       <Input
                         {...amountField}
-                        className="w-16 mr-2"
+                        className="bg-[#FAFAFA] w-16 mr-2"
                         placeholder="數量"
                         aria-label={`調味料數量 ${index + 1}`}
                         aria-labelledby="seasonings-heading"
@@ -590,7 +579,7 @@ export default function RecipeDraft() {
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
-                className="flex-1 mr-2"
+                className="bg-[#FAFAFA] flex-1 mr-2"
                 placeholder="輸入標籤"
                 aria-labelledby="tags-heading"
               />
@@ -618,7 +607,7 @@ export default function RecipeDraft() {
                     <Input
                       {...field}
                       type="text"
-                      className="w-20 mr-2"
+                      className="bg-[#FAFAFA] w-20 mr-2"
                       placeholder="時間"
                       aria-label="烹飪時間"
                     />
@@ -642,7 +631,7 @@ export default function RecipeDraft() {
                     <Input
                       {...field}
                       type="text"
-                      className="w-20 mr-2"
+                      className="bg-[#FAFAFA] w-20 mr-2"
                       placeholder="份量"
                       aria-label="份量"
                     />

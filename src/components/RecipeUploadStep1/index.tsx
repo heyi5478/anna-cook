@@ -126,6 +126,9 @@ export default function RecipeUploadForm() {
         return;
       }
 
+      // 儲存食譜名稱到 localStorage
+      localStorage.setItem('recipeName', data.recipeName);
+
       // 準備上傳資料
       const uploadData: RecipeFormData = {
         recipeName: data.recipeName,
