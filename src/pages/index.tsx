@@ -296,7 +296,7 @@ export default function HomePage({
       title: '小麻坊罐裝辛香料',
       link: '#',
     }
-  ]
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -311,25 +311,25 @@ export default function HomePage({
       <main className="flex-1 p-4">
         {/* 廣告輪播區塊 - 使用 adIndexImages 假資料渲染 */}
         <Carousel
-            title=""
-            items={adIndexImages}
-            renderItem={(ad) => (
-              <Link href={ad.link} key={ad.id}>
-                <div className="w-full relative cursor-pointer">
-                  <Image
-                    src={ad.image}
-                    alt={ad.title}
-                    fill
-                    className="object-cover rounded-md"
-                    priority
-                  />
-                </div>
-              </Link>
-            )}
-            showControls={false}
-            showDots={true}
-            className="mb-4"
-          />
+          title=""
+          items={adIndexImages}
+          renderItem={(ad) => (
+            <Link href={ad.link} key={ad.id}>
+              <div className="w-full relative cursor-pointer">
+                <Image
+                  src={ad.image}
+                  alt={ad.title}
+                  fill
+                  className="object-cover rounded-md"
+                  priority
+                />
+              </div>
+            </Link>
+          )}
+          showControls={false}
+          showDots={true} 
+          className="mb-4"
+        />
 
         {/* 特色區塊 - 使用 API 資料渲染 */}
         {featureSections.map((section) => (
