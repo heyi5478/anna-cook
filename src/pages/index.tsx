@@ -15,6 +15,7 @@ import {
   fetchHomeRecipes,
   HomeRecipesResponse,
 } from '@/services/server-api';
+import { title } from 'process';
 
 // 定義食譜類型
 type Recipe = {
@@ -282,6 +283,21 @@ export default function HomePage({
     }
   };
 
+  const adIndexImages = [
+    {
+      id: 1,
+      image: '/ad_home_01.png',
+      title: '高雄小農市集',
+      link: '#',
+    },
+    {
+      id: 2,
+      image: '/ad_home_02.png',
+      title: '小麻坊罐裝辛香料',
+      link: '#',
+    }
+  ]
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* <Header
@@ -293,9 +309,27 @@ export default function HomePage({
 
       {/* 頁面其他內容將在這裡 */}
       <main className="flex-1 p-4">
-        <div className="h-40 bg-gray-100 rounded-md flex items-center justify-center mb-4">
-          <div className="text-gray-400">圖片區域</div>
-        </div>
+        {/* 廣告輪播區塊 - 使用 adIndexImages 假資料渲染 */}
+        <Carousel
+            title=""
+            items={adIndexImages}
+            renderItem={(ad) => (
+              <Link href={ad.link} key={ad.id}>
+                <div className="w-full relative cursor-pointer">
+                  <Image
+                    src={ad.image}
+                    alt={ad.title}
+                    fill
+                    className="object-cover rounded-md"
+                    priority
+                  />
+                </div>
+              </Link>
+            )}
+            showControls={false}
+            showDots={true}
+            className="mb-4"
+          />
 
         {/* 特色區塊 - 使用 API 資料渲染 */}
         {featureSections.map((section) => (
