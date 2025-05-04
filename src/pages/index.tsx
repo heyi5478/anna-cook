@@ -15,8 +15,7 @@ import {
   fetchHomeRecipes,
   HomeRecipesResponse,
 } from '@/services/server-api';
-// import { title } from 'process';
-// title 雖有宣告但尚未被讀取使用，為避免錯誤先註解
+import { title } from 'process';
 import Link from 'next/link';
 import Image from 'next/image';
 
