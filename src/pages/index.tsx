@@ -50,6 +50,14 @@ interface HomePageProps {
   };
 }
 
+// 定義頂部橫幅輪播廣告類型
+interface AdImage {
+  id: number;
+  image: string;
+  title: string ;
+  link: string;
+}
+
 /**
  * 獲取首頁靜態資料 (SSG)
  */
