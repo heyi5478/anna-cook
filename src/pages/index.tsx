@@ -15,7 +15,8 @@ import {
   fetchHomeRecipes,
   HomeRecipesResponse,
 } from '@/services/server-api';
-import { title } from 'process';
+// import { title } from 'process';
+// title 雖有宣告但尚未被讀取使用，為避免錯誤先註解
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -338,7 +339,7 @@ export default function HomePage({
             </Link>
           )}
           showControls={false}
-          showDots
+          showDots={true}
           className="mb-4"
         />
 
