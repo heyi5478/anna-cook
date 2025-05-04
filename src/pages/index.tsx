@@ -16,6 +16,8 @@ import {
   HomeRecipesResponse,
 } from '@/services/server-api';
 import { title } from 'process';
+import Link from 'next/link';
+import Image from 'next/image';
 
 // 定義食譜類型
 type Recipe = {
@@ -295,7 +297,7 @@ export default function HomePage({
       image: '/ad_home_02.png',
       title: '小麻坊罐裝辛香料',
       link: '#',
-    }
+    },
   ];
 
   return (
@@ -327,7 +329,7 @@ export default function HomePage({
             </Link>
           )}
           showControls={false}
-          showDots={true} 
+          showDots
           className="mb-4"
         />
 
