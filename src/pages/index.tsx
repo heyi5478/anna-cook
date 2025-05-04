@@ -50,12 +50,13 @@ interface HomePageProps {
   };
 }
 
-// 定義頂部橫幅輪播廣告類型
+
+// 定義廣告圖片介面
 interface AdImage {
-  id: number;
-  image: string;
-  title: string ;
-  link: string;
+  id: number
+  image: string
+  title: string 
+  link: string
 }
 
 /**
@@ -293,7 +294,7 @@ export default function HomePage({
     }
   };
 
-  const adIndexImages = [
+  const adImages: AdImage[] = [
     {
       id: 1,
       image: '/ad_home_01.png',
@@ -322,7 +323,7 @@ export default function HomePage({
         {/* 廣告輪播區塊 - 使用 adIndexImages 假資料渲染 */}
         <Carousel
           title=""
-          items={adIndexImages}
+          items={adImages}
           renderItem={(ad) => (
             <Link href={ad.link} key={ad.id}>
               <div className="w-full relative cursor-pointer">
