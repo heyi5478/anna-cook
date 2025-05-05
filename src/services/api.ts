@@ -394,7 +394,7 @@ export const uploadRecipeVideo = async (
   videoFile: File,
 ): Promise<VideoUploadResponse> => {
   try {
-    console.log(`發送請求: PUT /api/recipes/${recipeId}/video`);
+    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/video`);
     console.log('上傳影片:', videoFile.name, videoFile.size, videoFile.type);
 
     // 創建 FormData 物件
@@ -402,10 +402,18 @@ export const uploadRecipeVideo = async (
     // 添加影片檔案 - 使用 'video' 作為欄位名稱（根據 API 文件要求）
     formData.append('video', videoFile);
 
-    // 發送請求到 Next.js API 路由
-    const res = await fetch(`/api/recipes/${recipeId}/video`, {
+    // 從 cookie 取得 token，因為 httpOnly 已被移除，可直接讀取
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('未取得授權 token，請先登入');
+    }
+
+    // 直接向後端 API 發送請求，不經過 Next.js API route
+    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/video`, {
       method: 'PUT',
-      credentials: 'include', // 包含 Cookie
+      headers: {
+        Authorization: `Bearer ${token}`, // 添加授權標頭
+      },
       body: formData,
     });
 
