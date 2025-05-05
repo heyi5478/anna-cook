@@ -328,9 +328,85 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       setCurrentSegmentIndex(0);
       setTrimValues([0, 100]);
 
-      // 生成縮圖
-      generateThumbnails();
+      // 針對移動裝置最佳化：只在非行動裝置上生成縮圖，或減少縮圖數量
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
+        generateThumbnails();
+      } else {
+        // 行動裝置上只生成少量縮圖或跳過
+        generateSimplifiedThumbnails();
+      }
     }
+  };
+
+  /**
+   * 新增：簡化版縮圖生成函數
+   */
+  const generateSimplifiedThumbnails = async () => {
+    if (!videoRef.current || !videoUrl) return;
+
+    const video = videoRef.current;
+    const videoDuration = video.duration;
+    // 行動裝置上只生成 3 張縮圖
+    const thumbnailCount = 3;
+
+    // 創建均勻分布的時間點
+    const timePoints = Array.from(
+      { length: thumbnailCount },
+      (_, i) => (videoDuration / thumbnailCount) * i,
+    );
+
+    // 儲存當前播放位置
+    const currentPos = video.currentTime;
+
+    // 使用遞迴處理而非迴圈，避免在迴圈中使用 await
+    const processTimePoints = async (
+      points: number[],
+      index = 0,
+      results: string[] = [],
+    ): Promise<string[]> => {
+      // 基本情況：已處理所有時間點
+      if (index >= points.length) {
+        return results;
+      }
+
+      // 設置影片時間
+      video.currentTime = points[index];
+
+      // 等待影片更新到指定時間
+      await new Promise<void>((resolve) => {
+        const seeked = () => {
+          video.removeEventListener('seeked', seeked);
+          resolve();
+        };
+        video.addEventListener('seeked', seeked);
+      });
+
+      // 為當前幀創建縮圖
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      let newResults = [...results];
+
+      if (ctx) {
+        canvas.width = 160; // 縮圖寬度
+        canvas.height = 90; // 縮圖高度
+
+        // 繪製縮圖
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.3); // 降低品質以節省資源
+        newResults = [...newResults, thumbnailUrl];
+      }
+
+      // 遞迴處理下一個時間點
+      return processTimePoints(points, index + 1, newResults);
+    };
+
+    // 開始處理時間點
+    const simplifiedThumbnails = await processTimePoints(timePoints);
+
+    // 更新縮圖狀態並恢復原始播放位置
+    setThumbnails(simplifiedThumbnails);
+    video.currentTime = currentPos;
   };
 
   /**
@@ -387,7 +463,16 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             videoRef.current.currentTime = currentSegment.startTime;
           }
         }
-        videoRef.current.play();
+
+        // 新增：使用使用者互動觸發播放
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error('播放失敗:', error);
+            // 提示使用者手動觸發播放
+            alert('請再次點擊播放按鈕開始播放');
+          });
+        }
       }
       setIsPlaying(!isPlaying);
     }
