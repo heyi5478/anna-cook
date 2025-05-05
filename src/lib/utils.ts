@@ -21,7 +21,7 @@ export function setClientCookie(
   if (typeof document === 'undefined') return '';
 
   const defaultOptions: SerializeOptions = {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: authConfig.tokenExpiryDays * 24 * 60 * 60, // 天數轉為秒數
@@ -29,13 +29,9 @@ export function setClientCookie(
     ...options,
   };
 
-  defaultOptions.httpOnly = true;
-
   const cookieString = serialize(name, value, defaultOptions);
   document.cookie = cookieString;
-  console.log(
-    '警告：HttpOnly cookie 無法透過客戶端 JavaScript 設置，請使用 API 路由',
-  );
+  console.log('已設置可讀取的 cookie (非 HttpOnly)，用於客戶端直接上傳');
 
   return cookieString;
 }
@@ -50,7 +46,7 @@ export function setServerCookie(
   name: string = authConfig.tokenCookieName,
 ): void {
   const defaultOptions: SerializeOptions = {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: authConfig.tokenExpiryDays * 24 * 60 * 60, // 天數轉為秒數
@@ -60,5 +56,5 @@ export function setServerCookie(
 
   const cookieString = serialize(name, value, defaultOptions);
   res.setHeader('Set-Cookie', cookieString);
-  console.log('已設定 cookie:', cookieString);
+  console.log('已設定非 HttpOnly cookie 允許 JavaScript 讀取:', cookieString);
 }
