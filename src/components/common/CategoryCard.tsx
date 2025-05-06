@@ -76,7 +76,7 @@ export function CategoryCard({
 }: CategoryCardProps) {
   // 使用傳入的 index 或 category 中的 index，如果都沒有則設為 null
   const displayIndex = index || category.index || null;
-  const rating = category.rating || 4.5;
+  const rating = category.rating || '';
 
   return (
     <Link
@@ -105,12 +105,16 @@ export function CategoryCard({
           {/* 評分區域 */}
           <div className="p-2 flex flex-col items-center text-center">
             <div className="flex items-center gap-1 text-gray-500 mb-2">
-              <Star className="h-4 w-4 text-gray-400 fill-gray-400" />
+              <Star className="h-[20px] w-[20px] text-amber-400" />
               <span className="text-sm">{rating}</span>
             </div>
 
-            <h3 className="font-medium text-base">{category.title}</h3>
-            <p className="text-xs text-gray-500 mt-1">{category.description}</p>
+            <h3 className="font-medium text-base truncate w-full">
+              {category.title}
+            </h3>
+            <p className="text-xs text-gray-500 mt-1 truncate w-full">
+              {category.description}
+            </p>
           </div>
         </div>
       </Card>

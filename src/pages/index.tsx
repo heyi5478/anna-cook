@@ -35,6 +35,7 @@ type Category = {
   title: string;
   image: string;
   description: string;
+  rating: number;
 };
 
 // 首頁 props 介面
@@ -199,6 +200,7 @@ export default function HomePage({
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
         : '/placeholder.svg?height=150&width=150',
       description: recipe.author,
+      rating: recipe.rating,
     };
   };
 
