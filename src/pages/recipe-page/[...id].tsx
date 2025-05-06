@@ -43,7 +43,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
           name="description"
           content={recipe.description || '美味食譜詳情'}
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/login-small-logo.svg" />
       </Head>
       <RecipePageComponent recipeData={recipeData.data} />
     </>
