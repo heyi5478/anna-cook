@@ -54,6 +54,28 @@ const categoryLinkVariants = cva(
   },
 );
 
+/**
+ * 根據索引號返回對應的背景顏色
+ */
+const getIndexColor = (index: number): string => {
+  switch (index) {
+    case 1:
+      return 'bg-[#C02A00]';
+    case 2:
+      return 'bg-[#FF4E0B]';
+    case 3:
+      return 'bg-[#FF855B]';
+    case 4:
+      return 'bg-[#FF9F7D]'; // 延續漸層顏色
+    case 5:
+      return 'bg-[#FFBBA0]'; // 延續漸層顏色
+    case 6:
+      return 'bg-[#FFD7C3]'; // 延續漸層顏色
+    default:
+      return 'bg-orange-500'; // 預設顏色
+  }
+};
+
 // 定義元件 props 類型
 export interface CategoryCardProps
   extends VariantProps<typeof categoryCardVariants> {
@@ -85,13 +107,15 @@ export function CategoryCard({
     >
       {/* 顯示編號圓圈 */}
       {displayIndex !== null && (
-        <div className="absolute left-0 top-0 z-10 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+        <div
+          className={`absolute left-0 top-0 z-10 w-8 h-8 ${getIndexColor(displayIndex)} rounded-full flex items-center justify-center text-white font-bold`}
+        >
           {displayIndex}
         </div>
       )}
 
       <Card className={cn(categoryCardVariants({ size, intent }), className)}>
-        <div className="relative">
+        <div className="relative bg-[#FAFAFA]">
           {/* 將圖片容器改為方形 */}
           <div className="relative aspect-square w-full">
             <Image
