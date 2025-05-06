@@ -64,7 +64,7 @@ export const AuthorProfile = ({
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/authors">查看用戶</BreadcrumbLink>
+              <BreadcrumbLink href="/user">查看用戶</BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

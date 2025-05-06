@@ -290,7 +290,7 @@ export default function ProfileEditForm() {
           首頁
         </Link>
         <span className="text-gray-500">&gt;</span>
-        <Link href="/member" className="hover:underline">
+        <Link href="/user" className="hover:underline">
           會員中心
         </Link>
         <span className="text-gray-500">&gt;</span>

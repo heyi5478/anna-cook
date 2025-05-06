@@ -221,10 +221,6 @@ export default function RecipeUploadForm() {
           首頁
         </Link>
         <span>&gt;</span>
-        <Link href="/recipes" className="hover:underline">
-          建立食譜
-        </Link>
-        <span>&gt;</span>
         <span className="text-gray-500">上傳食譜名稱</span>
       </nav>
 
