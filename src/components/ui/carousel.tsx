@@ -55,7 +55,7 @@ export function Carousel({
 }: {
   title: string;
   items: any[];
-  renderItem: (item: any) => React.ReactNode;
+  renderItem: (item: any, index: number) => React.ReactNode;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
@@ -90,7 +90,7 @@ export function Carousel({
       {/* 輪播區域 */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className={carouselTrackVariants()}>
-          {items.map((item) => renderItem(item))}
+          {items.map((item, index) => renderItem(item, index))}
         </div>
       </div>
 

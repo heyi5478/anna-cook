@@ -776,7 +776,7 @@ export default function UserCenter({
           首頁
         </Link>
         <span className="text-gray-400">{' > '}</span>
-        <span className="text-gray-800">食譜中心</span>
+        <span className="text-gray-800">會員中心</span>
       </div>
 
       <div className="flex flex-col items-center pb-4">

@@ -140,6 +140,10 @@ export const VimeoPlayer: React.FC<VimeoPlayerProps> = ({
           responsive,
           playsinline: true,
           dnt: true,
+          controls: false, // 隱藏控制界面和時間軸
+          title: false, // 隱藏標題
+          byline: false, // 隱藏作者信息
+          portrait: false, // 隱藏上傳者頭像
         };
 
         player = new Player(playerContainer.current, options);
