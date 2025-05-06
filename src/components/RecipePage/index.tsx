@@ -284,7 +284,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           首頁
         </Link>
         <span className="mx-1">&gt;</span>
-        <Link href="/category" className="hover:text-[#FF5722]">
+        <Link href="/recipe-list" className="hover:text-[#FF5722]">
           經典食譜
         </Link>
         <span className="mx-1">&gt;</span>
