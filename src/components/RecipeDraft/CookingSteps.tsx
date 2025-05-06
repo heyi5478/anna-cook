@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { ImageIcon, Trash, Play, Pause, Edit } from 'lucide-react';
+import { Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
@@ -94,7 +94,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <ImageIcon className="w-8 h-8 text-gray-400" />
+              <p className="text-gray-500 text-sm">影片上傳中 ... 請稍後</p>
             </div>
           )}
         </div>
