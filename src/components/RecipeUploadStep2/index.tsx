@@ -239,7 +239,7 @@ export default function RecipeUploadStep2() {
           首頁
         </Link>
         <span>&gt;</span>
-        <Link href="/recipes" className="hover:underline">
+        <Link href="/upload-step1" className="hover:underline">
           建立食譜
         </Link>
         <span>&gt;</span>
