@@ -45,20 +45,20 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
    */
   function renderInfo() {
     return (
-      <div className="flex flex-wrap items-center justify-end gap-4 text-gray-500">
+      <div className="flex flex-wrap items-center justify-end gap-4 text-gray-500 overflow-hidden">
         <div className="flex items-center gap-2">
-          <Users className="h-[20px] w-[20px] text-gray-400" />
-          <span className="text-[14px]">{recipe.servings} 人份</span>
+          <Users className="h-[20px] w-[20px] text-gray-400 flex-shrink-0" />
+          <span className="text-[14px] truncate">{recipe.servings} 人份</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Clock className="h-[20px] w-[20px] text-gray-400" />
-          <span className="text-[14px]">{recipe.time} 分鐘</span>
+          <Clock className="h-[20px] w-[20px] text-gray-400 flex-shrink-0" />
+          <span className="text-[14px] truncate">{recipe.time} 分鐘</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Star className="h-[20px] w-[20px] text-amber-400" />
-          <span className="text-[14px]">{recipe.rating}</span>
+        <div className="flex items-center gap-2 max-[400px]:hidden">
+          <Star className="h-[20px] w-[20px] text-amber-400 flex-shrink-0" />
+          <span className="text-[14px] truncate">{recipe.rating}</span>
         </div>
       </div>
     );
