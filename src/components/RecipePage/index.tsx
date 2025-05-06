@@ -459,27 +459,6 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               price={120}
               imageUrl="/Rectangle 70.png"
             />
-            <ProductCard
-              id="2"
-              name="金醬醬油"
-              description="經典釀造，香氣濃郁，適合各種料理使用"
-              price={120}
-              imageUrl="/Rectangle 70.png"
-            />
-            <ProductCard
-              id="3"
-              name="金醬醬油"
-              description="經典釀造，香氣濃郁，適合各種料理使用"
-              price={120}
-              imageUrl="/Rectangle 70.png"
-            />
-            <ProductCard
-              id="4"
-              name="金醬醬油"
-              description="經典釀造，香氣濃郁，適合各種料理使用"
-              price={120}
-              imageUrl="/Rectangle 70.png"
-            />
           </div>
         </div>
 
