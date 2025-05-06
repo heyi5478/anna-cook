@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { Star } from 'lucide-react';
 
 // 定義分類類型
 type Category = {
@@ -10,17 +11,19 @@ type Category = {
   title: string;
   image: string;
   description: string;
+  rating?: number;
+  index?: number;
 };
 
 // 定義卡片樣式變體
 const categoryCardVariants = cva(
-  'overflow-hidden h-full', // 基本樣式
+  'overflow-hidden h-full rounded-lg', // 基本樣式
   {
     variants: {
       size: {
-        sm: 'max-w-[150px]',
-        md: 'max-w-[200px]',
-        lg: 'max-w-[250px]',
+        sm: 'max-w-[130px]',
+        md: 'max-w-[180px]',
+        lg: 'max-w-[220px]',
       },
       intent: {
         default: '',
@@ -36,7 +39,7 @@ const categoryCardVariants = cva(
 
 // 定義連結容器樣式
 const categoryLinkVariants = cva(
-  'pl-4 min-w-[160px] transition-transform duration-300 hover:scale-105', // 新增的基本樣式
+  'pl-4 min-w-[150px] transition-transform duration-300 hover:scale-105 relative', // 新增的基本樣式
   {
     variants: {
       size: {
@@ -57,6 +60,7 @@ export interface CategoryCardProps
   category: Category;
   className?: string;
   linkClassName?: string;
+  index?: number;
 }
 
 /**
@@ -68,25 +72,47 @@ export function CategoryCard({
   intent,
   className,
   linkClassName,
+  index,
 }: CategoryCardProps) {
+  // 使用傳入的 index 或 category 中的 index，如果都沒有則設為 null
+  const displayIndex = index || category.index || null;
+  const rating = category.rating || 4.5;
+
   return (
     <Link
       href={`/recipe-page/${category.id}`}
       className={cn(categoryLinkVariants({ size }), linkClassName)}
     >
-      <Card className={cn(categoryCardVariants({ size, intent }), className)}>
-        <div className="relative h-24">
-          <Image
-            src={category.image || '/placeholder.svg'}
-            alt={category.title}
-            fill
-            className="object-cover"
-          />
+      {/* 顯示編號圓圈 */}
+      {displayIndex !== null && (
+        <div className="absolute left-0 top-1 z-10 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+          {displayIndex}
         </div>
-        <CardContent className="p-2">
-          <h3 className="font-medium">{category.title}</h3>
-          <p className="text-xs text-gray-500">{category.description}</p>
-        </CardContent>
+      )}
+
+      <Card className={cn(categoryCardVariants({ size, intent }), className)}>
+        <div className="relative">
+          {/* 將圖片容器改為方形 */}
+          <div className="relative aspect-square w-full">
+            <Image
+              src={category.image || '/placeholder.svg'}
+              alt={category.title}
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          {/* 評分區域 */}
+          <div className="p-2 flex flex-col items-center text-center">
+            <div className="flex items-center gap-1 text-gray-500 mb-2">
+              <Star className="h-4 w-4 text-gray-400 fill-gray-400" />
+              <span className="text-sm">{rating}</span>
+            </div>
+
+            <h3 className="font-medium text-base">{category.title}</h3>
+            <p className="text-xs text-gray-500 mt-1">{category.description}</p>
+          </div>
+        </div>
       </Card>
     </Link>
   );

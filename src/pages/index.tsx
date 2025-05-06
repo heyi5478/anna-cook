@@ -300,20 +300,17 @@ export default function HomePage({
         </div>
 
         {/* 特色區塊 - 使用 API 資料渲染 */}
-        {featureSections.map((section, index) => (
+        {featureSections.map((section) => (
           <section key={section.sectionPos} className="py-4">
             <Carousel
               title={section.sectionName}
               items={section.recipes.map(mapToCategoryCard)}
-              renderItem={(category) => (
+              renderItem={(category: Category, index: number) => (
                 <CategoryCard
                   key={category.id}
                   category={category}
-                  className={
-                    index === 0
-                      ? 'bg-white shadow-sm rounded-lg'
-                      : 'bg-white shadow-sm rounded-lg'
-                  }
+                  className="bg-white shadow-sm"
+                  index={index + 1}
                 />
               )}
             />
