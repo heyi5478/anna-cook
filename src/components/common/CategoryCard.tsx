@@ -85,7 +85,7 @@ export function CategoryCard({
     >
       {/* 顯示編號圓圈 */}
       {displayIndex !== null && (
-        <div className="absolute left-0 top-1 z-10 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+        <div className="absolute left-0 top-0 z-10 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
           {displayIndex}
         </div>
       )}
