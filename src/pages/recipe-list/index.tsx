@@ -248,17 +248,13 @@ export default function RecipeListPage({
      * 渲染廣告區塊
      */
     const renderAdBlock = () => (
-      <div className="my-4 h-20 bg-gray-100 flex items-center justify-between px-4 rounded-md">
-        <div>
-          <p className="text-gray-900 font-medium">廚房攪拌機</p>
-          <p className="text-gray-900 font-bold">$3,490</p>
-        </div>
+      <div className="my-4">
         <Image
-          src="/images/kitchen-mixer.jpg"
-          alt="廚房攪拌機"
-          width={80}
-          height={80}
-          className="object-contain"
+          src="/ad_list_01.png"
+          alt="推廣廣告"
+          width={1200}
+          height={200}
+          className="w-full rounded-md"
         />
       </div>
     );
