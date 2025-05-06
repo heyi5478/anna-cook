@@ -9,6 +9,7 @@ import { RecipeCard } from '@/components/ui/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
+import Image from 'next/image';
 import {
   fetchHomeFeatures,
   HomeFeatureResponse,
@@ -34,6 +35,7 @@ type Category = {
   title: string;
   image: string;
   description: string;
+  rating: number;
 };
 
 // 首頁 props 介面
@@ -198,6 +200,7 @@ export default function HomePage({
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
         : '/placeholder.svg?height=150&width=150',
       description: recipe.author,
+      rating: recipe.rating,
     };
   };
 
@@ -283,60 +286,68 @@ export default function HomePage({
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* <Header
-        variant="default"
-        size="lg"
-        atMenuClick={atMenuClick}
-        atSearchSubmit={atSearchSubmit}
-      /> */}
-
-      {/* 頁面其他內容將在這裡 */}
-      <main className="flex-1 p-4">
-        <div className="h-40 bg-gray-100 rounded-md flex items-center justify-center mb-4">
-          <div className="text-gray-400">圖片區域</div>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* 主要內容 */}
+      <main className="flex-1">
+        {/* 橫幅廣告區域 */}
+        <div className="relative w-full h-[240px] bg-orange-500">
+          <div className="absolute inset-0">
+            <Image
+              src="/ad_home_02.png"
+              alt="香麻辣到心坎裡"
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
         </div>
 
         {/* 特色區塊 - 使用 API 資料渲染 */}
         {featureSections.map((section) => (
-          <section key={section.sectionPos} className="py-3">
+          <section key={section.sectionPos} className="py-4">
             <Carousel
               title={section.sectionName}
               items={section.recipes.map(mapToCategoryCard)}
-              renderItem={(category) => (
-                <CategoryCard key={category.id} category={category} />
+              renderItem={(category: Category, index: number) => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  className="bg-white shadow-sm"
+                  index={index + 1}
+                />
               )}
             />
           </section>
         ))}
 
         {/* 標籤欄 */}
-        <Tabs
-          value={activeTab}
-          onValueChange={handleTabChange}
-          className="w-full border-b"
-        >
-          <TabsList className="w-full justify-start bg-transparent h-auto p-0">
-            <TabsTrigger
-              value="latest"
-              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
-            >
-              最新食譜
-            </TabsTrigger>
-            <TabsTrigger
-              value="popular"
-              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
-            >
-              人氣食譜
-            </TabsTrigger>
-            <TabsTrigger
-              value="convenience"
-              className="flex-1 py-2 data-[active=true]:border-b-2 data-[active=true]:border-orange-500 data-[active=true]:text-orange-500 rounded-none"
-            >
-              超商食譜
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="sticky top-0 z-10 bg-white shadow-sm">
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
+            <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
+              <TabsTrigger
+                value="latest"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+              >
+                最新食譜
+              </TabsTrigger>
+              <TabsTrigger
+                value="popular"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+              >
+                人氣食譜
+              </TabsTrigger>
+              <TabsTrigger
+                value="convenience"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+              >
+                經典食譜
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
         {/* 食譜列表載入中狀態 */}
         {isLoading && (
@@ -348,9 +359,13 @@ export default function HomePage({
 
         {/* 食譜列表 - 根據選中的標籤顯示不同的食譜 */}
         {!isLoading && (
-          <div className="py-2">
+          <div className="px-4">
             {getCurrentRecipes().map((recipe) => (
-              <RecipeCard key={`${recipe.id}-${activeTab}`} recipe={recipe} />
+              <RecipeCard
+                key={`${recipe.id}-${activeTab}`}
+                recipe={recipe}
+                className="shadow-sm mt-8"
+              />
             ))}
           </div>
         )}
@@ -370,9 +385,6 @@ export default function HomePage({
           </div>
         )}
       </main>
-
-      {/* Footer 由 Layout 元件處理，移除此處引用 */}
-      {/* <Footer companyName="版權所有" studioName="來自安那煮 Anna Cook" /> */}
 
       {/* 浮動按鈕和選單 */}
       <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
