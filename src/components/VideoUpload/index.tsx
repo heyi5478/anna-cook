@@ -155,21 +155,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           const url = URL.createObjectURL(file);
           setVideoUrl(url);
 
-          // iOS 裝置處理：先嘗試預載入影片
-          const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-          if (isIOS) {
-            console.log('檢測到 iOS 裝置，進行特殊處理');
-            // 創建臨時影片元素預載入
-            const tempVideo = document.createElement('video');
-            tempVideo.src = url;
-            tempVideo.load();
-            // 嘗試播放並立即暫停，這有助於iOS初始化影片
-            tempVideo
-              .play()
-              .then(() => tempVideo.pause())
-              .catch((e) => console.log('iOS 預載入:', e));
-          }
-
           // 預先創建一個默認片段
           const initialSegment: Segment = {
             id: generateId(),
@@ -343,72 +328,14 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       setCurrentSegmentIndex(0);
       setTrimValues([0, 100]);
 
-      // 檢測裝置類型
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const isAndroid = /Android/i.test(navigator.userAgent);
-
-      console.log(`裝置檢測 - iOS: ${isIOS}, Android: ${isAndroid}`);
-
-      if (isIOS) {
-        // iOS 需要特殊處理：直接設置預設縮圖
-        console.log('iOS 裝置：使用簡化縮圖生成');
-        generateIOSThumbnails();
-      } else if (isAndroid) {
-        // Android 行動裝置：使用簡化縮圖生成
-        console.log('Android 裝置：使用簡化縮圖生成');
-        generateSimplifiedThumbnails();
-      } else {
-        // 桌面瀏覽器：使用完整縮圖生成
-        console.log('桌面裝置：使用完整縮圖生成');
+      // 針對移動裝置最佳化：只在非行動裝置上生成縮圖，或減少縮圖數量
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
         generateThumbnails();
-      }
-    }
-  };
-
-  /**
-   * iOS 專用：簡化版縮圖生成
-   */
-  const generateIOSThumbnails = () => {
-    if (!videoRef.current || !videoUrl) return;
-
-    console.log('使用 iOS 優化版縮圖生成');
-
-    // 對於 iOS，使用極簡方法，只生成一張縮圖
-
-    try {
-      // 創建一個簡單畫布
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      if (ctx) {
-        // 使用更小的尺寸以減少記憶體使用
-        canvas.width = 120;
-        canvas.height = 68;
-
-        // 嘗試繪製當前影片幀
-        ctx.fillStyle = '#f0f0f0'; // 淺灰色背景
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // 在中間繪製播放圖示
-        ctx.fillStyle = '#888888';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // 創建縮圖
-        const singleThumbnail = canvas.toDataURL('image/jpeg', 0.1);
-
-        // 複製同一縮圖以填充陣列
-        setThumbnails(Array(3).fill(singleThumbnail));
-
-        console.log('iOS 縮圖生成完成');
       } else {
-        console.error('無法獲取 canvas 上下文');
+        // 行動裝置上只生成少量縮圖或跳過
+        generateSimplifiedThumbnails();
       }
-    } catch (error) {
-      console.error('iOS 縮圖生成失敗:', error);
-      // 失敗時設置空縮圖
-      setThumbnails([]);
     }
   };
 
@@ -972,35 +899,17 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
           {/* 影片預覽 */}
           <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
             {videoUrl ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={videoUrl}
-                  className="w-full h-full object-contain"
-                  onLoadedMetadata={atVideoLoaded}
-                  onTimeUpdate={atTimeUpdate}
-                  onClick={atTogglePlayPause}
-                  playsInline // 對 iOS 很重要，允許行內播放
-                  controls={false} // 隱藏原生控制項
-                  crossOrigin="anonymous" // 解決可能的跨域問題
-                  preload="metadata" // 先載入元數據
-                >
-                  <track kind="captions" label="中文" default />
-                  您的瀏覽器不支援影片標籤
-                </video>
-
-                {/* iOS 專用預覽遮罩 */}
-                {/iPhone|iPad|iPod/i.test(navigator.userAgent) && (
-                  <div className="absolute inset-0 bg-gray-100/50 flex items-center justify-center z-10 pointer-events-none">
-                    <div className="text-center">
-                      <div className="w-20 h-20 rounded-full bg-gray-700/60 mx-auto flex items-center justify-center">
-                        <div className="w-0 h-0 border-y-8 border-y-transparent border-l-12 border-l-white ml-1" />
-                      </div>
-                      <p className="text-sm text-gray-800 mt-2">點擊播放</p>
-                    </div>
-                  </div>
-                )}
-              </>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="w-full h-full object-contain"
+                onLoadedMetadata={atVideoLoaded}
+                onTimeUpdate={atTimeUpdate}
+                onClick={atTogglePlayPause}
+              >
+                <track kind="captions" label="中文" default />
+                您的瀏覽器不支援影片標籤
+              </video>
             ) : (
               <div className="flex items-center justify-center h-full">
                 <ImageIcon
