@@ -299,7 +299,11 @@ export default function ProfileEditForm() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/user">會員中心</BreadcrumbLink>
+            <BreadcrumbLink
+              href={userDisplayId ? `/user/${userDisplayId}` : '/'}
+            >
+              會員中心
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
