@@ -3,11 +3,18 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
 import { updateRecipeStep2 } from '@/services/api';
 import { RecipeStep2Data } from '@/types/api';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -234,17 +241,27 @@ export default function RecipeUploadStep2() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       {/* 麵包屑導航 */}
-      <nav className="flex items-center gap-2 text-sm mb-8">
-        <Link href="/" className="hover:underline">
-          首頁
-        </Link>
-        <span>&gt;</span>
-        <Link href="/upload-step1" className="hover:underline">
-          建立食譜
-        </Link>
-        <span>&gt;</span>
-        <span className="text-gray-500">上傳食譜資訊</span>
-      </nav>
+      <Breadcrumb className="mb-8">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/" className="hover:underline">
+              首頁
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/upload-step1" className="hover:underline">
+              建立食譜
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="text-gray-500">
+              上傳食譜資訊
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* 步驟指示器 */}
       <StepIndicator currentStep={currentStep} />
