@@ -11,6 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/ui/adCard';
 import { FollowButton } from '@/components/common/FollowButton';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 // 引入 API 服務
 import {
@@ -279,17 +287,28 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
   return (
     <div className={pageContainerStyles}>
       {/* 麵包屑導航 */}
-      <div className={breadcrumbStyles}>
-        <Link href="/" className="hover:text-[#FF5722]">
-          首頁
-        </Link>
-        <span className="mx-1">&gt;</span>
-        <Link href="/recipe-list" className="hover:text-[#FF5722]">
-          經典食譜
-        </Link>
-        <span className="mx-1">&gt;</span>
-        <span className="text-gray-700">{recipe.recipeName}</span>
-      </div>
+      <Breadcrumb className={breadcrumbStyles}>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/" className="hover:text-[#FF5722]">
+              首頁
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href="/recipe-list"
+              className="hover:text-[#FF5722]"
+            >
+              搜尋食譜
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{recipe.recipeName}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       <main className="flex-1">
         {/* 食譜主圖 */}

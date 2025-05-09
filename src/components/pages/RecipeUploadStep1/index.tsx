@@ -5,11 +5,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { uploadRecipeBasic } from '@/services/api';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -216,13 +223,21 @@ export default function RecipeUploadForm() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       {/* 麵包屑導航 */}
-      <nav className="flex items-center gap-2 text-sm mb-8">
-        <Link href="/" className="hover:underline">
-          首頁
-        </Link>
-        <span>&gt;</span>
-        <span className="text-gray-500">上傳食譜名稱</span>
-      </nav>
+      <Breadcrumb className="mb-8">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/" className="hover:underline">
+              首頁
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="text-gray-500">
+              上傳食譜名稱
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* 步驟指示器 */}
       <StepIndicator currentStep={currentStep} />
