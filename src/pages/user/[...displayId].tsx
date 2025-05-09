@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import UserCenter from '@/components/UserCenter';
-import { AuthorProfile } from '@/components/AuthorProfile';
-import { mockAuthor } from '@/components/AuthorProfile/types';
+import { AuthorProfile } from '@/components/pages/AuthorProfile';
+import { mockAuthor } from '@/components/pages/AuthorProfile/types';
 import { fetchUserProfileServer, ServerUserProfileResponse } from '@/services';
 
 interface UserPageProps {
