@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import StepIndicator from '@/components/ui/StepIndicator';
+import StepIndicator from '@/components/common/StepIndicator';
 import { updateRecipeStep2 } from '@/services/api';
 import { RecipeStep2Data } from '@/types/api';
 
