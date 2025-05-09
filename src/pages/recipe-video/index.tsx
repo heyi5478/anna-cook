@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { VimeoPlayer } from '@/components/ui/VimeoPlayer';
+import { VimeoPlayer } from '@/components/common/VimeoPlayer';
 import {
   ArrowLeft,
   Play,
