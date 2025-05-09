@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import ProfileEditForm from '@/components/ProfileEditForm';
+import ProfileEditForm from '@/components/pages/ProfileEditForm';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
