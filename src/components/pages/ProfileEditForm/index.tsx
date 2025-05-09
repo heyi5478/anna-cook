@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Camera, ShieldCheck } from 'lucide-react';
@@ -25,6 +24,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
@@ -285,17 +292,21 @@ export default function ProfileEditForm() {
       </Dialog>
 
       {/* 麵包屑導航 */}
-      <nav className="px-4 py-3 text-sm flex items-center gap-2">
-        <Link href="/" className="hover:underline">
-          首頁
-        </Link>
-        <span className="text-gray-500">&gt;</span>
-        <Link href="/user" className="hover:underline">
-          會員中心
-        </Link>
-        <span className="text-gray-500">&gt;</span>
-        <span className="text-gray-700">編輯個人資料</span>
-      </nav>
+      <Breadcrumb className="px-4 py-3">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/user">會員中心</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>編輯個人資料</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* 主要內容 */}
       <main className="flex-1 px-4 py-6 md:max-w-2xl md:mx-auto w-full">
