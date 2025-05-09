@@ -906,6 +906,9 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
                 onLoadedMetadata={atVideoLoaded}
                 onTimeUpdate={atTimeUpdate}
                 onClick={atTogglePlayPause}
+                playsInline
+                preload="metadata"
+                crossOrigin="anonymous"
               >
                 <track kind="captions" label="中文" default />
                 您的瀏覽器不支援影片標籤
