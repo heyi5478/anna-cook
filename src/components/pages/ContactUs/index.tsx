@@ -1,7 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { contactFormSchema, type ContactFormValues } from './schema';
 
 /**
@@ -56,13 +62,17 @@ export default function ContactUs() {
   return (
     <>
       {/* 麵包屑導航 */}
-      <div className="flex items-center p-4 text-sm">
-        <Link href="/" className="text-gray-700">
-          首頁
-        </Link>
-        <ChevronRight size={16} className="mx-1 text-gray-500" />
-        <span className="text-gray-700">聯絡我們</span>
-      </div>
+      <Breadcrumb className="p-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">首頁</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>聯絡我們</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* 主要內容 */}
       <main className="px-4 pb-20">
