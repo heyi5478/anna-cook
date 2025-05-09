@@ -64,6 +64,9 @@ export default function UploadArea({
         </div>
       </div>
       <div className="text-gray-500 mt-2">{fileName}</div>
+      <div className="text-gray-500 mt-2">
+        {isUploading ? '正在上傳影片中 ，請稍後...' : ''}
+      </div>
       {error && (
         <div className="text-red-500 text-sm mt-1 flex items-center error-message">
           <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
