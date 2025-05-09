@@ -9,10 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-// 引入自定義元件
-import { ReviewDisplay } from '@/components/RecipePage/ReviewDisplay';
-import Review from '@/components/RecipePage/Review';
 import { ProductCard } from '@/components/ui/adCard';
 import { FollowButton } from '@/components/common/FollowButton';
 
@@ -23,6 +19,10 @@ import {
   fetchRecipeRatingComments,
 } from '@/services/api';
 import { RecipeRatingCommentResponse } from '@/types/api';
+
+// 引入自定義元件
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
+import Review from '@/components/pages/RecipePage/Review';
 
 // 引入樣式
 import {
