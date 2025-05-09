@@ -3,7 +3,7 @@ import type React from 'react';
 import { Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { VimeoPlayer, timeToSeconds } from '@/components/ui/VimeoPlayer';
+import { VimeoPlayer, timeToSeconds } from '@/components/common/VimeoPlayer';
 import {
   Accordion,
   AccordionContent,

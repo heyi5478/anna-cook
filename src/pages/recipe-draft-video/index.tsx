@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import RecipeDraftVideo from '@/components/RecipeDraftVideo';
+import RecipeDraftVideo from '@/components/pages/RecipeDraftVideo';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';

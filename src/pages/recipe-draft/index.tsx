@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import RecipeDraft from '@/components/RecipeDraft';
+import RecipeDraft from '@/components/pages/RecipeDraft';
 import { useAuth } from '@/hooks/useAuth';
 
 /**

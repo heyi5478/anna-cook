@@ -16,7 +16,7 @@ import {
   VimeoPlayer,
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
-} from '@/components/ui/VimeoPlayer';
+} from '@/components/common/VimeoPlayer';
 import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { RecipeDraftStep } from '@/types/api';
 import { useRouter } from 'next/router';

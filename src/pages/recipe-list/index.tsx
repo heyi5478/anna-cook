@@ -6,7 +6,7 @@ import Image from 'next/image';
 import {
   RecipeCard,
   Recipe as RecipeCardType,
-} from '@/components/ui/RecipeCard';
+} from '@/components/common/RecipeCard';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Search, Settings2 } from 'lucide-react';
 // import { Layout } from '@/components/layout';

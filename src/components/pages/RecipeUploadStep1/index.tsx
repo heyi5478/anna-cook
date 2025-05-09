@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { uploadRecipeBasic } from '@/services/api';
-import StepIndicator from '@/components/ui/StepIndicator';
+import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';
 
 // 定義表單驗證 schema

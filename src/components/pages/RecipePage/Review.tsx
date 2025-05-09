@@ -1,13 +1,11 @@
 import type React from 'react';
-
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { StarRating } from '@/components/RecipePage/StarRating';
-import { ReviewDisplay } from '@/components/RecipePage/ReviewDisplay';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -15,11 +13,15 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
+
 import {
   submitRecipeRatingComment,
   fetchRecipeRatingComments,
 } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+
+import { StarRating } from '@/components/pages/RecipePage/StarRating';
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
 
 // 定義表單 schema
 const reviewSchema = z.object({

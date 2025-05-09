@@ -1,4 +1,4 @@
-import RecipeUploadStep2 from '@/components/RecipeUploadStep2';
+import RecipeUploadStep2 from '@/components/pages/RecipeUploadStep2';
 import { useAuth } from '@/hooks/useAuth';
 
 /**

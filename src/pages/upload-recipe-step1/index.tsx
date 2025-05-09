@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import RecipeUploadForm from '@/components/RecipeUploadStep1';
+import RecipeUploadForm from '@/components/pages/RecipeUploadStep1';
 import { useAuth } from '@/hooks/useAuth';
 
 /**

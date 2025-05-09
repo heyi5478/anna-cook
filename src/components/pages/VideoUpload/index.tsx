@@ -15,7 +15,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import StepIndicator from '@/components/ui/StepIndicator';
+import StepIndicator from '@/components/common/StepIndicator';
 import { useRouter } from 'next/router';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/api';
 import UploadArea from './UploadArea';

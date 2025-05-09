@@ -5,7 +5,7 @@ import { Plus, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoryCard } from '@/components/common/CategoryCard';
-import { RecipeCard } from '@/components/ui/RecipeCard';
+import { RecipeCard } from '@/components/common/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';

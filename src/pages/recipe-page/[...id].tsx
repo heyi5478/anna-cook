@@ -1,12 +1,11 @@
 import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import RecipePageComponent from '@/components/RecipePage';
-// import { Layout } from '@/components/layout';
 import {
   fetchRecipeDetailServer,
   RecipeDetailResponse,
 } from '@/services/server-api';
+import RecipePageComponent from '@/components/pages/RecipePage';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
