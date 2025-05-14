@@ -1333,7 +1333,7 @@ export const submitRecipeRatingComment = async (
   recipeId: number,
   rating: number,
   commentContent: string,
-): Promise<any> => {
+): Promise<RecipeRatingCommentResponse> => {
   try {
     console.log(`發送請求: POST /api/recipes/${recipeId}/rating-comment`);
     console.log('請求資料:', { rating, commentContent });
