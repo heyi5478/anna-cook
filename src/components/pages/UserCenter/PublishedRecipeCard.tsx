@@ -16,7 +16,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
-import { toggleRecipePublishStatus } from '@/services/api';
+import { toggleRecipePublishStatus } from '@/services/recipes';
 
 /**
  * PublishedRecipeCard 元件的 props 類型

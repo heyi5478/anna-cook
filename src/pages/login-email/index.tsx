@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { registerWithEmail } from '@/services/api';
+import { registerWithEmail } from '@/services/auth';
 
 // 定義表單驗證規則
 const formSchema = z.object({

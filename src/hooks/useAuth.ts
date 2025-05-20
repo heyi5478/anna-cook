@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { checkAuth } from '@/services/api';
+import { checkAuth } from '@/services/auth';
 
 export type AuthStatus = {
   isAuthenticated: boolean | null;

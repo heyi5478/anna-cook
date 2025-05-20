@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { followUser, unfollowUser } from '@/services/api';
+import { followUser, unfollowUser } from '@/services/users';
 
 // Toast 樣式
 const toastStyles = {

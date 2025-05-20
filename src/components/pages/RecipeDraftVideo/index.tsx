@@ -17,7 +17,6 @@ import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/common/VimeoPlayer';
-import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { RecipeDraftStep } from '@/types/api';
 import { useRouter } from 'next/router';
 import {
@@ -30,6 +29,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { toast } from '@/hooks/use-toast';
+import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
 
 /**
  * 步驟資料型別

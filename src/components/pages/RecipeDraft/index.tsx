@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageIcon, Plus, X } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { fetchRecipeDraft, submitRecipeDraft } from '@/services/api';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
+import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL

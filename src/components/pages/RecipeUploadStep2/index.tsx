@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
-import { updateRecipeStep2 } from '@/services/api';
 import { RecipeStep2Data } from '@/types/api';
 import {
   Breadcrumb,
@@ -15,6 +14,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { updateRecipeStep2 } from '@/services/recipes';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({

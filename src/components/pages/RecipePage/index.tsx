@@ -20,17 +20,17 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
+// 引入自定義元件
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
+import Review from '@/components/pages/RecipePage/Review';
+
 // 引入 API 服務
 import {
   favoriteRecipe,
   unfavoriteRecipe,
   fetchRecipeRatingComments,
-} from '@/services/api';
+} from '@/services/recipes';
 import { RecipeRatingCommentResponse } from '@/types/api';
-
-// 引入自定義元件
-import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
-import Review from '@/components/pages/RecipePage/Review';
 
 // 引入樣式
 import {

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { exchangeGoogleCodeForToken } from '@/services/api';
 import { setServerCookie } from '@/lib/utils';
+import { exchangeGoogleCodeForToken } from '@/services/auth';
 
 /**
  * 處理 Google OAuth 登入回調

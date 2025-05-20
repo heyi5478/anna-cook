@@ -14,14 +14,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
+import { StarRating } from '@/components/pages/RecipePage/StarRating';
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
+
 import {
   submitRecipeRatingComment,
   fetchRecipeRatingComments,
-} from '@/services/api';
+} from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
-
-import { StarRating } from '@/components/pages/RecipePage/StarRating';
-import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
 
 // 定義表單 schema
 const reviewSchema = z.object({

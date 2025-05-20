@@ -32,9 +32,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { fetchCurrentUserProfile, updateUserProfile } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
+import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({

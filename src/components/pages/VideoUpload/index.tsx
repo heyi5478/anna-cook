@@ -17,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import StepIndicator from '@/components/common/StepIndicator';
 import { useRouter } from 'next/router';
-import { uploadRecipeVideo, updateRecipeSteps } from '@/services/api';
+import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import UploadArea from './UploadArea';
 
 // 定義片段類型

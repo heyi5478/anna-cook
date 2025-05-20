@@ -9,8 +9,8 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
-import { toggleRecipePublishStatus } from '@/services/api';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { toggleRecipePublishStatus } from '@/services/recipes';
 
 /**
  * DraftRecipeCard 元件的 props 類型

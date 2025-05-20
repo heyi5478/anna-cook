@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { loginWithEmail } from '@/services/api';
 import { setServerCookie } from '@/lib/utils';
+import { loginWithEmail } from '@/services/auth';
 
 /**
  * 處理電子郵件登入請求

@@ -18,21 +18,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import {
-  fetchAuthorRecipes,
-  deleteMultipleRecipes,
-  fetchUserFavoriteFollow,
-} from '@/services/api';
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 import {
   AuthorRecipesResponse,
   UserFavoriteResponse,
   UserFollowResponse,
 } from '@/types/api';
 import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog';
+  fetchAuthorRecipes,
+  fetchUserFavoriteFollow,
+  deleteMultipleRecipes,
+} from '@/services/recipes';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';

@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
-import { uploadRecipeBasic } from '@/services/api';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';
 import {
@@ -17,6 +16,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { uploadRecipeBasic } from '@/services/recipes';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({

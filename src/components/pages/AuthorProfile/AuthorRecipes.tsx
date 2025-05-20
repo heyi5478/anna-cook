@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/common/RecipeCard';
-import { fetchUserRecipes } from '@/services/api';
+import { fetchUserRecipes } from '@/services/users';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
