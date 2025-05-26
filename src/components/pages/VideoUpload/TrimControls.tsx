@@ -1,7 +1,7 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, formatTime } from '@/lib/utils';
 
 /**
  * 影片剪輯控制元件，處理影片片段的時間軸及剪輯控制
@@ -38,13 +38,6 @@ export default function TrimControls({
   segments,
   currentSegmentIndex,
 }: TrimControlsProps) {
-  /**
-   * 格式化時間顯示 (秒)
-   */
-  const formatTime = (timeInSeconds: number) => {
-    return timeInSeconds.toFixed(2);
-  };
-
   // 獲取當前片段
   const currentSegment = segments[currentSegmentIndex] || {
     startTime: 0,

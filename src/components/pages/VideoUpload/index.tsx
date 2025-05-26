@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import StepIndicator from '@/components/common/StepIndicator';
 import { useRouter } from 'next/router';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
+import { generateId, isMobileDevice } from '@/lib/utils';
 
 // 引入子元件
 import UploadArea from './UploadArea';
@@ -14,7 +15,6 @@ import ActionButtons from './ActionButtons';
 
 // 引入類型和工具函數
 import { Segment, VideoTrimmerProps, ErrorState } from './types';
-import { generateId, isMobileDevice } from './utils';
 
 /**
  * 影片剪輯器元件，用於上傳、預覽和剪輯影片

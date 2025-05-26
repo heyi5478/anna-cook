@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
+import { formatTime } from '@/lib/utils';
 
 /**
  * 影片播放器元件，處理影片的顯示、播放與暫停控制
@@ -26,13 +27,6 @@ export default function VideoPlayer({
   atTimeUpdate,
   atVideoLoaded,
 }: VideoPlayerProps) {
-  /**
-   * 格式化時間顯示 (秒)
-   */
-  const formatTime = (timeInSeconds: number) => {
-    return timeInSeconds.toFixed(2);
-  };
-
   return (
     <div className="space-y-4">
       {/* 影片預覽 */}
