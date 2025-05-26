@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/ui/adCard';
-import { FollowButton } from '@/components/common/FollowButton';
+import { FollowButton } from '@/components/features/FollowButton';
 import {
   Breadcrumb,
   BreadcrumbItem,

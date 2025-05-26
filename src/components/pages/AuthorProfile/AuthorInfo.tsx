@@ -1,7 +1,7 @@
 import { Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { FollowButton } from '@/components/common/FollowButton';
+import { FollowButton } from '@/components/features/FollowButton';
 import { Author } from './types';
 
 interface AuthorInfoProps {
