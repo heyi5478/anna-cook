@@ -1,20 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useId } from 'react';
-
-// 型別定義區塊
-type Ingredient = {
-  name: string;
-  amount: string;
-  id?: string;
-};
-
-type Seasoning = {
-  name: string;
-  amount: string;
-  id?: string;
-};
+import type { Ingredient, Seasoning } from './types';
 
 type IngredientListProps = {
   ingredients: Ingredient[];
@@ -33,11 +21,21 @@ type IngredientListProps = {
   ) => void;
   onRemoveSeasoning: (index: number) => void;
   onAddSeasoning: () => void;
+  errors?: {
+    ingredients?: Array<{
+      name?: { message?: string };
+      amount?: { message?: string };
+    }>;
+    seasonings?: Array<{
+      name?: { message?: string };
+      amount?: { message?: string };
+    }>;
+  };
 };
 
 /**
- * 食材清單元件 - 用於管理食譜中的食材和調味料清單
- * 支援新增、編輯和刪除食材及調味料項目
+ * 食材清單元件 - 顯示和管理食譜中的食材和調味料清單
+ * 純視覺組件，不包含商業邏輯
  */
 export const IngredientList = ({
   ingredients,
@@ -48,8 +46,8 @@ export const IngredientList = ({
   onUpdateSeasoning,
   onRemoveSeasoning,
   onAddSeasoning,
+  errors,
 }: IngredientListProps) => {
-  // 生成唯一ID前綴用於穩定的key值
   const uniqueIdPrefix = useId();
 
   /**
@@ -57,34 +55,46 @@ export const IngredientList = ({
    */
   const renderIngredientItem = (ingredient: Ingredient, index: number) => {
     const itemKey = ingredient.id || `${uniqueIdPrefix}-ingredient-${index}`;
+    const nameError = errors?.ingredients?.[index]?.name?.message;
+    const amountError = errors?.ingredients?.[index]?.amount?.message;
 
     return (
-      <div key={itemKey} className="flex items-center mb-2">
-        <div className="flex items-center flex-1">
-          <Input
-            value={ingredient.name}
-            onChange={(e) => onUpdateIngredient(index, 'name', e.target.value)}
-            className="flex-1 mr-2"
-            placeholder="食材名稱"
-            aria-label={`食材名稱 ${index + 1}`}
-          />
-          <Input
-            value={ingredient.amount}
-            onChange={(e) =>
-              onUpdateIngredient(index, 'amount', e.target.value)
-            }
-            className="w-16 mr-2"
-            placeholder="數量"
-            aria-label={`食材數量 ${index + 1}`}
-          />
+      <div key={itemKey} className="mb-2">
+        <div className="flex items-center">
+          <div className="flex items-center flex-1">
+            <Input
+              value={ingredient.name}
+              onChange={(e) =>
+                onUpdateIngredient(index, 'name', e.target.value)
+              }
+              className="bg-[#FAFAFA] flex-1 mr-2"
+              placeholder="食材名稱"
+              aria-label={`食材名稱 ${index + 1}`}
+            />
+            <Input
+              value={ingredient.amount}
+              onChange={(e) =>
+                onUpdateIngredient(index, 'amount', e.target.value)
+              }
+              className="bg-[#FAFAFA] w-16 mr-2"
+              placeholder="數量"
+              aria-label={`食材數量 ${index + 1}`}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => onRemoveIngredient(index)}
+            className="p-1 text-gray-500"
+            aria-label={`移除食材 ${index + 1}`}
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          onClick={() => onRemoveIngredient(index)}
-          className="p-1 text-gray-500"
-          aria-label={`移除食材 ${index + 1}`}
-        >
-          <Trash className="w-4 h-4" />
-        </button>
+        {/* 錯誤訊息顯示 */}
+        {nameError && <p className="mt-1 text-sm text-red-500">{nameError}</p>}
+        {amountError && (
+          <p className="mt-1 text-sm text-red-500">{amountError}</p>
+        )}
       </div>
     );
   };
@@ -94,48 +104,48 @@ export const IngredientList = ({
    */
   const renderSeasoningItem = (seasoning: Seasoning, index: number) => {
     const itemKey = seasoning.id || `${uniqueIdPrefix}-seasoning-${index}`;
+    const nameError = errors?.seasonings?.[index]?.name?.message;
+    const amountError = errors?.seasonings?.[index]?.amount?.message;
 
     return (
-      <div key={itemKey} className="flex items-center mb-2">
-        <div className="flex items-center flex-1">
-          <Input
-            value={seasoning.name}
-            onChange={(e) => onUpdateSeasoning(index, 'name', e.target.value)}
-            className="flex-1 mr-2"
-            placeholder="調味料名稱"
-            aria-label={`調味料名稱 ${index + 1}`}
-          />
-          <Input
-            value={seasoning.amount}
-            onChange={(e) => onUpdateSeasoning(index, 'amount', e.target.value)}
-            className="w-16 mr-2"
-            placeholder="數量"
-            aria-label={`調味料數量 ${index + 1}`}
-          />
+      <div key={itemKey} className="mb-2">
+        <div className="flex items-center">
+          <div className="flex items-center flex-1">
+            <Input
+              value={seasoning.name}
+              onChange={(e) => onUpdateSeasoning(index, 'name', e.target.value)}
+              className="bg-[#FAFAFA] flex-1 mr-2"
+              placeholder="調味料名稱"
+              aria-label={`調味料名稱 ${index + 1}`}
+              aria-labelledby="seasonings-heading"
+            />
+            <Input
+              value={seasoning.amount}
+              onChange={(e) =>
+                onUpdateSeasoning(index, 'amount', e.target.value)
+              }
+              className="bg-[#FAFAFA] w-16 mr-2"
+              placeholder="數量"
+              aria-label={`調味料數量 ${index + 1}`}
+              aria-labelledby="seasonings-heading"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => onRemoveSeasoning(index)}
+            className="p-1 text-gray-500"
+            aria-label={`移除調味料 ${index + 1}`}
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          onClick={() => onRemoveSeasoning(index)}
-          className="p-1 text-gray-500"
-          aria-label={`移除調味料 ${index + 1}`}
-        >
-          <Trash className="w-4 h-4" />
-        </button>
+        {/* 錯誤訊息顯示 */}
+        {nameError && <p className="mt-1 text-sm text-red-500">{nameError}</p>}
+        {amountError && (
+          <p className="mt-1 text-sm text-red-500">{amountError}</p>
+        )}
       </div>
     );
-  };
-
-  /**
-   * 處理新增食材按鈕點擊
-   */
-  const atHandleAddIngredient = () => {
-    onAddIngredient();
-  };
-
-  /**
-   * 處理新增調味料按鈕點擊
-   */
-  const atHandleAddSeasoning = () => {
-    onAddSeasoning();
   };
 
   return (
@@ -143,21 +153,17 @@ export const IngredientList = ({
       {/* 食材清單區塊 */}
       <div className="mb-4">
         <h2 className="mb-2 text-lg font-medium">食材清單</h2>
-
-        {/* 食材項目列表 */}
         <div className="ingredients-container">
           {ingredients.map((ingredient, index) =>
             renderIngredientItem(ingredient, index),
           )}
         </div>
-
-        {/* 新增食材按鈕 */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
-          onClick={atHandleAddIngredient}
+          onClick={onAddIngredient}
           className="mt-2"
-          type="button"
         >
           <Plus className="w-4 h-4 mr-1" /> 新增食材
         </Button>
@@ -165,22 +171,20 @@ export const IngredientList = ({
 
       {/* 調味料清單區塊 */}
       <div className="mb-4">
-        <h2 className="mb-2 text-lg font-medium">調味料清單</h2>
-
-        {/* 調味料項目列表 */}
+        <h2 id="seasonings-heading" className="mb-2 text-lg font-medium">
+          調味料清單
+        </h2>
         <div className="seasonings-container">
           {seasonings.map((seasoning, index) =>
             renderSeasoningItem(seasoning, index),
           )}
         </div>
-
-        {/* 新增調味料按鈕 */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
-          onClick={atHandleAddSeasoning}
+          onClick={onAddSeasoning}
           className="mt-2"
-          type="button"
         >
           <Plus className="w-4 h-4 mr-1" /> 新增調味料
         </Button>

@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ImageIcon, Plus, X } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -17,63 +15,43 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
-import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
+import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
+import { type Ingredient, type Seasoning } from './types';
+import { recipeFormSchema, type RecipeFormValues } from './schema';
+import { IngredientList } from './IngredientList';
+import { TagSection } from './TagsSection';
+import { CookingInfo } from './CookingInfo';
 import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
-// 類型定義區塊
-type Step = {
-  description: string;
-  startTime: string;
-  endTime: string;
-  video?: string;
-  vimeoId?: string;
-  id?: string;
-};
-
-// 表單驗證 Schema
-const recipeFormSchema = z.object({
-  name: z.string().min(1, '請輸入食譜名稱'),
-  description: z.string(),
-  ingredients: z.array(
-    z.object({
-      name: z.string().min(1, '請輸入食材名稱'),
-      amount: z.string(),
-      id: z.string().optional(),
-    }),
-  ),
-  seasonings: z.array(
-    z.object({
-      name: z.string().min(1, '請輸入調味料名稱'),
-      amount: z.string(),
-      id: z.string().optional(),
-    }),
-  ),
-  tags: z.array(z.string()),
-  cookingTimeValue: z.string().regex(/^\d*$/, '請輸入數字'),
-  cookingTimeUnit: z.string(),
-  servingsValue: z.string().regex(/^\d*$/, '請輸入數字'),
-  servingsUnit: z.string(),
-});
-
-// 表單值型別
-type RecipeFormValues = z.infer<typeof recipeFormSchema>;
-
 /**
  * 食譜草稿編輯器元件 - 用於建立和編輯食譜草稿
+ * 主要負責視覺呈現和表單管理，商業邏輯由 store 處理
  */
 export default function RecipeDraft() {
   const router = useRouter();
   const { recipeId } = router.query;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [recipeImage, setRecipeImage] = useState<string | null>(null);
-  const [recipeSteps, setRecipeSteps] = useState<Step[]>([]);
-  const [newTag, setNewTag] = useState('');
   const userDisplayId = useUserDisplayId();
+
+  // 從 store 獲取狀態和動作
+  const {
+    loading,
+    saving,
+    error,
+    recipeImage,
+    recipeSteps,
+    newTag,
+    formData,
+    loadRecipeDraft,
+    removeStep,
+    setNewTag,
+    addTag,
+    removeTag,
+    submitRecipe,
+    reset,
+  } = useRecipeDraftStore();
 
   // 初始化表單
   const {
@@ -85,17 +63,7 @@ export default function RecipeDraft() {
     formState: { errors },
   } = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      ingredients: [],
-      seasonings: [],
-      tags: [],
-      cookingTimeValue: '',
-      cookingTimeUnit: '分鐘',
-      servingsValue: '',
-      servingsUnit: '人份',
-    },
+    defaultValues: formData,
   });
 
   // 獲取食材和調味料陣列控制器
@@ -103,6 +71,7 @@ export default function RecipeDraft() {
     fields: ingredientFields,
     append: appendIngredient,
     remove: removeIngredient,
+    update: updateIngredient,
   } = useFieldArray({
     control,
     name: 'ingredients',
@@ -112,228 +81,125 @@ export default function RecipeDraft() {
     fields: seasoningFields,
     append: appendSeasoning,
     remove: removeSeasoning,
+    update: updateSeasoning,
   } = useFieldArray({
     control,
     name: 'seasonings',
   });
 
-  // 從 API 獲取食譜草稿資料
+  // 載入食譜草稿資料
   useEffect(() => {
-    console.log('useEffect 執行，recipeId:', recipeId);
-
-    async function loadRecipeDraft() {
-      if (!recipeId) {
-        console.log('沒有 recipeId 參數，不進行 API 請求');
-        setLoading(false);
-        setError('請確認網址中包含正確的食譜 ID');
-        return;
-      }
-
-      console.log('開始獲取食譜草稿，ID:', recipeId);
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const id = Number(recipeId);
-        if (Number.isNaN(id)) {
-          console.log('ID 轉換為數字失敗:', recipeId);
-          setError('無效的食譜 ID');
-          setLoading(false);
-          return;
-        }
-
-        console.log('調用 fetchRecipeDraft API，recipeId:', id);
-        const draftData = await fetchRecipeDraft(id);
-        console.log('API 回應資料:', draftData);
-
-        if (draftData.StatusCode !== 200) {
-          setError(draftData.msg);
-          setLoading(false);
-          return;
-        }
-
-        // 轉換 API 資料為元件所需格式
-        const { recipe: recipeData, ingredients, tags, steps } = draftData;
-
-        // 從 videoId 中提取 Vimeo ID
-        let vimeoId = '';
-        if (recipeData.videoId) {
-          // 假設 videoId 格式為 "/videos/1075575886"
-          const match = recipeData.videoId.match(/\/videos\/(\d+)/);
-          if (match && match[1]) {
-            const [, extractedId] = match;
-            vimeoId = extractedId;
-            console.log('提取的 Vimeo ID:', vimeoId);
-          }
-        }
-
-        // 設置表單值
-        setValue('name', recipeData.recipeName);
-        setValue('description', recipeData.description || '');
-        setValue('cookingTimeValue', recipeData.cookingTime.toString());
-        setValue('cookingTimeUnit', '分鐘');
-        setValue('servingsValue', recipeData.portion.toString());
-        setValue('servingsUnit', '人份');
-
-        // 設置食材
-        setValue(
-          'ingredients',
-          ingredients
-            .filter((item) => !item.isFlavoring)
-            .map((item) => ({
-              name: item.ingredientName,
-              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
-              id: item.ingredientId.toString(),
-            })),
-        );
-
-        // 設置調味料
-        setValue(
-          'seasonings',
-          ingredients
-            .filter((item) => item.isFlavoring)
-            .map((item) => ({
-              name: item.ingredientName,
-              amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
-              id: item.ingredientId.toString(),
-            })),
-        );
-
-        // 設置標籤
-        setValue(
-          'tags',
-          tags.map((tag) => tag.tagName),
-        );
-
-        // 設置圖片
-        setRecipeImage(recipeData.coverPhoto || null);
-
-        // 設置步驟
-        setRecipeSteps(
-          steps.map((step) => ({
-            description: step.stepDescription,
-            startTime: formatTimeFromSeconds(step.videoStart),
-            endTime: formatTimeFromSeconds(step.videoEnd),
-            id: step.stepId.toString(),
-            vimeoId,
-          })),
-        );
-      } catch (err) {
-        console.error('獲取食譜草稿失敗:', err);
-        setError('獲取食譜草稿時發生錯誤');
-      } finally {
-        console.log('載入流程結束，設置 loading = false');
-        setLoading(false);
-      }
+    if (!recipeId) {
+      return;
     }
 
-    loadRecipeDraft();
-  }, [recipeId, setValue]);
+    const id = Number(recipeId);
+    if (Number.isNaN(id)) {
+      return;
+    }
+
+    loadRecipeDraft(id);
+  }, [recipeId, loadRecipeDraft]);
+
+  // 當組件卸載時重置狀態
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [reset]);
+
+  // 當 store 中的 formData 更新時，同步到 react-hook-form
+  useEffect(() => {
+    if (formData.name) {
+      setValue('name', formData.name);
+      setValue('description', formData.description);
+      setValue('cookingTimeValue', formData.cookingTimeValue);
+      setValue('cookingTimeUnit', formData.cookingTimeUnit);
+      setValue('servingsValue', formData.servingsValue);
+      setValue('servingsUnit', formData.servingsUnit);
+      setValue('ingredients', formData.ingredients);
+      setValue('seasonings', formData.seasonings);
+      setValue('tags', formData.tags);
+    }
+  }, [formData, setValue]);
 
   /**
-   * 將秒數格式化為 MM:SS 格式
+   * 處理食材更新
    */
-  const formatTimeFromSeconds = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const atUpdateIngredient = (
+    index: number,
+    field: keyof Ingredient,
+    value: string,
+  ) => {
+    if (field === 'id') return; // 不允許更新 id 欄位
+    const currentIngredient = ingredientFields[index];
+    updateIngredient(index, { ...currentIngredient, [field]: value });
   };
 
   /**
-   * 添加新標籤
+   * 處理調味料更新
+   */
+  const atUpdateSeasoning = (
+    index: number,
+    field: keyof Seasoning,
+    value: string,
+  ) => {
+    if (field === 'id') return; // 不允許更新 id 欄位
+    const currentSeasoning = seasoningFields[index];
+    updateSeasoning(index, { ...currentSeasoning, [field]: value });
+  };
+
+  /**
+   * 處理新增標籤
    */
   const atAddTag = () => {
-    if (newTag && !getValues('tags').includes(newTag)) {
+    if (newTag.trim()) {
       const currentTags = getValues('tags');
-      setValue('tags', [...currentTags, newTag]);
+      const newTags = addTag(newTag.trim(), currentTags);
+      setValue('tags', newTags);
       setNewTag('');
     }
   };
 
   /**
-   * 移除標籤
+   * 處理移除標籤
    */
   const atRemoveTag = (tagToRemove: string) => {
     const currentTags = getValues('tags');
-    setValue(
-      'tags',
-      currentTags.filter((tag) => tag !== tagToRemove),
-    );
+    const newTags = removeTag(tagToRemove, currentTags);
+    setValue('tags', newTags);
   };
 
   /**
-   * 移除指定烹飪步驟
+   * 處理導航到影片編輯頁面
    */
-  const atRemoveStep = (index: number) => {
-    setRecipeSteps(recipeSteps.filter((_, i) => i !== index));
+  const atNavigateToVideoEdit = () => {
+    if (recipeId) {
+      router.push(`/recipe-draft-video?recipeId=${recipeId}`);
+    } else {
+      router.push('/recipe-draft-video');
+    }
   };
 
   /**
-   * 儲存食譜草稿至後端
+   * 處理表單提交
    */
   const atSaveRecipe = handleSubmit(async (data) => {
-    try {
-      console.log('正在提交食譜草稿:', data);
+    if (!recipeId) {
+      console.error('無法提交草稿：缺少食譜 ID');
+      return;
+    }
 
-      if (!recipeId) {
-        console.error('無法提交草稿：缺少食譜 ID');
-        return;
-      }
+    const result = await submitRecipe(Number(recipeId), data, recipeSteps);
 
-      // 設置提交中狀態
-      setSaving(true);
-
-      // 準備提交的資料
-      const submitData = {
-        recipeName: data.name,
-        recipeIntro: data.description,
-        cookingTime: parseInt(data.cookingTimeValue, 10) || 0,
-        portion: parseInt(data.servingsValue, 10) || 0,
-        ingredients: [
-          // 食材列表 (非調味料)
-          ...data.ingredients.map((item) => ({
-            name: item.name,
-            amount: item.amount,
-            isFlavoring: false,
-          })),
-          // 調味料列表
-          ...data.seasonings.map((item) => ({
-            name: item.name,
-            amount: item.amount,
-            isFlavoring: true,
-          })),
-        ],
-        tags: data.tags,
-        steps: recipeSteps.map((step) => ({
-          description: step.description,
-          startTime: step.startTime,
-          endTime: step.endTime,
-        })),
-      };
-
-      // 呼叫 API 提交草稿
-      const response = await submitRecipeDraft(Number(recipeId), submitData);
-
-      // 處理回應
-      if (response.StatusCode === 200) {
-        console.log('草稿提交成功:', response);
-
-        // 使用 displayId 導轉到用戶頁面，若無 displayId 則導轉到首頁
-        if (userDisplayId) {
-          router.push(`/user/${userDisplayId}`);
-        } else {
-          console.warn('未找到用戶 displayId，導轉到首頁');
-          router.push('/');
-        }
+    if (result.success) {
+      // 使用 displayId 導轉到用戶頁面，若無 displayId 則導轉到首頁
+      if (userDisplayId) {
+        router.push(`/user/${userDisplayId}`);
       } else {
-        console.error('草稿提交失敗:', response);
+        console.warn('未找到用戶 displayId，導轉到首頁');
+        router.push('/');
       }
-    } catch (err) {
-      console.error('提交過程發生錯誤:', err);
-    } finally {
-      // 結束提交狀態
-      setSaving(false);
     }
   });
 
@@ -447,208 +313,53 @@ export default function RecipeDraft() {
             )}
           </div>
 
-          {/* 食材清單 */}
-          <div className="mb-4">
-            <h2 className="mb-2 text-lg font-medium">食材清單</h2>
-            {ingredientFields.map((item, index) => (
-              <div key={item.id} className="flex items-center mb-2">
-                <div className="flex items-center flex-1">
-                  <Controller
-                    name={`ingredients.${index}.name`}
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        className="bg-[#FAFAFA] flex-1 mr-2"
-                        placeholder="食材名稱"
-                        aria-label={`食材名稱 ${index + 1}`}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name={`ingredients.${index}.amount`}
-                    control={control}
-                    render={({ field: amountField }) => (
-                      <Input
-                        {...amountField}
-                        className="bg-[#FAFAFA] w-16 mr-2"
-                        placeholder="數量"
-                        aria-label={`食材數量 ${index + 1}`}
-                      />
-                    )}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeIngredient(index)}
-                  className="p-1 text-gray-500"
-                  aria-label={`移除食材 ${index + 1}`}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => appendIngredient({ name: '', amount: '' })}
-              className="mt-2"
-            >
-              <Plus className=" w-4 h-4 mr-1" /> 新增食材
-            </Button>
-          </div>
-
-          {/* 調味料清單 */}
-          <div className="mb-4">
-            <h2 id="seasonings-heading" className="mb-2 text-lg font-medium">
-              調味料清單
-            </h2>
-            {seasoningFields.map((item, index) => (
-              <div key={item.id} className="flex items-center mb-2">
-                <div className="flex items-center flex-1">
-                  <Controller
-                    name={`seasonings.${index}.name`}
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        className="bg-[#FAFAFA] flex-1 mr-2"
-                        placeholder="調味料名稱"
-                        aria-label={`調味料名稱 ${index + 1}`}
-                        aria-labelledby="seasonings-heading"
-                      />
-                    )}
-                  />
-                  <Controller
-                    name={`seasonings.${index}.amount`}
-                    control={control}
-                    render={({ field: amountField }) => (
-                      <Input
-                        {...amountField}
-                        className="bg-[#FAFAFA] w-16 mr-2"
-                        placeholder="數量"
-                        aria-label={`調味料數量 ${index + 1}`}
-                        aria-labelledby="seasonings-heading"
-                      />
-                    )}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeSeasoning(index)}
-                  className="p-1 text-gray-500"
-                  aria-label={`移除調味料 ${index + 1}`}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => appendSeasoning({ name: '', amount: '' })}
-              className="mt-2"
-            >
-              <Plus className="w-4 h-4 mr-1" /> 新增調味料
-            </Button>
-          </div>
+          {/* 食材和調味料清單 */}
+          <IngredientList
+            ingredients={ingredientFields}
+            seasonings={seasoningFields}
+            onUpdateIngredient={atUpdateIngredient}
+            onRemoveIngredient={removeIngredient}
+            onAddIngredient={() => appendIngredient({ name: '', amount: '' })}
+            onUpdateSeasoning={atUpdateSeasoning}
+            onRemoveSeasoning={removeSeasoning}
+            onAddSeasoning={() => appendSeasoning({ name: '', amount: '' })}
+            errors={{
+              ingredients: errors.ingredients as any,
+              seasonings: errors.seasonings as any,
+            }}
+          />
 
           {/* 食譜標籤 */}
-          <div className="mb-4">
-            <h2 id="tags-heading" className="mb-2 text-lg font-medium">
-              食譜標籤
-            </h2>
-            <div className="flex flex-wrap mb-2">
-              {watch('tags').map((tag) => (
-                <Badge key={tag} className="mr-2 mb-2">
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => atRemoveTag(tag)}
-                    className="ml-1 text-xs"
-                    aria-label={`移除標籤 ${tag}`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-            <div className="flex">
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                className="bg-[#FAFAFA] flex-1 mr-2"
-                placeholder="輸入標籤"
-                aria-labelledby="tags-heading"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={atAddTag}
-                disabled={!newTag}
-              >
-                新增
-              </Button>
-            </div>
-          </div>
+          <TagSection
+            tags={formValues.tags}
+            newTag={newTag}
+            onNewTagChange={setNewTag}
+            onAddTag={atAddTag}
+            onRemoveTag={atRemoveTag}
+          />
 
           {/* 烹飪時間和份量 */}
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div>
-              <h2 className="mb-2 text-lg font-medium">烹飪時間</h2>
-              <div className="flex items-center">
-                <Controller
-                  name="cookingTimeValue"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="text"
-                      className="bg-[#FAFAFA] w-20 mr-2"
-                      placeholder="時間"
-                      aria-label="烹飪時間"
-                    />
-                  )}
-                />
-                <span>{formValues.cookingTimeUnit}</span>
-              </div>
-              {errors.cookingTimeValue && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.cookingTimeValue.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <h2 className="mb-2 text-lg font-medium">份量</h2>
-              <div className="flex items-center">
-                <Controller
-                  name="servingsValue"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="text"
-                      className="bg-[#FAFAFA] w-20 mr-2"
-                      placeholder="份量"
-                      aria-label="份量"
-                    />
-                  )}
-                />
-                <span>{formValues.servingsUnit}</span>
-              </div>
-              {errors.servingsValue && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.servingsValue.message}
-                </p>
-              )}
-            </div>
-          </div>
+          <CookingInfo
+            cookingTimeValue={formValues.cookingTimeValue}
+            cookingTimeUnit={formValues.cookingTimeUnit}
+            servingsValue={formValues.servingsValue}
+            servingsUnit={formValues.servingsUnit}
+            onUpdateCookingTimeValue={(value) =>
+              setValue('cookingTimeValue', value)
+            }
+            onUpdateServingsValue={(value) => setValue('servingsValue', value)}
+            errors={{
+              cookingTimeValue: errors.cookingTimeValue,
+              servingsValue: errors.servingsValue,
+            }}
+          />
 
           {/* 料理步驟 */}
-          <CookingStep steps={recipeSteps} onRemoveStep={atRemoveStep} />
+          <CookingStep
+            steps={recipeSteps}
+            onRemoveStep={removeStep}
+            onNavigateToVideoEdit={atNavigateToVideoEdit}
+          />
 
           {/* 儲存按鈕 */}
           <Button type="submit" className="w-full mb-4" disabled={saving}>
