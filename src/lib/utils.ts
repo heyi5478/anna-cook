@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { serialize, type SerializeOptions } from 'cookie';
 import { authConfig } from '@/config';
+import { RecipeDraftStep } from '@/types/api';
+import type { Step } from '@/types/video-editor';
 
 /**
  * 合併 class 名稱並處理 Tailwind 類名沖突
@@ -80,4 +82,35 @@ export const isMobileDevice = (): boolean => {
   return /iPhone|iPad|iPod|Android/i.test(
     typeof navigator !== 'undefined' ? navigator.userAgent : '',
   );
+};
+
+/**
+ * 創建防抖動函數
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function (...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
+
+/**
+ * 轉換 API 回傳的步驟資料為元件使用的格式
+ */
+export const convertApiStepsToComponentSteps = (
+  apiSteps: RecipeDraftStep[],
+): Step[] => {
+  return apiSteps.map((step) => ({
+    id: step.stepId,
+    startTime: step.videoStart,
+    endTime: step.videoEnd,
+    description: step.stepDescription,
+  }));
 };
