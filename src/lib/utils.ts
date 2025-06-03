@@ -76,6 +76,15 @@ export const formatTime = (timeInSeconds: number): string => {
 };
 
 /**
+ * 格式化時間為 mm:ss 格式
+ */
+export const formatTimeMinutes = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+/**
  * 檢查設備是否為行動裝置
  */
 export const isMobileDevice = (): boolean => {
