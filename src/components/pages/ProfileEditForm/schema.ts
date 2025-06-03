@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
 
 /**
  * 定義個人資料表單驗證結構
@@ -6,10 +7,19 @@ import * as z from 'zod';
 export const profileFormSchema = z.object({
   nickname: z
     .string()
-    .min(2, { message: '暱稱至少需要 2 個字元' })
-    .max(30, { message: '暱稱不能超過 30 個字元' }),
-  email: z.string().email({ message: '請輸入有效的電子郵件地址' }),
-  bio: z.string().max(500, { message: '簡介不能超過 500 個字元' }).optional(),
+    .min(TEXT_LIMITS.MIN_NICKNAME_LENGTH, {
+      message: VALIDATION_MESSAGES.MIN_NICKNAME_LENGTH,
+    })
+    .max(TEXT_LIMITS.MAX_NICKNAME_LENGTH, {
+      message: VALIDATION_MESSAGES.MAX_NICKNAME_LENGTH,
+    }),
+  email: z.string().email({ message: VALIDATION_MESSAGES.INVALID_EMAIL }),
+  bio: z
+    .string()
+    .max(TEXT_LIMITS.MAX_BIO_LENGTH, {
+      message: VALIDATION_MESSAGES.MAX_BIO_LENGTH,
+    })
+    .optional(),
 });
 
 /**

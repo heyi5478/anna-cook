@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -13,23 +12,26 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-
 import { StarRating } from '@/components/pages/RecipePage/StarRating';
 import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
-
 import {
   submitRecipeRatingComment,
   fetchRecipeRatingComments,
 } from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
+import { HTTP_STATUS, VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
 
 // 定義表單 schema
 const reviewSchema = z.object({
-  rating: z.number().min(1).max(5),
+  rating: z.number().min(1, { message: '請選擇評分' }),
   comment: z
     .string()
-    .min(10, { message: '評論內容至少需要 10 個字' })
-    .max(500, { message: '評論內容不可超過 500 個字' }),
+    .min(TEXT_LIMITS.MIN_COMMENT_LENGTH, {
+      message: VALIDATION_MESSAGES.MIN_COMMENT_LENGTH,
+    })
+    .max(TEXT_LIMITS.MAX_COMMENT_LENGTH, {
+      message: VALIDATION_MESSAGES.MAX_COMMENT_LENGTH,
+    }),
 });
 
 // 定義表單類型
@@ -82,7 +84,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
         // 獲取自己提交的評論
         const commentsResponse = await fetchRecipeRatingComments(recipeId);
         if (
-          commentsResponse.StatusCode === 200 &&
+          commentsResponse.StatusCode === HTTP_STATUS.OK &&
           commentsResponse.data.length > 0
         ) {
           // 假設第一條是最新的評論（即自己剛提交的）
@@ -118,6 +120,13 @@ export default function Review({ recipeId }: { recipeId: number }) {
     }
   };
 
+  /**
+   * 處理評分變更
+   */
+  const atRatingChange = (rating: number) => {
+    form.setValue('rating', rating);
+  };
+
   return (
     <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-dashed border-purple-200">
       <div className="p-4">
@@ -136,7 +145,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                     <FormItem>
                       <StarRating
                         rating={field.value}
-                        onRatingChange={(rating) => field.onChange(rating)}
+                        onRatingChange={atRatingChange}
                         size="lg"
                         showRating
                         ratingTitle="您的評價"
@@ -233,7 +242,6 @@ export default function Review({ recipeId }: { recipeId: number }) {
                 <ReviewDisplay
                   comment={review.comment}
                   username={review.authorName || '您'}
-                  userRating={review.rating}
                 />
               </>
             )}

@@ -1,45 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Step } from '@/types/recipe';
 import { debounce } from '@/lib/utils';
-
-// 初始範例步驟資料 (作為備用)
-const DEFAULT_STEPS: Step[] = [
-  {
-    id: 1,
-    startTime: 0.12,
-    endTime: 0.3,
-    description: '步驟一：加入花生醬燒煮，醬汁香濃醇厚',
-  },
-  {
-    id: 2,
-    startTime: 10,
-    endTime: 20,
-    description: '步驟二：混合調味料，增添風味',
-  },
-  {
-    id: 3,
-    startTime: 23,
-    endTime: 30,
-    description: '步驟三：完成料理，裝盤即可享用',
-  },
-];
+import {
+  DEFAULT_RECIPE_STEPS,
+  DEFAULT_TIME_VALUES,
+  COMMON_TEXTS,
+  DEBOUNCE_DELAYS,
+} from '@/lib/constants';
 
 /**
  * 步驟管理 Hook
  */
-export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
+export function useStepManager(initialSteps: Step[] = DEFAULT_RECIPE_STEPS) {
   const [steps, setSteps] = useState<Step[]>(initialSteps);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [startTime, setStartTime] = useState<number>(() => {
     const firstStepTime = initialSteps[0]?.startTime;
-    return typeof firstStepTime === 'number' ? firstStepTime : 0;
+    return typeof firstStepTime === 'number'
+      ? firstStepTime
+      : DEFAULT_TIME_VALUES.START_TIME;
   });
   const [endTime, setEndTime] = useState<number>(() => {
     const firstStepTime = initialSteps[0]?.endTime;
-    return typeof firstStepTime === 'number' ? firstStepTime : 10;
+    return typeof firstStepTime === 'number'
+      ? firstStepTime
+      : DEFAULT_TIME_VALUES.END_TIME;
   });
   const [currentDescription, setCurrentDescription] = useState<string>(
-    initialSteps[0]?.description || '請輸入步驟說明',
+    initialSteps[0]?.description || COMMON_TEXTS.PLACEHOLDER_STEP,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isStepChanging, setIsStepChanging] = useState<boolean>(false);
@@ -52,9 +40,13 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     if (newSteps.length > 0) {
       const firstStep = newSteps[0];
       const startTimeValue =
-        typeof firstStep.startTime === 'number' ? firstStep.startTime : 0;
+        typeof firstStep.startTime === 'number'
+          ? firstStep.startTime
+          : DEFAULT_TIME_VALUES.START_TIME;
       const endTimeValue =
-        typeof firstStep.endTime === 'number' ? firstStep.endTime : 10;
+        typeof firstStep.endTime === 'number'
+          ? firstStep.endTime
+          : DEFAULT_TIME_VALUES.END_TIME;
 
       setStartTime(startTimeValue);
       setEndTime(endTimeValue);
@@ -124,9 +116,9 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
 
     const newStep: Step = {
       id: newStepId,
-      startTime: 0,
-      endTime: 10,
-      description: `步驟 ${newStepId}：請輸入步驟說明`,
+      startTime: DEFAULT_TIME_VALUES.START_TIME,
+      endTime: DEFAULT_TIME_VALUES.END_TIME,
+      description: `步驟 ${newStepId}：${COMMON_TEXTS.PLACEHOLDER_STEP}`,
     };
 
     setSteps((prevSteps) => [...prevSteps, newStep]);
@@ -134,7 +126,7 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     setTimeout(() => {
       setIsStepChanging(true); // 設置步驟切換狀態
       setCurrentStep(steps.length + 1);
-    }, 10);
+    }, DEBOUNCE_DELAYS.STEP_CHANGE);
   }, [steps]);
 
   /**
@@ -244,8 +236,13 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
     if (steps[stepIndex]) {
       const step = steps[stepIndex];
       const startTimeValue =
-        typeof step.startTime === 'number' ? step.startTime : 0;
-      const endTimeValue = typeof step.endTime === 'number' ? step.endTime : 10;
+        typeof step.startTime === 'number'
+          ? step.startTime
+          : DEFAULT_TIME_VALUES.START_TIME;
+      const endTimeValue =
+        typeof step.endTime === 'number'
+          ? step.endTime
+          : DEFAULT_TIME_VALUES.END_TIME;
 
       setStartTime(startTimeValue);
       setEndTime(endTimeValue);

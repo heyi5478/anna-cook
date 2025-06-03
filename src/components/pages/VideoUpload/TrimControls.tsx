@@ -2,6 +2,7 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { cn, formatTime } from '@/lib/utils';
+import { VIDEO_SEGMENT_LIMITS, VIDEO_SEGMENT_STATUS } from '@/lib/constants';
 
 /**
  * 影片剪輯控制元件，處理影片片段的時間軸及剪輯控制
@@ -191,24 +192,29 @@ export default function TrimControls({
           let statusColor = '';
           let statusText = '';
 
-          if (segmentDuration < 5 || segmentDuration > 30) {
+          if (
+            segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION ||
+            segmentDuration > VIDEO_SEGMENT_LIMITS.MAX_DURATION
+          ) {
             statusColor = 'bg-red-500';
             statusText =
-              segmentDuration < 5
-                ? '時間太短 (建議至少5秒)'
-                : '時間太長 (建議不超過30秒)';
+              segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION
+                ? VIDEO_SEGMENT_STATUS.TOO_SHORT
+                : VIDEO_SEGMENT_STATUS.TOO_LONG;
           } else if (
-            (segmentDuration >= 5 && segmentDuration < 10) ||
-            (segmentDuration > 25 && segmentDuration <= 30)
+            (segmentDuration >= VIDEO_SEGMENT_LIMITS.MIN_DURATION &&
+              segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN) ||
+            (segmentDuration > VIDEO_SEGMENT_LIMITS.IDEAL_MAX &&
+              segmentDuration <= VIDEO_SEGMENT_LIMITS.MAX_DURATION)
           ) {
             statusColor = 'bg-yellow-500';
             statusText =
-              segmentDuration < 10
-                ? '時間略短 (適中為10-25秒)'
-                : '時間略長 (適中為10-25秒)';
+              segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN
+                ? VIDEO_SEGMENT_STATUS.SLIGHTLY_SHORT
+                : VIDEO_SEGMENT_STATUS.SLIGHTLY_LONG;
           } else {
             statusColor = 'bg-green-500';
-            statusText = '時間長度適中';
+            statusText = VIDEO_SEGMENT_STATUS.IDEAL;
           }
 
           return (

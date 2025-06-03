@@ -3,6 +3,15 @@ import { devtools } from 'zustand/middleware';
 import type { Step, RecipeSubmitData } from '@/types/recipe';
 import type { RecipeFormValues } from '@/components/pages/RecipeDraft/schema';
 import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
+import {
+  DEFAULT_FORM_VALUES,
+  TIME_UNITS,
+  SERVING_UNITS,
+  ERROR_MESSAGES,
+  REGEX_PATTERNS,
+  HTTP_STATUS,
+  SUCCESS_MESSAGES,
+} from '@/lib/constants';
 
 // 狀態型別定義
 type State = {
@@ -61,15 +70,15 @@ type Actions = {
 };
 
 const defaultFormData: RecipeFormValues = {
-  name: '',
-  description: '',
-  ingredients: [],
-  seasonings: [],
-  tags: [],
-  cookingTimeValue: '',
-  cookingTimeUnit: '分鐘',
-  servingsValue: '',
-  servingsUnit: '人份',
+  name: DEFAULT_FORM_VALUES.RECIPE_FORM.name,
+  description: DEFAULT_FORM_VALUES.RECIPE_FORM.description,
+  ingredients: DEFAULT_FORM_VALUES.RECIPE_FORM.ingredients,
+  seasonings: DEFAULT_FORM_VALUES.RECIPE_FORM.seasonings,
+  tags: DEFAULT_FORM_VALUES.RECIPE_FORM.tags,
+  cookingTimeValue: DEFAULT_FORM_VALUES.RECIPE_FORM.cookingTimeValue,
+  cookingTimeUnit: TIME_UNITS.MINUTES,
+  servingsValue: DEFAULT_FORM_VALUES.RECIPE_FORM.servingsValue,
+  servingsUnit: SERVING_UNITS.PERSON,
 };
 
 /**
@@ -104,7 +113,7 @@ export const useRecipeDraftStore = create<State & Actions>()(
           const draftData = await fetchRecipeDraft(recipeId);
           console.log('API 回應資料:', draftData);
 
-          if (draftData.StatusCode !== 200) {
+          if (draftData.StatusCode !== HTTP_STATUS.OK) {
             set({ error: draftData.msg, loading: false });
             return;
           }
@@ -115,7 +124,7 @@ export const useRecipeDraftStore = create<State & Actions>()(
           // 從 videoId 中提取 Vimeo ID
           let vimeoId = '';
           if (recipeData.videoId) {
-            const match = recipeData.videoId.match(/\/videos\/(\d+)/);
+            const match = recipeData.videoId.match(REGEX_PATTERNS.VIMEO_ID);
             if (match?.[1]) {
               const [, extractedId] = match;
               vimeoId = extractedId;
@@ -128,9 +137,9 @@ export const useRecipeDraftStore = create<State & Actions>()(
             name: recipeData.recipeName,
             description: recipeData.description || '',
             cookingTimeValue: recipeData.cookingTime.toString(),
-            cookingTimeUnit: '分鐘',
+            cookingTimeUnit: TIME_UNITS.MINUTES,
             servingsValue: recipeData.portion.toString(),
-            servingsUnit: '人份',
+            servingsUnit: SERVING_UNITS.PERSON,
             ingredients: ingredients
               .filter((item) => !item.isFlavoring)
               .map((item) => ({
@@ -164,8 +173,11 @@ export const useRecipeDraftStore = create<State & Actions>()(
             loading: false,
           });
         } catch (err) {
-          console.error('載入食譜草稿失敗:', err);
-          set({ error: '載入食譜草稿時發生錯誤', loading: false });
+          console.error(ERROR_MESSAGES.LOAD_RECIPE_DRAFT_FAILED, err);
+          set({
+            error: ERROR_MESSAGES.LOAD_RECIPE_DRAFT_ERROR,
+            loading: false,
+          });
         }
       },
 
@@ -253,17 +265,16 @@ export const useRecipeDraftStore = create<State & Actions>()(
 
           const response = await submitRecipeDraft(recipeId, submitData);
 
-          if (response.StatusCode === 200) {
-            console.log('草稿提交成功:', response);
+          if (response.StatusCode === HTTP_STATUS.OK) {
+            console.log(SUCCESS_MESSAGES.DRAFT_SUBMITTED, response);
             set({ saving: false });
             return { success: true };
           }
-          console.error('草稿提交失敗:', response);
-          set({ saving: false, error: '提交失敗' });
+          set({ error: response.msg, saving: false });
           return { success: false };
         } catch (err) {
-          console.error('提交過程發生錯誤:', err);
-          set({ saving: false, error: '提交過程發生錯誤' });
+          console.error('提交食譜草稿失敗:', err);
+          set({ error: '提交食譜草稿時發生錯誤', saving: false });
           return { success: false };
         }
       },

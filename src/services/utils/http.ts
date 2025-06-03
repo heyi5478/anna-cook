@@ -1,4 +1,5 @@
 import { authConfig } from '@/config';
+import { DEV_TEST_TOKEN, COMMON_TEXTS, COOKIE_EXPIRES } from '@/lib/constants';
 
 /**
  * 從 Cookie 或 localStorage 獲取 JWT Token
@@ -6,8 +7,8 @@ import { authConfig } from '@/config';
 export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log('開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
+    console.log(COMMON_TEXTS.DEV_ENVIRONMENT_TOKEN);
+    return DEV_TEST_TOKEN;
   }
 
   // 在伺服器端 document 不存在
@@ -40,7 +41,9 @@ export const updateAuthToken = (token: string): void => {
 
   // 1. 更新 Cookie (可能由服務器設置為 HttpOnly)
   const expirationDate = new Date();
-  expirationDate.setDate(expirationDate.getDate() + authConfig.tokenExpiryDays);
+  expirationDate.setDate(
+    expirationDate.getDate() + COOKIE_EXPIRES.TOKEN_EXPIRY_DAYS,
+  );
 
   document.cookie = `${authConfig.tokenCookieName}=${encodeURIComponent(
     token,

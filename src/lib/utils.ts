@@ -4,6 +4,7 @@ import { serialize, type SerializeOptions } from 'cookie';
 import { authConfig } from '@/config';
 import { RecipeDraftStep } from '@/types/api';
 import type { Step } from '@/types/recipe';
+import { COOKIE_EXPIRES } from '@/lib/constants';
 
 /**
  * 合併 class 名稱並處理 Tailwind 類名沖突
@@ -26,7 +27,7 @@ export function setClientCookie(
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: authConfig.tokenExpiryDays * 24 * 60 * 60, // 天數轉為秒數
+    maxAge: COOKIE_EXPIRES.TOKEN_EXPIRY_SECONDS,
     path: '/',
     ...options,
   };
@@ -51,7 +52,7 @@ export function setServerCookie(
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: authConfig.tokenExpiryDays * 24 * 60 * 60, // 天數轉為秒數
+    maxAge: COOKIE_EXPIRES.TOKEN_EXPIRY_SECONDS,
     path: '/',
     ...options,
   };
@@ -98,15 +99,16 @@ export const isMobileDevice = (): boolean => {
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number,
+  delay: number,
 ): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
+  let timeoutId: NodeJS.Timeout;
 
-  return function (...args: Parameters<T>) {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func(...args);
-    }, wait);
+  return function debouncedFunction(this: any, ...args: Parameters<T>) {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
   };
 }
 

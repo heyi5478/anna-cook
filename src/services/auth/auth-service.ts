@@ -5,6 +5,7 @@ import {
   LoginResponse,
   CheckAuthResponse,
 } from '@/types/api';
+import { HTTP_STATUS } from '@/lib/constants';
 import { updateAuthToken } from '../utils/http';
 
 /**
@@ -184,7 +185,7 @@ export const loginWithEmail = async (
     }
 
     // 如果登入成功，將 token 存儲到 localStorage
-    if (responseData.StatusCode === 200 && responseData.token) {
+    if (responseData.StatusCode === HTTP_STATUS.OK && responseData.token) {
       // 檢查是否在瀏覽器環境
       if (typeof window !== 'undefined') {
         updateAuthToken(responseData.token);
@@ -203,7 +204,7 @@ export const loginWithEmail = async (
   } catch (error) {
     console.error('登入失敗:', error);
     return {
-      StatusCode: 500,
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       msg: error instanceof Error ? error.message : '登入過程中發生未知錯誤',
     };
   }

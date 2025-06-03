@@ -6,6 +6,7 @@ import {
   RecipeDetailResponse,
 } from '@/services/server-api';
 import RecipePageComponent from '@/components/pages/RecipePage';
+import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -20,7 +21,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   }
 
   // 如果沒有成功獲取食譜資料
-  if (recipeData.StatusCode !== 200 || !recipeData.data) {
+  if (recipeData.StatusCode !== HTTP_STATUS.OK || !recipeData.data) {
     return (
       <div className="container mx-auto py-10 text-center">
         <h2 className="text-xl font-semibold mb-4">找不到該食譜</h2>
@@ -70,12 +71,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const recipeData = await fetchRecipeDetailServer(recipeId);
 
-    if (recipeData.StatusCode !== 200 || !recipeData.data) {
+    if (recipeData.StatusCode !== HTTP_STATUS.OK || !recipeData.data) {
       return {
         props: {
           recipeData,
         },
-        revalidate: 60, // 1分鐘後重新驗證
+        revalidate: REVALIDATE_INTERVALS.SHORT, // 1分鐘後重新驗證
       };
     }
 
@@ -83,18 +84,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
       props: {
         recipeData,
       },
-      revalidate: 3600, // 每小時重新驗證一次成功的資料
+      revalidate: REVALIDATE_INTERVALS.MEDIUM, // 每小時重新驗證一次成功的資料
     };
   } catch (error) {
     console.error('獲取食譜資料失敗:', error);
     return {
       props: {
         recipeData: {
-          StatusCode: 500,
+          StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
           msg: '獲取食譜資料失敗',
         },
       },
-      revalidate: 60, // 1分鐘後重新驗證
+      revalidate: REVALIDATE_INTERVALS.SHORT, // 1分鐘後重新驗證
     };
   }
 };

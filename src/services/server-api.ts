@@ -2,6 +2,7 @@ import { IncomingMessage } from 'http';
 import { apiConfig, authConfig } from '@/config';
 import { getServerToken as getNextApiServerToken } from '@/lib/auth-middleware';
 import type { NextApiRequest } from 'next';
+import { DEV_TEST_TOKEN, COMMON_TEXTS } from '@/lib/constants';
 
 /**
  * 從 IncomingMessage 請求 Cookie 中獲取 JWT Token
@@ -42,8 +43,8 @@ export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
 
   // 在開發環境中使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log('伺服器端開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
+    console.log(COMMON_TEXTS.DEV_SERVER_TOKEN);
+    return DEV_TEST_TOKEN;
   }
 
   // 生產環境中沒有 token，返回 null
