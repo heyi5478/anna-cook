@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import type { Step } from './types';
+import type { Step } from '@/types/recipe';
 
 type CookingStepProps = {
   steps: Step[];
@@ -68,8 +68,12 @@ export const CookingStep = ({
           {step.vimeoId ? (
             <VimeoPlayer
               videoId={step.vimeoId}
-              startTime={timeToSeconds(step.startTime)}
-              endTime={timeToSeconds(step.endTime)}
+              startTime={timeToSeconds(
+                typeof step.startTime === 'string' ? step.startTime : '0:00',
+              )}
+              endTime={timeToSeconds(
+                typeof step.endTime === 'string' ? step.endTime : '0:00',
+              )}
               responsive
               muted
               loop
@@ -89,7 +93,7 @@ export const CookingStep = ({
    * 渲染步驟資訊區塊
    */
   const renderStepInfo = (step: Step, index: number) => {
-    const stepId = step.id || `step-${index}`;
+    const stepId = step.id ? String(step.id) : `step-${index}`;
     const isPlaying = playingSteps[stepId] || false;
 
     return (

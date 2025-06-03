@@ -1,25 +1,4 @@
-// 定義作者資料類型
-export type Author = {
-  id: string;
-  name: string;
-  avatar: string;
-  bio: string;
-  recipeCount: number;
-  followerCount: number;
-  isFollowing: boolean;
-};
-
-// 定義食譜資料類型
-export type Recipe = {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  time: number;
-  servings: number;
-  rating: number;
-  description: string;
-};
+import type { Author, Recipe } from '@/types/recipe';
 
 // 模擬作者資料
 export const mockAuthor: Author = {
@@ -43,6 +22,7 @@ export const mockRecipes: Recipe[] = [
     servings: 2,
     rating: 4.5,
     description: '使用五香粉和醬油等調味料，讓豬肉入味...',
+    cookingTime: 30,
   },
   {
     id: '2',
@@ -53,6 +33,7 @@ export const mockRecipes: Recipe[] = [
     servings: 2,
     rating: 4.5,
     description: '使用五香粉和醬油等調味料，讓豬肉入味...',
+    cookingTime: 30,
   },
   {
     id: '3',
@@ -63,5 +44,6 @@ export const mockRecipes: Recipe[] = [
     servings: 2,
     rating: 4.5,
     description: '使用五香粉和醬油等調味料，讓豬肉入味...',
+    cookingTime: 30,
   },
 ];

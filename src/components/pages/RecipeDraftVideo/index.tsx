@@ -4,13 +4,8 @@ import { useRouter } from 'next/router';
 import { toast } from '@/hooks/use-toast';
 
 // 型別
-import type {
-  VideoEditorProps,
-  SubmitData,
-  Ingredient,
-  Tag,
-  Step,
-} from '@/types/video-editor';
+import type { VideoEditorProps, SubmitData, Tag } from '@/types/video-editor';
+import type { Ingredient, Step } from '@/types/recipe';
 
 // Hooks
 import { useVideoTime } from '@/hooks/useVideoTime';
@@ -50,7 +45,7 @@ const buildSubmitData = (recipeData: any, steps: Step[]): SubmitData => {
         .filter((item: Ingredient) => !item.isFlavoring)
         .map((item: Ingredient) => ({
           name: item.ingredientName,
-          amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+          amount: `${item.ingredientAmount || 0} ${item.ingredientUnit || ''}`,
           isFlavoring: false,
         })),
       // 調味料列表
@@ -58,15 +53,17 @@ const buildSubmitData = (recipeData: any, steps: Step[]): SubmitData => {
         .filter((item: Ingredient) => item.isFlavoring)
         .map((item: Ingredient) => ({
           name: item.ingredientName,
-          amount: `${item.ingredientAmount} ${item.ingredientUnit}`,
+          amount: `${item.ingredientAmount || 0} ${item.ingredientUnit || ''}`,
           isFlavoring: true,
         })),
     ],
     tags: tags.map((tag: Tag) => tag.tagName),
     steps: steps.map((step) => ({
       description: step.description,
-      startTime: formatSec(step.startTime),
-      endTime: formatSec(step.endTime),
+      startTime: formatSec(
+        typeof step.startTime === 'number' ? step.startTime : 0,
+      ),
+      endTime: formatSec(typeof step.endTime === 'number' ? step.endTime : 0),
     })),
   };
 };
@@ -132,7 +129,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       setError('');
       try {
         // 使用 URL 中的 recipeId 參數或 props 中的 recipeId
-        const recipeIdValue = Number(urlRecipeId) || recipeId;
+        let recipeIdValue = 0;
+        if (typeof urlRecipeId === 'string') {
+          recipeIdValue = parseInt(urlRecipeId, 10);
+        } else if (typeof recipeId === 'number') {
+          recipeIdValue = recipeId;
+        }
 
         console.log('取得食譜 ID:', recipeIdValue);
 
@@ -264,7 +266,12 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
    */
   const atSubmitSteps = async () => {
     try {
-      const recipeIdValue = Number(urlRecipeId) || recipeId;
+      let recipeIdValue = 0;
+      if (typeof urlRecipeId === 'string') {
+        recipeIdValue = parseInt(urlRecipeId, 10);
+      } else if (typeof recipeId === 'number') {
+        recipeIdValue = recipeId;
+      }
 
       if (!recipeIdValue) {
         toast({

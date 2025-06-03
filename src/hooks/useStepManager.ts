@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Step } from '@/types/video-editor';
+import type { Step } from '@/types/recipe';
 import { debounce } from '@/lib/utils';
 
 // 初始範例步驟資料 (作為備用)
@@ -30,12 +30,14 @@ const DEFAULT_STEPS: Step[] = [
 export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   const [steps, setSteps] = useState<Step[]>(initialSteps);
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [startTime, setStartTime] = useState<number>(
-    initialSteps[0]?.startTime || 0,
-  );
-  const [endTime, setEndTime] = useState<number>(
-    initialSteps[0]?.endTime || 10,
-  );
+  const [startTime, setStartTime] = useState<number>(() => {
+    const firstStepTime = initialSteps[0]?.startTime;
+    return typeof firstStepTime === 'number' ? firstStepTime : 0;
+  });
+  const [endTime, setEndTime] = useState<number>(() => {
+    const firstStepTime = initialSteps[0]?.endTime;
+    return typeof firstStepTime === 'number' ? firstStepTime : 10;
+  });
   const [currentDescription, setCurrentDescription] = useState<string>(
     initialSteps[0]?.description || '請輸入步驟說明',
   );
@@ -48,9 +50,15 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   const setStepsData = useCallback((newSteps: Step[]) => {
     setSteps(newSteps);
     if (newSteps.length > 0) {
-      setStartTime(newSteps[0].startTime);
-      setEndTime(newSteps[0].endTime);
-      setCurrentDescription(newSteps[0].description);
+      const firstStep = newSteps[0];
+      const startTimeValue =
+        typeof firstStep.startTime === 'number' ? firstStep.startTime : 0;
+      const endTimeValue =
+        typeof firstStep.endTime === 'number' ? firstStep.endTime : 10;
+
+      setStartTime(startTimeValue);
+      setEndTime(endTimeValue);
+      setCurrentDescription(firstStep.description);
       setCurrentStep(1);
     }
   }, []);
@@ -98,8 +106,23 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
    * 添加新的步驟
    */
   const addStep = useCallback(() => {
-    const newStepId = Math.max(...steps.map((s) => s.id), 0) + 1;
-    const newStep = {
+    const stepIds = steps
+      .map((s) => {
+        const { id } = s;
+        if (typeof id === 'number') {
+          return id;
+        }
+        if (typeof id === 'string') {
+          return parseInt(id, 10);
+        }
+        return 0;
+      })
+      .filter((id) => !Number.isNaN(id));
+
+    const maxId = stepIds.length > 0 ? Math.max(...stepIds) : 0;
+    const newStepId = maxId + 1;
+
+    const newStep: Step = {
       id: newStepId,
       startTime: 0,
       endTime: 10,
@@ -219,9 +242,14 @@ export function useStepManager(initialSteps: Step[] = DEFAULT_STEPS) {
   useEffect(() => {
     const stepIndex = currentStep - 1;
     if (steps[stepIndex]) {
-      setStartTime(steps[stepIndex].startTime);
-      setEndTime(steps[stepIndex].endTime);
-      setCurrentDescription(steps[stepIndex].description);
+      const step = steps[stepIndex];
+      const startTimeValue =
+        typeof step.startTime === 'number' ? step.startTime : 0;
+      const endTimeValue = typeof step.endTime === 'number' ? step.endTime : 10;
+
+      setStartTime(startTimeValue);
+      setEndTime(endTimeValue);
+      setCurrentDescription(step.description);
     }
   }, [currentStep, steps]);
 

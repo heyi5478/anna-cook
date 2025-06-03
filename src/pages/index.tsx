@@ -10,24 +10,13 @@ import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
 import Image from 'next/image';
+import type { Recipe } from '@/types/recipe';
 import {
   fetchHomeFeatures,
   HomeFeatureResponse,
   fetchHomeRecipes,
   HomeRecipesResponse,
 } from '@/services/server-api';
-
-// 定義食譜類型
-type Recipe = {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  time: number;
-  servings: number;
-  rating: number;
-  description: string;
-};
 
 // 定義分類類型
 type Category = {
@@ -218,6 +207,7 @@ export default function HomePage({
         : '/placeholder.svg?height=80&width=80',
       category: '',
       time: recipe.cookingTime,
+      cookingTime: recipe.cookingTime,
       servings: recipe.portion,
       rating: recipe.rating,
       description: recipe.description || '',

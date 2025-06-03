@@ -1,9 +1,9 @@
-import { clsx, type ClassValue } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { serialize, type SerializeOptions } from 'cookie';
 import { authConfig } from '@/config';
 import { RecipeDraftStep } from '@/types/api';
-import type { Step } from '@/types/video-editor';
+import type { Step } from '@/types/recipe';
 
 /**
  * 合併 class 名稱並處理 Tailwind 類名沖突

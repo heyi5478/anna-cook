@@ -1,9 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type {
-  RecipeSubmitData,
-  Step,
-} from '@/components/pages/RecipeDraft/types';
+import type { Step, RecipeSubmitData } from '@/types/recipe';
 import type { RecipeFormValues } from '@/components/pages/RecipeDraft/schema';
 import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
 
@@ -243,8 +240,14 @@ export const useRecipeDraftStore = create<State & Actions>()(
             tags: formData.tags,
             steps: steps.map((step) => ({
               description: step.description,
-              startTime: step.startTime,
-              endTime: step.endTime,
+              startTime:
+                typeof step.startTime === 'string'
+                  ? step.startTime
+                  : String(step.startTime || '0:00'),
+              endTime:
+                typeof step.endTime === 'string'
+                  ? step.endTime
+                  : String(step.endTime || '0:00'),
             })),
           };
 

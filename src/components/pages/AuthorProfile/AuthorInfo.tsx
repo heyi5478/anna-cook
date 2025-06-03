@@ -2,7 +2,7 @@ import { Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { FollowButton } from '@/components/features/FollowButton';
-import { Author } from './types';
+import type { Author } from '@/types/recipe';
 
 interface AuthorInfoProps {
   author: Author;
@@ -17,7 +17,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
   console.log('AuthorInfo.tsx - author:', author);
 
   // 使用從 props 傳入的 isFollowing 狀態
-  const [isFollowing, setIsFollowing] = useState(author.isFollowing);
+  const [isFollowing, setIsFollowing] = useState(author.isFollowing || false);
 
   // 顯示追蹤狀態初始值
   console.log('AuthorInfo.tsx - author.isFollowing:', author.isFollowing);
@@ -29,7 +29,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
       'AuthorInfo.tsx - useEffect 觸發 - author.isFollowing 變更為:',
       author.isFollowing,
     );
-    setIsFollowing(author.isFollowing);
+    setIsFollowing(author.isFollowing || false);
   }, [author.isFollowing]);
 
   /**
@@ -58,7 +58,10 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
 
         {/* 作者頭像 */}
         <Avatar className="h-24 w-24 mb-3">
-          <AvatarImage src={author.avatar} alt={author.name} />
+          <AvatarImage
+            src={author.avatar || author.profilePhoto}
+            alt={author.name}
+          />
           <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
         </Avatar>
 
@@ -67,13 +70,15 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
 
         {/* 食譜和粉絲數量 */}
         <div className="flex gap-4 mb-4 text-sm text-gray-500">
-          <span>{author.recipeCount} 食譜</span>
-          <span>{author.followerCount} 粉絲</span>
+          <span>{author.recipeCount || 0} 食譜</span>
+          <span>{author.followerCount || author.followersCount || 0} 粉絲</span>
         </div>
 
         {/* 追蹤按鈕 - 使用通用的 FollowButton 元件 */}
         <FollowButton
-          userId={parseInt(author.id, 10)}
+          userId={
+            typeof author.id === 'string' ? parseInt(author.id, 10) : author.id
+          }
           initialIsFollowing={isFollowing}
           variant={isFollowing ? 'outline' : 'default'}
           className={
@@ -87,7 +92,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
 
       {/* 作者簡介 */}
       <div className="mt-8 text-gray-700 text-sm px-4">
-        <p className="leading-6">{author.bio}</p>
+        <p className="leading-6">{author.bio || author.description}</p>
       </div>
     </div>
   );

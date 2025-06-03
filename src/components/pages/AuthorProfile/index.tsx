@@ -6,7 +6,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/router';
-import { Author } from './types';
+import type { Author } from '@/types/recipe';
 import { AuthorInfo } from './AuthorInfo';
 import { AuthorRecipes } from './AuthorRecipes';
 
@@ -74,7 +74,7 @@ export const AuthorProfile = ({
       <AuthorInfo author={author} onShareClick={atShareClick} />
 
       {/* 食譜區塊 */}
-      <AuthorRecipes displayId={effectiveDisplayId} isMe={isMe} />
+      <AuthorRecipes displayId={String(effectiveDisplayId)} isMe={isMe} />
     </main>
   );
 };

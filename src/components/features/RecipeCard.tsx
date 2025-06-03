@@ -2,18 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Clock, Users, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-
-// 定義食譜類型
-export type Recipe = {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  time: number;
-  servings: number;
-  rating: number;
-  description: string;
-};
+import type { Recipe } from '@/types/recipe';
 
 export type RecipeCardProps = {
   recipe: Recipe;
@@ -32,7 +21,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
       <div className="relative w-24 h-24 my-4 ml-4 mr-0 flex-shrink-0">
         <Image
           src={recipe.image || '/placeholder.svg'}
-          alt={recipe.title}
+          alt={recipe.title || recipe.recipeName || '食譜圖片'}
           fill
           className="object-cover rounded-md"
         />

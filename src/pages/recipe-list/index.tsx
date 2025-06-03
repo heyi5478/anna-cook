@@ -3,10 +3,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import {
-  RecipeCard,
-  Recipe as RecipeCardType,
-} from '@/components/features/RecipeCard';
+import { RecipeCard } from '@/components/features/RecipeCard';
+import type { Recipe as RecipeCardType } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Search, Settings2 } from 'lucide-react';
 // import { Layout } from '@/components/layout';
@@ -65,6 +63,7 @@ export default function RecipeListPage({
               : '/images/recipe-placeholder.jpg',
             category: '',
             time: item.cookingTime,
+            cookingTime: item.cookingTime,
             servings: item.portion,
             rating: item.rating,
             description: item.description,
@@ -379,6 +378,7 @@ export const getStaticProps: GetStaticProps = async () => {
         : '/images/recipe-placeholder.jpg',
       category: '', // 填入空字串，因為這個欄位是必須的
       time: item.cookingTime,
+      cookingTime: item.cookingTime,
       servings: item.portion,
       rating: item.rating,
       description: item.description,

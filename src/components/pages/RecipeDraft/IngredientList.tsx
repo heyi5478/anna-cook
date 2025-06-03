@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, X } from 'lucide-react';
 import { useId } from 'react';
-import type { Ingredient, Seasoning } from './types';
+import type { Ingredient, Seasoning } from '@/types/recipe';
 
 type IngredientListProps = {
   ingredients: Ingredient[];

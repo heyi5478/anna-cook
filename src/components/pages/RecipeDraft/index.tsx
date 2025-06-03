@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
-import { type Ingredient, type Seasoning } from './types';
+import type { Ingredient, Seasoning } from '@/types/recipe';
 import { recipeFormSchema, type RecipeFormValues } from './schema';
 import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';

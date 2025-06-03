@@ -77,6 +77,7 @@ export const AuthorRecipes = ({
       : '/images/recipe-placeholder.jpg',
     description: apiRecipe.description,
     time: apiRecipe.cookTime,
+    cookingTime: apiRecipe.cookTime,
     servings: apiRecipe.portion,
     rating: apiRecipe.rating || 0,
     category: '',

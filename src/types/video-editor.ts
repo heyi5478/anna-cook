@@ -1,27 +1,7 @@
-export type Step = {
-  id: number;
-  startTime: number;
-  endTime: number;
-  description: string;
-};
-
-/**
- * Video Editor 元件的 Props 型別
- */
 export type VideoEditorProps = {
-  videoId?: number | string;
+  recipeId?: string | number;
+  videoId?: string | number;
   totalDuration?: number;
-  recipeId?: number;
-};
-
-/**
- * 食材型別
- */
-export type Ingredient = {
-  ingredientName: string;
-  ingredientAmount: number;
-  ingredientUnit: string;
-  isFlavoring: boolean;
 };
 
 /**
