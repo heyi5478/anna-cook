@@ -24,7 +24,7 @@ import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 // 定義表單 schema
 const reviewSchema = z.object({
-  rating: z.number().min(1, { message: '請選擇評分' }),
+  rating: z.number().min(1, { message: VALIDATION_MESSAGES.REQUIRED_RATING }),
   comment: z
     .string()
     .min(TEXT_LIMITS.MIN_COMMENT_LENGTH, {

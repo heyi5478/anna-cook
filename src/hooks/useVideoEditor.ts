@@ -5,6 +5,7 @@ import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import { isMobileDevice } from '@/lib/utils';
 import { HTTP_STATUS } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 /**
  * 提供視頻編輯功能的自定義 Hook
@@ -77,7 +78,10 @@ export const useVideoEditor = () => {
       segments[currentSegmentIndex]?.description &&
       segments[currentSegmentIndex]?.description.trim().length < 10
     ) {
-      setErrors({ ...errors, description: '說明文字至少需要10個字' });
+      setErrors({
+        ...errors,
+        description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
+      });
     }
   }, [segments, currentSegmentIndex, setErrors, errors]);
 
@@ -91,7 +95,7 @@ export const useVideoEditor = () => {
 
       // 驗證檔案類型
       if (!file.type.startsWith('video/')) {
-        setErrors({ ...errors, video: '請上傳有效的影片檔案' });
+        setErrors({ ...errors, video: VALIDATION_MESSAGES.UPLOAD_VALID_VIDEO });
         return;
       }
 
@@ -209,7 +213,10 @@ export const useVideoEditor = () => {
     // 驗證說明文字
     if (value.trim().length < 10) {
       console.log('說明文字不足 10 字，設置錯誤');
-      setErrors({ ...errors, description: '說明文字至少需要10個字' });
+      setErrors({
+        ...errors,
+        description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
+      });
     } else {
       console.log('說明文字已達標準，清除錯誤');
       // 完全清除錯誤狀態，確保按鈕可點擊
@@ -522,7 +529,7 @@ export const useVideoEditor = () => {
 
     // 驗證影片
     if (!videoFile) {
-      newErrors.video = '請上傳影片';
+      newErrors.video = VALIDATION_MESSAGES.UPLOAD_VIDEO;
     }
 
     // 驗證說明文字
@@ -531,7 +538,8 @@ export const useVideoEditor = () => {
       const currentDescription =
         segments[currentSegmentIndex]?.description?.trim() || '';
       if (currentDescription.length < 10) {
-        newErrors.description = '說明文字至少需要10個字';
+        newErrors.description =
+          VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH;
       }
     }
 

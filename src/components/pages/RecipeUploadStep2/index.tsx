@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { updateRecipeStep2 } from '@/services/recipes';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -26,23 +27,35 @@ const recipeStep2Schema = z.object({
   ingredients: z
     .array(
       z.object({
-        name: z.string().min(1, { message: '請輸入食材名稱' }),
-        amount: z.string().min(1, { message: '請輸入數量' }),
+        name: z
+          .string()
+          .min(1, { message: VALIDATION_MESSAGES.REQUIRED_INGREDIENT_NAME }),
+        amount: z
+          .string()
+          .min(1, { message: VALIDATION_MESSAGES.REQUIRED_AMOUNT }),
         unit: z.string().optional(),
         isFlavoring: z.boolean().default(false),
       }),
     )
-    .min(1, { message: '至少需要一項食材' }),
+    .min(1, { message: VALIDATION_MESSAGES.MIN_INGREDIENTS }),
   seasonings: z.array(
     z.object({
-      name: z.string().min(1, { message: '請輸入調料名稱' }),
-      amount: z.string().min(1, { message: '請輸入數量' }),
+      name: z
+        .string()
+        .min(1, { message: VALIDATION_MESSAGES.REQUIRED_SEASONING_NAME_ALT }),
+      amount: z
+        .string()
+        .min(1, { message: VALIDATION_MESSAGES.REQUIRED_AMOUNT }),
       unit: z.string().optional(),
     }),
   ),
-  tags: z.array(z.string()).min(1, { message: '至少需要一個標籤' }),
-  cookingTime: z.string().min(1, { message: '請輸入烹調時間' }),
-  servings: z.string().min(1, { message: '請輸入人份數' }),
+  tags: z.array(z.string()).min(1, { message: VALIDATION_MESSAGES.MIN_TAGS }),
+  cookingTime: z
+    .string()
+    .min(1, { message: VALIDATION_MESSAGES.REQUIRED_COOKING_TIME }),
+  servings: z
+    .string()
+    .min(1, { message: VALIDATION_MESSAGES.REQUIRED_SERVINGS }),
 });
 
 // 定義表單資料型別

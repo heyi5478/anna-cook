@@ -27,6 +27,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ISSUE_TYPES } from '@/lib/constants';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 import { contactFormSchema, type ContactFormValues } from './schema';
 
 /**
@@ -136,7 +137,9 @@ export default function ContactUs() {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="請選擇問題類型" />
+                        <SelectValue
+                          placeholder={VALIDATION_MESSAGES.SELECT_ISSUE_TYPE}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

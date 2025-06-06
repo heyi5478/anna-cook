@@ -36,6 +36,7 @@ import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -46,7 +47,7 @@ const profileFormSchema = z.object({
   email: z
     .string()
     .min(1, { message: '電子郵件為必填欄位' })
-    .email({ message: '請輸入有效的電子郵件地址格式' }),
+    .email({ message: VALIDATION_MESSAGES.INVALID_EMAIL }),
   bio: z.string().max(500, { message: '簡介不能超過 500 個字元' }).optional(),
 });
 

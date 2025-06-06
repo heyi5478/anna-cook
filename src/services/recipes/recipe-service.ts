@@ -1,6 +1,7 @@
 import { apiConfig } from '@/config';
 import { HTTP_STATUS } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 import {
   Recipe,
   ApiResponse,
@@ -94,8 +95,8 @@ export const uploadRecipeBasic = async (
       );
       multipartFormData.append('photo', formData.coverImage);
     } else {
-      console.error('請上傳圖片：圖片為必填欄位');
-      throw new Error('請上傳圖片：圖片為必填欄位');
+      console.error(VALIDATION_MESSAGES.UPLOAD_IMAGE_REQUIRED);
+      throw new Error(VALIDATION_MESSAGES.UPLOAD_IMAGE_REQUIRED);
     }
 
     // 發送請求到 Next.js API 路由，由其代理到後端 API

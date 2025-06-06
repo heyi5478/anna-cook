@@ -17,11 +17,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證規則
 const formSchema = z.object({
-  email: z.string().email('請輸入有效的電子郵件地址'),
-  password: z.string().min(1, '請輸入密碼'),
+  email: z.string().email(VALIDATION_MESSAGES.INVALID_EMAIL),
+  password: z.string().min(1, VALIDATION_MESSAGES.REQUIRED_PASSWORD),
 });
 
 // 定義表單資料型別

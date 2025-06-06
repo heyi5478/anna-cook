@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { proxyAuthRequest } from '@/lib/auth-middleware';
 import { HTTP_STATUS } from '@/lib/constants';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 // 需要安裝: npm install formidable @types/formidable
 import formidable from 'formidable';
 import fs from 'fs';
@@ -57,7 +58,7 @@ export default async function handler(
     } else {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ error: '請上傳圖片：圖片為必填欄位' });
+        .json({ error: VALIDATION_MESSAGES.UPLOAD_IMAGE_REQUIRED });
     }
 
     // 使用通用代理函數處理請求

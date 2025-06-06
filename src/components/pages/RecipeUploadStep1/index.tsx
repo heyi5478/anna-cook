@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { uploadRecipeBasic } from '@/services/recipes';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -31,7 +32,7 @@ const recipeFormSchema = z.object({
       if (!value) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '請上傳封面圖片',
+          message: VALIDATION_MESSAGES.REQUIRED_COVER_IMAGE,
         });
         return;
       }
@@ -40,7 +41,7 @@ const recipeFormSchema = z.object({
       if (!(value instanceof File)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '請選擇有效的圖片檔案',
+          message: VALIDATION_MESSAGES.SELECT_VALID_IMAGE,
         });
         return;
       }
@@ -55,7 +56,7 @@ const recipeFormSchema = z.object({
       }
     }),
   agreement: z.literal(true, {
-    errorMap: () => ({ message: '請同意條款才能繼續' }),
+    errorMap: () => ({ message: VALIDATION_MESSAGES.AGREE_TERMS }),
   }),
 });
 
@@ -123,14 +124,14 @@ export default function RecipeUploadForm() {
 
       if (!data.agreement) {
         console.error('未同意條款');
-        setErrorMsg('請同意條款才能繼續');
+        setErrorMsg(VALIDATION_MESSAGES.AGREE_TERMS);
         return;
       }
 
       // 檢查圖片（使用已經處理好的檔案）
       if (!selectedFile) {
         console.error('未上傳封面圖片');
-        setErrorMsg('請上傳封面圖片');
+        setErrorMsg(VALIDATION_MESSAGES.REQUIRED_COVER_IMAGE);
         return;
       }
 
@@ -354,7 +355,8 @@ export default function RecipeUploadForm() {
           </div>
           {errors.coverImage && (
             <p className="mt-1 text-sm text-red-500">
-              {errors.coverImage.message?.toString() || '請上傳有效的封面圖片'}
+              {errors.coverImage.message?.toString() ||
+                VALIDATION_MESSAGES.UPLOAD_COVER_IMAGE}
             </p>
           )}
           {imagePreview && (
