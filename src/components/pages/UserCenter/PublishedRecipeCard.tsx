@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { toggleRecipePublishStatus } from '@/services/recipes';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * PublishedRecipeCard 元件的 props 類型
@@ -171,7 +172,7 @@ export function PublishedRecipeCard({
                   className="flex-1 bg-orange-500 hover:bg-orange-600"
                   disabled={isChanging}
                 >
-                  {isChanging ? '處理中...' : '確認'}
+                  {isChanging ? COMMON_TEXTS.SUBMITTING : '確認'}
                 </Button>
                 <DialogClose asChild>
                   <Button

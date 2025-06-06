@@ -20,6 +20,7 @@ import {
 } from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
 import { HTTP_STATUS, VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義表單 schema
 const reviewSchema = z.object({
@@ -221,7 +222,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                       <path d="m12 5 7 7-7 7" />
                     </svg>
                   )}
-                  {isLoading ? '提交中...' : '提交留言'}
+                  {isLoading ? COMMON_TEXTS.SUBMITTING : '提交留言'}
                 </Button>
               </form>
             </Form>

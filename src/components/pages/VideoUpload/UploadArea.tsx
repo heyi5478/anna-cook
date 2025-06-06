@@ -1,6 +1,7 @@
 import type React from 'react';
 import { AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 上傳區域元件屬性
@@ -31,7 +32,7 @@ export default function UploadArea({
       {isUploading && (
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span>上傳中...</span>
+            <span>{COMMON_TEXTS.UPLOADING}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} className="h-2" />

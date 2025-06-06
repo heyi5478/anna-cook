@@ -11,6 +11,7 @@ import { ChevronRight, Search, Settings2 } from 'lucide-react';
 import { searchRecipesServer } from '@/services/server-api';
 import { GetStaticProps } from 'next';
 import { SORT_TYPES, PAGINATION_DEFAULTS } from '@/lib/constants';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義頁面 props 介面
 interface RecipeListPageProps {
@@ -239,7 +240,7 @@ export default function RecipeListPage({
    */
   function renderSearchResults() {
     if (loading) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (recipes.length === 0) {

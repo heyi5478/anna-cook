@@ -2,6 +2,7 @@ import VideoUpload from '@/components/pages/VideoUpload';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 上傳影片頁面
@@ -29,7 +30,7 @@ export default function CreateRecipeStep3Page() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">載入中...</div>
+        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

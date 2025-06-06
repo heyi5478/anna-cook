@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 type SubmitButtonProps = {
   onSubmit: () => void;
@@ -21,7 +22,7 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
       disabled={submitting}
     >
       <Check className="h-4 w-4 mr-2" />
-      {submitting ? '提交中...' : '完成草稿'}
+      {submitting ? COMMON_TEXTS.SUBMITTING : '完成草稿'}
     </Button>
   </div>
 );

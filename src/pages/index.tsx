@@ -18,6 +18,7 @@ import {
   HomeRecipesResponse,
 } from '@/services/server-api';
 import { SORT_TYPES } from '@/lib/constants';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義分類類型
 type Category = {
@@ -344,7 +345,7 @@ export default function HomePage({
         {isLoading && (
           <div className="py-8 text-center">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-2 text-gray-500">載入中...</p>
+            <p className="mt-2 text-gray-500">{COMMON_TEXTS.LOADING}</p>
           </div>
         )}
 
@@ -370,7 +371,7 @@ export default function HomePage({
               onClick={onLoadMore}
               disabled={isLoading}
             >
-              {isLoading ? '載入中...' : '更多食譜'}{' '}
+              {isLoading ? COMMON_TEXTS.LOADING : '更多食譜'}{' '}
               {!isLoading && <ChevronDown size={16} />}
             </Button>
           </div>

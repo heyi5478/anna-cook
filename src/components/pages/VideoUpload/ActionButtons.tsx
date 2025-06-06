@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 操作按鈕元件，處理取消和確認操作
@@ -74,7 +75,7 @@ export default function ActionButtons({
           className="w-1/2"
         >
           {isSubmitting ? (
-            '上傳中...'
+            COMMON_TEXTS.UPLOADING
           ) : (
             <>
               <Check className="h-5 w-5 mr-2" />

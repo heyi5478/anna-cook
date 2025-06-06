@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 登入頁面組件
@@ -96,7 +97,7 @@ export default function LoginPage() {
                   />
                 </span>
                 <span className="mx-auto">
-                  {isLoading ? '處理中...' : '使用 Google 繼續'}
+                  {isLoading ? COMMON_TEXTS.SUBMITTING : '使用 Google 繼續'}
                 </span>
               </Button>
 

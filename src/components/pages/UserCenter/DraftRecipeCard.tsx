@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toggleRecipePublishStatus } from '@/services/recipes';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * DraftRecipeCard 元件的 props 類型
@@ -149,7 +150,7 @@ export function DraftRecipeCard({
                     className="flex-1 bg-orange-500 hover:bg-orange-600"
                     disabled={isPublishing}
                   >
-                    {isPublishing ? '處理中...' : '確認'}
+                    {isPublishing ? COMMON_TEXTS.SUBMITTING : '確認'}
                   </Button>
                   <DialogClose asChild>
                     <Button

@@ -33,6 +33,7 @@ import {
 import { RecipeRatingCommentResponse } from '@/types/api';
 
 // 引入樣式
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import {
   cardStyles,
   interactionButtonStyles,
@@ -496,7 +497,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               <Bookmark
                 className={`w-5 h-5 ${liked ? 'fill-[#FF5722] text-[#FF5722]' : ''}`}
               />
-              <span>{likeLoading ? '處理中...' : '收藏'}</span>
+              <span>{likeLoading ? COMMON_TEXTS.SUBMITTING : '收藏'}</span>
             </button>
             <button
               className={cn(
@@ -575,7 +576,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 onClick={atLoadMoreComments}
                 disabled={isLoadingComments}
               >
-                {isLoadingComments ? '載入中...' : '查看更多'}
+                {isLoadingComments ? COMMON_TEXTS.LOADING : '查看更多'}
               </Button>
             )}
           </div>

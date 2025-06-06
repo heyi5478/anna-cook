@@ -35,6 +35,7 @@ import {
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -426,7 +427,7 @@ export default function ProfileEditForm() {
                 className="w-full bg-gray-600 hover:bg-gray-700"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? '儲存中...' : '儲存更新'}
+                {isSubmitting ? COMMON_TEXTS.SAVING : '儲存更新'}
               </Button>
               <Button
                 type="button"

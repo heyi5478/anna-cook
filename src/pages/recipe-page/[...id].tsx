@@ -7,6 +7,7 @@ import {
 } from '@/services/server-api';
 import RecipePageComponent from '@/components/pages/RecipePage';
 import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -17,7 +18,11 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
 
   // 如果頁面正在建立，顯示載入中狀態
   if (router.isFallback) {
-    return <div className="container mx-auto py-10 text-center">載入中...</div>;
+    return (
+      <div className="container mx-auto py-10 text-center">
+        {COMMON_TEXTS.LOADING}
+      </div>
+    );
   }
 
   // 如果沒有成功獲取食譜資料

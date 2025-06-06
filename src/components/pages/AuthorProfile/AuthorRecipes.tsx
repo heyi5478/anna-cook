@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/features/RecipeCard';
 import { fetchUserRecipes } from '@/services/users';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
@@ -95,7 +96,7 @@ export const AuthorRecipes = ({
     }
 
     if (loading && page === 1) {
-      return <p className="text-center py-4">載入中...</p>;
+      return <p className="text-center py-4">{COMMON_TEXTS.LOADING}</p>;
     }
 
     if (error) {
@@ -120,7 +121,9 @@ export const AuthorRecipes = ({
         <div className="space-y-3">{renderRecipeList()}</div>
 
         {/* 載入中狀態 */}
-        {loading && page > 1 && <p className="text-center py-2">載入中...</p>}
+        {loading && page > 1 && (
+          <p className="text-center py-2">{COMMON_TEXTS.LOADING}</p>
+        )}
 
         {/* 更多食譜按鈕 */}
         {hasMore && !loading && (

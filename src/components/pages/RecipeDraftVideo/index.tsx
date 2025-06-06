@@ -20,6 +20,7 @@ import { convertApiStepsToComponentSteps } from '@/lib/utils';
 import { formatSeconds as formatSec } from '@/components/common/VimeoPlayer';
 
 // 子元件
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { BreadcrumbNavigation } from './BreadcrumbNavigation';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { StepNavigation } from './StepNavigation';
@@ -325,7 +326,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-40">載入中...</div>
+      <div className="flex justify-center items-center h-40">
+        {COMMON_TEXTS.LOADING}
+      </div>
     );
   }
 

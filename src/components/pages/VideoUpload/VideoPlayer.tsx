@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 影片播放器元件，處理影片的顯示、播放與暫停控制
@@ -48,7 +49,7 @@ export default function VideoPlayer({
           </video>
         ) : (
           <div className="flex items-center justify-center h-full">
-            影片載入中...
+            影片{COMMON_TEXTS.LOADING}
           </div>
         )}
 

@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義表單驗證規則
 const formSchema = z.object({
@@ -192,7 +193,7 @@ export default function SignInWithEmail() {
               disabled={submitting}
               className="w-full h-14 rounded-full bg-[#FF4500] hover:bg-[#FF4500]/90 text-white font-medium text-lg"
             >
-              {submitting ? '處理中...' : '登入'}
+              {submitting ? COMMON_TEXTS.SUBMITTING : '登入'}
             </Button>
           </form>
         </Form>

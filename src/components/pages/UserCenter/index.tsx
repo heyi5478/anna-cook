@@ -33,6 +33,7 @@ import {
   fetchUserFavoriteFollow,
   deleteMultipleRecipes,
 } from '@/services/recipes';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -396,7 +397,7 @@ export default function UserCenter({
   // 數據標籤頁內容 - 顯示食譜統計資訊
   const renderDataContent = () => {
     if (isLoadingPublished) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -437,7 +438,7 @@ export default function UserCenter({
   // 已發布標籤頁內容
   const renderPublishedContent = () => {
     if (isLoadingPublished) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -479,7 +480,7 @@ export default function UserCenter({
   // 草稿標籤頁內容
   const renderDraftContent = () => {
     if (isLoadingDrafts) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -628,7 +629,7 @@ export default function UserCenter({
                       className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-normal"
                       disabled={deleteLoading}
                     >
-                      {deleteLoading ? '處理中...' : '確認'}
+                      {deleteLoading ? COMMON_TEXTS.SUBMITTING : '確認'}
                     </Button>
                   </div>
                 </div>
@@ -648,7 +649,7 @@ export default function UserCenter({
   // 渲染「已追蹤」標籤內容
   const renderFollowContent = () => {
     if (followLoading && followPage === 1) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (followError) {
@@ -699,7 +700,7 @@ export default function UserCenter({
   // 渲染「已收藏」標籤內容
   const renderFavoriteContent = () => {
     if (favoriteLoading && favoritePage === 1) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (favoriteError) {

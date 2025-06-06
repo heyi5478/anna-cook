@@ -1,5 +1,6 @@
 import RecipeUploadStep2 from '@/components/pages/RecipeUploadStep2';
 import { useAuth } from '@/hooks/useAuth';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 上傳食譜第二步頁面
@@ -12,7 +13,7 @@ export default function CreateRecipeStep2Page() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">載入中...</div>
+        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

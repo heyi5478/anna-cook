@@ -17,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { uploadRecipeBasic } from '@/services/recipes';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -405,7 +406,7 @@ export default function RecipeUploadForm() {
               : 'bg-gray-400 hover:bg-gray-500',
           )}
         >
-          {isLoading ? '上傳中...' : '下一步'}
+          {isLoading ? COMMON_TEXTS.UPLOADING : '下一步'}
         </button>
       </form>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { followUser, unfollowUser } from '@/services/users';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // Toast 樣式
 const toastStyles = {
@@ -109,7 +110,7 @@ export const FollowButton = ({
    */
   const getButtonText = () => {
     if (loading) {
-      return '處理中...';
+      return COMMON_TEXTS.SUBMITTING;
     }
     return isFollowing ? '取消追蹤' : '追蹤';
   };
