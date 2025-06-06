@@ -10,6 +10,7 @@ import { ChevronRight, Search, Settings2 } from 'lucide-react';
 // import { Layout } from '@/components/layout';
 import { searchRecipesServer } from '@/services/server-api';
 import { GetStaticProps } from 'next';
+import { SORT_TYPES, PAGINATION_DEFAULTS } from '@/lib/constants';
 
 // 定義頁面 props 介面
 interface RecipeListPageProps {
@@ -32,7 +33,7 @@ export default function RecipeListPage({
   const [query, setQuery] = useState<string>(searchQuery);
   const [showSortOptions, setShowSortOptions] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>(
-    sortType ? String(sortType) : 'latest',
+    sortType ? String(sortType) : SORT_TYPES.LATEST,
   );
   const [recipes, setRecipes] = useState<RecipeCardType[]>(initialRecipes);
   const [loading, setLoading] = useState<boolean>(false);
@@ -46,7 +47,10 @@ export default function RecipeListPage({
         setLoading(true);
         try {
           // 轉換為API需要的參數格式
-          const apiSortType = sort === 'latest' ? 'createdAt' : 'popular';
+          const apiSortType =
+            sort === SORT_TYPES.LATEST
+              ? SORT_TYPES.CREATED_AT
+              : SORT_TYPES.POPULAR;
 
           // 獲取新的搜尋結果
           const response = await fetch(
@@ -98,7 +102,10 @@ export default function RecipeListPage({
             pathname: '/recipe-list',
             query: {
               q: newQuery,
-              type: sortBy === 'latest' ? 'createdAt' : 'popular',
+              type:
+                sortBy === SORT_TYPES.LATEST
+                  ? SORT_TYPES.CREATED_AT
+                  : SORT_TYPES.POPULAR,
               page: 1,
             },
           },
@@ -113,7 +120,10 @@ export default function RecipeListPage({
 
     if (sortType) {
       const newSortType = Array.isArray(sortType) ? sortType[0] : sortType;
-      const mappedSortType = newSortType === 'createdAt' ? 'latest' : 'popular';
+      const mappedSortType =
+        newSortType === SORT_TYPES.CREATED_AT
+          ? SORT_TYPES.LATEST
+          : SORT_TYPES.POPULAR;
 
       if (mappedSortType !== sortBy) {
         setSortBy(mappedSortType);
@@ -162,7 +172,10 @@ export default function RecipeListPage({
         pathname: '/recipe-list',
         query: {
           q: query,
-          type: newSortBy === 'latest' ? 'createdAt' : 'popular',
+          type:
+            newSortBy === SORT_TYPES.LATEST
+              ? SORT_TYPES.CREATED_AT
+              : SORT_TYPES.POPULAR,
           page: 1,
         },
       },
@@ -183,7 +196,10 @@ export default function RecipeListPage({
         pathname: '/recipe-list',
         query: {
           q: query,
-          type: sortBy === 'latest' ? 'createdAt' : 'popular',
+          type:
+            sortBy === SORT_TYPES.LATEST
+              ? SORT_TYPES.CREATED_AT
+              : SORT_TYPES.POPULAR,
           page: newPage,
         },
       },
@@ -201,16 +217,16 @@ export default function RecipeListPage({
     return (
       <div className="flex gap-2 mb-4">
         <Button
-          variant={sortBy === 'latest' ? 'default' : 'outline'}
+          variant={sortBy === SORT_TYPES.LATEST ? 'default' : 'outline'}
           className="rounded-full text-sm px-4"
-          onClick={() => handleSortChange('latest')}
+          onClick={() => handleSortChange(SORT_TYPES.LATEST)}
         >
           依上傳日期排序
         </Button>
         <Button
-          variant={sortBy === 'popular' ? 'default' : 'outline'}
+          variant={sortBy === SORT_TYPES.POPULAR ? 'default' : 'outline'}
           className="rounded-full text-sm px-4"
-          onClick={() => handleSortChange('popular')}
+          onClick={() => handleSortChange(SORT_TYPES.POPULAR)}
         >
           依人氣排序
         </Button>
@@ -279,7 +295,10 @@ export default function RecipeListPage({
         {totalCount > 0 && (
           <div className="flex justify-center items-center gap-2 my-4">
             {Array.from({
-              length: Math.min(5, Math.ceil(totalCount / 10)),
+              length: Math.min(
+                5,
+                Math.ceil(totalCount / PAGINATION_DEFAULTS.PAGE_SIZE),
+              ),
             }).map((_, i) => (
               <Button
                 key={`page-${i + 1}`}
@@ -297,7 +316,7 @@ export default function RecipeListPage({
               </Button>
             ))}
 
-            {Math.ceil(totalCount / 10) > 5 && (
+            {Math.ceil(totalCount / PAGINATION_DEFAULTS.PAGE_SIZE) > 5 && (
               <Button
                 variant="outline"
                 size="sm"
@@ -359,7 +378,7 @@ export const getStaticProps: GetStaticProps = async () => {
   try {
     // 從搜尋參數中獲取資料，或使用預設值
     const searchQuery = '';
-    const sortType = 'createdAt';
+    const sortType = SORT_TYPES.CREATED_AT;
     const page = 1;
 
     // 呼叫 API 獲取食譜搜尋結果
