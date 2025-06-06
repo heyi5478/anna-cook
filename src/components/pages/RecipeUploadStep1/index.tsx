@@ -19,6 +19,10 @@ import {
 import { uploadRecipeBasic } from '@/services/recipes';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import {
+  SUPPORTED_IMAGE_TYPES,
+  FILE_VALIDATION_MESSAGES,
+} from '@/lib/constants/file';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -47,11 +51,10 @@ const recipeFormSchema = z.object({
       }
 
       // 檢查檔案類型
-      const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-      if (!validFileTypes.includes(value.type)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(value.type as any)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '僅支援 JPG, JPEG 與 PNG 格式的圖片',
+          message: FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE,
         });
       }
     }),
@@ -182,9 +185,9 @@ export default function RecipeUploadForm() {
     const file = e.target.files?.[0];
     if (file) {
       // 檢查檔案格式
-      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(file.type as any)) {
         console.error('不支援的圖片格式:', file.type);
-        setErrorMsg('僅支援 JPG, JPEG 與 PNG 格式的圖片');
+        setErrorMsg(FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE);
         setImagePreview(null);
         setSelectedFile(null);
         return;
@@ -347,7 +350,7 @@ export default function RecipeUploadForm() {
             <input
               id="coverImage"
               type="file"
-              accept="image/jpeg,image/jpg,image/png"
+              accept={SUPPORTED_IMAGE_TYPES.join(',')}
               className="hidden"
               onChange={atImageChange}
               // 不再使用 register 直接綁定檔案欄位，我們將手動處理檔案上傳

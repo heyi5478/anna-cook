@@ -41,6 +41,10 @@ import {
   ERROR_MESSAGES,
 } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import {
+  SUPPORTED_IMAGE_TYPES,
+  FILE_VALIDATION_MESSAGES,
+} from '@/lib/constants/file';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -192,10 +196,10 @@ export default function ProfileEditForm() {
     const file = event.target.files?.[0];
     if (file) {
       // 檢查檔案類型
-      if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(file.type as any)) {
         toast({
           title: '不支援的圖片格式',
-          description: '只允許上傳 JPG、JPEG 或 PNG 圖片',
+          description: FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE,
           variant: 'destructive',
         });
         return;
@@ -370,7 +374,7 @@ export default function ProfileEditForm() {
                   <input
                     id="avatar-upload"
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png"
+                    accept={SUPPORTED_IMAGE_TYPES.join(',')}
                     className="hidden"
                     onChange={handleAvatarChange}
                     ref={avatarFileInputRef}

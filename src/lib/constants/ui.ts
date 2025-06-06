@@ -24,19 +24,6 @@ export const DEFAULT_TIME_VALUES = {
   STEP_INTERVAL: 5,
 } as const;
 
-// UI 顯示文字
-export const UI_TEXT = {
-  PLACEHOLDER_STEP: '請輸入步驟說明',
-  LOADING: '載入中...',
-  SUBMITTING: '提交中...',
-  UPLOADING: '上傳中...',
-  CANCEL: '取消',
-  CONFIRM: '確認',
-  SAVE: '儲存',
-  DELETE: '刪除',
-  COMPLETE: '完成',
-} as const;
-
 // 影片播放器設定
 export const VIDEO_PLAYER = {
   DEFAULT_WIDTH: 640,

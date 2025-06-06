@@ -25,3 +25,6 @@ export * from './regex';
 
 // 訊息文字常數
 export * from './messages';
+
+// 檔案相關常數
+export * from './file';
