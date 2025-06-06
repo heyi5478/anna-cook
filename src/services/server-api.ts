@@ -437,9 +437,9 @@ export interface HomeFeatureResponse {
  */
 export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
   try {
-    console.log(`伺服器端發送請求: GET ${apiConfig.baseUrl}/home/feature`);
+    console.log(`伺服器端發送請求: GET ${apiConfig.baseUrl}/home/features`);
 
-    const response = await fetch(`${apiConfig.baseUrl}/home/feature`);
+    const response = await fetch(`${apiConfig.baseUrl}/home/features`);
 
     console.log('伺服器端回應狀態:', response.status);
 
