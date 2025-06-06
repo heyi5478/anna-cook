@@ -1,4 +1,5 @@
 import { apiConfig } from '@/config';
+import { HTTP_STATUS } from '@/lib/constants';
 import {
   UserProfileResponse,
   CurrentUserProfileResponse,
@@ -66,7 +67,7 @@ export const fetchCurrentUserProfile =
       console.log('解析後的回應資料:', responseData);
 
       // 處理錯誤狀態碼
-      if (responseData.StatusCode !== 200) {
+      if (responseData.StatusCode !== HTTP_STATUS.OK) {
         throw new Error(responseData.msg || '獲取用戶資料失敗');
       }
 
@@ -133,7 +134,7 @@ export const updateUserProfile = async (
     }
 
     // 處理錯誤狀態碼
-    if (responseData.StatusCode !== 200) {
+    if (responseData.StatusCode !== HTTP_STATUS.OK) {
       throw new Error(responseData.msg || '更新用戶資料失敗');
     }
 
@@ -168,11 +169,11 @@ export const fetchUserRecipes = async (
 
     // 處理 404 或其他錯誤狀態
     if (!res.ok) {
-      if (res.status === 404) {
+      if (res.status === HTTP_STATUS.NOT_FOUND) {
         console.warn(`找不到使用者 ${displayId} 的食譜資料`);
         // 返回空資料而非拋出錯誤
         return {
-          statusCode: 404,
+          statusCode: HTTP_STATUS.NOT_FOUND,
           hasMore: false,
           recipeCount: 0,
           recipes: [],
@@ -186,7 +187,7 @@ export const fetchUserRecipes = async (
     if (!responseText.trim()) {
       console.warn('API 回應內容為空');
       return {
-        statusCode: 200,
+        statusCode: HTTP_STATUS.OK,
         hasMore: false,
         recipeCount: 0,
         recipes: [],
@@ -198,22 +199,10 @@ export const fetchUserRecipes = async (
       const data = JSON.parse(responseText);
       console.log('回應資料:', data);
 
-      // 如果回應狀態不是成功
-      if (data.statusCode !== 200) {
-        console.warn(`API 回應狀態碼非 200: ${data.statusCode}`);
-        return {
-          statusCode: data.statusCode,
-          hasMore: false,
-          recipeCount: 0,
-          recipes: [],
-          message: data.msg || '獲取使用者食譜失敗',
-        };
-      }
-
       return data;
-    } catch (parseError) {
-      console.error('解析 JSON 失敗:', parseError, '原始文本:', responseText);
-      throw new Error('解析回應資料失敗');
+    } catch (e) {
+      console.error('解析 JSON 失敗:', e);
+      throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
   } catch (error) {
     console.error('獲取使用者食譜失敗:', error);

@@ -138,7 +138,7 @@ export const registerWithEmail = async (
   } catch (error) {
     console.error('註冊失敗:', error);
     return {
-      StatusCode: 500,
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       msg: error instanceof Error ? error.message : '註冊過程中發生未知錯誤',
     };
   }

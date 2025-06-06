@@ -1,4 +1,5 @@
 import { apiConfig } from '@/config';
+import { HTTP_STATUS } from '@/lib/constants';
 import {
   Recipe,
   ApiResponse,
@@ -220,14 +221,14 @@ export const fetchRecipeDraft = async (
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
-    // 如果回應狀態不是成功
-    if (responseData.StatusCode !== 200) {
+    // 如果狀態碼不是成功，返回錯誤資料
+    if (responseData.StatusCode !== HTTP_STATUS.OK) {
       return responseData;
     }
 
     return responseData;
   } catch (error) {
-    console.error('獲取草稿食譜失敗:', error);
+    console.error('獲取食譜草稿失敗:', error);
     throw error;
   }
 };
