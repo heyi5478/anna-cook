@@ -20,7 +20,11 @@ import { convertApiStepsToComponentSteps } from '@/lib/utils';
 import { formatSeconds as formatSec } from '@/components/common/VimeoPlayer';
 
 // 子元件
-import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 import { BreadcrumbNavigation } from './BreadcrumbNavigation';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { StepNavigation } from './StepNavigation';
@@ -309,7 +313,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
       if (response.StatusCode === 200) {
         toast({
           title: '成功',
-          description: '草稿已提交成功',
+          description: SUCCESS_MESSAGES.DRAFT_SUBMITTED,
         });
 
         // 導轉到食譜草稿頁面，帶上 recipeId 參數

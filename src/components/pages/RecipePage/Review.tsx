@@ -20,7 +20,11 @@ import {
 } from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
 import { HTTP_STATUS, VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
-import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 
 // 定義表單 schema
 const reviewSchema = z.object({
@@ -100,7 +104,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
         setIsSubmitted(true);
         toast({
           title: '成功',
-          description: '評分與留言已成功提交',
+          description: SUCCESS_MESSAGES.REVIEW_SUBMITTED,
         });
       } else {
         toast({

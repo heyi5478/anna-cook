@@ -389,7 +389,7 @@ export default function RecipeUploadStep2() {
                 type="button"
                 onClick={() => removeIngredient(index)}
                 className="text-gray-500"
-                aria-label="刪除食材"
+                aria-label={`${COMMON_TEXTS.DELETE}食材`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -477,7 +477,7 @@ export default function RecipeUploadStep2() {
                 type="button"
                 onClick={() => removeSeasoning(index)}
                 className="text-gray-500"
-                aria-label="刪除調料"
+                aria-label={`${COMMON_TEXTS.DELETE}調料`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

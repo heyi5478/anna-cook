@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Trash2 } from 'lucide-react';
 import type { TimeMarkButtonsProps } from '@/types/video-editor';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 時間標記按鈕元件
@@ -44,7 +45,7 @@ export const TimeMarkButtons: React.FC<TimeMarkButtonsProps> = ({
         className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center"
       >
         <Trash2 className="h-4 w-4 mr-2" />
-        刪除此步驟
+        {COMMON_TEXTS.DELETE}此步驟
       </Button>
     </div>
   </>

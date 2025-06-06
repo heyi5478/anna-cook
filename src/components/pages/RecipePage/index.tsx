@@ -33,7 +33,11 @@ import {
 import { RecipeRatingCommentResponse } from '@/types/api';
 
 // 引入樣式
-import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 import {
   cardStyles,
   interactionButtonStyles,
@@ -245,7 +249,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           url: window.location.href,
         });
 
-        alert('分享成功');
+        alert(SUCCESS_MESSAGES.SHARE_SUCCESS);
       } catch (error: unknown) {
         // 用戶取消分享不需要顯示錯誤
         if (error instanceof Error && error.name !== 'AbortError') {

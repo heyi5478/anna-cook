@@ -35,7 +35,11 @@ import {
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
-import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證結構
@@ -139,8 +143,8 @@ export default function ProfileEditForm() {
 
       // 顯示成功提示
       toast({
-        title: '更新成功',
-        description: '您的個人資料已成功更新',
+        title: SUCCESS_MESSAGES.UPDATE_SUCCESS,
+        description: SUCCESS_MESSAGES.PROFILE_UPDATE_SUCCESS,
         variant: 'default',
       });
 
@@ -296,7 +300,7 @@ export default function ProfileEditForm() {
               返回編輯
             </Button>
             <Button variant="destructive" onClick={confirmReset}>
-              確認取消
+              {COMMON_TEXTS.CONFIRM}取消
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -437,7 +441,9 @@ export default function ProfileEditForm() {
                 className="w-full bg-gray-600 hover:bg-gray-700"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? COMMON_TEXTS.SAVING : '儲存更新'}
+                {isSubmitting
+                  ? COMMON_TEXTS.SAVING
+                  : `${COMMON_TEXTS.SAVE}更新`}
               </Button>
               <Button
                 type="button"
@@ -446,7 +452,7 @@ export default function ProfileEditForm() {
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
-                取消變更
+                {COMMON_TEXTS.CANCEL}變更
               </Button>
             </div>
           </form>

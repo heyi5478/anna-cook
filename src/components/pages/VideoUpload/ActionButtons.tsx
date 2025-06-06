@@ -48,7 +48,7 @@ export default function ActionButtons({
       {/* 按鈕群組 */}
       <div className="flex gap-3 mt-6">
         <Button onClick={atCancel} variant="outline" className="w-1/2">
-          取消
+          {COMMON_TEXTS.CANCEL}
         </Button>
         <Button
           onClick={() => {
@@ -79,7 +79,7 @@ export default function ActionButtons({
           ) : (
             <>
               <Check className="h-5 w-5 mr-2" />
-              完成
+              {COMMON_TEXTS.COMPLETE}
             </>
           )}
         </Button>

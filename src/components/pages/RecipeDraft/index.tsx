@@ -17,6 +17,7 @@ import {
 import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
 import type { Ingredient, Seasoning } from '@/types/recipe';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { recipeFormSchema, type RecipeFormValues } from './schema';
 import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';
@@ -363,7 +364,7 @@ export default function RecipeDraft() {
 
           {/* 儲存按鈕 */}
           <Button type="submit" className="w-full mb-4" disabled={saving}>
-            {saving ? '正在提交...' : '儲存草稿'}
+            {saving ? COMMON_TEXTS.SUBMITTING : `${COMMON_TEXTS.SAVE}草稿`}
           </Button>
         </form>
       </main>

@@ -8,6 +8,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 片段導航元件，處理片段間的切換和管理
@@ -77,7 +78,7 @@ export default function SegmentNavigation({
         className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center"
       >
         <Trash2 className="h-4 w-4 mr-2" />
-        刪除此步驟
+        {COMMON_TEXTS.DELETE}此步驟
       </Button>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { followUser, unfollowUser } from '@/services/users';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
 
 // Toast 樣式
 const toastStyles = {
@@ -60,7 +60,7 @@ export const FollowButton = ({
           if (onFollowChange) onFollowChange(false);
           toast({
             title: '成功',
-            description: '已取消追蹤該作者',
+            description: SUCCESS_MESSAGES.UNFOLLOW_SUCCESS,
             style: toastStyles,
           });
         } else {
@@ -80,7 +80,7 @@ export const FollowButton = ({
           if (onFollowChange) onFollowChange(true);
           toast({
             title: '成功',
-            description: '已成功追蹤該作者',
+            description: SUCCESS_MESSAGES.FOLLOW_SUCCESS,
             style: toastStyles,
           });
         } else {

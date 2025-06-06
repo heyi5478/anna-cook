@@ -2,6 +2,7 @@ import type React from 'react';
 import { Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { VimeoPlayer, timeToSeconds } from '@/components/common/VimeoPlayer';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import {
   Accordion,
   AccordionContent,
@@ -177,7 +178,7 @@ export const CookingStep = ({
                   onRemoveStep(index);
                 }}
                 className="mr-2 p-1 text-gray-500 z-10"
-                aria-label={`刪除步驟 ${index + 1}`}
+                aria-label={`${COMMON_TEXTS.DELETE}步驟 ${index + 1}`}
               >
                 <Trash className="w-4 h-4" />
               </button>

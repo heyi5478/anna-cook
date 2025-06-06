@@ -65,6 +65,16 @@ export const SUCCESS_MESSAGES = {
   RECIPE_SAVED: '食譜已儲存',
   UPLOAD_COMPLETE: '上傳完成',
   DRAFT_SUBMITTED: '草稿提交成功',
+  PUBLISH_SUCCESS: '發佈成功',
+  RECIPE_PUBLISHED: '食譜已成功發佈',
+  CONVERT_SUCCESS: '轉換成功',
+  RECIPE_TO_DRAFT: '食譜已成功轉為草稿',
+  FOLLOW_SUCCESS: '已成功追蹤該作者',
+  UNFOLLOW_SUCCESS: '已取消追蹤該作者',
+  REVIEW_SUBMITTED: '評分與留言已成功提交',
+  UPDATE_SUCCESS: '更新成功',
+  PROFILE_UPDATE_SUCCESS: '您的個人資料已成功更新',
+  SHARE_SUCCESS: '分享成功',
 } as const;
 
 // 常用文字

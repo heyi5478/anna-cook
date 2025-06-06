@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { ISSUE_TYPES } from '@/lib/constants';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { contactFormSchema, type ContactFormValues } from './schema';
 
 /**
@@ -188,7 +189,7 @@ export default function ContactUs() {
                 className="w-full"
                 onClick={atCancel}
               >
-                取消留言
+                {COMMON_TEXTS.CANCEL}留言
               </Button>
             </div>
           </form>
