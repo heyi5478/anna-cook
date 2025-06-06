@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { apiConfig } from '@/config';
-import { HTTP_STATUS } from '@/lib/constants';
+import { HTTP_STATUS, SORT_TYPES } from '@/lib/constants';
 
 /**
  * 轉發食譜搜尋請求到後端 API
@@ -16,7 +16,11 @@ export default async function handler(
   }
 
   try {
-    const { searchData = '', type = 'createdAt', number = '1' } = req.query;
+    const {
+      searchData = '',
+      type = SORT_TYPES.CREATED_AT,
+      number = '1',
+    } = req.query;
 
     // 構建查詢參數
     const queryParams = new URLSearchParams();
