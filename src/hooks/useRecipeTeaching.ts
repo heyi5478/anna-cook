@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RecipeTeachingResponse } from '@/types/api';
 import { fetchRecipeTeaching } from '@/services/recipes';
+import { HTTP_STATUS } from '@/lib/constants';
 
 type Step = {
   id: number;
@@ -45,7 +46,7 @@ export const useRecipeTeaching = (
 
         const response = await fetchRecipeTeaching(recipeId);
 
-        if (response.StatusCode === 200 && response.data) {
+        if (response.StatusCode === HTTP_STATUS.OK && response.data) {
           setTeachingData(response.data);
           setSteps(response.data.steps);
 

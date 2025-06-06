@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useVideoEditStore } from '@/stores/video/useVideoEditStore';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import { isMobileDevice } from '@/lib/utils';
+import { HTTP_STATUS } from '@/lib/constants';
 
 /**
  * 提供視頻編輯功能的自定義 Hook
@@ -580,7 +581,7 @@ export const useVideoEditor = () => {
           );
           console.log('步驟更新成功:', stepResponse);
 
-          if (stepResponse.StatusCode !== 200) {
+          if (stepResponse.StatusCode !== HTTP_STATUS.OK) {
             console.warn('步驟更新回應狀態不是200:', stepResponse);
           }
         } catch (stepError) {
