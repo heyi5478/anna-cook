@@ -12,7 +12,9 @@ export default async function handler(
 ) {
   // 只允許 POST 請求
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: '方法不允許' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ error: '方法不允許' });
   }
 
   try {
@@ -35,7 +37,7 @@ export default async function handler(
       setServerCookie(res, response.token);
 
       // 回傳成功訊息和使用者資料（不包含 token）
-      return res.status(200).json({
+      return res.status(HTTP_STATUS.OK).json({
         StatusCode: HTTP_STATUS.OK,
         msg: response.msg,
         userData: response.userData,
@@ -43,7 +45,7 @@ export default async function handler(
     }
 
     // 登入失敗
-    return res.status(401).json({
+    return res.status(HTTP_STATUS.UNAUTHORIZED).json({
       StatusCode: response.StatusCode,
       msg: response.msg,
     });

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { proxyAuthRequest } from '@/lib/auth-middleware';
+import { HTTP_STATUS } from '@/lib/constants';
 // 需要安裝: npm install formidable @types/formidable
 import formidable from 'formidable';
 import fs from 'fs';
@@ -20,7 +21,9 @@ export default async function handler(
 ) {
   // 只允許 POST 請求
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: '方法不允許' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ error: '方法不允許' });
   }
 
   try {
@@ -35,7 +38,9 @@ export default async function handler(
     if (fields.recipeName && fields.recipeName[0]) {
       formData.append('recipeName', fields.recipeName[0]);
     } else {
-      return res.status(400).json({ error: '食譜名稱為必填欄位' });
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ error: '食譜名稱為必填欄位' });
     }
 
     // 添加封面圖片
@@ -50,14 +55,16 @@ export default async function handler(
         file.originalFilename || 'image.jpg',
       );
     } else {
-      return res.status(400).json({ error: '請上傳圖片：圖片為必填欄位' });
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ error: '請上傳圖片：圖片為必填欄位' });
     }
 
     // 使用通用代理函數處理請求
     return proxyAuthRequest(req, res, '/recipes', 'POST', formData);
   } catch (error) {
     console.error('處理食譜創建請求失敗:', error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       error: '處理請求時發生錯誤',
       message: error instanceof Error ? error.message : String(error),
     });

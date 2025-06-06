@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { apiConfig } from '@/config';
+import { HTTP_STATUS } from '@/lib/constants';
 
 /**
  * 轉發食譜搜尋請求到後端 API
@@ -9,7 +10,9 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: '僅支援 GET 請求' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ message: '僅支援 GET 請求' });
   }
 
   try {
@@ -35,8 +38,8 @@ export default async function handler(
     return res.status(response.status).json(data);
   } catch (error) {
     console.error('處理食譜搜尋請求失敗:', error);
-    return res.status(500).json({
-      StatusCode: 500,
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       msg: '處理食譜搜尋請求失敗',
       number: `page ${req.query.number || 1}`,
       hasMore: false,
