@@ -20,7 +20,7 @@ import {
 } from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
 import { HTTP_STATUS, VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 // 定義表單 schema
 const reviewSchema = z.object({
@@ -105,7 +105,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
       } else {
         toast({
           title: '錯誤',
-          description: response.msg || '提交評論失敗',
+          description: response.msg || ERROR_MESSAGES.SUBMIT_COMMENT_FAILED,
           variant: 'destructive',
         });
       }
@@ -113,7 +113,10 @@ export default function Review({ recipeId }: { recipeId: number }) {
       console.error('提交評論失敗:', error);
       toast({
         title: '錯誤',
-        description: error instanceof Error ? error.message : '提交評論失敗',
+        description:
+          error instanceof Error
+            ? error.message
+            : ERROR_MESSAGES.SUBMIT_COMMENT_FAILED,
         variant: 'destructive',
       });
     } finally {

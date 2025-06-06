@@ -20,7 +20,7 @@ import { convertApiStepsToComponentSteps } from '@/lib/utils';
 import { formatSeconds as formatSec } from '@/components/common/VimeoPlayer';
 
 // 子元件
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { BreadcrumbNavigation } from './BreadcrumbNavigation';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { StepNavigation } from './StepNavigation';
@@ -150,7 +150,9 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         console.log('API 回應資料:', response);
 
         if (response.StatusCode !== 200) {
-          throw new Error(response.msg || '獲取食譜草稿失敗');
+          throw new Error(
+            response.msg || ERROR_MESSAGES.FETCH_RECIPE_DRAFT_FAILED,
+          );
         }
 
         // 保存完整的食譜資料
@@ -182,7 +184,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         }
       } catch (err) {
         console.error('獲取食譜草稿失敗:', err);
-        setError(err instanceof Error ? err.message : '獲取食譜草稿時發生錯誤');
+        setError(
+          err instanceof Error
+            ? err.message
+            : ERROR_MESSAGES.LOAD_RECIPE_DRAFT_ERROR,
+        );
       } finally {
         setLoading(false);
       }
@@ -309,7 +315,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         // 導轉到食譜草稿頁面，帶上 recipeId 參數
         router.push(`/recipe-draft?recipeId=${recipeIdValue}`);
       } else {
-        throw new Error(response.msg || '提交草稿失敗');
+        throw new Error(response.msg || ERROR_MESSAGES.SUBMIT_DRAFT_FAILED);
       }
     } catch (err) {
       console.error('提交步驟編輯結果失敗:', err);

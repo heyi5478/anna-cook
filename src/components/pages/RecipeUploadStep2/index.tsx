@@ -15,7 +15,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { updateRecipeStep2 } from '@/services/recipes';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -182,7 +182,9 @@ export default function RecipeUploadStep2() {
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
-        setErrorMsg(result?.msg || '更新失敗，請稍後再試');
+        setErrorMsg(
+          result?.msg || `${ERROR_MESSAGES.UPDATE_RECIPE_FAILED}，請稍後再試`,
+        );
       }
     } catch (error) {
       console.error('更新食譜詳細資訊發生異常:', error);

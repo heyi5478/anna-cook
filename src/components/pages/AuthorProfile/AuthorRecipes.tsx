@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/features/RecipeCard';
 import { fetchUserRecipes } from '@/services/users';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
@@ -49,7 +49,9 @@ export const AuthorRecipes = ({
       setHasMore(data.hasMore);
       setPage(pageNum);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '載入食譜失敗');
+      setError(
+        err instanceof Error ? err.message : ERROR_MESSAGES.LOAD_RECIPE_FAILED,
+      );
       console.error('載入食譜失敗:', err);
     } finally {
       setLoading(false);

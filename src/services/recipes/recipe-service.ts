@@ -1,5 +1,6 @@
 import { apiConfig } from '@/config';
 import { HTTP_STATUS } from '@/lib/constants';
+import { ERROR_MESSAGES } from '@/lib/constants/messages';
 import {
   Recipe,
   ApiResponse,
@@ -124,7 +125,7 @@ export const uploadRecipeBasic = async (
       return (
         data || {
           StatusCode: res.status,
-          msg: res.statusText || '伺服器錯誤',
+          msg: res.statusText || ERROR_MESSAGES.SERVER_ERROR,
           Id: 0,
         }
       );
@@ -178,7 +179,7 @@ export const updateRecipeStep2 = async (
       return (
         responseData || {
           StatusCode: res.status,
-          msg: res.statusText || '伺服器錯誤',
+          msg: res.statusText || ERROR_MESSAGES.SERVER_ERROR,
           Id: 0,
         }
       );
@@ -295,7 +296,7 @@ export const uploadRecipeVideo = async (
     // 從 cookie 取得 token，因為 httpOnly 已被移除，可直接讀取
     const token = getAuthToken();
     if (!token) {
-      throw new Error('未取得授權 token，請先登入');
+      throw new Error(ERROR_MESSAGES.LOGIN_REQUIRED);
     }
 
     // 直接向後端 API 發送請求，不經過 Next.js API route
@@ -325,7 +326,10 @@ export const uploadRecipeVideo = async (
     // 如果回應狀態不是成功
     if (!res.ok) {
       return {
-        message: responseData?.message || res.statusText || '上傳失敗',
+        message:
+          responseData?.message ||
+          res.statusText ||
+          ERROR_MESSAGES.UPLOAD_FAILED,
       };
     }
 
@@ -334,7 +338,7 @@ export const uploadRecipeVideo = async (
     console.error('上傳影片失敗:', error);
     return {
       message:
-        error instanceof Error ? error.message : '上傳影片過程中發生錯誤',
+        error instanceof Error ? error.message : ERROR_MESSAGES.UPLOAD_FAILED,
     };
   }
 };
@@ -453,7 +457,10 @@ export const submitRecipeDraft = async (
     console.error('提交食譜草稿失敗:', error);
     return {
       StatusCode: 500,
-      msg: error instanceof Error ? error.message : '提交草稿時發生未知錯誤',
+      msg:
+        error instanceof Error
+          ? error.message
+          : ERROR_MESSAGES.SUBMIT_DRAFT_FAILED,
     };
   }
 };
@@ -499,7 +506,9 @@ export const fetchAuthorRecipes = async (
 
     // 如果回應狀態不是成功
     if (responseData.statusCode !== 200) {
-      throw new Error(responseData.msg || '獲取作者食譜失敗');
+      throw new Error(
+        responseData.msg || ERROR_MESSAGES.FETCH_AUTHOR_RECIPES_FAILED,
+      );
     }
 
     return responseData;
@@ -548,7 +557,9 @@ export const deleteMultipleRecipes = async (
 
     // 如果回應狀態不是成功
     if (responseData.StatusCode !== 200) {
-      throw new Error(responseData.msg || '刪除食譜失敗');
+      throw new Error(
+        responseData.msg || ERROR_MESSAGES.DELETE_MULTIPLE_RECIPES_FAILED,
+      );
     }
 
     return responseData;
@@ -600,7 +611,9 @@ export const toggleRecipePublishStatus = async (
 
     // 如果回應狀態不是成功
     if (responseData.StatusCode !== 200) {
-      throw new Error(responseData.msg || '更新食譜發佈狀態失敗');
+      throw new Error(
+        responseData.msg || ERROR_MESSAGES.UPDATE_PUBLISH_STATUS_FAILED,
+      );
     }
 
     return responseData;
@@ -653,7 +666,9 @@ export const fetchUserFavoriteFollow = async (
 
     // 如果回應狀態不是成功
     if (responseData.StatusCode !== 200) {
-      throw new Error(responseData.msg || '獲取使用者的收藏或追蹤清單失敗');
+      throw new Error(
+        responseData.msg || ERROR_MESSAGES.FETCH_USER_FAVORITE_FOLLOW_FAILED,
+      );
     }
 
     return responseData;
@@ -767,7 +782,7 @@ export const fetchRecipeRatingComments = async (
       if (res.status === 400) {
         return {
           StatusCode: 400,
-          msg: '未找到任何留言',
+          msg: ERROR_MESSAGES.NO_COMMENT_FOUND,
           totalCount: 0,
           hasMore: false,
           data: [],
@@ -776,7 +791,7 @@ export const fetchRecipeRatingComments = async (
       if (res.status === 404) {
         return {
           StatusCode: 404,
-          msg: '找不到該食譜或無法進行此操作',
+          msg: ERROR_MESSAGES.RECIPE_NOT_FOUND,
           totalCount: 0,
           hasMore: false,
           data: [],
@@ -792,7 +807,7 @@ export const fetchRecipeRatingComments = async (
     console.error('獲取食譜留言與評分失敗:', error);
     return {
       StatusCode: 500,
-      msg: '獲取食譜留言與評分失敗',
+      msg: ERROR_MESSAGES.FETCH_RECIPE_RATING_COMMENTS_FAILED,
       totalCount: 0,
       hasMore: false,
       data: [],
@@ -868,13 +883,13 @@ export const fetchRecipeTeaching = async (
       if (response.status === 404) {
         return {
           StatusCode: 404,
-          msg: '找不到該食譜的教學資訊',
+          msg: ERROR_MESSAGES.RECIPE_TEACHING_NOT_FOUND,
         };
       }
       if (response.status === 401) {
         return {
           StatusCode: 401,
-          msg: '尚未公開的食譜無法觀看教學',
+          msg: ERROR_MESSAGES.RECIPE_NOT_PUBLISHED,
         };
       }
 
@@ -888,7 +903,7 @@ export const fetchRecipeTeaching = async (
     console.error('獲取食譜教學資訊失敗:', error);
     return {
       StatusCode: 500,
-      msg: '獲取食譜教學資訊失敗，請稍後再試',
+      msg: ERROR_MESSAGES.FETCH_RECIPE_TEACHING_FAILED,
     };
   }
 };

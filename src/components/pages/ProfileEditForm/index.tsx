@@ -35,7 +35,7 @@ import {
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -103,7 +103,11 @@ export default function ProfileEditForm() {
         setUserDisplayId(response.data.displayId);
       } catch (err) {
         console.error('載入用戶資料失敗:', err);
-        setError(err instanceof Error ? err.message : '載入用戶資料失敗');
+        setError(
+          err instanceof Error
+            ? err.message
+            : ERROR_MESSAGES.LOAD_USER_DATA_FAILED,
+        );
       } finally {
         setIsLoading(false);
       }
@@ -146,11 +150,14 @@ export default function ProfileEditForm() {
       }, 1500);
     } catch (err) {
       console.error('更新失敗:', err);
-      const errorMessage = err instanceof Error ? err.message : '更新資料失敗';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.UPDATE_RECIPE_FAILED;
 
       // 顯示錯誤提示
       toast({
-        title: '更新失敗',
+        title: ERROR_MESSAGES.UPDATE_RECIPE_FAILED,
         description: errorMessage,
         variant: 'destructive',
       });
@@ -254,7 +261,9 @@ export default function ProfileEditForm() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
-          <div className="text-red-500 text-xl mb-4">載入失敗</div>
+          <div className="text-red-500 text-xl mb-4">
+            {ERROR_MESSAGES.LOAD_FAILED}
+          </div>
           <p className="text-gray-700 mb-4">{error}</p>
           <Button
             onClick={() => window.location.reload()}

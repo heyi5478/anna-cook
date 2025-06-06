@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
  * 登入頁面組件
@@ -26,7 +26,7 @@ export default function LoginPage() {
       const response = await fetch('/api/auth/google/google');
 
       if (!response.ok) {
-        throw new Error('獲取 Google 登入 URL 失敗');
+        throw new Error(ERROR_MESSAGES.API_REQUEST_FAILED);
       }
 
       const data = await response.json();

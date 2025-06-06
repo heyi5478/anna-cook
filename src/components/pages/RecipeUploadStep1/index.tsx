@@ -17,7 +17,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { uploadRecipeBasic } from '@/services/recipes';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -160,7 +160,9 @@ export default function RecipeUploadForm() {
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
-        setErrorMsg(result?.msg || '上傳失敗，請稍後再試');
+        setErrorMsg(
+          result?.msg || `${ERROR_MESSAGES.UPLOAD_FAILED}，請稍後再試`,
+        );
       }
     } catch (error) {
       console.error('上傳發生異常:', error);

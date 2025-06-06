@@ -7,7 +7,7 @@ import {
 } from '@/services/server-api';
 import RecipePageComponent from '@/components/pages/RecipePage';
 import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -97,7 +97,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       props: {
         recipeData: {
           StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          msg: '獲取食譜資料失敗',
+          msg: ERROR_MESSAGES.FETCH_RECIPE_FAILED,
         },
       },
       revalidate: REVALIDATE_INTERVALS.SHORT, // 1分鐘後重新驗證

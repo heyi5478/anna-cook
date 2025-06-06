@@ -8,6 +8,7 @@ import {
   HTTP_STATUS,
   SORT_TYPES,
 } from '@/lib/constants';
+import { ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
  * 從 IncomingMessage 請求 Cookie 中獲取 JWT Token
@@ -127,8 +128,8 @@ export const fetchUserProfileServer = async (
         isMe: false,
         msg:
           response.status === HTTP_STATUS.BAD_REQUEST
-            ? '查無此使用者'
-            : '獲取使用者資料失敗',
+            ? ERROR_MESSAGES.USER_NOT_FOUND
+            : ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
       };
     }
 
@@ -142,7 +143,7 @@ export const fetchUserProfileServer = async (
     return {
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       isMe: false,
-      msg: '伺服器端獲取使用者資料失敗',
+      msg: ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
     };
   }
 };
@@ -205,7 +206,7 @@ export const fetchUserRecipesServer = async (
         hasMore: false,
         recipeCount: 0,
         recipes: [],
-        message: '獲取使用者食譜失敗',
+        message: ERROR_MESSAGES.FETCH_USER_RECIPES_FAILED,
       };
     }
 
@@ -221,7 +222,7 @@ export const fetchUserRecipesServer = async (
       hasMore: false,
       recipeCount: 0,
       recipes: [],
-      message: '伺服器端獲取使用者食譜失敗',
+      message: ERROR_MESSAGES.FETCH_USER_RECIPES_FAILED,
     };
   }
 };
@@ -391,8 +392,8 @@ export const fetchRecipeDetailServer = async (
         StatusCode: response.status,
         msg:
           response.status === HTTP_STATUS.NOT_FOUND
-            ? '食譜不存在'
-            : '獲取食譜詳細資料失敗',
+            ? ERROR_MESSAGES.RECIPE_NOT_FOUND
+            : ERROR_MESSAGES.FETCH_RECIPE_DETAIL_FAILED,
       };
     }
 
@@ -405,7 +406,7 @@ export const fetchRecipeDetailServer = async (
     console.error('伺服器端獲取食譜詳細資料失敗:', error);
     return {
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      msg: '伺服器端獲取食譜詳細資料失敗',
+      msg: ERROR_MESSAGES.FETCH_RECIPE_DETAIL_FAILED,
     };
   }
 };
@@ -445,7 +446,7 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '獲取首頁特色內容失敗',
+        msg: ERROR_MESSAGES.FETCH_HOME_FEATURES_FAILED,
         data: [],
       };
     }
@@ -458,7 +459,7 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
     console.error('伺服器端獲取首頁特色內容失敗:', error);
     return {
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      msg: '伺服器端獲取首頁特色內容失敗',
+      msg: ERROR_MESSAGES.FETCH_HOME_FEATURES_FAILED,
       data: [],
     };
   }
@@ -504,7 +505,7 @@ export const fetchHomeRecipes = async (
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '獲取首頁食譜失敗',
+        msg: ERROR_MESSAGES.FETCH_HOME_RECIPES_FAILED,
         totalCount: 0,
         hasMore: false,
         data: [],
@@ -519,7 +520,7 @@ export const fetchHomeRecipes = async (
     console.error('伺服器端獲取首頁食譜失敗:', error);
     return {
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      msg: '伺服器端獲取首頁食譜失敗',
+      msg: ERROR_MESSAGES.FETCH_HOME_RECIPES_FAILED,
       totalCount: 0,
       hasMore: false,
       data: [],
@@ -582,7 +583,7 @@ export const searchRecipesServer = async (
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '搜尋食譜失敗',
+        msg: ERROR_MESSAGES.SEARCH_RECIPE_FAILED,
         number: `page ${number}`,
         hasMore: false,
         totalCount: 0,
@@ -598,7 +599,7 @@ export const searchRecipesServer = async (
     console.error('伺服器端搜尋食譜失敗:', error);
     return {
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      msg: '伺服器端搜尋食譜失敗',
+      msg: ERROR_MESSAGES.SEARCH_RECIPES_SERVER_FAILED,
       number: `page ${number}`,
       hasMore: false,
       totalCount: 0,

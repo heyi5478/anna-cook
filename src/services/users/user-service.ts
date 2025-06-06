@@ -1,5 +1,6 @@
 import { apiConfig } from '@/config';
 import { HTTP_STATUS } from '@/lib/constants';
+import { ERROR_MESSAGES } from '@/lib/constants/messages';
 import {
   UserProfileResponse,
   CurrentUserProfileResponse,
@@ -68,7 +69,9 @@ export const fetchCurrentUserProfile =
 
       // 處理錯誤狀態碼
       if (responseData.StatusCode !== HTTP_STATUS.OK) {
-        throw new Error(responseData.msg || '獲取用戶資料失敗');
+        throw new Error(
+          responseData.msg || ERROR_MESSAGES.LOAD_USER_DATA_FAILED,
+        );
       }
 
       return responseData;
@@ -135,7 +138,7 @@ export const updateUserProfile = async (
 
     // 處理錯誤狀態碼
     if (responseData.StatusCode !== HTTP_STATUS.OK) {
-      throw new Error(responseData.msg || '更新用戶資料失敗');
+      throw new Error(responseData.msg || ERROR_MESSAGES.LOAD_USER_DATA_FAILED);
     }
 
     return responseData;

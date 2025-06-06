@@ -6,7 +6,7 @@ import UserCenter from '@/components/pages/UserCenter';
 import { AuthorProfile } from '@/components/pages/AuthorProfile';
 import { mockAuthor } from '@/components/pages/AuthorProfile/types';
 import { fetchUserProfileServer, ServerUserProfileResponse } from '@/services';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 interface UserPageProps {
   userProfileData?: ServerUserProfileResponse;
@@ -201,7 +201,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       // 其他錯誤則返回錯誤頁面
       return {
         props: {
-          errorMessage: userProfileData.msg || '獲取使用者資料失敗',
+          errorMessage:
+            userProfileData.msg || ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
           statusCode: userProfileData.StatusCode,
         },
       };

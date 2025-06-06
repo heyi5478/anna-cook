@@ -33,7 +33,7 @@ import {
   fetchUserFavoriteFollow,
   deleteMultipleRecipes,
 } from '@/services/recipes';
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -191,7 +191,11 @@ export default function UserCenter({
       setPublishedRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入已發佈食譜失敗:', err);
-      setError(err instanceof Error ? err.message : '載入已發佈食譜失敗');
+      setError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_PUBLISHED_RECIPES_FAILED,
+      );
     } finally {
       setIsLoadingPublished(false);
     }
@@ -209,7 +213,11 @@ export default function UserCenter({
       setDraftRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入草稿食譜失敗:', err);
-      setError(err instanceof Error ? err.message : '載入草稿食譜失敗');
+      setError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_DRAFT_RECIPES_FAILED,
+      );
     } finally {
       setIsLoadingDrafts(false);
     }
@@ -250,7 +258,11 @@ export default function UserCenter({
       }
     } catch (err) {
       console.error('載入追蹤的用戶失敗:', err);
-      setFollowError(err instanceof Error ? err.message : '載入追蹤的用戶失敗');
+      setFollowError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_FOLLOWED_USERS_FAILED,
+      );
     } finally {
       setFollowLoading(false);
     }
@@ -296,7 +308,9 @@ export default function UserCenter({
     } catch (err) {
       console.error('載入收藏的食譜失敗:', err);
       setFavoriteError(
-        err instanceof Error ? err.message : '載入收藏的食譜失敗',
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_FAVORITE_RECIPES_FAILED,
       );
     } finally {
       setFavoriteLoading(false);
@@ -372,7 +386,11 @@ export default function UserCenter({
       setDeleteDialogOpen(false);
     } catch (err) {
       console.error('刪除食譜失敗:', err);
-      setDeleteError(err instanceof Error ? err.message : '刪除食譜失敗');
+      setDeleteError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.DELETE_MULTIPLE_RECIPES_FAILED,
+      );
     } finally {
       setDeleteLoading(false);
     }

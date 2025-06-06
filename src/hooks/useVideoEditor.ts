@@ -4,6 +4,7 @@ import { useVideoEditStore } from '@/stores/video/useVideoEditStore';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import { isMobileDevice } from '@/lib/utils';
 import { HTTP_STATUS } from '@/lib/constants';
+import { ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
  * 提供視頻編輯功能的自定義 Hook
@@ -143,7 +144,10 @@ export const useVideoEditor = () => {
 
         // 檢查回應是否成功
         if (response.message && !response.videoUri) {
-          throw new Error(response.message || '上傳失敗，伺服器回應錯誤');
+          throw new Error(
+            response.message ||
+              `${ERROR_MESSAGES.UPLOAD_FAILED}，伺服器回應錯誤`,
+          );
         }
 
         // API 成功回傳後，停止進度模擬並設為 100%
@@ -178,7 +182,9 @@ export const useVideoEditor = () => {
 
         console.error('影片上傳失敗:', error);
         setApiError(
-          error instanceof Error ? error.message : '影片上傳失敗，請稍後再試',
+          error instanceof Error
+            ? error.message
+            : `${ERROR_MESSAGES.VIDEO_UPLOAD_FAILED}，請稍後再試`,
         );
 
         // 重置進度條狀態

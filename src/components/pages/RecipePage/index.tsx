@@ -33,7 +33,7 @@ import {
 import { RecipeRatingCommentResponse } from '@/types/api';
 
 // 引入樣式
-import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import {
   cardStyles,
   interactionButtonStyles,
@@ -159,7 +159,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         }
       } catch (error) {
         console.error('獲取評論失敗:', error);
-        setCommentError('獲取評論失敗，請稍後再試');
+        setCommentError(`${ERROR_MESSAGES.FETCH_COMMENTS_FAILED}，請稍後再試`);
       } finally {
         setIsLoadingComments(false);
       }
@@ -189,7 +189,9 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
       }
     } catch (error) {
       console.error('載入更多評論失敗:', error);
-      setCommentError('載入更多評論失敗，請稍後再試');
+      setCommentError(
+        `${ERROR_MESSAGES.LOAD_MORE_COMMENTS_FAILED}，請稍後再試`,
+      );
     } finally {
       setIsLoadingComments(false);
     }
