@@ -62,11 +62,11 @@ const parseIntEnv = (
 };
 
 /**
- * API 相關配置
+ * API 相關配置 - 延遲載入
  */
-export const apiConfig = {
+export const getApiConfig = () => ({
   baseUrl: validateApiUrl(getApiBaseUrl()),
-};
+});
 
 /**
  * 認證相關配置
