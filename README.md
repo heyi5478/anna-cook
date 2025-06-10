@@ -67,7 +67,12 @@
 ## 專案技術
 - UI/UX: **Figma**、**lucide-icons**
 - 專案管理：**Notion**、**Gitbook**、**Discord**、**Miro**
-- 前端：**Next.js**、**React**、**Tailwind CSS**、**TypeScript**、**Shadcn UI**、**React-hook-form**、**ZOD**、**eslint**、**prettier**
+- 前端架構：
+  - 框架：**Next.js (Pages Router)**、**React**、**TypeScript**
+  - 樣式：**Tailwind CSS**、**Shadcn UI**、**CVA (Class Variance Authority)**
+  - 狀態管理：**Zustand** (功能分組架構)
+  - 表單處理：**React-hook-form**、**ZOD** (表單驗證)
+  - 程式碼品質：**ESLint**、**Prettier**
 - 後端：**C#**、**ASP.NET Core**、**Microsoft SQL Server**、**Restful API**
 - 部署：**Vercel**
 
@@ -76,18 +81,43 @@
 anna-cook/
 ├── public/                     # 靜態資源目錄
 │
-├── src/                        # 源碼目錄
-│   ├── components/             # React 元件
-│   │   ├── ui/                 # UI 元件 (shadcn/ui)
-│   │   └── common/             # 共用 元件
-│   ├── config/                 # 設定檔
+├── src/                        # 源碼目錄 (重構後)
+│   ├── components/             # React 元件 (分層架構)
+│   │   ├── ui/                 # UI 基礎元件 (shadcn/ui + CVA)
+│   │   ├── common/             # 通用/共用元件
+│   │   ├── features/           # 功能特定元件
+│   │   ├── pages/              # 頁面專用元件
+│   │   └── layout/             # 佈局元件
+│   ├── stores/                 # Zustand 狀態管理 (按功能分組)
+│   │   ├── recipes/            # 食譜相關狀態
+│   │   └── video/              # 影片相關狀態
+│   ├── services/               # API 服務層 (按功能分組)
+│   │   ├── auth/               # 認證相關服務
+│   │   ├── recipes/            # 食譜相關服務
+│   │   ├── users/              # 用戶相關服務
+│   │   ├── utils/              # 服務工具函式
+│   │   ├── server-api.ts       # 通用 API 客戶端
+│   │   └── index.ts            # 服務統一匯出
 │   ├── hooks/                  # Custom React Hooks
-│   ├── lib/                    # 共用函式庫
-│   ├── pages/                  # Next.js 頁面
-│   ├── services/              # API 服務
-│   ├── stores/                # Zustand 狀態管理
-│   ├── styles/                # 樣式檔案
-│   └── types/                 # TypeScript 型別定義
+│   ├── lib/                    # 共用函式庫與工具
+│   │   ├── constants/          # 常數定義
+│   │   ├── utils.ts            # 通用工具函式
+│   │   └── auth-middleware.ts  # 認證中間件
+│   ├── types/                  # TypeScript 型別定義
+│   │   ├── api.ts              # API 型別
+│   │   ├── auth.ts             # 認證型別
+│   │   ├── recipe.ts           # 食譜型別
+│   │   ├── ui.ts               # UI 元件型別
+│   │   └── video-editor.ts     # 影片編輯器型別
+│   ├── config/                 # 應用程式設定
+│   │   └── index.ts            # 設定統一匯出
+│   ├── pages/                  # Next.js 頁面 (Pages Router)
+│   │   ├── api/                # API 路由
+│   │   ├── _app.tsx            # App 元件
+│   │   ├── _document.tsx       # Document 元件
+│   │   └── [各功能頁面目錄]/    # 功能頁面
+│   └── styles/                 # 樣式檔案
+│       └── globals.css         # 全域樣式 (Tailwind CSS)
 │
 ├── 設定檔
 │   ├── .eslintignore          # ESLint 忽略檔案設定
