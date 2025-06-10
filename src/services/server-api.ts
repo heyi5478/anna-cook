@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http';
-import { apiConfig, authConfig } from '@/config';
+import { getApiConfig, authConfig } from '@/config';
 import { getServerToken as getNextApiServerToken } from '@/lib/auth-middleware';
 import type { NextApiRequest } from 'next';
 import {
@@ -102,7 +102,9 @@ export const fetchUserProfileServer = async (
   req: IncomingMessage,
 ): Promise<UserProfileResponse> => {
   try {
-    console.log(`伺服器端發送請求: GET ${apiConfig.baseUrl}/user/${displayId}`);
+    console.log(
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}`,
+    );
 
     // 獲取 token (若有)
     const token = getAuthTokenForServer(req);
@@ -115,10 +117,13 @@ export const fetchUserProfileServer = async (
     }
 
     // 發送請求 (token 為選填)
-    const response = await fetch(`${apiConfig.baseUrl}/user/${displayId}`, {
-      method: 'GET',
-      headers,
-    });
+    const response = await fetch(
+      `${getApiConfig().baseUrl}/user/${displayId}`,
+      {
+        method: 'GET',
+        headers,
+      },
+    );
 
     console.log('伺服器端回應狀態:', response.status);
 
@@ -179,12 +184,12 @@ export const fetchUserRecipesServer = async (
 ): Promise<UserRecipesResponse> => {
   try {
     console.log(
-      `伺服器端發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
     // 發送請求 (不需要 token)
     const response = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
     console.log('伺服器端回應狀態:', response.status);
@@ -274,7 +279,7 @@ export const fetchAuthorRecipesServer = async (
     }
 
     const queryParam = isPublished ? '?isPublished=true' : '?isPublished=false';
-    const apiUrl = `${apiConfig.baseUrl}/user/${displayId}/management/recipe${queryParam}`;
+    const apiUrl = `${getApiConfig().baseUrl}/user/${displayId}/management/recipe${queryParam}`;
 
     console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
@@ -365,7 +370,7 @@ export const fetchRecipeDetailServer = async (
 ): Promise<RecipeDetailResponse> => {
   try {
     console.log(
-      `伺服器端發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}`,
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/recipes/${recipeId}`,
     );
 
     // 準備請求標頭
@@ -380,10 +385,13 @@ export const fetchRecipeDetailServer = async (
     }
 
     // 發送請求
-    const response = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}`, {
-      method: 'GET',
-      headers,
-    });
+    const response = await fetch(
+      `${getApiConfig().baseUrl}/recipes/${recipeId}`,
+      {
+        method: 'GET',
+        headers,
+      },
+    );
 
     console.log('伺服器端回應狀態:', response.status);
 
@@ -437,9 +445,11 @@ export interface HomeFeatureResponse {
  */
 export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
   try {
-    console.log(`伺服器端發送請求: GET ${apiConfig.baseUrl}/home/features`);
+    console.log(
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/home/features`,
+    );
 
-    const response = await fetch(`${apiConfig.baseUrl}/home/features`);
+    const response = await fetch(`${getApiConfig().baseUrl}/home/features`);
 
     console.log('伺服器端回應狀態:', response.status);
 
@@ -495,7 +505,7 @@ export const fetchHomeRecipes = async (
   number: number = 1,
 ): Promise<HomeRecipesResponse> => {
   try {
-    const apiUrl = `${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`;
+    const apiUrl = `${getApiConfig().baseUrl}/home/recipes?type=${type}&number=${number}`;
     console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl);
@@ -573,7 +583,7 @@ export const searchRecipesServer = async (
     queryParams.append('type', type);
     queryParams.append('number', String(number));
 
-    const apiUrl = `${apiConfig.baseUrl}/recipes/search?${queryParams.toString()}`;
+    const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
     console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl);

@@ -1,4 +1,4 @@
-import { apiConfig } from '@/config';
+import { getApiConfig } from '@/config';
 import {
   GoogleAuthResponse,
   RegisterResponse,
@@ -13,8 +13,8 @@ import { updateAuthToken } from '../utils/http';
  */
 export const fetchGoogleAuthUrl = async (): Promise<string> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/auth/google/auth`);
-    const res = await fetch(`${apiConfig.baseUrl}/auth/google/auth`);
+    console.log(`發送請求: GET ${getApiConfig().baseUrl}/auth/google/auth`);
+    const res = await fetch(`${getApiConfig().baseUrl}/auth/google/auth`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -39,7 +39,7 @@ export const exchangeGoogleCodeForToken = async (
   try {
     // 直接調用後端 API，而不是 Next.js API 路由
     const res = await fetch(
-      `${apiConfig.baseUrl}/auth/google/callback?code=${encodeURIComponent(code)}`,
+      `${getApiConfig().baseUrl}/auth/google/callback?code=${encodeURIComponent(code)}`,
       {
         method: 'GET',
       },
@@ -101,7 +101,7 @@ export const registerWithEmail = async (
   password: string,
 ): Promise<RegisterResponse> => {
   try {
-    console.log(`發送請求: POST ${apiConfig.baseUrl}/auth/register`);
+    console.log(`發送請求: POST ${getApiConfig().baseUrl}/auth/register`);
 
     const requestData = {
       AccountEmail: email,
@@ -111,7 +111,7 @@ export const registerWithEmail = async (
 
     console.log('請求資料:', { ...requestData, Password: '***' });
 
-    const res = await fetch(`${apiConfig.baseUrl}/auth/register`, {
+    const res = await fetch(`${getApiConfig().baseUrl}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export const loginWithEmail = async (
   password: string,
 ): Promise<LoginResponse> => {
   try {
-    console.log(`發送請求: POST ${apiConfig.baseUrl}/auth/login`);
+    console.log(`發送請求: POST ${getApiConfig().baseUrl}/auth/login`);
 
     const requestData = {
       AccountEmail: email,
@@ -161,7 +161,7 @@ export const loginWithEmail = async (
 
     console.log('請求資料:', { ...requestData, Password: '***' });
 
-    const res = await fetch(`${apiConfig.baseUrl}/auth/login`, {
+    const res = await fetch(`${getApiConfig().baseUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

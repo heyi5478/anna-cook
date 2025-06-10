@@ -1,4 +1,4 @@
-import { apiConfig } from '@/config';
+import { getApiConfig } from '@/config';
 import { HTTP_STATUS } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
 import {
@@ -157,12 +157,12 @@ export const fetchUserRecipes = async (
 ): Promise<UserRecipesResponse> => {
   try {
     console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
     // 發送請求
     const res = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
       {
         method: 'GET',
       },

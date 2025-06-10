@@ -1,4 +1,4 @@
-import { apiConfig } from '@/config';
+import { getApiConfig } from '@/config';
 import { HTTP_STATUS } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
@@ -30,8 +30,8 @@ import { getAuthToken } from '../utils/http';
  */
 export const fetchRecipes = async (): Promise<Recipe[]> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes`);
-    const res = await fetch(`${apiConfig.baseUrl}/recipes`);
+    console.log(`發送請求: GET ${getApiConfig().baseUrl}/recipes`);
+    const res = await fetch(`${getApiConfig().baseUrl}/recipes`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -52,8 +52,8 @@ export const fetchRecipes = async (): Promise<Recipe[]> => {
  */
 export const fetchRecipeById = async (id: number): Promise<Recipe> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/recipes/${id}`);
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/${id}`);
+    console.log(`發送請求: GET ${getApiConfig().baseUrl}/recipes/${id}`);
+    const res = await fetch(`${getApiConfig().baseUrl}/recipes/${id}`);
     console.log('回應狀態:', res.status, res.statusText);
 
     if (!res.ok) {
@@ -286,7 +286,9 @@ export const uploadRecipeVideo = async (
   videoFile: File,
 ): Promise<VideoUploadResponse> => {
   try {
-    console.log(`發送請求: PUT ${apiConfig.baseUrl}/recipes/${recipeId}/video`);
+    console.log(
+      `發送請求: PUT ${getApiConfig().baseUrl}/recipes/${recipeId}/video`,
+    );
     console.log('上傳影片:', videoFile.name, videoFile.size, videoFile.type);
 
     // 創建 FormData 物件
@@ -301,13 +303,16 @@ export const uploadRecipeVideo = async (
     }
 
     // 直接向後端 API 發送請求，不經過 Next.js API route
-    const res = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}/video`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`, // 添加授權標頭
+    const res = await fetch(
+      `${getApiConfig().baseUrl}/recipes/${recipeId}/video`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // 添加授權標頭
+        },
+        body: formData,
       },
-      body: formData,
-    });
+    );
 
     console.log('回應狀態:', res.status, res.statusText);
 
@@ -765,12 +770,12 @@ export const fetchRecipeRatingComments = async (
 ): Promise<RecipeRatingCommentResponse> => {
   try {
     console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
+      `發送請求: GET ${getApiConfig().baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
     );
 
     // 發送請求
     const res = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
+      `${getApiConfig().baseUrl}/recipes/${recipeId}/rating-comment?number=${page}`,
       {
         method: 'GET',
       },
@@ -868,13 +873,13 @@ export const fetchRecipeTeaching = async (
 ): Promise<RecipeTeachingResponse> => {
   try {
     console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}/teaching`,
+      `發送請求: GET ${getApiConfig().baseUrl}/recipes/${recipeId}/teaching`,
     );
 
-    // 直接使用 apiConfig.baseUrl 發起請求，而不是經過 Next.js API 路由
+    // 直接使用 getApiConfig().baseUrl 發起請求，而不是經過 Next.js API 路由
     // 因為根據 API 文檔，公開食譜不需要授權，所以不要直接添加 credentials
     const response = await fetch(
-      `${apiConfig.baseUrl}/recipes/${recipeId}/teaching`,
+      `${getApiConfig().baseUrl}/recipes/${recipeId}/teaching`,
       {
         method: 'GET',
       },
