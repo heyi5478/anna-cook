@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
-import { updateRecipeStep2 } from '@/services/api';
 import { RecipeStep2Data } from '@/types/api';
 import {
   Breadcrumb,
@@ -15,6 +14,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { updateRecipeStep2 } from '@/services/recipes';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -25,23 +27,35 @@ const recipeStep2Schema = z.object({
   ingredients: z
     .array(
       z.object({
-        name: z.string().min(1, { message: '請輸入食材名稱' }),
-        amount: z.string().min(1, { message: '請輸入數量' }),
+        name: z
+          .string()
+          .min(1, { message: VALIDATION_MESSAGES.REQUIRED_INGREDIENT_NAME }),
+        amount: z
+          .string()
+          .min(1, { message: VALIDATION_MESSAGES.REQUIRED_AMOUNT }),
         unit: z.string().optional(),
         isFlavoring: z.boolean().default(false),
       }),
     )
-    .min(1, { message: '至少需要一項食材' }),
+    .min(1, { message: VALIDATION_MESSAGES.MIN_INGREDIENTS }),
   seasonings: z.array(
     z.object({
-      name: z.string().min(1, { message: '請輸入調料名稱' }),
-      amount: z.string().min(1, { message: '請輸入數量' }),
+      name: z
+        .string()
+        .min(1, { message: VALIDATION_MESSAGES.REQUIRED_SEASONING_NAME_ALT }),
+      amount: z
+        .string()
+        .min(1, { message: VALIDATION_MESSAGES.REQUIRED_AMOUNT }),
       unit: z.string().optional(),
     }),
   ),
-  tags: z.array(z.string()).min(1, { message: '至少需要一個標籤' }),
-  cookingTime: z.string().min(1, { message: '請輸入烹調時間' }),
-  servings: z.string().min(1, { message: '請輸入人份數' }),
+  tags: z.array(z.string()).min(1, { message: VALIDATION_MESSAGES.MIN_TAGS }),
+  cookingTime: z
+    .string()
+    .min(1, { message: VALIDATION_MESSAGES.REQUIRED_COOKING_TIME }),
+  servings: z
+    .string()
+    .min(1, { message: VALIDATION_MESSAGES.REQUIRED_SERVINGS }),
 });
 
 // 定義表單資料型別
@@ -181,7 +195,9 @@ export default function RecipeUploadStep2() {
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
-        setErrorMsg(result?.msg || '更新失敗，請稍後再試');
+        setErrorMsg(
+          result?.msg || `${ERROR_MESSAGES.UPDATE_RECIPE_FAILED}，請稍後再試`,
+        );
       }
     } catch (error) {
       console.error('更新食譜詳細資訊發生異常:', error);
@@ -373,7 +389,7 @@ export default function RecipeUploadStep2() {
                 type="button"
                 onClick={() => removeIngredient(index)}
                 className="text-gray-500"
-                aria-label="刪除食材"
+                aria-label={`${COMMON_TEXTS.DELETE}食材`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -461,7 +477,7 @@ export default function RecipeUploadStep2() {
                 type="button"
                 onClick={() => removeSeasoning(index)}
                 className="text-gray-500"
-                aria-label="刪除調料"
+                aria-label={`${COMMON_TEXTS.DELETE}調料`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -646,7 +662,7 @@ export default function RecipeUploadStep2() {
               : 'bg-gray-400 hover:bg-gray-500',
           )}
         >
-          {isLoading ? '提交中...' : '下一步'}
+          {isLoading ? COMMON_TEXTS.SUBMITTING : '下一步'}
         </button>
       </form>
     </div>

@@ -16,7 +16,8 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
-import { toggleRecipePublishStatus } from '@/services/api';
+import { toggleRecipePublishStatus } from '@/services/recipes';
+import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * PublishedRecipeCard 元件的 props 類型
@@ -143,8 +144,12 @@ export function PublishedRecipeCard({
           {changeSuccess ? (
             <div className="flex flex-col items-center justify-center py-8">
               <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
-              <h2 className="text-lg font-medium text-center mb-2">轉換成功</h2>
-              <p className="text-gray-500 text-center">食譜已成功轉為草稿</p>
+              <h2 className="text-lg font-medium text-center mb-2">
+                {SUCCESS_MESSAGES.CONVERT_SUCCESS}
+              </h2>
+              <p className="text-gray-500 text-center">
+                {SUCCESS_MESSAGES.RECIPE_TO_DRAFT}
+              </p>
             </div>
           ) : (
             <>
@@ -171,7 +176,7 @@ export function PublishedRecipeCard({
                   className="flex-1 bg-orange-500 hover:bg-orange-600"
                   disabled={isChanging}
                 >
-                  {isChanging ? '處理中...' : '確認'}
+                  {isChanging ? COMMON_TEXTS.SUBMITTING : COMMON_TEXTS.CONFIRM}
                 </Button>
                 <DialogClose asChild>
                   <Button
@@ -183,7 +188,7 @@ export function PublishedRecipeCard({
                     className="flex-1 border border-gray-200"
                     disabled={isChanging}
                   >
-                    取消
+                    {COMMON_TEXTS.CANCEL}
                   </Button>
                 </DialogClose>
               </div>

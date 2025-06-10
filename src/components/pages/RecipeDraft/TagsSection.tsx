@@ -1,59 +1,36 @@
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
-import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 
 type TagSectionProps = {
   tags: string[];
-  onAddTag: (tag: string) => void;
+  newTag: string;
+  onNewTagChange: (tag: string) => void;
+  onAddTag: () => void;
   onRemoveTag: (tag: string) => void;
+  maxTags?: number;
 };
 
 /**
- * 標籤區塊元件 - 用於管理食譜的標籤集合
- * 支援新增和刪除標籤，並顯示標籤數量上限
+ * 標籤區塊元件 - 顯示和管理食譜的標籤集合
+ * 純視覺組件，不包含內部狀態管理
  */
 export const TagSection = ({
   tags,
+  newTag,
+  onNewTagChange,
   onAddTag,
   onRemoveTag,
+  maxTags = 5,
 }: TagSectionProps) => {
-  const [newTag, setNewTag] = useState('');
-
-  /**
-   * 處理新增標籤事件
-   * 驗證輸入值並新增至標籤列表
-   */
-  const atHandleAddTag = () => {
-    if (newTag.trim()) {
-      onAddTag(newTag.trim());
-      setNewTag('');
-    }
-  };
-
-  /**
-   * 處理輸入框變更事件
-   */
-  const atHandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTag(e.target.value);
-  };
-
-  /**
-   * 處理標籤移除事件
-   */
-  const atHandleRemoveTag = (tag: string) => {
-    onRemoveTag(tag);
-  };
-
   /**
    * 處理輸入框按鍵事件 - 按下 Enter 時新增標籤
    */
   const atHandleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      atHandleAddTag();
+      onAddTag();
     }
   };
 
@@ -62,12 +39,13 @@ export const TagSection = ({
    */
   const renderTag = (tag: string) => {
     return (
-      <Badge key={tag} variant="outline" className="flex items-center gap-1">
+      <Badge key={tag} className="mr-2 mb-2">
         {tag}
         <button
-          onClick={() => atHandleRemoveTag(tag)}
+          type="button"
+          onClick={() => onRemoveTag(tag)}
+          className="ml-1 text-xs"
           aria-label={`移除標籤 ${tag}`}
-          className="focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary rounded-full"
         >
           <X className="w-3 h-3" />
         </button>
@@ -75,36 +53,42 @@ export const TagSection = ({
     );
   };
 
+  const canAddTag = newTag.trim() && tags.length < maxTags;
+
   return (
     <div className="mb-4">
-      <h2 className="mb-2 text-lg font-medium">食譜標籤</h2>
-      <Card className="p-4">
-        {/* 標籤計數區 */}
-        <p className="mb-2 text-sm text-gray-500">已選擇 ({tags.length}/5)</p>
+      <h2 id="tags-heading" className="mb-2 text-lg font-medium">
+        食譜標籤
+      </h2>
 
-        {/* 標籤顯示區域 */}
-        <div className="flex flex-wrap gap-2 mb-4">{tags.map(renderTag)}</div>
+      {/* 標籤顯示區域 */}
+      <div className="flex flex-wrap mb-2">{tags.map(renderTag)}</div>
 
-        {/* 標籤輸入區域 */}
-        <div className="flex">
-          <Input
-            value={newTag}
-            onChange={atHandleInputChange}
-            onKeyPress={atHandleKeyPress}
-            placeholder="新增標籤"
-            className="flex-1 mr-2"
-            aria-label="輸入新標籤"
-          />
-          <Button
-            onClick={atHandleAddTag}
-            size="sm"
-            aria-label="新增標籤"
-            disabled={!newTag.trim()}
-          >
-            新增
-          </Button>
-        </div>
-      </Card>
+      {/* 標籤輸入區域 */}
+      <div className="flex">
+        <Input
+          value={newTag}
+          onChange={(e) => onNewTagChange(e.target.value)}
+          onKeyPress={atHandleKeyPress}
+          className="bg-[#FAFAFA] flex-1 mr-2"
+          placeholder="輸入標籤"
+          aria-labelledby="tags-heading"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onAddTag}
+          disabled={!canAddTag}
+        >
+          新增
+        </Button>
+      </div>
+
+      {/* 標籤數量提示 */}
+      <p className="mt-1 text-sm text-gray-500">
+        已選擇 ({tags.length}/{maxTags})
+      </p>
     </div>
   );
 };

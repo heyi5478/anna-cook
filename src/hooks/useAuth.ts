@@ -1,12 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { checkAuth } from '@/services/api';
-
-export type AuthStatus = {
-  isAuthenticated: boolean | null;
-  isLoading: boolean;
-  userData?: any;
-};
+import { checkAuth } from '@/services/auth';
+import type { AuthStatus } from '@/types/auth';
 
 /**
  * 提供身份驗證檢查的自定義 Hook

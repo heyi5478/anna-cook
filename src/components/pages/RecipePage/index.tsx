@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/ui/adCard';
-import { FollowButton } from '@/components/common/FollowButton';
+import { FollowButton } from '@/components/features/FollowButton';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,19 +20,24 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
+// 引入自定義元件
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
+import Review from '@/components/pages/RecipePage/Review';
+
 // 引入 API 服務
 import {
   favoriteRecipe,
   unfavoriteRecipe,
   fetchRecipeRatingComments,
-} from '@/services/api';
+} from '@/services/recipes';
 import { RecipeRatingCommentResponse } from '@/types/api';
 
-// 引入自定義元件
-import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
-import Review from '@/components/pages/RecipePage/Review';
-
 // 引入樣式
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 import {
   cardStyles,
   interactionButtonStyles,
@@ -158,7 +163,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         }
       } catch (error) {
         console.error('獲取評論失敗:', error);
-        setCommentError('獲取評論失敗，請稍後再試');
+        setCommentError(`${ERROR_MESSAGES.FETCH_COMMENTS_FAILED}，請稍後再試`);
       } finally {
         setIsLoadingComments(false);
       }
@@ -188,7 +193,9 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
       }
     } catch (error) {
       console.error('載入更多評論失敗:', error);
-      setCommentError('載入更多評論失敗，請稍後再試');
+      setCommentError(
+        `${ERROR_MESSAGES.LOAD_MORE_COMMENTS_FAILED}，請稍後再試`,
+      );
     } finally {
       setIsLoadingComments(false);
     }
@@ -242,7 +249,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           url: window.location.href,
         });
 
-        alert('分享成功');
+        alert(SUCCESS_MESSAGES.SHARE_SUCCESS);
       } catch (error: unknown) {
         // 用戶取消分享不需要顯示錯誤
         if (error instanceof Error && error.name !== 'AbortError') {
@@ -496,7 +503,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               <Bookmark
                 className={`w-5 h-5 ${liked ? 'fill-[#FF5722] text-[#FF5722]' : ''}`}
               />
-              <span>{likeLoading ? '處理中...' : '收藏'}</span>
+              <span>{likeLoading ? COMMON_TEXTS.SUBMITTING : '收藏'}</span>
             </button>
             <button
               className={cn(
@@ -575,7 +582,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 onClick={atLoadMoreComments}
                 disabled={isLoadingComments}
               >
-                {isLoadingComments ? '載入中...' : '查看更多'}
+                {isLoadingComments ? COMMON_TEXTS.LOADING : '查看更多'}
               </Button>
             )}
           </div>

@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
-import { uploadRecipeBasic } from '@/services/api';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';
 import {
@@ -17,6 +16,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { uploadRecipeBasic } from '@/services/recipes';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import {
+  SUPPORTED_IMAGE_TYPES,
+  FILE_VALIDATION_MESSAGES,
+} from '@/lib/constants/file';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -30,7 +36,7 @@ const recipeFormSchema = z.object({
       if (!value) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '請上傳封面圖片',
+          message: VALIDATION_MESSAGES.REQUIRED_COVER_IMAGE,
         });
         return;
       }
@@ -39,22 +45,21 @@ const recipeFormSchema = z.object({
       if (!(value instanceof File)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '請選擇有效的圖片檔案',
+          message: VALIDATION_MESSAGES.SELECT_VALID_IMAGE,
         });
         return;
       }
 
       // 檢查檔案類型
-      const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-      if (!validFileTypes.includes(value.type)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(value.type as any)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: '僅支援 JPG, JPEG 與 PNG 格式的圖片',
+          message: FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE,
         });
       }
     }),
   agreement: z.literal(true, {
-    errorMap: () => ({ message: '請同意條款才能繼續' }),
+    errorMap: () => ({ message: VALIDATION_MESSAGES.AGREE_TERMS }),
   }),
 });
 
@@ -122,14 +127,14 @@ export default function RecipeUploadForm() {
 
       if (!data.agreement) {
         console.error('未同意條款');
-        setErrorMsg('請同意條款才能繼續');
+        setErrorMsg(VALIDATION_MESSAGES.AGREE_TERMS);
         return;
       }
 
       // 檢查圖片（使用已經處理好的檔案）
       if (!selectedFile) {
         console.error('未上傳封面圖片');
-        setErrorMsg('請上傳封面圖片');
+        setErrorMsg(VALIDATION_MESSAGES.REQUIRED_COVER_IMAGE);
         return;
       }
 
@@ -159,7 +164,9 @@ export default function RecipeUploadForm() {
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);
-        setErrorMsg(result?.msg || '上傳失敗，請稍後再試');
+        setErrorMsg(
+          result?.msg || `${ERROR_MESSAGES.UPLOAD_FAILED}，請稍後再試`,
+        );
       }
     } catch (error) {
       console.error('上傳發生異常:', error);
@@ -178,9 +185,9 @@ export default function RecipeUploadForm() {
     const file = e.target.files?.[0];
     if (file) {
       // 檢查檔案格式
-      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(file.type as any)) {
         console.error('不支援的圖片格式:', file.type);
-        setErrorMsg('僅支援 JPG, JPEG 與 PNG 格式的圖片');
+        setErrorMsg(FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE);
         setImagePreview(null);
         setSelectedFile(null);
         return;
@@ -343,7 +350,7 @@ export default function RecipeUploadForm() {
             <input
               id="coverImage"
               type="file"
-              accept="image/jpeg,image/jpg,image/png"
+              accept={SUPPORTED_IMAGE_TYPES.join(',')}
               className="hidden"
               onChange={atImageChange}
               // 不再使用 register 直接綁定檔案欄位，我們將手動處理檔案上傳
@@ -351,7 +358,8 @@ export default function RecipeUploadForm() {
           </div>
           {errors.coverImage && (
             <p className="mt-1 text-sm text-red-500">
-              {errors.coverImage.message?.toString() || '請上傳有效的封面圖片'}
+              {errors.coverImage.message?.toString() ||
+                VALIDATION_MESSAGES.UPLOAD_COVER_IMAGE}
             </p>
           )}
           {imagePreview && (
@@ -405,7 +413,7 @@ export default function RecipeUploadForm() {
               : 'bg-gray-400 hover:bg-gray-500',
           )}
         >
-          {isLoading ? '上傳中...' : '下一步'}
+          {isLoading ? COMMON_TEXTS.UPLOADING : '下一步'}
         </button>
       </form>
     </div>

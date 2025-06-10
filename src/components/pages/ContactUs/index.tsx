@@ -26,6 +26,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { ISSUE_TYPES } from '@/lib/constants';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { contactFormSchema, type ContactFormValues } from './schema';
 
 /**
@@ -135,20 +138,17 @@ export default function ContactUs() {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="請選擇問題類型" />
+                        <SelectValue
+                          placeholder={VALIDATION_MESSAGES.SELECT_ISSUE_TYPE}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="1. 檢舉會員">1. 檢舉會員</SelectItem>
-                      <SelectItem value="2. 檢舉餐廳">2. 檢舉餐廳</SelectItem>
-                      <SelectItem value="3. 檢舉留言">3. 檢舉留言</SelectItem>
-                      <SelectItem value="4. 會員操作問題">
-                        4. 會員操作問題
-                      </SelectItem>
-                      <SelectItem value="5. 廣告/行銷合作">
-                        5. 廣告/行銷合作
-                      </SelectItem>
-                      <SelectItem value="6. 其他">6. 其他</SelectItem>
+                      {ISSUE_TYPES.map((issueType) => (
+                        <SelectItem key={issueType} value={issueType}>
+                          {issueType}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -189,7 +189,7 @@ export default function ContactUs() {
                 className="w-full"
                 onClick={atCancel}
               >
-                取消留言
+                {COMMON_TEXTS.CANCEL}留言
               </Button>
             </div>
           </form>

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { checkAuth } from '@/services/api';
+import { checkAuth } from '@/services/auth';
 
 /**
  * 定義 header 的基本樣式和變體

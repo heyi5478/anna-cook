@@ -32,9 +32,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { fetchCurrentUserProfile, updateUserProfile } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useToast } from '@/hooks/use-toast';
+import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import {
+  SUPPORTED_IMAGE_TYPES,
+  FILE_VALIDATION_MESSAGES,
+} from '@/lib/constants/file';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -45,7 +55,7 @@ const profileFormSchema = z.object({
   email: z
     .string()
     .min(1, { message: '電子郵件為必填欄位' })
-    .email({ message: '請輸入有效的電子郵件地址格式' }),
+    .email({ message: VALIDATION_MESSAGES.INVALID_EMAIL }),
   bio: z.string().max(500, { message: '簡介不能超過 500 個字元' }).optional(),
 });
 
@@ -102,7 +112,11 @@ export default function ProfileEditForm() {
         setUserDisplayId(response.data.displayId);
       } catch (err) {
         console.error('載入用戶資料失敗:', err);
-        setError(err instanceof Error ? err.message : '載入用戶資料失敗');
+        setError(
+          err instanceof Error
+            ? err.message
+            : ERROR_MESSAGES.LOAD_USER_DATA_FAILED,
+        );
       } finally {
         setIsLoading(false);
       }
@@ -133,8 +147,8 @@ export default function ProfileEditForm() {
 
       // 顯示成功提示
       toast({
-        title: '更新成功',
-        description: '您的個人資料已成功更新',
+        title: SUCCESS_MESSAGES.UPDATE_SUCCESS,
+        description: SUCCESS_MESSAGES.PROFILE_UPDATE_SUCCESS,
         variant: 'default',
       });
 
@@ -145,11 +159,14 @@ export default function ProfileEditForm() {
       }, 1500);
     } catch (err) {
       console.error('更新失敗:', err);
-      const errorMessage = err instanceof Error ? err.message : '更新資料失敗';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.UPDATE_RECIPE_FAILED;
 
       // 顯示錯誤提示
       toast({
-        title: '更新失敗',
+        title: ERROR_MESSAGES.UPDATE_RECIPE_FAILED,
         description: errorMessage,
         variant: 'destructive',
       });
@@ -179,10 +196,10 @@ export default function ProfileEditForm() {
     const file = event.target.files?.[0];
     if (file) {
       // 檢查檔案類型
-      if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(file.type as any)) {
         toast({
           title: '不支援的圖片格式',
-          description: '只允許上傳 JPG、JPEG 或 PNG 圖片',
+          description: FILE_VALIDATION_MESSAGES.INVALID_IMAGE_TYPE,
           variant: 'destructive',
         });
         return;
@@ -253,7 +270,9 @@ export default function ProfileEditForm() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
-          <div className="text-red-500 text-xl mb-4">載入失敗</div>
+          <div className="text-red-500 text-xl mb-4">
+            {ERROR_MESSAGES.LOAD_FAILED}
+          </div>
           <p className="text-gray-700 mb-4">{error}</p>
           <Button
             onClick={() => window.location.reload()}
@@ -285,7 +304,7 @@ export default function ProfileEditForm() {
               返回編輯
             </Button>
             <Button variant="destructive" onClick={confirmReset}>
-              確認取消
+              {COMMON_TEXTS.CONFIRM}取消
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -355,7 +374,7 @@ export default function ProfileEditForm() {
                   <input
                     id="avatar-upload"
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png"
+                    accept={SUPPORTED_IMAGE_TYPES.join(',')}
                     className="hidden"
                     onChange={handleAvatarChange}
                     ref={avatarFileInputRef}
@@ -426,7 +445,9 @@ export default function ProfileEditForm() {
                 className="w-full bg-gray-600 hover:bg-gray-700"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? '儲存中...' : '儲存更新'}
+                {isSubmitting
+                  ? COMMON_TEXTS.SAVING
+                  : `${COMMON_TEXTS.SAVE}更新`}
               </Button>
               <Button
                 type="button"
@@ -435,7 +456,7 @@ export default function ProfileEditForm() {
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
-                取消變更
+                {COMMON_TEXTS.CANCEL}變更
               </Button>
             </div>
           </form>

@@ -1,9 +1,8 @@
 import type React from 'react';
-
 import { Trash, Play, Pause, Edit } from 'lucide-react';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { VimeoPlayer, timeToSeconds } from '@/components/common/VimeoPlayer';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 import {
   Accordion,
   AccordionContent,
@@ -11,51 +10,27 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-
-// 型別定義區塊
-type Step = {
-  description: string;
-  startTime: string;
-  endTime: string;
-  video?: string;
-  vimeoId?: string;
-  id?: string;
-};
+import type { Step } from '@/types/recipe';
 
 type CookingStepProps = {
   steps: Step[];
   onRemoveStep: (index: number) => void;
+  onNavigateToVideoEdit: () => void;
 };
 
 /**
  * 料理步驟元件 - 顯示烹飪過程的步驟列表及相關影片
+ * 純視覺組件，不包含導航邏輯
  */
-export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
+export const CookingStep = ({
+  steps,
+  onRemoveStep,
+  onNavigateToVideoEdit,
+}: CookingStepProps) => {
   // 設定初始展開的步驟值（只有步驟1展開）
   const defaultValue = ['step-0'];
   // 追踪每個步驟的播放狀態
   const [playingSteps, setPlayingSteps] = useState<Record<string, boolean>>({});
-  // 使用路由器進行頁面導航
-  const router = useRouter();
-
-  /**
-   * 導航到影片編輯頁面
-   */
-  const atNavigateToVideoEdit = (e: React.MouseEvent) => {
-    // 阻止事件冒泡，防止觸發表單提交事件
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 保存當前的 recipeId，以便在影片編輯頁面使用
-    const { recipeId } = router.query;
-
-    // 如果有 recipeId，則帶著 recipeId 導航到影片編輯頁面
-    if (recipeId) {
-      router.push(`/recipe-draft-video?recipeId=${recipeId}`);
-    } else {
-      router.push('/recipe-draft-video');
-    }
-  };
 
   /**
    * 切換步驟影片的播放狀態
@@ -72,6 +47,15 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
   };
 
   /**
+   * 處理導航到影片編輯頁面
+   */
+  const atHandleNavigateToVideoEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onNavigateToVideoEdit();
+  };
+
+  /**
    * 渲染步驟影片區塊
    */
   const renderStepVideo = (step: Step, index: number) => {
@@ -85,8 +69,12 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
           {step.vimeoId ? (
             <VimeoPlayer
               videoId={step.vimeoId}
-              startTime={timeToSeconds(step.startTime)}
-              endTime={timeToSeconds(step.endTime)}
+              startTime={timeToSeconds(
+                typeof step.startTime === 'string' ? step.startTime : '0:00',
+              )}
+              endTime={timeToSeconds(
+                typeof step.endTime === 'string' ? step.endTime : '0:00',
+              )}
               responsive
               muted
               loop
@@ -106,7 +94,7 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
    * 渲染步驟資訊區塊
    */
   const renderStepInfo = (step: Step, index: number) => {
-    const stepId = step.id || `step-${index}`;
+    const stepId = step.id ? String(step.id) : `step-${index}`;
     const isPlaying = playingSteps[stepId] || false;
 
     return (
@@ -161,9 +149,10 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">料理步驟</h2>
         <button
+          type="button"
           className="p-1"
           aria-label="修改步驟"
-          onClick={atNavigateToVideoEdit}
+          onClick={atHandleNavigateToVideoEdit}
         >
           <Edit className="w-4 h-4" />
         </button>
@@ -183,12 +172,13 @@ export const CookingStep = ({ steps, onRemoveStep }: CookingStepProps) => {
                 <h3 className="font-medium text-left">步驟 {index + 1}</h3>
               </AccordionTrigger>
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemoveStep(index);
                 }}
                 className="mr-2 p-1 text-gray-500 z-10"
-                aria-label={`刪除步驟 ${index + 1}`}
+                aria-label={`${COMMON_TEXTS.DELETE}步驟 ${index + 1}`}
               >
                 <Trash className="w-4 h-4" />
               </button>

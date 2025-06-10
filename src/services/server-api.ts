@@ -1,7 +1,14 @@
 import { IncomingMessage } from 'http';
-import { apiConfig, authConfig } from '@/config';
+import { getApiConfig, authConfig } from '@/config';
 import { getServerToken as getNextApiServerToken } from '@/lib/auth-middleware';
 import type { NextApiRequest } from 'next';
+import {
+  DEV_TEST_TOKEN,
+  COMMON_TEXTS,
+  HTTP_STATUS,
+  SORT_TYPES,
+} from '@/lib/constants';
+import { ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
  * 從 IncomingMessage 請求 Cookie 中獲取 JWT Token
@@ -42,8 +49,8 @@ export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
 
   // 在開發環境中使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log('伺服器端開發環境：使用測試 token');
-    return 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
+    console.log(COMMON_TEXTS.DEV_SERVER_TOKEN);
+    return DEV_TEST_TOKEN;
   }
 
   // 生產環境中沒有 token，返回 null
@@ -95,7 +102,9 @@ export const fetchUserProfileServer = async (
   req: IncomingMessage,
 ): Promise<UserProfileResponse> => {
   try {
-    console.log(`伺服器端發送請求: GET ${apiConfig.baseUrl}/user/${displayId}`);
+    console.log(
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}`,
+    );
 
     // 獲取 token (若有)
     const token = getAuthTokenForServer(req);
@@ -108,10 +117,13 @@ export const fetchUserProfileServer = async (
     }
 
     // 發送請求 (token 為選填)
-    const response = await fetch(`${apiConfig.baseUrl}/user/${displayId}`, {
-      method: 'GET',
-      headers,
-    });
+    const response = await fetch(
+      `${getApiConfig().baseUrl}/user/${displayId}`,
+      {
+        method: 'GET',
+        headers,
+      },
+    );
 
     console.log('伺服器端回應狀態:', response.status);
 
@@ -119,7 +131,10 @@ export const fetchUserProfileServer = async (
       return {
         StatusCode: response.status,
         isMe: false,
-        msg: response.status === 400 ? '查無此使用者' : '獲取使用者資料失敗',
+        msg:
+          response.status === HTTP_STATUS.BAD_REQUEST
+            ? ERROR_MESSAGES.USER_NOT_FOUND
+            : ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
       };
     }
 
@@ -131,9 +146,9 @@ export const fetchUserProfileServer = async (
   } catch (error) {
     console.error('伺服器端獲取使用者資料失敗:', error);
     return {
-      StatusCode: 500,
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       isMe: false,
-      msg: '伺服器端獲取使用者資料失敗',
+      msg: ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
     };
   }
 };
@@ -169,22 +184,22 @@ export const fetchUserRecipesServer = async (
 ): Promise<UserRecipesResponse> => {
   try {
     console.log(
-      `伺服器端發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
     // 發送請求 (不需要 token)
     const response = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/recipes?page=${page}`,
+      `${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
     console.log('伺服器端回應狀態:', response.status);
 
     // 處理 404 或其他錯誤狀態
     if (!response.ok) {
-      if (response.status === 404) {
+      if (response.status === HTTP_STATUS.NOT_FOUND) {
         console.warn(`伺服器端找不到使用者 ${displayId} 的食譜資料`);
         return {
-          statusCode: 404,
+          statusCode: HTTP_STATUS.NOT_FOUND,
           hasMore: false,
           recipeCount: 0,
           recipes: [],
@@ -196,21 +211,23 @@ export const fetchUserRecipesServer = async (
         hasMore: false,
         recipeCount: 0,
         recipes: [],
-        message: '獲取使用者食譜失敗',
+        message: ERROR_MESSAGES.FETCH_USER_RECIPES_FAILED,
       };
     }
 
     // 解析回應資料
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
     console.error('伺服器端獲取使用者食譜失敗:', error);
     return {
-      statusCode: 500,
+      statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       hasMore: false,
       recipeCount: 0,
       recipes: [],
-      message: '伺服器端獲取使用者食譜失敗',
+      message: ERROR_MESSAGES.FETCH_USER_RECIPES_FAILED,
     };
   }
 };
@@ -241,7 +258,7 @@ export interface AuthorRecipesResponse {
  * 伺服器端獲取作者食譜列表
  * @param displayId 作者顯示 ID
  * @param req 伺服器端請求物件
- * @param isPublished 是否為已發布的食譜
+ * @param isPublished 是否只顯示已發佈的食譜
  * @returns 作者食譜列表回應
  */
 export const fetchAuthorRecipesServer = async (
@@ -250,42 +267,47 @@ export const fetchAuthorRecipesServer = async (
   isPublished: boolean = true,
 ): Promise<AuthorRecipesResponse> => {
   try {
-    console.log(
-      `伺服器端發送請求: GET ${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
-    );
-
-    // 獲取 token
     const token = getAuthTokenForServer(req);
 
     if (!token) {
-      console.error('伺服器端認證錯誤: 未登入或 Token 不存在');
+      console.warn('伺服器端缺少授權 token');
       return {
-        statusCode: 401,
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
         totalCount: 0,
         data: [],
       };
     }
 
-    // 發送請求
-    const response = await fetch(
-      `${apiConfig.baseUrl}/user/${displayId}/author-recipes?isPublished=${isPublished}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const queryParam = isPublished ? '?isPublished=true' : '?isPublished=false';
+    const apiUrl = `${getApiConfig().baseUrl}/user/${displayId}/management/recipe${queryParam}`;
+
+    console.log(`伺服器端發送請求: GET ${apiUrl}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     console.log('伺服器端回應狀態:', response.status);
 
-    // 解析回應資料
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        totalCount: 0,
+        data: [],
+      };
+    }
+
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
     console.error('伺服器端獲取作者食譜失敗:', error);
     return {
-      statusCode: 500,
+      statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       totalCount: 0,
       data: [],
     };
@@ -338,8 +360,8 @@ export interface RecipeDetailResponse {
 
 /**
  * 伺服器端獲取單筆食譜詳細資料
- * @param recipeId 食譜ID
- * @param req 伺服器端請求物件
+ * @param recipeId 食譜 ID
+ * @param req 伺服器端請求物件（選填）
  * @returns 食譜詳細資料回應
  */
 export const fetchRecipeDetailServer = async (
@@ -348,43 +370,51 @@ export const fetchRecipeDetailServer = async (
 ): Promise<RecipeDetailResponse> => {
   try {
     console.log(
-      `伺服器端發送請求: GET ${apiConfig.baseUrl}/recipes/${recipeId}`,
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/recipes/${recipeId}`,
     );
-
-    // 獲取 token (若有)
-    const token = req ? getAuthTokenForServer(req) : null;
 
     // 準備請求標頭
     const headers: HeadersInit = {};
-    if (token) {
-      // 如果有 token，加入授權標頭
-      headers.Authorization = `Bearer ${token}`;
+
+    // 如果有請求物件，嘗試獲取 token
+    if (req) {
+      const token = getAuthTokenForServer(req);
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     // 發送請求
-    const response = await fetch(`${apiConfig.baseUrl}/recipes/${recipeId}`, {
-      method: 'GET',
-      headers,
-    });
+    const response = await fetch(
+      `${getApiConfig().baseUrl}/recipes/${recipeId}`,
+      {
+        method: 'GET',
+        headers,
+      },
+    );
 
     console.log('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: response.status === 400 ? '找不到該食譜' : '獲取食譜資料失敗',
+        msg:
+          response.status === HTTP_STATUS.NOT_FOUND
+            ? ERROR_MESSAGES.RECIPE_NOT_FOUND
+            : ERROR_MESSAGES.FETCH_RECIPE_DETAIL_FAILED,
       };
     }
 
     // 解析回應資料
     const data = await response.json();
     console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
-    console.error('伺服器端獲取食譜資料失敗:', error);
+    console.error('伺服器端獲取食譜詳細資料失敗:', error);
     return {
-      StatusCode: 500,
-      msg: '伺服器端獲取食譜資料失敗',
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      msg: ERROR_MESSAGES.FETCH_RECIPE_DETAIL_FAILED,
     };
   }
 };
@@ -410,34 +440,36 @@ export interface HomeFeatureResponse {
 }
 
 /**
- * 獲取首頁主題區塊與對應食譜卡片
- * @returns 首頁主題區塊與食譜卡片資料
+ * 伺服器端獲取首頁特色內容
+ * @returns 首頁特色內容回應
  */
 export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
   try {
-    console.log(`發送請求: GET ${apiConfig.baseUrl}/home/features`);
+    console.log(
+      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/home/features`,
+    );
 
-    // 發送請求 (不需要 token)
-    const response = await fetch(`${apiConfig.baseUrl}/home/features`);
+    const response = await fetch(`${getApiConfig().baseUrl}/home/features`);
 
-    console.log('回應狀態:', response.status);
+    console.log('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '獲取首頁特色區塊失敗',
+        msg: ERROR_MESSAGES.FETCH_HOME_FEATURES_FAILED,
         data: [],
       };
     }
 
-    // 解析回應資料
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
-    console.error('獲取首頁特色區塊失敗:', error);
+    console.error('伺服器端獲取首頁特色內容失敗:', error);
     return {
-      StatusCode: 500,
-      msg: '獲取首頁特色區塊失敗',
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      msg: ERROR_MESSAGES.FETCH_HOME_FEATURES_FAILED,
       data: [],
     };
   }
@@ -464,44 +496,41 @@ export interface HomeRecipesResponse {
 
 /**
  * 獲取首頁推薦食譜列表
- * @param type 排序方式 (latest/popular/classic)
+ * @param type 排序類型 (latest, popular, classic)
  * @param number 頁碼
  * @returns 首頁推薦食譜列表資料
  */
 export const fetchHomeRecipes = async (
-  type: string = 'latest',
+  type: string = SORT_TYPES.LATEST,
   number: number = 1,
 ): Promise<HomeRecipesResponse> => {
   try {
-    console.log(
-      `發送請求: GET ${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
-    );
+    const apiUrl = `${getApiConfig().baseUrl}/home/recipes?type=${type}&number=${number}`;
+    console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
-    // 發送請求 (不需要 token)
-    const response = await fetch(
-      `${apiConfig.baseUrl}/home/recipes?type=${type}&number=${number}`,
-    );
+    const response = await fetch(apiUrl);
 
-    console.log('回應狀態:', response.status);
+    console.log('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '獲取首頁推薦食譜失敗',
+        msg: ERROR_MESSAGES.FETCH_HOME_RECIPES_FAILED,
         totalCount: 0,
         hasMore: false,
         data: [],
       };
     }
 
-    // 解析回應資料
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
-    console.error('獲取首頁推薦食譜失敗:', error);
+    console.error('伺服器端獲取首頁食譜失敗:', error);
     return {
-      StatusCode: 500,
-      msg: '獲取首頁推薦食譜失敗',
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      msg: ERROR_MESSAGES.FETCH_HOME_RECIPES_FAILED,
       totalCount: 0,
       hasMore: false,
       data: [],
@@ -536,34 +565,35 @@ export interface RecipeSearchResponse {
 /**
  * 伺服器端搜尋食譜
  * @param searchData 搜尋關鍵字
- * @param type 排序方式（createdAt 或 popular）
+ * @param type 排序類型
  * @param number 頁碼
- * @returns 食譜搜尋結果
+ * @returns 搜尋結果回應
  */
 export const searchRecipesServer = async (
   searchData: string = '',
-  type: string = 'createdAt',
+  type: string = SORT_TYPES.CREATED_AT,
   number: number = 1,
 ): Promise<RecipeSearchResponse> => {
   try {
     // 構建查詢參數
     const queryParams = new URLSearchParams();
-    if (searchData) queryParams.append('searchData', searchData);
+    if (searchData) {
+      queryParams.append('searchData', searchData);
+    }
     queryParams.append('type', type);
-    queryParams.append('number', number.toString());
+    queryParams.append('number', String(number));
 
-    const url = `${apiConfig.baseUrl}/recipes/search?${queryParams.toString()}`;
-    console.log(`伺服器端發送請求: GET ${url}`);
+    const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
+    console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
-    // 發送請求 (不需要 token)
-    const response = await fetch(url);
+    const response = await fetch(apiUrl);
 
     console.log('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
         StatusCode: response.status,
-        msg: '搜尋食譜失敗',
+        msg: ERROR_MESSAGES.SEARCH_RECIPE_FAILED,
         number: `page ${number}`,
         hasMore: false,
         totalCount: 0,
@@ -571,14 +601,15 @@ export const searchRecipesServer = async (
       };
     }
 
-    // 解析回應資料
     const data = await response.json();
+    console.log('伺服器端回應資料:', data);
+
     return data;
   } catch (error) {
     console.error('伺服器端搜尋食譜失敗:', error);
     return {
-      StatusCode: 500,
-      msg: '伺服器端搜尋食譜失敗',
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      msg: ERROR_MESSAGES.SEARCH_RECIPES_SERVER_FAILED,
       number: `page ${number}`,
       hasMore: false,
       totalCount: 0,

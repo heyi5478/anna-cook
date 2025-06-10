@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -13,23 +12,31 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-
+import { StarRating } from '@/components/pages/RecipePage/StarRating';
+import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
 import {
   submitRecipeRatingComment,
   fetchRecipeRatingComments,
-} from '@/services/api';
+} from '@/services/recipes';
 import { useToast } from '@/hooks/use-toast';
-
-import { StarRating } from '@/components/pages/RecipePage/StarRating';
-import { ReviewDisplay } from '@/components/pages/RecipePage/ReviewDisplay';
+import { HTTP_STATUS, VALIDATION_MESSAGES, TEXT_LIMITS } from '@/lib/constants';
+import {
+  SUCCESS_MESSAGES,
+  COMMON_TEXTS,
+  ERROR_MESSAGES,
+} from '@/lib/constants/messages';
 
 // 定義表單 schema
 const reviewSchema = z.object({
-  rating: z.number().min(1).max(5),
+  rating: z.number().min(1, { message: VALIDATION_MESSAGES.REQUIRED_RATING }),
   comment: z
     .string()
-    .min(10, { message: '評論內容至少需要 10 個字' })
-    .max(500, { message: '評論內容不可超過 500 個字' }),
+    .min(TEXT_LIMITS.MIN_COMMENT_LENGTH, {
+      message: VALIDATION_MESSAGES.MIN_COMMENT_LENGTH,
+    })
+    .max(TEXT_LIMITS.MAX_COMMENT_LENGTH, {
+      message: VALIDATION_MESSAGES.MAX_COMMENT_LENGTH,
+    }),
 });
 
 // 定義表單類型
@@ -82,7 +89,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
         // 獲取自己提交的評論
         const commentsResponse = await fetchRecipeRatingComments(recipeId);
         if (
-          commentsResponse.StatusCode === 200 &&
+          commentsResponse.StatusCode === HTTP_STATUS.OK &&
           commentsResponse.data.length > 0
         ) {
           // 假設第一條是最新的評論（即自己剛提交的）
@@ -97,12 +104,12 @@ export default function Review({ recipeId }: { recipeId: number }) {
         setIsSubmitted(true);
         toast({
           title: '成功',
-          description: '評分與留言已成功提交',
+          description: SUCCESS_MESSAGES.REVIEW_SUBMITTED,
         });
       } else {
         toast({
           title: '錯誤',
-          description: response.msg || '提交評論失敗',
+          description: response.msg || ERROR_MESSAGES.SUBMIT_COMMENT_FAILED,
           variant: 'destructive',
         });
       }
@@ -110,12 +117,22 @@ export default function Review({ recipeId }: { recipeId: number }) {
       console.error('提交評論失敗:', error);
       toast({
         title: '錯誤',
-        description: error instanceof Error ? error.message : '提交評論失敗',
+        description:
+          error instanceof Error
+            ? error.message
+            : ERROR_MESSAGES.SUBMIT_COMMENT_FAILED,
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * 處理評分變更
+   */
+  const atRatingChange = (rating: number) => {
+    form.setValue('rating', rating);
   };
 
   return (
@@ -136,7 +153,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                     <FormItem>
                       <StarRating
                         rating={field.value}
-                        onRatingChange={(rating) => field.onChange(rating)}
+                        onRatingChange={atRatingChange}
                         size="lg"
                         showRating
                         ratingTitle="您的評價"
@@ -212,7 +229,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                       <path d="m12 5 7 7-7 7" />
                     </svg>
                   )}
-                  {isLoading ? '提交中...' : '提交留言'}
+                  {isLoading ? COMMON_TEXTS.SUBMITTING : '提交留言'}
                 </Button>
               </form>
             </Form>
@@ -233,7 +250,6 @@ export default function Review({ recipeId }: { recipeId: number }) {
                 <ReviewDisplay
                   comment={review.comment}
                   username={review.authorName || '您'}
-                  userRating={review.rating}
                 />
               </>
             )}

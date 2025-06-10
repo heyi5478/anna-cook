@@ -18,21 +18,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import {
-  fetchAuthorRecipes,
-  deleteMultipleRecipes,
-  fetchUserFavoriteFollow,
-} from '@/services/api';
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 import {
   AuthorRecipesResponse,
   UserFavoriteResponse,
   UserFollowResponse,
 } from '@/types/api';
 import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog';
+  fetchAuthorRecipes,
+  fetchUserFavoriteFollow,
+  deleteMultipleRecipes,
+} from '@/services/recipes';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
@@ -190,7 +191,11 @@ export default function UserCenter({
       setPublishedRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入已發佈食譜失敗:', err);
-      setError(err instanceof Error ? err.message : '載入已發佈食譜失敗');
+      setError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_PUBLISHED_RECIPES_FAILED,
+      );
     } finally {
       setIsLoadingPublished(false);
     }
@@ -208,7 +213,11 @@ export default function UserCenter({
       setDraftRecipes(mapApiRecipeData(response.data));
     } catch (err) {
       console.error('載入草稿食譜失敗:', err);
-      setError(err instanceof Error ? err.message : '載入草稿食譜失敗');
+      setError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_DRAFT_RECIPES_FAILED,
+      );
     } finally {
       setIsLoadingDrafts(false);
     }
@@ -249,7 +258,11 @@ export default function UserCenter({
       }
     } catch (err) {
       console.error('載入追蹤的用戶失敗:', err);
-      setFollowError(err instanceof Error ? err.message : '載入追蹤的用戶失敗');
+      setFollowError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_FOLLOWED_USERS_FAILED,
+      );
     } finally {
       setFollowLoading(false);
     }
@@ -295,7 +308,9 @@ export default function UserCenter({
     } catch (err) {
       console.error('載入收藏的食譜失敗:', err);
       setFavoriteError(
-        err instanceof Error ? err.message : '載入收藏的食譜失敗',
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.LOAD_FAVORITE_RECIPES_FAILED,
       );
     } finally {
       setFavoriteLoading(false);
@@ -360,7 +375,9 @@ export default function UserCenter({
       const response = await deleteMultipleRecipes(selectedDrafts);
 
       // 設置成功訊息
-      setDeleteSuccess(`成功刪除 ${response.deletedIds.length} 個食譜`);
+      setDeleteSuccess(
+        `成功${COMMON_TEXTS.DELETE} ${response.deletedIds.length} 個食譜`,
+      );
 
       // 重新載入草稿列表
       await loadDraftRecipes();
@@ -371,7 +388,11 @@ export default function UserCenter({
       setDeleteDialogOpen(false);
     } catch (err) {
       console.error('刪除食譜失敗:', err);
-      setDeleteError(err instanceof Error ? err.message : '刪除食譜失敗');
+      setDeleteError(
+        err instanceof Error
+          ? err.message
+          : ERROR_MESSAGES.DELETE_MULTIPLE_RECIPES_FAILED,
+      );
     } finally {
       setDeleteLoading(false);
     }
@@ -396,7 +417,7 @@ export default function UserCenter({
   // 數據標籤頁內容 - 顯示食譜統計資訊
   const renderDataContent = () => {
     if (isLoadingPublished) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -437,7 +458,7 @@ export default function UserCenter({
   // 已發布標籤頁內容
   const renderPublishedContent = () => {
     if (isLoadingPublished) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -479,7 +500,7 @@ export default function UserCenter({
   // 草稿標籤頁內容
   const renderDraftContent = () => {
     if (isLoadingDrafts) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (error) {
@@ -580,7 +601,7 @@ export default function UserCenter({
               onClick={atToggleDeleteMode}
               className="flex-1 border border-gray-200"
             >
-              取消刪除
+              {COMMON_TEXTS.CANCEL}刪除
             </Button>
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <DialogTrigger asChild>
@@ -595,7 +616,8 @@ export default function UserCenter({
                   className="flex-1 bg-orange-500 hover:bg-orange-600"
                   disabled={selectedDrafts.length === 0}
                 >
-                  確認刪除
+                  {COMMON_TEXTS.CONFIRM}
+                  {COMMON_TEXTS.DELETE}
                   {selectedDrafts.length > 0
                     ? `(${selectedDrafts.length})`
                     : ''}
@@ -610,7 +632,7 @@ export default function UserCenter({
                     <AlertCircle className="h-6 w-6 text-gray-500" />
                   </div>
                   <h2 className="text-lg font-medium text-center mb-6">
-                    是否刪除所選食譜?
+                    是否{COMMON_TEXTS.DELETE}所選食譜?
                   </h2>
                   <div className="flex justify-between w-full gap-4">
                     <DialogClose asChild>
@@ -619,7 +641,7 @@ export default function UserCenter({
                         onClick={() => setDeleteDialogOpen(false)}
                         className="flex-1 border border-gray-300 text-black font-normal"
                       >
-                        取消
+                        {COMMON_TEXTS.CANCEL}
                       </Button>
                     </DialogClose>
                     <Button
@@ -628,7 +650,9 @@ export default function UserCenter({
                       className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-normal"
                       disabled={deleteLoading}
                     >
-                      {deleteLoading ? '處理中...' : '確認'}
+                      {deleteLoading
+                        ? COMMON_TEXTS.SUBMITTING
+                        : COMMON_TEXTS.CONFIRM}
                     </Button>
                   </div>
                 </div>
@@ -648,7 +672,7 @@ export default function UserCenter({
   // 渲染「已追蹤」標籤內容
   const renderFollowContent = () => {
     if (followLoading && followPage === 1) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (followError) {
@@ -699,7 +723,7 @@ export default function UserCenter({
   // 渲染「已收藏」標籤內容
   const renderFavoriteContent = () => {
     if (favoriteLoading && favoritePage === 1) {
-      return <div className="text-center py-8">載入中...</div>;
+      return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
     }
 
     if (favoriteError) {
@@ -831,7 +855,7 @@ export default function UserCenter({
               onClick={atToggleDeleteMode}
             >
               <Trash2 className="h-5 w-5" />
-              <span>刪除草稿</span>
+              <span>{COMMON_TEXTS.DELETE}草稿</span>
             </Button>
           </div>
         </div>

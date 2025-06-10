@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { proxyAuthRequest } from '@/lib/auth-middleware';
+import { HTTP_STATUS } from '@/lib/constants';
 // 需要安裝: npm install formidable @types/formidable
 import formidable from 'formidable';
 import fs from 'fs';
@@ -61,13 +62,15 @@ export default async function handler(
       return proxyAuthRequest(req, res, '/user/profile', 'PUT', formData);
     } catch (error) {
       console.error('處理更新用戶個人資料請求失敗:', error);
-      return res.status(500).json({
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         error: '處理請求時發生錯誤',
         message: error instanceof Error ? error.message : String(error),
       });
     }
   } else {
     // 不支援的 HTTP 方法
-    return res.status(405).json({ error: '方法不允許' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ error: '方法不允許' });
   }
 }

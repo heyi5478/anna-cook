@@ -1,23 +1,18 @@
 import * as z from 'zod';
+import { VALIDATION_MESSAGES, ISSUE_TYPES, TEXT_LIMITS } from '@/lib/constants';
 
 // 定義表單驗證規則
 export const contactFormSchema = z.object({
-  name: z.string().min(1, { message: '請輸入姓名' }),
-  email: z.string().email({ message: '請輸入有效的電子信箱' }),
-  issueType: z.enum(
-    [
-      '1. 檢舉會員',
-      '2. 檢舉餐廳',
-      '3. 檢舉留言',
-      '4. 會員操作問題',
-      '5. 廣告/行銷合作',
-      '6. 其他',
-    ],
-    {
-      required_error: '請選擇問題類型',
-    },
-  ),
-  message: z.string().min(10, { message: '留言內容至少需要10個字元' }),
+  name: z.string().min(TEXT_LIMITS.MIN_NAME_LENGTH, {
+    message: VALIDATION_MESSAGES.REQUIRED_NAME,
+  }),
+  email: z.string().email({ message: VALIDATION_MESSAGES.REQUIRED_EMAIL }),
+  issueType: z.enum(ISSUE_TYPES, {
+    required_error: VALIDATION_MESSAGES.REQUIRED_ISSUE_TYPE,
+  }),
+  message: z.string().min(TEXT_LIMITS.MIN_MESSAGE_LENGTH, {
+    message: VALIDATION_MESSAGES.MIN_MESSAGE_LENGTH,
+  }),
 });
 
 // 定義表單資料型別

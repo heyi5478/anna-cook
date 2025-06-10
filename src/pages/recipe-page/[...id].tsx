@@ -6,6 +6,8 @@ import {
   RecipeDetailResponse,
 } from '@/services/server-api';
 import RecipePageComponent from '@/components/pages/RecipePage';
+import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -16,11 +18,15 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
 
   // 如果頁面正在建立，顯示載入中狀態
   if (router.isFallback) {
-    return <div className="container mx-auto py-10 text-center">載入中...</div>;
+    return (
+      <div className="container mx-auto py-10 text-center">
+        {COMMON_TEXTS.LOADING}
+      </div>
+    );
   }
 
   // 如果沒有成功獲取食譜資料
-  if (recipeData.StatusCode !== 200 || !recipeData.data) {
+  if (recipeData.StatusCode !== HTTP_STATUS.OK || !recipeData.data) {
     return (
       <div className="container mx-auto py-10 text-center">
         <h2 className="text-xl font-semibold mb-4">找不到該食譜</h2>
@@ -70,12 +76,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const recipeData = await fetchRecipeDetailServer(recipeId);
 
-    if (recipeData.StatusCode !== 200 || !recipeData.data) {
+    if (recipeData.StatusCode !== HTTP_STATUS.OK || !recipeData.data) {
       return {
         props: {
           recipeData,
         },
-        revalidate: 60, // 1分鐘後重新驗證
+        revalidate: REVALIDATE_INTERVALS.SHORT, // 1分鐘後重新驗證
       };
     }
 
@@ -83,18 +89,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
       props: {
         recipeData,
       },
-      revalidate: 3600, // 每小時重新驗證一次成功的資料
+      revalidate: REVALIDATE_INTERVALS.MEDIUM, // 每小時重新驗證一次成功的資料
     };
   } catch (error) {
     console.error('獲取食譜資料失敗:', error);
     return {
       props: {
         recipeData: {
-          StatusCode: 500,
-          msg: '獲取食譜資料失敗',
+          StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          msg: ERROR_MESSAGES.FETCH_RECIPE_FAILED,
         },
       },
-      revalidate: 60, // 1分鐘後重新驗證
+      revalidate: REVALIDATE_INTERVALS.SHORT, // 1分鐘後重新驗證
     };
   }
 };
