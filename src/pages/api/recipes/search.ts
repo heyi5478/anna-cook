@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { apiConfig } from '@/config';
+import { getApiConfig } from '@/config';
 import { HTTP_STATUS, SORT_TYPES } from '@/lib/constants';
 
 /**
@@ -31,7 +31,7 @@ export default async function handler(
     queryParams.append('number', String(number));
 
     // 發送請求到後端 API
-    const apiUrl = `${apiConfig.baseUrl}/recipes/search?${queryParams.toString()}`;
+    const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
     console.log(`前端 API 代理請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl);
