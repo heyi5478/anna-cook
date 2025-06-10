@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { apiConfig } from '@/config';
+import { getApiConfig } from '@/config';
+import { HTTP_STATUS, SORT_TYPES } from '@/lib/constants';
 
 /**
  * 轉發食譜搜尋請求到後端 API
@@ -9,11 +10,17 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: '僅支援 GET 請求' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ message: '僅支援 GET 請求' });
   }
 
   try {
-    const { searchData = '', type = 'createdAt', number = '1' } = req.query;
+    const {
+      searchData = '',
+      type = SORT_TYPES.CREATED_AT,
+      number = '1',
+    } = req.query;
 
     // 構建查詢參數
     const queryParams = new URLSearchParams();
@@ -24,7 +31,7 @@ export default async function handler(
     queryParams.append('number', String(number));
 
     // 發送請求到後端 API
-    const apiUrl = `${apiConfig.baseUrl}/recipes/search?${queryParams.toString()}`;
+    const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
     console.log(`前端 API 代理請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl);
@@ -35,8 +42,8 @@ export default async function handler(
     return res.status(response.status).json(data);
   } catch (error) {
     console.error('處理食譜搜尋請求失敗:', error);
-    return res.status(500).json({
-      StatusCode: 500,
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       msg: '處理食譜搜尋請求失敗',
       number: `page ${req.query.number || 1}`,
       hasMore: false,

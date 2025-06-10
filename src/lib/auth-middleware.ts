@@ -2,7 +2,7 @@ import {
   NextApiRequest as OriginalNextApiRequest,
   NextApiResponse,
 } from 'next';
-import { authConfig, apiConfig } from '@/config';
+import { authConfig, getApiConfig } from '@/config';
 import { setServerCookie } from '@/lib/utils';
 
 // 擴展 NextApiRequest 類型，添加 user 屬性
@@ -140,7 +140,7 @@ export const proxyAuthRequest = async (
     }
 
     // 從原始請求中獲取並附加查詢參數（若有）
-    let apiUrl = `${apiConfig.baseUrl}${url}`;
+    let apiUrl = `${getApiConfig().baseUrl}${url}`;
     const queryString = Object.keys(req.query)
       .filter((key) => !['recipeId', 'userId', 'displayId'].includes(key)) // 排除路徑參數
       .map(

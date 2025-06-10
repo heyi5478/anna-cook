@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { proxyAuthRequest } from '@/lib/auth-middleware';
+import { HTTP_STATUS } from '@/lib/constants';
 // 需要安裝: npm install formidable @types/formidable
 import formidable from 'formidable';
 import fs from 'fs';
@@ -20,14 +21,16 @@ export default async function handler(
 ) {
   // 只允許 POST 請求
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: '方法不允許' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ error: '方法不允許' });
   }
 
   // 從查詢參數中獲取食譜 ID
   const { recipeId } = req.query;
 
   if (!recipeId || Array.isArray(recipeId)) {
-    return res.status(400).json({ error: '無效的食譜 ID' });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: '無效的食譜 ID' });
   }
 
   try {
@@ -75,7 +78,7 @@ export default async function handler(
     );
   } catch (error) {
     console.error('處理提交食譜草稿請求失敗:', error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       error: '處理請求時發生錯誤',
       message: error instanceof Error ? error.message : String(error),
     });

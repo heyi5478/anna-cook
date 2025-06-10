@@ -17,12 +17,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { registerWithEmail } from '@/services/api';
+import { registerWithEmail } from '@/services/auth';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 
 // 定義表單驗證規則
 const formSchema = z.object({
-  name: z.string().min(1, '請輸入您的姓名'),
-  email: z.string().email('請輸入有效的電子郵件地址'),
+  name: z.string().min(1, VALIDATION_MESSAGES.REQUIRED_YOUR_NAME),
+  email: z.string().email(VALIDATION_MESSAGES.INVALID_EMAIL),
   password: z
     .string()
     .min(8, '密碼至少需要8個字元')
@@ -255,7 +257,7 @@ export default function RegisterWithEmail() {
               disabled={submitting}
               className="w-full h-14 rounded-full bg-[#FF4500] hover:bg-[#FF4500]/90 text-white font-medium text-lg"
             >
-              {submitting ? '處理中...' : '註冊'}
+              {submitting ? COMMON_TEXTS.SUBMITTING : '註冊'}
             </Button>
           </form>
         </Form>

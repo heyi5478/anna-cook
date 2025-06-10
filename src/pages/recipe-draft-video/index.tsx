@@ -1,8 +1,9 @@
 import { NextPage } from 'next';
-import RecipeDraftVideo from '@/components/RecipeDraftVideo';
+import RecipeDraftVideo from '@/components/pages/RecipeDraftVideo';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 食譜草稿影片頁面
@@ -23,7 +24,7 @@ const RecipeDraftVideoPage: NextPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">載入中...</div>
+        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

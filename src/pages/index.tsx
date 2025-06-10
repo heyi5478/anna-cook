@@ -4,30 +4,21 @@ import { Plus, ChevronDown, X } from 'lucide-react';
 // import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CategoryCard } from '@/components/common/CategoryCard';
-import { RecipeCard } from '@/components/ui/RecipeCard';
+import { CategoryCard } from '@/components/features/CategoryCard';
+import { RecipeCard } from '@/components/features/RecipeCard';
 import { Carousel } from '@/components/ui/carousel';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
 import Image from 'next/image';
+import type { Recipe } from '@/types/recipe';
 import {
   fetchHomeFeatures,
   HomeFeatureResponse,
   fetchHomeRecipes,
   HomeRecipesResponse,
 } from '@/services/server-api';
-
-// 定義食譜類型
-type Recipe = {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  time: number;
-  servings: number;
-  rating: number;
-  description: string;
-};
+import { SORT_TYPES } from '@/lib/constants';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 定義分類類型
 type Category = {
@@ -58,7 +49,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
     const featuresData = await fetchHomeFeatures();
 
     // 獲取最新食譜
-    const latestRecipesData = await fetchHomeRecipes('latest', 1);
+    const latestRecipesData = await fetchHomeRecipes(SORT_TYPES.LATEST, 1);
 
     // 檢查其他類型是否有更多
     const hasMorePopular = true; // 假設有更多人氣食譜
@@ -105,38 +96,38 @@ export default function HomePage({
 }: HomePageProps) {
   const router = useRouter();
   // 設定當前選中的標籤
-  const [activeTab, setActiveTab] = useState('latest');
+  const [activeTab, setActiveTab] = useState<string>(SORT_TYPES.LATEST);
   // 控制浮動按鈕選單的顯示
   const [showFloatingMenu, setShowFloatingMenu] = useState(false);
   // 各種類型的食譜頁碼
   const [currentPage, setCurrentPage] = useState<Record<string, number>>({
-    latest: 1,
-    popular: 1,
-    classic: 1,
+    [SORT_TYPES.LATEST]: 1,
+    [SORT_TYPES.POPULAR]: 1,
+    [SORT_TYPES.CLASSIC]: 1,
   });
   // 存儲已加載的食譜列表
   const [loadedRecipes, setLoadedRecipes] = useState<
     Record<string, HomeRecipesResponse['data']>
   >({
-    latest: latestRecipes,
-    popular: [], // 延遲載入
-    classic: [], // 延遲載入
+    [SORT_TYPES.LATEST]: latestRecipes,
+    [SORT_TYPES.POPULAR]: [], // 延遲載入
+    [SORT_TYPES.CLASSIC]: [], // 延遲載入
   });
   // 加載狀態
   const [isLoading, setIsLoading] = useState(false);
   // 標籤頁是否已初始化過
   const [tabInitialized, setTabInitialized] = useState<Record<string, boolean>>(
     {
-      latest: true, // 初始頁簽預載入了
-      popular: false,
-      classic: false,
+      [SORT_TYPES.LATEST]: true, // 初始頁簽預載入了
+      [SORT_TYPES.POPULAR]: false,
+      [SORT_TYPES.CLASSIC]: false,
     },
   );
   // 是否還有更多
   const [hasMoreState, setHasMoreState] = useState<Record<string, boolean>>({
-    latest: hasMoreRecipes.latest,
-    popular: hasMoreRecipes.popular,
-    classic: hasMoreRecipes.classic,
+    [SORT_TYPES.LATEST]: hasMoreRecipes.latest,
+    [SORT_TYPES.POPULAR]: hasMoreRecipes.popular,
+    [SORT_TYPES.CLASSIC]: hasMoreRecipes.classic,
   });
 
   // 在標籤切換時檢查是否需要載入數據
@@ -144,7 +135,7 @@ export default function HomePage({
     setActiveTab(value);
 
     // 將convenience對應到classic
-    const type = value === 'convenience' ? 'classic' : value;
+    const type = value === 'convenience' ? SORT_TYPES.CLASSIC : value;
 
     // 如果標籤頁尚未初始化，則載入數據
     if (!tabInitialized[type]) {
@@ -218,6 +209,7 @@ export default function HomePage({
         : '/placeholder.svg?height=80&width=80',
       category: '',
       time: recipe.cookingTime,
+      cookingTime: recipe.cookingTime,
       servings: recipe.portion,
       rating: recipe.rating,
       description: recipe.description || '',
@@ -228,7 +220,7 @@ export default function HomePage({
    * 根據當前活動標籤獲取對應的食譜列表
    */
   const getCurrentRecipes = () => {
-    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    const type = activeTab === 'convenience' ? SORT_TYPES.CLASSIC : activeTab;
     return loadedRecipes[type].map(mapToRecipeCardData);
   };
 
@@ -236,7 +228,7 @@ export default function HomePage({
    * 獲取當前標籤的更多按鈕狀態
    */
   const hasMore = () => {
-    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    const type = activeTab === 'convenience' ? SORT_TYPES.CLASSIC : activeTab;
     return hasMoreState[type];
   };
 
@@ -244,7 +236,7 @@ export default function HomePage({
    * 處理載入更多按鈕點擊事件
    */
   const onLoadMore = async () => {
-    const type = activeTab === 'convenience' ? 'classic' : activeTab;
+    const type = activeTab === 'convenience' ? SORT_TYPES.CLASSIC : activeTab;
     const nextPage = currentPage[type] + 1;
 
     // 設置加載狀態
@@ -328,13 +320,13 @@ export default function HomePage({
           >
             <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
               <TabsTrigger
-                value="latest"
+                value={SORT_TYPES.LATEST}
                 className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
               >
                 最新食譜
               </TabsTrigger>
               <TabsTrigger
-                value="popular"
+                value={SORT_TYPES.POPULAR}
                 className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
               >
                 人氣食譜
@@ -353,7 +345,7 @@ export default function HomePage({
         {isLoading && (
           <div className="py-8 text-center">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-2 text-gray-500">載入中...</p>
+            <p className="mt-2 text-gray-500">{COMMON_TEXTS.LOADING}</p>
           </div>
         )}
 
@@ -379,7 +371,7 @@ export default function HomePage({
               onClick={onLoadMore}
               disabled={isLoading}
             >
-              {isLoading ? '載入中...' : '更多食譜'}{' '}
+              {isLoading ? COMMON_TEXTS.LOADING : '更多食譜'}{' '}
               {!isLoading && <ChevronDown size={16} />}
             </Button>
           </div>

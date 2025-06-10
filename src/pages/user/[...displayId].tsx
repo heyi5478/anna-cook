@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import UserCenter from '@/components/UserCenter';
-import { AuthorProfile } from '@/components/AuthorProfile';
-import { mockAuthor } from '@/components/AuthorProfile/types';
+import UserCenter from '@/components/pages/UserCenter';
+import { AuthorProfile } from '@/components/pages/AuthorProfile';
+import { mockAuthor } from '@/components/pages/AuthorProfile/types';
 import { fetchUserProfileServer, ServerUserProfileResponse } from '@/services';
+import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 
 interface UserPageProps {
   userProfileData?: ServerUserProfileResponse;
@@ -120,7 +121,7 @@ export default function UserPage({
   if (isCurrentUser === null) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        載入中...
+        {COMMON_TEXTS.LOADING}
       </div>
     );
   }
@@ -200,7 +201,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       // 其他錯誤則返回錯誤頁面
       return {
         props: {
-          errorMessage: userProfileData.msg || '獲取使用者資料失敗',
+          errorMessage:
+            userProfileData.msg || ERROR_MESSAGES.FETCH_USER_PROFILE_FAILED,
           statusCode: userProfileData.StatusCode,
         },
       };

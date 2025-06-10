@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
-import ProfileEditForm from '@/components/ProfileEditForm';
+import ProfileEditForm from '@/components/pages/ProfileEditForm';
 import { useAuth } from '@/hooks/useAuth';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 用戶中心編輯頁面
@@ -13,7 +14,7 @@ const CreateRecipePage: NextPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">載入中...</div>
+        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

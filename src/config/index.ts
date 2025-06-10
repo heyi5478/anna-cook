@@ -4,14 +4,33 @@
  */
 
 /**
+ * 獲取 API Base URL，支援開發和生產環境切換
+ */
+const getApiBaseUrl = (): string => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // 開發環境優先使用開發專用 URL
+  if (isDevelopment && process.env.NEXT_PUBLIC_API_BASE_URL_DEV) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
+  }
+
+  // 使用一般的 API URL
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+
+  // 如果都沒有配置，拋出錯誤
+  throw new Error(
+    'API URL 未設定！請在 .env 檔案中設定 NEXT_PUBLIC_API_BASE_URL 或 NEXT_PUBLIC_API_BASE_URL_DEV',
+  );
+};
+
+/**
  * 驗證 API URL 並確保安全連線
  */
-const validateApiUrl = (url?: string): string => {
-  // 如果沒有提供 URL，使用預設值
-  const apiUrl = url || 'https://annacook.rocket-coding.com/api';
-
+const validateApiUrl = (url: string): string => {
   try {
-    const parsedUrl = new URL(apiUrl);
+    const parsedUrl = new URL(url);
 
     // 在生產環境中強制使用 HTTPS
     if (
@@ -23,11 +42,10 @@ const validateApiUrl = (url?: string): string => {
       return parsedUrl.toString();
     }
 
-    return apiUrl;
+    return url;
   } catch (error) {
     console.error('配置錯誤: API URL 格式無效', error);
-    // 回傳安全的預設值
-    return 'https://annacook.rocket-coding.com/api';
+    throw new Error(`API URL 格式無效: ${url}`);
   }
 };
 
@@ -44,11 +62,11 @@ const parseIntEnv = (
 };
 
 /**
- * API 相關配置
+ * API 相關配置 - 延遲載入
  */
-export const apiConfig = {
-  baseUrl: validateApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL),
-};
+export const getApiConfig = () => ({
+  baseUrl: validateApiUrl(getApiBaseUrl()),
+});
 
 /**
  * 認證相關配置

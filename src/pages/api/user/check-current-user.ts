@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { authConfig } from '@/config';
+import { HTTP_STATUS } from '@/lib/constants';
 
 /**
  * 解析 JWT Token 取得使用者資訊
@@ -30,7 +31,9 @@ export default async function handler(
 ) {
   // 只接受 POST 請求
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: '方法不被允許' });
+    return res
+      .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+      .json({ message: '方法不被允許' });
   }
 
   try {
@@ -38,7 +41,7 @@ export default async function handler(
     const { displayId } = req.body;
 
     if (!displayId) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         isCurrentUser: false,
         message: '缺少 displayId 參數',
       });
@@ -50,7 +53,7 @@ export default async function handler(
 
     // 如果沒有 token，則不是登入用戶
     if (!token) {
-      return res.status(200).json({ isCurrentUser: false });
+      return res.status(HTTP_STATUS.OK).json({ isCurrentUser: false });
     }
 
     // 解析 token 並驗證是否與 displayId 匹配
@@ -58,10 +61,10 @@ export default async function handler(
     const isCurrentUser = tokenData.DisplayId === displayId;
 
     // 回傳結果
-    return res.status(200).json({ isCurrentUser });
+    return res.status(HTTP_STATUS.OK).json({ isCurrentUser });
   } catch (error) {
     console.error('檢查當前用戶時發生錯誤:', error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       isCurrentUser: false,
       message: '驗證過程中發生錯誤',
     });

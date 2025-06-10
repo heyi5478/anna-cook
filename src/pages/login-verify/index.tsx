@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { COUNTDOWN } from '@/lib/constants';
 
 /**
  * 電子郵件驗證提示頁面
  */
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState<number>(
+    COUNTDOWN.LOGIN_VERIFY_SECONDS,
+  );
 
   /**
    * 設置倒數計時並自動跳轉
@@ -22,7 +25,7 @@ export default function VerifyEmailPage() {
     // 每秒減少倒數計時器
     const timer = setTimeout(() => {
       setCountdown((prev) => prev - 1);
-    }, 1000);
+    }, COUNTDOWN.TIMER_INTERVAL_MS);
 
     // 清理計時器
     return () => clearTimeout(timer);

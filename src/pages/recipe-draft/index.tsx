@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
-import RecipeDraft from '@/components/RecipeDraft';
+import RecipeDraft from '@/components/pages/RecipeDraft';
 import { useAuth } from '@/hooks/useAuth';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 /**
  * 食譜草稿頁面
@@ -13,7 +14,7 @@ const RecipeDraftPage: NextPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">載入中...</div>
+        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

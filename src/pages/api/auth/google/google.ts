@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchGoogleAuthUrl } from '@/services/api';
+import { fetchGoogleAuthUrl } from '@/services/auth';
 
 /**
  * 處理 Google 登入請求
