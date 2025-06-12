@@ -13,6 +13,45 @@ export default {
     },
     extend: {
       colors: {
+        /* ============ Brand Color System ============ */
+
+        /* Primary Colors - 主要品牌色階 (50-900) */
+        primary: {
+          50: 'hsl(var(--primary-50))',
+          100: 'hsl(var(--primary-100))',
+          200: 'hsl(var(--primary-200))',
+          300: 'hsl(var(--primary-300))',
+          400: 'hsl(var(--primary-400))',
+          500: 'hsl(var(--primary-500))',
+          600: 'hsl(var(--primary-600))',
+          700: 'hsl(var(--primary-700))',
+          800: 'hsl(var(--primary-800))',
+          900: 'hsl(var(--primary-900))',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+
+        /* Neutral Colors - 中性色階 (50-900) */
+        neutral: {
+          50: 'hsl(var(--neutral-50))',
+          100: 'hsl(var(--neutral-100))',
+          200: 'hsl(var(--neutral-200))',
+          300: 'hsl(var(--neutral-300))',
+          400: 'hsl(var(--neutral-400))',
+          500: 'hsl(var(--neutral-500))',
+          600: 'hsl(var(--neutral-600))',
+          700: 'hsl(var(--neutral-700))',
+          800: 'hsl(var(--neutral-800))',
+          900: 'hsl(var(--neutral-900))',
+        },
+
+        /* Functional Colors - 功能性顏色 */
+        success: 'hsl(var(--success))',
+        warning: 'hsl(var(--warning))',
+        error: 'hsl(var(--error))',
+
+        /* ============ shadCN UI Semantic Colors ============ */
+
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -22,10 +61,6 @@ export default {
         popover: {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
-        },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
