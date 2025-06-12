@@ -84,3 +84,40 @@ export const envConfig = {
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
 };
+
+// ============ 色票配置匯出 ============
+
+/**
+ * 重新匯出色票配置系統
+ * 提供統一的配置匯入介面
+ */
+export {
+  // 色票物件
+  colors,
+  primaryColors,
+  neutralColors,
+  functionalColors,
+
+  // 類型定義
+  type ColorScale,
+  type PrimaryColor,
+  type PrimaryColorKey,
+  type PrimaryColorValue,
+  type NeutralColor,
+  type NeutralColorKey,
+  type NeutralColorValue,
+  type FunctionalColor,
+  type FunctionalColorKey,
+  type FunctionalColorValue,
+  type Colors,
+  type ColorKey,
+  type ColorValue,
+  type ColorConfig,
+
+  // 工具函式
+  getPrimaryColor,
+  getNeutralColor,
+  getFunctionalColor,
+  isValidHexColor,
+  validateColorConfig,
+} from './colors';
