@@ -46,6 +46,7 @@ export default {
         },
 
         /* Functional Colors - 功能性顏色 */
+        'secondary-brand': 'hsl(var(--secondary-brand))',
         success: 'hsl(var(--success))',
         warning: 'hsl(var(--warning))',
         error: 'hsl(var(--error))',

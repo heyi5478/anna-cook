@@ -80,7 +80,11 @@ export const ColorPalette: React.FC = () => {
 
   // Functional Colors
   const functionalColors = [
-    { name: 'Secondary', className: 'bg-secondary', description: '次要品牌色' },
+    {
+      name: 'Secondary Brand',
+      className: 'bg-secondary-brand',
+      description: '品牌次要色',
+    },
     { name: 'Success', className: 'bg-success', description: '成功狀態' },
     { name: 'Warning', className: 'bg-warning', description: '警告狀態' },
     { name: 'Error', className: 'bg-error', description: '錯誤狀態' },
@@ -98,6 +102,11 @@ export const ColorPalette: React.FC = () => {
       name: 'Card',
       className: 'bg-card border-2 border-neutral-300',
       description: '卡片背景',
+    },
+    {
+      name: 'Secondary',
+      className: 'bg-secondary',
+      description: 'shadCN 次要色',
     },
     { name: 'Muted', className: 'bg-muted', description: '靜音色' },
     { name: 'Accent', className: 'bg-accent', description: '強調色' },
@@ -149,8 +158,11 @@ export const ColorPalette: React.FC = () => {
             <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
               Primary Button
             </button>
-            <button className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors">
-              Secondary Button
+            <button className="px-4 py-2 bg-secondary-brand text-white rounded-lg hover:bg-secondary-brand/90 transition-colors">
+              Secondary Brand Button
+            </button>
+            <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors">
+              Secondary Button (shadCN)
             </button>
             <button className="px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
               Success Button
@@ -191,7 +203,7 @@ export const ColorPalette: React.FC = () => {
         <h3 className="text-lg font-semibold text-neutral-900">使用方式</h3>
         <div className="space-y-2 text-sm text-neutral-700">
           <p>
-            <strong>Tailwind Classes:</strong>
+            <strong>Brand Color System (Tailwind Classes):</strong>
           </p>
           <ul className="list-disc list-inside space-y-1 ml-4">
             <li>
@@ -213,8 +225,31 @@ export const ColorPalette: React.FC = () => {
               - 淺色品牌邊框
             </li>
             <li>
+              <code className="bg-neutral-200 px-1 rounded">
+                bg-secondary-brand
+              </code>{' '}
+              - 品牌次要色背景
+            </li>
+            <li>
               <code className="bg-neutral-200 px-1 rounded">bg-success</code> -
               成功狀態背景
+            </li>
+          </ul>
+          <p className="mt-4">
+            <strong>Semantic Colors (shadCN 相容):</strong>
+          </p>
+          <ul className="list-disc list-inside space-y-1 ml-4">
+            <li>
+              <code className="bg-neutral-200 px-1 rounded">bg-secondary</code>{' '}
+              - shadCN 次要色 (中性色)
+            </li>
+            <li>
+              <code className="bg-neutral-200 px-1 rounded">bg-muted</code> -
+              靜音色
+            </li>
+            <li>
+              <code className="bg-neutral-200 px-1 rounded">bg-accent</code> -
+              強調色
             </li>
           </ul>
           <p className="mt-4">
@@ -229,11 +264,32 @@ export const ColorPalette: React.FC = () => {
             </li>
             <li>
               <code className="bg-neutral-200 px-1 rounded">
+                hsl(var(--secondary-brand))
+              </code>{' '}
+              - 品牌次要色變數
+            </li>
+            <li>
+              <code className="bg-neutral-200 px-1 rounded">
                 hsl(var(--neutral-500))
               </code>{' '}
               - 中性色變數
             </li>
           </ul>
+        </div>
+
+        {/* 色彩區分說明 */}
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h4 className="font-medium text-yellow-800 mb-2">⚠️ 重要區分</h4>
+          <div className="text-sm text-yellow-700 space-y-1">
+            <p>
+              <strong>secondary-brand</strong>: 品牌次要色 (#00A5E6, 藍色) -
+              用於品牌識別
+            </p>
+            <p>
+              <strong>secondary</strong>: shadCN 語義化次要色 (中性色) - 用於 UI
+              元件
+            </p>
+          </div>
         </div>
       </div>
     </div>

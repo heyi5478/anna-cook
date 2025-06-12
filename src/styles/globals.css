@@ -74,7 +74,7 @@ a {
     --neutral-900: 0 0% 9%;
 
     /* Functional Colors - 功能性顏色 */
-    --secondary: 197 100% 45%;
+    --secondary-brand: 197 100% 45%;
     --success: 142 71% 45%;
     --warning: 50 98% 64%;
     --error: 16 100% 52%;
@@ -95,7 +95,7 @@ a {
     --primary: var(--primary-600);
     --primary-foreground: var(--neutral-50);
 
-    /* 次要色彩 - 使用淺色中性色 */
+    /* 次要色彩 - 使用淺色中性色 (shadCN semantic) */
     --secondary: var(--neutral-100);
     --secondary-foreground: var(--neutral-900);
 
@@ -120,7 +120,7 @@ a {
 
     /* 圖表色彩 */
     --chart-1: var(--primary-500);
-    --chart-2: var(--secondary);
+    --chart-2: var(--secondary-brand);
     --chart-3: var(--success);
     --chart-4: var(--warning);
     --chart-5: var(--error);
@@ -146,7 +146,7 @@ a {
     --primary: var(--primary-400);
     --primary-foreground: var(--neutral-900);
 
-    /* 次要色彩 - 使用深色中性色 */
+    /* 次要色彩 - 使用深色中性色 (shadCN semantic) */
     --secondary: var(--neutral-800);
     --secondary-foreground: var(--neutral-50);
 
@@ -171,7 +171,7 @@ a {
 
     /* 圖表色彩 - 暗色模式調整 */
     --chart-1: var(--primary-400);
-    --chart-2: var(--secondary);
+    --chart-2: var(--secondary-brand);
     --chart-3: var(--success);
     --chart-4: var(--warning);
     --chart-5: var(--error);
