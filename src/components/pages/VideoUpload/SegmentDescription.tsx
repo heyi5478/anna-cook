@@ -25,9 +25,9 @@ export default function SegmentDescription({
 }: SegmentDescriptionProps) {
   return (
     <div className="mt-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-2">
+      <h3 className="text-sm font-medium text-neutral-700 mb-2">
         說明文字 (步驟 {currentSegmentIndex + 1})
-        <span className="ml-2 text-xs text-gray-500">
+        <span className="ml-2 text-xs text-neutral-500">
           {segments[currentSegmentIndex]?.description?.trim().length || 0}
           /10 字元
         </span>
@@ -38,7 +38,9 @@ export default function SegmentDescription({
         onBlur={() => validateForm()}
         className={cn(
           'w-full p-2 text-sm border rounded-md min-h-[80px] resize-none',
-          error ? 'border-red-500 bg-red-50' : 'border-gray-300 text-gray-600',
+          error
+            ? 'border-red-500 bg-red-50'
+            : 'border-neutral-300 text-neutral-600',
         )}
         placeholder="請輸入此步驟的說明文字，至少需要10個字元..."
       />

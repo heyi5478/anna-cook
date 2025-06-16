@@ -25,7 +25,7 @@ export function RecipeStatsItem({
         </div>
         <div className="flex-1">
           <h4 className="text-lg font-medium mb-1">{title}</h4>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-neutral-500">
             評分: {rating} • 瀏覽: {views}
           </div>
         </div>
@@ -33,15 +33,15 @@ export function RecipeStatsItem({
 
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-gray-500 mb-1">收藏</div>
+          <div className="text-xs text-neutral-500 mb-1">收藏</div>
           <div className="text-lg font-medium">{bookmarks}</div>
         </div>
         <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-gray-500 mb-1">留言</div>
+          <div className="text-xs text-neutral-500 mb-1">留言</div>
           <div className="text-lg font-medium">{comments}</div>
         </div>
         <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-gray-500 mb-1">分享</div>
+          <div className="text-xs text-neutral-500 mb-1">分享</div>
           <div className="text-lg font-medium">{shares}</div>
         </div>
       </div>

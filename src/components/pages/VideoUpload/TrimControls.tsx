@@ -53,7 +53,7 @@ export default function TrimControls({
       {/* 雙滑桿剪輯 (YouTube 風格) */}
       <div className="space-y-2 mt-6">
         {/* 時間標記 */}
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-neutral-500">
           <span>0:00</span>
           <span>
             {Math.floor(duration / 60)}:
@@ -220,9 +220,11 @@ export default function TrimControls({
           return (
             <div className="flex items-center">
               <div className={`w-4 h-4 rounded-full ${statusColor} mr-2`} />
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-neutral-700">
                 <span>步驟時長: {segmentDuration.toFixed(2)} 秒</span>
-                <span className="ml-2 text-xs text-gray-500">{statusText}</span>
+                <span className="ml-2 text-xs text-neutral-500">
+                  {statusText}
+                </span>
               </div>
             </div>
           );

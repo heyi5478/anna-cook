@@ -39,13 +39,15 @@ export function ProductCard({
         </div>
         <CardContent className="flex h-full flex-1 flex-col justify-between p-0">
           <div className="space-y-2">
-            <h3 className="text-xl font-normal leading-tight text-gray-800">
+            <h3 className="text-xl font-normal leading-tight text-neutral-800">
               {name}
             </h3>
-            <p className="text-sm text-gray-500 line-clamp-1">{description}</p>
+            <p className="text-sm text-neutral-500 line-clamp-1">
+              {description}
+            </p>
           </div>
           <div className="mt-auto pt-4 text-right">
-            <span className="text-2xl leading-relaxed font-bold text-gray-800">
+            <span className="text-2xl leading-relaxed font-bold text-neutral-800">
               $ {price}
             </span>
           </div>

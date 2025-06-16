@@ -345,7 +345,7 @@ export default function HomePage({
         {isLoading && (
           <div className="py-8 text-center">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-2 text-gray-500">{COMMON_TEXTS.LOADING}</p>
+            <p className="mt-2 text-neutral-500">{COMMON_TEXTS.LOADING}</p>
           </div>
         )}
 
@@ -367,7 +367,7 @@ export default function HomePage({
           <div className="flex justify-center py-4">
             <Button
               variant="ghost"
-              className="text-gray-500 flex items-center gap-1"
+              className="text-neutral-500 flex items-center gap-1"
               onClick={onLoadMore}
               disabled={isLoading}
             >
@@ -388,7 +388,7 @@ export default function HomePage({
             </Button>
             <Button
               variant="outline"
-              className="bg-white text-gray-800 border-primary border hover:bg-primary-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
+              className="bg-white text-neutral-800 border-primary border hover:bg-primary-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
               onClick={() => router.push('/upload-recipe-step1')}
             >
               新增食譜
@@ -402,7 +402,7 @@ export default function HomePage({
           onClick={toggleFloatingMenu}
           className={`h-12 w-12 rounded-full shadow-lg transition-all duration-300 ${
             showFloatingMenu
-              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300'
               : 'bg-primary text-primary-50 hover:bg-primary-50 hover:text-primary hover:border-primary'
           }`}
         >

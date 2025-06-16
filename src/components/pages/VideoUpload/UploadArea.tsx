@@ -56,16 +56,16 @@ export default function UploadArea({
         />
         <div className="flex flex-col items-center justify-center cursor-pointer w-full h-full">
           <ImageIcon
-            className="h-12 w-12 text-gray-400 mb-2"
+            className="h-12 w-12 text-neutral-400 mb-2"
             aria-hidden="true"
           />
-          <span className="text-gray-500">
+          <span className="text-neutral-500">
             {isUploading ? '正在上傳...' : '點擊選擇影片檔案上傳'}
           </span>
         </div>
       </div>
-      <div className="text-gray-500 mt-2">{fileName}</div>
-      <div className="text-gray-500 mt-2">
+      <div className="text-neutral-500 mt-2">{fileName}</div>
+      <div className="text-neutral-500 mt-2">
         {isUploading ? '正在上傳影片中 ，請稍後...' : ''}
       </div>
       {error && (
