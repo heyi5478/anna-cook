@@ -5,9 +5,6 @@
  * - Primary Colors: 主要品牌色階 (50-900)
  * - Neutral Colors: 中性色階 (50-900)
  * - Functional Colors: 功能性顏色 (secondary, success, warning, error)
- *
- * 所有色彩值來自設計師提供的設計規格
- * 使用 const assertions 確保類型安全
  */
 
 /**
@@ -179,8 +176,6 @@ export type ColorConfig = {
 
 /**
  * 獲取指定的 primary 色階
- * @param scale - 色階等級
- * @returns 對應的色彩值
  */
 export const getPrimaryColor = (scale: PrimaryColorKey): PrimaryColorValue => {
   return primaryColors[scale];
@@ -188,8 +183,6 @@ export const getPrimaryColor = (scale: PrimaryColorKey): PrimaryColorValue => {
 
 /**
  * 獲取指定的 neutral 色階
- * @param scale - 色階等級
- * @returns 對應的色彩值
  */
 export const getNeutralColor = (scale: NeutralColorKey): NeutralColorValue => {
   return neutralColors[scale];
@@ -197,8 +190,6 @@ export const getNeutralColor = (scale: NeutralColorKey): NeutralColorValue => {
 
 /**
  * 獲取指定的功能性顏色
- * @param colorKey - 功能性顏色鍵名
- * @returns 對應的色彩值
  */
 export const getFunctionalColor = (
   colorKey: FunctionalColorKey,
@@ -208,8 +199,6 @@ export const getFunctionalColor = (
 
 /**
  * 檢查是否為有效的 HEX 色彩值
- * @param color - 要檢查的色彩值
- * @returns 是否為有效的 HEX 色彩值
  */
 export const isValidHexColor = (color: string): boolean => {
   return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
@@ -217,7 +206,6 @@ export const isValidHexColor = (color: string): boolean => {
 
 /**
  * 驗證色票配置的完整性
- * @returns 驗證結果物件
  */
 export const validateColorConfig = () => {
   const errors: string[] = [];
