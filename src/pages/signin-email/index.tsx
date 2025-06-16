@@ -95,7 +95,7 @@ export default function SignInWithEmail() {
             height={80}
             className="mb-6"
           />
-          <h1 className="text-center text-2xl font-medium text-gray-700">
+          <h1 className="text-center text-2xl font-medium text-neutral-700">
             歡迎回來!
           </h1>
         </div>
@@ -112,7 +112,7 @@ export default function SignInWithEmail() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* 電子郵件輸入區塊 */}
             <div className="space-y-2">
-              <div className="text-gray-700">您的電子信箱</div>
+              <div className="text-neutral-700">您的電子信箱</div>
               <FormField
                 control={form.control}
                 name="email"
@@ -132,7 +132,7 @@ export default function SignInWithEmail() {
                             className="absolute right-3 top-1/2 -translate-y-1/2"
                             aria-label="清除電子郵件"
                           >
-                            <X className="h-6 w-6 text-gray-400" />
+                            <X className="h-6 w-6 text-neutral-400" />
                           </button>
                         )}
                       </div>
@@ -145,7 +145,7 @@ export default function SignInWithEmail() {
 
             {/* 密碼輸入區塊 */}
             <div className="space-y-2">
-              <div className="text-gray-700">您的密碼</div>
+              <div className="text-neutral-700">您的密碼</div>
               <FormField
                 control={form.control}
                 name="password"
@@ -166,7 +166,7 @@ export default function SignInWithEmail() {
                             className="absolute right-3 top-1/2 -translate-y-1/2"
                             aria-label="清除密碼"
                           >
-                            <X className="h-6 w-6 text-gray-400" />
+                            <X className="h-6 w-6 text-neutral-400" />
                           </button>
                         )}
                       </div>

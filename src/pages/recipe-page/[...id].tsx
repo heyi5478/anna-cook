@@ -30,7 +30,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
     return (
       <div className="container mx-auto py-10 text-center">
         <h2 className="text-xl font-semibold mb-4">找不到該食譜</h2>
-        <p className="text-gray-600">
+        <p className="text-neutral-600">
           {recipeData.msg || '食譜可能已被刪除或尚未發布'}
         </p>
       </div>
