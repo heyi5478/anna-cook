@@ -272,7 +272,7 @@ export default function RecipeUploadStep2() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage className="text-gray-500">
+            <BreadcrumbPage className="text-neutral-500">
               上傳食譜資訊
             </BreadcrumbPage>
           </BreadcrumbItem>
@@ -299,7 +299,7 @@ export default function RecipeUploadStep2() {
             </h2>
             {/* <button
               type="button"
-              className="text-gray-500"
+              className="text-neutral-500"
               aria-label="編輯食譜標題"
             >
               <svg
@@ -333,8 +333,10 @@ export default function RecipeUploadStep2() {
             rows={10}
             placeholder="食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！"
             className={cn(
-              'w-full p-3 border rounded-md bg-gray-50',
-              errors.recipeDescription ? 'border-red-500' : 'border-gray-300',
+              'w-full p-3 border rounded-md bg-neutral-50',
+              errors.recipeDescription
+                ? 'border-red-500'
+                : 'border-neutral-300',
             )}
             {...register('recipeDescription')}
           />
@@ -388,7 +390,7 @@ export default function RecipeUploadStep2() {
               <button
                 type="button"
                 onClick={() => removeIngredient(index)}
-                className="text-gray-500"
+                className="text-neutral-500"
                 aria-label={`${COMMON_TEXTS.DELETE}食材`}
               >
                 <svg
@@ -412,7 +414,7 @@ export default function RecipeUploadStep2() {
           <button
             type="button"
             onClick={atAddIngredient}
-            className="flex items-center text-gray-500 mt-2"
+            className="flex items-center text-neutral-500 mt-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -476,7 +478,7 @@ export default function RecipeUploadStep2() {
               <button
                 type="button"
                 onClick={() => removeSeasoning(index)}
-                className="text-gray-500"
+                className="text-neutral-500"
                 aria-label={`${COMMON_TEXTS.DELETE}調料`}
               >
                 <svg
@@ -500,7 +502,7 @@ export default function RecipeUploadStep2() {
           <button
             type="button"
             onClick={atAddSeasoning}
-            className="flex items-center text-gray-500 mt-2"
+            className="flex items-center text-neutral-500 mt-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -526,8 +528,8 @@ export default function RecipeUploadStep2() {
           <h2 className="text-lg font-medium mb-2">食譜標籤</h2>
           <div
             className={cn(
-              'bg-gray-50 p-3 rounded-md border',
-              errors.tags ? 'border-red-500' : 'border-gray-300',
+              'bg-neutral-50 p-3 rounded-md border',
+              errors.tags ? 'border-red-500' : 'border-neutral-300',
             )}
           >
             <div className="flex justify-between items-center mb-2">
@@ -537,7 +539,7 @@ export default function RecipeUploadStep2() {
               <input
                 type="text"
                 placeholder="輸入自訂標籤"
-                className="flex-1 p-2 border border-gray-300 rounded-md bg-white"
+                className="flex-1 p-2 border border-neutral-300 rounded-md bg-white"
                 value={customTag}
                 onChange={(e) => setCustomTag(e.target.value)}
                 onKeyDown={atTagKeyDown}
@@ -545,7 +547,7 @@ export default function RecipeUploadStep2() {
               />
               <button
                 type="button"
-                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
+                className="px-3 py-2 bg-neutral-200 text-neutral-700 rounded-md disabled:opacity-50"
                 onClick={atAddTag}
                 disabled={!customTag.trim() || tags.length >= 5}
               >
@@ -559,12 +561,12 @@ export default function RecipeUploadStep2() {
                 {tags.map((tag) => (
                   <div
                     key={tag}
-                    className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full flex items-center"
+                    className="bg-neutral-200 text-neutral-700 px-2 py-1 rounded-full flex items-center"
                   >
                     <span>{tag}</span>
                     <button
                       type="button"
-                      className="ml-1 text-gray-500"
+                      className="ml-1 text-neutral-500"
                       onClick={() => atRemoveTag(tag)}
                       aria-label={`移除標籤 ${tag}`}
                     >
@@ -610,7 +612,7 @@ export default function RecipeUploadStep2() {
                 type="number"
                 className={cn(
                   'w-full p-2 border rounded-md',
-                  errors.cookingTime ? 'border-red-500' : 'border-gray-300',
+                  errors.cookingTime ? 'border-red-500' : 'border-neutral-300',
                 )}
                 {...register('cookingTime')}
               />
@@ -637,7 +639,7 @@ export default function RecipeUploadStep2() {
                 type="number"
                 className={cn(
                   'w-full p-2 border rounded-md',
-                  errors.servings ? 'border-red-500' : 'border-gray-300',
+                  errors.servings ? 'border-red-500' : 'border-neutral-300',
                 )}
                 {...register('servings')}
               />
@@ -658,8 +660,8 @@ export default function RecipeUploadStep2() {
           className={cn(
             'w-full py-3 text-white rounded-md transition-colors',
             isLoading
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-gray-400 hover:bg-gray-500',
+              ? 'bg-neutral-300 cursor-not-allowed'
+              : 'bg-neutral-400 hover:bg-neutral-500',
           )}
         >
           {isLoading ? COMMON_TEXTS.SUBMITTING : '下一步'}

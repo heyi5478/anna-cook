@@ -432,7 +432,7 @@ export default function UserCenter({
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-bold mb-1">食譜數據</h3>
-          <p className="text-gray-500">深入了解您的食譜表現</p>
+          <p className="text-neutral-500">深入了解您的食譜表現</p>
         </div>
 
         {publishedRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => (
@@ -471,7 +471,7 @@ export default function UserCenter({
 
     return (
       <div className="space-y-4">
-        <p className="text-gray-500 mb-2">
+        <p className="text-neutral-500 mb-2">
           共{publishedRecipes.length || 0}篇食譜
         </p>
 
@@ -525,7 +525,9 @@ export default function UserCenter({
           </div>
         )}
 
-        <p className="text-gray-500 mb-2">共{draftRecipes.length || 0}篇食譜</p>
+        <p className="text-neutral-500 mb-2">
+          共{draftRecipes.length || 0}篇食譜
+        </p>
 
         {draftRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => {
           // 計算卡片的 className
@@ -543,7 +545,7 @@ export default function UserCenter({
                   className={`mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer ${
                     selectedDrafts.includes(recipe.recipeId)
                       ? 'bg-orange-500 border-orange-500 text-white'
-                      : 'border-gray-300'
+                      : 'border-neutral-300'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -599,7 +601,7 @@ export default function UserCenter({
             <Button
               variant="outline"
               onClick={atToggleDeleteMode}
-              className="flex-1 border border-gray-200"
+              className="flex-1 border border-neutral-200"
             >
               {COMMON_TEXTS.CANCEL}刪除
             </Button>
@@ -629,7 +631,7 @@ export default function UserCenter({
               >
                 <div className="flex flex-col items-center justify-center py-4">
                   <div className="w-12 h-12 rounded-full border-2 border-gray-400 flex items-center justify-center mb-4">
-                    <AlertCircle className="h-6 w-6 text-gray-500" />
+                    <AlertCircle className="h-6 w-6 text-neutral-500" />
                   </div>
                   <h2 className="text-lg font-medium text-center mb-6">
                     是否{COMMON_TEXTS.DELETE}所選食譜?
@@ -639,7 +641,7 @@ export default function UserCenter({
                       <Button
                         variant="outline"
                         onClick={() => setDeleteDialogOpen(false)}
-                        className="flex-1 border border-gray-300 text-black font-normal"
+                        className="flex-1 border border-neutral-300 text-black font-normal"
                       >
                         {COMMON_TEXTS.CANCEL}
                       </Button>
@@ -685,7 +687,7 @@ export default function UserCenter({
 
     return (
       <div className="space-y-4">
-        <p className="text-sm text-gray-500 mb-1">
+        <p className="text-sm text-neutral-500 mb-1">
           共{followTotalCount}位追蹤中
         </p>
 
@@ -710,7 +712,7 @@ export default function UserCenter({
         {followHasMore && !followLoading && (
           <Button
             variant="ghost"
-            className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+            className="w-full py-2 flex items-center justify-center gap-1 text-neutral-500"
             onClick={loadMore}
           >
             <span>更多追蹤</span>
@@ -738,7 +740,7 @@ export default function UserCenter({
 
     return (
       <div className="space-y-2">
-        <p className="text-sm text-gray-500 mb-1">
+        <p className="text-sm text-neutral-500 mb-1">
           共{favoriteTotalCount}篇收藏食譜
         </p>
 
@@ -761,10 +763,10 @@ export default function UserCenter({
                 <h4 className="font-medium">{recipe.recipeName}</h4>
                 <BookmarkIcon className="h-4 w-4" />
               </div>
-              <p className="text-xs text-gray-500 line-clamp-2">
+              <p className="text-xs text-neutral-500 line-clamp-2">
                 {recipe.description}
               </p>
-              <div className="flex items-center mt-1 text-xs text-gray-500">
+              <div className="flex items-center mt-1 text-xs text-neutral-500">
                 <Users className="h-3 w-3 mr-1" />
                 <span className="mr-2">{recipe.portion}人份</span>
                 <Clock className="h-3 w-3 mr-1" />
@@ -783,7 +785,7 @@ export default function UserCenter({
         {favoriteHasMore && !favoriteLoading && (
           <Button
             variant="ghost"
-            className="w-full py-2 flex items-center justify-center gap-1 text-gray-500"
+            className="w-full py-2 flex items-center justify-center gap-1 text-neutral-500"
             onClick={loadMore}
           >
             <span>更多收藏</span>
@@ -796,11 +798,11 @@ export default function UserCenter({
   return (
     <div className="bg-white p-4">
       <div className="flex items-center gap-3 mb-4">
-        <Link href="/" className="text-gray-600">
+        <Link href="/" className="text-neutral-600">
           首頁
         </Link>
-        <span className="text-gray-400">{' > '}</span>
-        <span className="text-gray-800">會員中心</span>
+        <span className="text-neutral-400">{' > '}</span>
+        <span className="text-neutral-800">會員中心</span>
       </div>
 
       <div className="flex flex-col items-center pb-4">
@@ -812,7 +814,7 @@ export default function UserCenter({
         </Avatar>
         <h2 className="text-lg font-medium">{userName}</h2>
 
-        <div className="flex justify-center gap-6 my-2 text-sm text-gray-500">
+        <div className="flex justify-center gap-6 my-2 text-sm text-neutral-500">
           <div className="text-center">
             <div>{followingCount}</div>
             <div>追蹤中</div>
@@ -829,7 +831,7 @@ export default function UserCenter({
 
         <Button
           variant="outline"
-          className="w-full mt-2 rounded-lg font-normal text-gray-700"
+          className="w-full mt-2 rounded-lg font-normal text-neutral-700"
           onClick={() => router.push('/user-center-edit')}
         >
           編輯個人資料
@@ -965,19 +967,21 @@ export default function UserCenter({
             <Card className="border-0 shadow-none">
               <CardContent className="p-0">
                 <h4 className="font-medium mb-1">創作者總覽</h4>
-                <p className="text-sm text-gray-500 mb-4">您的食譜表現情況</p>
+                <p className="text-sm text-neutral-500 mb-4">
+                  您的食譜表現情況
+                </p>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-500">總瀏覽次數</div>
+                    <div className="text-sm text-neutral-500">總瀏覽次數</div>
                     <div className="font-bold">{totalViewCount}</div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-500">總收讚次數</div>
+                    <div className="text-sm text-neutral-500">總收讚次數</div>
                     <div className="font-bold">{favoritedTotal}</div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-500">平均評分</div>
+                    <div className="text-sm text-neutral-500">平均評分</div>
                     <div className="font-bold">{averageRating.toFixed(1)}</div>
                   </div>
                 </div>
