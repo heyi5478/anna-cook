@@ -50,6 +50,7 @@ a {
     /* ============ Brand Color System ============ */
 
     /* Primary Colors - 主要品牌色階 (50-900) */
+    --primary: #e64100;
     --primary-50: 5 78% 95%;
     --primary-100: 15 100% 86%;
     --primary-200: 19 100% 76%;
