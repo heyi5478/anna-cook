@@ -86,7 +86,7 @@ export const TagSection = ({
       </div>
 
       {/* 標籤數量提示 */}
-      <p className="mt-1 text-sm text-gray-500">
+      <p className="mt-1 text-sm text-neutral-500">
         已選擇 ({tags.length}/{maxTags})
       </p>
     </div>
