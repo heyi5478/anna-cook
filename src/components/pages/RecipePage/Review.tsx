@@ -207,7 +207,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                 <Button
                   type="submit"
                   variant="outline"
-                  className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 flex items-center justify-center gap-2"
+                  className="w-full bg-gray-200 hover:bg-gray-300 text-neutral-800 flex items-center justify-center gap-2"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -223,7 +223,7 @@ export default function Review({ recipeId }: { recipeId: number }) {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-gray-700"
+                      className="text-neutral-700"
                     >
                       <path d="M5 12h14" />
                       <path d="m12 5 7 7-7 7" />

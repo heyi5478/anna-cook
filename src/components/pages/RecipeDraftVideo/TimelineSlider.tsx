@@ -27,7 +27,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
   <>
     {/* 時間軸 */}
     <div className="px-4 py-2">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
+      <div className="flex justify-between text-xs text-neutral-500 mb-1">
         <span>0:00</span>
         <span>{formatTimeHMS(videoDuration)}</span>
       </div>
@@ -40,8 +40,8 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
           step={0.1}
           onValueChange={onTimeRangeChange}
           onValueCommit={onSliderCommitted}
-          className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-gray-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-gray-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          thumbClassName="h-6 w-4 bg-white border-2 border-gray-400 rounded-sm shadow-md hover:border-gray-600 focus:border-gray-600 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors"
+          className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-neutral-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-neutral-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          thumbClassName="h-6 w-4 bg-white border-2 border-neutral-400 rounded-sm shadow-md hover:border-neutral-600 focus:border-neutral-600 focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-colors"
           disabled={false}
         />
       </div>
