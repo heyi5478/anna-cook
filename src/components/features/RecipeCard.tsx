@@ -34,14 +34,14 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
    */
   function renderInfo() {
     return (
-      <div className="flex flex-wrap items-center justify-end gap-4 text-gray-500 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-end gap-4 text-neutral-500 overflow-hidden">
         <div className="flex items-center gap-2">
-          <Users className="h-[20px] w-[20px] text-gray-400 flex-shrink-0" />
+          <Users className="h-[20px] w-[20px] text-neutral-400 flex-shrink-0" />
           <span className="text-[14px] truncate">{recipe.servings} 人份</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Clock className="h-[20px] w-[20px] text-gray-400 flex-shrink-0" />
+          <Clock className="h-[20px] w-[20px] text-neutral-400 flex-shrink-0" />
           <span className="text-[14px] truncate">{recipe.time} 分鐘</span>
         </div>
 
@@ -56,13 +56,13 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
   return (
     <Link href={`/recipe-page/${recipe.id}`} className="block">
       <Card className={`overflow-hidden w-full mb-4 ${className || ''}`}>
-        <div className="flex flex-row items-center bg-[#FAFAFA]">
+        <div className="flex flex-row items-center bg-neutral-50">
           {renderImage()}
           <CardContent className="flex-1 px-4 py-6">
-            <h2 className="text-[22px] font-bold text-gray-800 mb-2">
+            <h2 className="text-[22px] font-bold text-neutral-800 mb-2">
               {recipe.title}
             </h2>
-            <p className="text-[14px] text-gray-600 mb-4 line-clamp-1">
+            <p className="text-[14px] text-neutral-600 mb-4 line-clamp-1">
               {recipe.description}
             </p>
             {renderInfo()}

@@ -17,7 +17,7 @@ export const NavigationBar = ({
     <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/70 to-transparent p-4 flex items-center z-20">
       <Link
         href={`/recipe-page/${recipeId}`}
-        className="flex items-center text-white hover:text-gray-300 transition"
+        className="flex items-center text-white hover:text-neutral-300 transition"
       >
         <ArrowLeft className="w-6 h-6 mr-2" />
         <span className="underline">回到食譜</span>

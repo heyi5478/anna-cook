@@ -65,18 +65,20 @@ export default function VerifyEmailPage() {
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-medium text-gray-800">驗證郵件已發送</h1>
-          <p className="text-gray-600">
+          <h1 className="text-2xl font-medium text-neutral-800">
+            驗證郵件已發送
+          </h1>
+          <p className="text-neutral-600">
             我們已向您的電子郵件地址發送了一封驗證郵件。請檢查您的收件箱並點擊郵件中的連結完成註冊。
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-neutral-500 text-sm">
             {countdown} 秒後將自動跳轉到登入頁面...
           </p>
         </div>
 
         {/* 提示信息 */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-md">
-          <p className="text-sm text-gray-500">
+        <div className="mt-8 p-4 bg-neutral-50 rounded-md">
+          <p className="text-sm text-neutral-500">
             如果您沒有收到驗證郵件，請檢查您的垃圾郵件或垃圾桶。
             <br />
             郵件可能需要幾分鐘時間才能到達您的收件箱。

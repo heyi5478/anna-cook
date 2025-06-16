@@ -282,7 +282,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           <Badge
             key={tag.id}
             variant="outline"
-            className="rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700"
+            className="rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200 text-neutral-700"
           >
             {tag.tag}
           </Badge>
@@ -347,28 +347,28 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-gray-400"
+                className="text-neutral-400"
               >
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-neutral-600">
                 {recipe.portion}人份
               </span>
             </div>
 
             <div className={recipeInfoItemStyles}>
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-600">
+              <Clock className="w-4 h-4 text-neutral-400" />
+              <span className="text-sm text-neutral-600">
                 {recipe.cookingTime}分鐘
               </span>
             </div>
 
             <div className={recipeInfoItemStyles}>
               <Star className="w-4 h-4 text-[#FF5722] fill-[#FF5722]" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-neutral-600">
                 {recipe.rating.toFixed(1)}
               </span>
             </div>
@@ -406,7 +406,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               </Avatar>
               <div className="flex-1 ml-3">
                 <p className="font-medium">{author.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-neutral-500">
                   {author.followersCount} 粉絲
                 </p>
               </div>
@@ -422,7 +422,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
         {/* 食譜描述 */}
         <div className={cardStyles()}>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-neutral-700 leading-relaxed">
             {recipe.description}
           </p>
         </div>
@@ -444,7 +444,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 <div key={ingredient.ingredientId}>
                   <div className={separatedItemStyles()}>
                     <span className="text-sm">{ingredient.ingredientName}</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-neutral-500">
                       {ingredient.amount} {ingredient.unit}
                     </span>
                   </div>
@@ -464,7 +464,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 <div key={flavor.ingredientId}>
                   <div className={separatedItemStyles()}>
                     <span className="text-sm">{flavor.ingredientName}</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-neutral-500">
                       {flavor.amount} {flavor.unit}
                     </span>
                   </div>
@@ -517,7 +517,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
                 className={`w-5 h-5 ${showReview ? 'fill-[#FF5722] text-[#FF5722]' : ''}`}
               />
               <span>留言</span>
-              <span className="ml-1 text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
+              <span className="ml-1 text-xs bg-neutral-200 text-neutral-600 px-1.5 py-0.5 rounded-full">
                 {totalComments}
               </span>
             </button>
@@ -542,7 +542,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         <div className={cardStyles()}>
           <div className="flex items-center justify-between mb-4">
             <h3 className={headingStyles()}>用戶評論</h3>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-neutral-500">
               共 {totalComments} 則評論
             </span>
           </div>
@@ -555,11 +555,13 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
             )}
 
             {!commentError && comments.length === 0 && !isLoadingComments && (
-              <p className="text-sm text-gray-500 text-center py-4">暫無評論</p>
+              <p className="text-sm text-neutral-500 text-center py-4">
+                暫無評論
+              </p>
             )}
 
             {isLoadingComments && comments.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-4">
+              <p className="text-sm text-neutral-500 text-center py-4">
                 載入評論中...
               </p>
             )}
@@ -578,7 +580,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs text-gray-500"
+                className="w-full text-xs text-neutral-500"
                 onClick={atLoadMoreComments}
                 disabled={isLoadingComments}
               >

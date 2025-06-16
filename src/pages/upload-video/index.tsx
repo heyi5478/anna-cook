@@ -30,7 +30,7 @@ export default function CreateRecipeStep3Page() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
+        <div className="text-lg text-neutral-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }
@@ -41,7 +41,7 @@ export default function CreateRecipeStep3Page() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-neutral-50">
       <div className="w-full max-w-md">
         <VideoUpload
           onSave={(trimmedVideo) => {

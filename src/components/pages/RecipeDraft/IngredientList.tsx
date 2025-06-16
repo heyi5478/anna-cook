@@ -84,7 +84,7 @@ export const IngredientList = ({
           <button
             type="button"
             onClick={() => onRemoveIngredient(index)}
-            className="p-1 text-gray-500"
+            className="p-1 text-neutral-500"
             aria-label={`移除食材 ${index + 1}`}
           >
             <X className="w-4 h-4" />
@@ -133,7 +133,7 @@ export const IngredientList = ({
           <button
             type="button"
             onClick={() => onRemoveSeasoning(index)}
-            className="p-1 text-gray-500"
+            className="p-1 text-neutral-500"
             aria-label={`移除調味料 ${index + 1}`}
           >
             <X className="w-4 h-4" />

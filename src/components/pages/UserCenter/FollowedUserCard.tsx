@@ -22,8 +22,8 @@ export function FollowedUserCard({
 
       <div className="flex-1">
         <h3 className="text-lg font-medium">{username}</h3>
-        <p className="text-gray-500 text-sm line-clamp-1 mb-1">{bio}</p>
-        <div className="flex gap-4 text-sm text-gray-500">
+        <p className="text-neutral-500 text-sm line-clamp-1 mb-1">{bio}</p>
+        <div className="flex gap-4 text-sm text-neutral-500">
           <span>{recipesCount} 食譜</span>
           <span>{followersCount} 粉絲</span>
         </div>

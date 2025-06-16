@@ -108,11 +108,11 @@ export function PublishedRecipeCard({
 
       <div className="flex-1 ml-4 flex flex-col">
         <h3 className="text-lg font-medium mb-1">{title}</h3>
-        <p className="text-gray-500 text-sm mb-auto line-clamp-2">
+        <p className="text-neutral-500 text-sm mb-auto line-clamp-2">
           {description}
         </p>
 
-        <div className="flex items-center gap-6 mt-2 text-sm text-gray-800">
+        <div className="flex items-center gap-6 mt-2 text-sm text-neutral-800">
           <div className="flex items-center gap-1">
             <BookmarkIcon className="h-5 w-5" />
             <span>{comments}</span>
@@ -147,7 +147,7 @@ export function PublishedRecipeCard({
               <h2 className="text-lg font-medium text-center mb-2">
                 {SUCCESS_MESSAGES.CONVERT_SUCCESS}
               </h2>
-              <p className="text-gray-500 text-center">
+              <p className="text-neutral-500 text-center">
                 {SUCCESS_MESSAGES.RECIPE_TO_DRAFT}
               </p>
             </div>
@@ -185,7 +185,7 @@ export function PublishedRecipeCard({
                       e.stopPropagation();
                       setDialogOpen(false);
                     }}
-                    className="flex-1 border border-gray-200"
+                    className="flex-1 border border-neutral-200"
                     disabled={isChanging}
                   >
                     {COMMON_TEXTS.CANCEL}

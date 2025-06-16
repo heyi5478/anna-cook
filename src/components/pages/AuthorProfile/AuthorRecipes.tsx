@@ -117,7 +117,7 @@ export const AuthorRecipes = ({
       </div>
 
       <div className="px-4">
-        <p className="text-sm text-gray-500 mb-2">共{recipeCount}篇食譜</p>
+        <p className="text-sm text-neutral-500 mb-2">共{recipeCount}篇食譜</p>
 
         {/* 食譜列表 */}
         <div className="space-y-3">{renderRecipeList()}</div>
@@ -131,7 +131,7 @@ export const AuthorRecipes = ({
         {hasMore && !loading && (
           <div className="mt-4 flex justify-center">
             <button
-              className="flex items-center text-gray-500 py-2"
+              className="flex items-center text-neutral-500 py-2"
               onClick={atLoadMore}
             >
               <span className="mr-1">更多食譜</span>

@@ -84,7 +84,7 @@ export default function LoginPage() {
               {/* Google登入按鈕 */}
               <Button
                 variant="outline"
-                className="w-full py-6 text-lg font-normal relative px-6 border-gray-300"
+                className="w-full py-6 text-lg font-normal relative px-6 border-neutral-300"
                 onClick={atGoogleLogin}
                 disabled={isLoading}
               >
@@ -104,17 +104,17 @@ export default function LoginPage() {
               {/* 分隔線 */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+                  <div className="w-full border-t border-neutral-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500">或</span>
+                  <span className="px-4 bg-white text-neutral-500">或</span>
                 </div>
               </div>
 
               {/* 電子郵件登入按鈕 */}
               <Button
                 variant="outline"
-                className="w-full py-6 text-lg font-normal relative px-6 border-gray-300"
+                className="w-full py-6 text-lg font-normal relative px-6 border-neutral-300"
                 onClick={atEmailLogin}
               >
                 <span className="absolute left-6">

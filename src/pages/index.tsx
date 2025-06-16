@@ -282,7 +282,7 @@ export default function HomePage({
       {/* 主要內容 */}
       <main className="flex-1">
         {/* 橫幅廣告區域 */}
-        <div className="relative w-full h-[240px] bg-orange-500">
+        <div className="relative w-full h-[240px] bg-primary-400">
           <div className="absolute inset-0">
             <Image
               src="/ad_home_02.png"
@@ -321,19 +321,19 @@ export default function HomePage({
             <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
               <TabsTrigger
                 value={SORT_TYPES.LATEST}
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
               >
                 最新食譜
               </TabsTrigger>
               <TabsTrigger
                 value={SORT_TYPES.POPULAR}
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
               >
                 人氣食譜
               </TabsTrigger>
               <TabsTrigger
                 value="convenience"
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal"
+                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
               >
                 經典食譜
               </TabsTrigger>
@@ -344,8 +344,8 @@ export default function HomePage({
         {/* 食譜列表載入中狀態 */}
         {isLoading && (
           <div className="py-8 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-2 text-gray-500">{COMMON_TEXTS.LOADING}</p>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+            <p className="mt-2 text-neutral-500">{COMMON_TEXTS.LOADING}</p>
           </div>
         )}
 
@@ -367,7 +367,7 @@ export default function HomePage({
           <div className="flex justify-center py-4">
             <Button
               variant="ghost"
-              className="text-gray-500 flex items-center gap-1"
+              className="text-neutral-500 flex items-center gap-1"
               onClick={onLoadMore}
               disabled={isLoading}
             >
@@ -383,12 +383,12 @@ export default function HomePage({
         {/* 浮動選單 */}
         {showFloatingMenu && (
           <div className="flex flex-col gap-3 mb-3 items-end">
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32">
+            <Button className="bg-primary-800 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32">
               搜尋食譜
             </Button>
             <Button
               variant="outline"
-              className="bg-white text-gray-800 border-orange-500 border hover:bg-orange-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
+              className="bg-white text-neutral-800 border-primary border hover:bg-primary-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
               onClick={() => router.push('/upload-recipe-step1')}
             >
               新增食譜
@@ -402,8 +402,8 @@ export default function HomePage({
           onClick={toggleFloatingMenu}
           className={`h-12 w-12 rounded-full shadow-lg transition-all duration-300 ${
             showFloatingMenu
-              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              : 'bg-orange-200 text-orange-600 hover:bg-orange-300'
+              ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300'
+              : 'bg-primary text-primary-50 hover:bg-primary-50 hover:text-primary hover:border-primary'
           }`}
         >
           {showFloatingMenu ? <X size={24} /> : <Plus size={24} />}

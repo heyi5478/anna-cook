@@ -33,7 +33,7 @@ export default function StepIndicator({
                 'w-8 h-8 rounded-full flex items-center justify-center z-10',
                 currentStep >= step
                   ? 'bg-gray-700 text-white'
-                  : 'bg-gray-200 text-gray-500',
+                  : 'bg-gray-200 text-neutral-500',
               )}
             >
               {step}

@@ -27,7 +27,7 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
   <div className="flex items-center justify-between px-4 py-2">
     <button
       onClick={() => onStepChange('prev')}
-      className="p-2 text-gray-600"
+      className="p-2 text-neutral-600"
       disabled={currentStep === 1}
     >
       <ChevronLeft className="h-5 w-5" />
@@ -37,19 +37,19 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
     </div>
     <button
       onClick={() => onStepChange('next')}
-      className="p-2 text-gray-600"
+      className="p-2 text-neutral-600"
       disabled={currentStep === totalSteps}
     >
       <ChevronRight className="h-5 w-5" />
     </button>
     <button
       onClick={onTogglePlay}
-      className={`p-2 ${isDragging || isStepChanging ? 'text-gray-400' : 'text-gray-600'}`}
+      className={`p-2 ${isDragging || isStepChanging ? 'text-neutral-400' : 'text-neutral-600'}`}
       disabled={isDragging || isStepChanging}
     >
       {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
     </button>
-    <button onClick={onAddStep} className="p-2 text-gray-600">
+    <button onClick={onAddStep} className="p-2 text-neutral-600">
       <Plus className="h-5 w-5" />
     </button>
   </div>

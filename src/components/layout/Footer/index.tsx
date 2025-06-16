@@ -23,7 +23,7 @@ type NavItem = {
 const footerVariants = cva('w-full py-6 px-4', {
   variants: {
     variant: {
-      default: 'bg-gray-50',
+      default: 'bg-neutral-100',
       transparent: 'bg-transparent',
     },
     size: {
@@ -43,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({
   className,
   variant,
   size,
-  companyName = 'Anna Cook',
+  companyName = '安那煮',
   year = new Date().getFullYear(),
   studioName = 'Anna Cook',
   ...props
@@ -80,27 +80,27 @@ export const Footer: React.FC<FooterProps> = ({
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center justify-between py-4 border-t border-gray-200"
+              className="flex items-center justify-between py-4 border-t border-neutral-300"
             >
-              <span className="text-[#737373] text-lg">{item.label}</span>
-              <ChevronRight className="h-5 w-5 text-[#737373]" />
+              <span className="text-neutral-500 text-lg">{item.label}</span>
+              <ChevronRight className="h-5 w-5 text-neutral-500" />
             </Link>
           ))}
         </nav>
 
         {/* 最後一條分隔線 */}
-        <div className="border-t border-gray-200 mt-0" />
+        <div className="border-t border-neutral-300 mt-0" />
 
         {/* 聯絡我們區域 */}
         <div className="flex justify-center items-center gap-2 py-6">
-          <span className="text-gray-600">需要協助？</span>
-          <Link href="/contact" className="text-[#D83A00] font-medium">
+          <span className="text-neutral-600">需要協助？</span>
+          <Link href="/contact" className="text-primary-800 font-medium">
             聯絡我們
           </Link>
         </div>
 
         {/* 版權資訊 */}
-        <div className="flex justify-center items-center text-sm text-gray-500 pb-4">
+        <div className="flex justify-center items-center text-sm text-neutral-400 pb-4">
           <span className="mr-2">©</span>
           <span>
             {year} {companyName} {studioName}

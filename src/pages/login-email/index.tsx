@@ -101,7 +101,7 @@ export default function RegisterWithEmail() {
             height={80}
             className="mb-6"
           />
-          <h1 className="text-center text-2xl font-medium text-gray-700">
+          <h1 className="text-center text-2xl font-medium text-neutral-700">
             使用 電子郵件 註冊
           </h1>
         </div>
@@ -118,7 +118,7 @@ export default function RegisterWithEmail() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* 姓名輸入區塊 */}
             <div className="space-y-2">
-              <div className="text-gray-700">您的姓名</div>
+              <div className="text-neutral-700">您的姓名</div>
               <FormField
                 control={form.control}
                 name="name"
@@ -128,7 +128,7 @@ export default function RegisterWithEmail() {
                       <div className="relative">
                         <Input
                           placeholder="請輸入您的姓名"
-                          className="h-14 pl-4 pr-10 rounded-md bg-gray-50 text-base"
+                          className="h-14 pl-4 pr-10 rounded-md bg-neutral-50 text-base"
                           {...field}
                         />
                         {field.value && (
@@ -138,7 +138,7 @@ export default function RegisterWithEmail() {
                             className="absolute right-3 top-1/2 -translate-y-1/2"
                             aria-label="清除姓名"
                           >
-                            <X className="h-6 w-6 text-gray-400" />
+                            <X className="h-6 w-6 text-neutral-400" />
                           </button>
                         )}
                       </div>
@@ -151,7 +151,7 @@ export default function RegisterWithEmail() {
 
             {/* 電子郵件輸入區塊 */}
             <div className="space-y-2">
-              <div className="text-gray-700">電子郵件設定</div>
+              <div className="text-neutral-700">電子郵件設定</div>
               <FormField
                 control={form.control}
                 name="email"
@@ -161,7 +161,7 @@ export default function RegisterWithEmail() {
                       <div className="relative">
                         <Input
                           placeholder="請輸入電子郵件地址"
-                          className="h-14 pl-4 pr-10 rounded-md bg-gray-50 text-base"
+                          className="h-14 pl-4 pr-10 rounded-md bg-neutral-50 text-base"
                           {...field}
                         />
                         {field.value && (
@@ -171,7 +171,7 @@ export default function RegisterWithEmail() {
                             className="absolute right-3 top-1/2 -translate-y-1/2"
                             aria-label="清除電子郵件"
                           >
-                            <X className="h-6 w-6 text-gray-400" />
+                            <X className="h-6 w-6 text-neutral-400" />
                           </button>
                         )}
                       </div>
@@ -184,7 +184,7 @@ export default function RegisterWithEmail() {
 
             {/* 密碼輸入區塊 */}
             <div className="space-y-2">
-              <div className="text-gray-700">密碼設定</div>
+              <div className="text-neutral-700">密碼設定</div>
               <FormField
                 control={form.control}
                 name="password"
@@ -195,7 +195,7 @@ export default function RegisterWithEmail() {
                         <Input
                           type="password"
                           placeholder="請輸入密碼"
-                          className="h-14 pl-4 pr-10 rounded-md bg-gray-50 text-base"
+                          className="h-14 pl-4 pr-10 rounded-md bg-neutral-50 text-base"
                           {...field}
                         />
                         {field.value && (
@@ -205,7 +205,7 @@ export default function RegisterWithEmail() {
                             className="absolute right-3 top-1/2 -translate-y-1/2"
                             aria-label="清除密碼"
                           >
-                            <X className="h-6 w-6 text-gray-400" />
+                            <X className="h-6 w-6 text-neutral-400" />
                           </button>
                         )}
                       </div>
@@ -214,7 +214,7 @@ export default function RegisterWithEmail() {
                   </FormItem>
                 )}
               />
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-neutral-500">
                 密碼需至少8碼，包含至少一個大寫英文字母與一個數字
               </div>
             </div>
@@ -229,10 +229,10 @@ export default function RegisterWithEmail() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      className="h-6 w-6 rounded data-[state=checked]:bg-[#FF4500] data-[state=checked]:text-white border-gray-300"
+                      className="h-6 w-6 rounded data-[state=checked]:bg-primary data-[state=checked]:text-white border-neutral-300"
                     />
                   </FormControl>
-                  <div className="text-sm text-gray-700 leading-normal">
+                  <div className="text-sm text-neutral-700 leading-normal">
                     我已同意本公司隱私及著作權條款
                   </div>
                   <FormMessage />
@@ -242,10 +242,10 @@ export default function RegisterWithEmail() {
 
             {/* 已有帳號連結 */}
             <div className="flex items-center justify-start">
-              <span className="text-gray-700">已有帳號? </span>
+              <span className="text-neutral-700">已有帳號? </span>
               <Link
                 href="/signin-email"
-                className="ml-1 text-[#FF4500] hover:underline"
+                className="ml-1 text-primary hover:underline"
               >
                 登入帳號
               </Link>
@@ -255,7 +255,7 @@ export default function RegisterWithEmail() {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full h-14 rounded-full bg-[#FF4500] hover:bg-[#FF4500]/90 text-white font-medium text-lg"
+              className="w-full h-14 rounded-full bg-primary hover:bg-primary-50 text-white font-medium text-lg"
             >
               {submitting ? COMMON_TEXTS.SUBMITTING : '註冊'}
             </Button>
