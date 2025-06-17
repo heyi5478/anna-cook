@@ -72,6 +72,7 @@
   - 樣式：**Tailwind CSS**、**Shadcn UI**、**CVA (Class Variance Authority)**
   - 狀態管理：**Zustand** (功能分組架構)
   - 表單處理：**React-hook-form**、**ZOD** (表單驗證)
+  - 測試框架：**Jest**、**@testing-library/react** (單元測試)
   - 程式碼品質：**ESLint**、**Prettier**
 - 後端：**C#**、**ASP.NET Core**、**Microsoft SQL Server**、**Restful API**
 - 部署：**Vercel**
@@ -82,6 +83,9 @@ anna-cook/
 ├── public/                     # 靜態資源目錄
 │
 ├── src/                        # 源碼目錄 (重構後)
+│   ├── __tests__/              # 測試檔案目錄
+│   │   ├── hooks/              # Custom Hooks 測試
+│   │   └── utils/              # 工具函式測試
 │   ├── components/             # React 元件 (分層架構)
 │   │   ├── ui/                 # UI 基礎元件 (shadcn/ui + CVA)
 │   │   ├── common/             # 通用/共用元件
@@ -116,8 +120,9 @@ anna-cook/
 │   │   ├── _app.tsx            # App 元件
 │   │   ├── _document.tsx       # Document 元件
 │   │   └── [各功能頁面目錄]/    # 功能頁面
-│   └── styles/                 # 樣式檔案
-│       └── globals.css         # 全域樣式 (Tailwind CSS)
+│   ├── styles/                 # 樣式檔案
+│   │   └── globals.css         # 全域樣式 (Tailwind CSS)
+│   └── setupTests.js           # Jest 測試環境設定
 │
 ├── 設定檔
 │   ├── .eslintignore          # ESLint 忽略檔案設定
@@ -126,6 +131,7 @@ anna-cook/
 │   ├── .prettierignore        # Prettier 忽略檔案設定
 │   ├── .prettierrc.cjs        # Prettier 格式設定
 │   ├── components.json        # shadcn/ui 元件設定
+│   ├── jest.config.js         # Jest 測試配置
 │   ├── next-env.d.ts         # Next.js TypeScript 環境定義
 │   ├── next.config.ts        # Next.js 設定
 │   ├── postcss.config.mjs    # PostCSS 設定
@@ -152,6 +158,18 @@ npm install
 啟動開發伺服器
 ```
 npm run dev
+```
+執行測試
+```
+npm run test
+```
+執行測試並監視檔案變更
+```
+npm run test:watch
+```
+執行測試並產生覆蓋率報告
+```
+npm run test:coverage
 ```
 
 ## Git flow 規範
@@ -180,6 +198,25 @@ npm run dev
   | `docs` | 更新文件 |
   | `chore` | 其他雜項 |
   | `test` | 新增測試 |
+
+## 測試規範
+### 測試覆蓋率要求
+- 函式覆蓋率：80% 以上
+- 分支覆蓋率：80% 以上  
+- 行覆蓋率：80% 以上
+- 語句覆蓋率：80% 以上
+
+### 測試檔案組織
+- 測試檔案命名：`{模組名稱}.test.ts`
+- 測試檔案位置：`src/__tests__/` 目錄下，按功能分類
+- 每個工具模組都應有對應的測試檔案
+
+### 測試撰寫規範
+- 使用 Jest 框架進行單元測試
+- 測試名稱使用正體中文描述預期行為
+- 格式：`應該 + 預期行為` 或 `當 + 條件 + 時應該 + 結果`
+- 在每個測試函式前加上中文功能註解
+- 遵循 Arrange-Act-Assert (AAA) 模式
 ### PR Naming
   - 分支名稱
   - 用 md 格式描述這次 PR 做了什麼
