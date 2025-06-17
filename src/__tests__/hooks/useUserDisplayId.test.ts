@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useUserDisplayId } from '../hooks/useUserDisplayId';
+import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 
 // Mock console.error 避免測試時顯示錯誤訊息
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
