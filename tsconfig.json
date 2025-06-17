@@ -26,9 +26,22 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    // Jest 測試支援
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src"],
+  "include": [
+    "next-env.d.ts", 
+    "**/*.ts", 
+    "**/*.tsx", 
+    "src",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
   "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
