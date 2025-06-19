@@ -49,7 +49,7 @@ export function setServerCookie(
   name: string = authConfig.tokenCookieName,
 ): void {
   const defaultOptions: SerializeOptions = {
-    httpOnly: false,
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: COOKIE_EXPIRES.TOKEN_EXPIRY_SECONDS,
