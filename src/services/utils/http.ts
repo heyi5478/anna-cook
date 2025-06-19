@@ -1,5 +1,6 @@
 import { authConfig } from '@/config';
 import { DEV_TEST_TOKEN, COMMON_TEXTS, COOKIE_EXPIRES } from '@/lib/constants';
+import { setClientCookie } from '@/lib/utils';
 
 /**
  * 從 Cookie 或 localStorage 獲取 JWT Token
@@ -34,20 +35,16 @@ export const getAuthToken = (): string | null => {
 };
 
 /**
- * 更新 Cookie 和 localStorage 中的 JWT Token
+ * 使用 setClientCookie 統一管理 cookie 設置和 localStorage 中的 JWT Token
  */
 export const updateAuthToken = (token: string): void => {
   if (typeof window === 'undefined') return;
 
-  // 1. 更新 Cookie (可能由服務器設置為 HttpOnly)
-  const expirationDate = new Date();
-  expirationDate.setDate(
-    expirationDate.getDate() + COOKIE_EXPIRES.TOKEN_EXPIRY_DAYS,
-  );
-
-  document.cookie = `${authConfig.tokenCookieName}=${encodeURIComponent(
-    token,
-  )}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict; Secure`;
+  // 1. 使用 setClientCookie 統一管理 cookie 設置
+  setClientCookie(token, {
+    maxAge: COOKIE_EXPIRES.TOKEN_EXPIRY_DAYS * 24 * 60 * 60,
+    sameSite: 'strict',
+  });
 
   // 2. 同時存儲到 localStorage 以便客戶端讀取
   localStorage.setItem('authToken', token);
