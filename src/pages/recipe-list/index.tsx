@@ -255,7 +255,7 @@ export default function RecipeListPage({
             <Search className="w-4 h-4" />
             回首頁重新搜尋
           </Button>
-          <p className="text-gray-500 mb-8">查詢「{query}」無結果</p>
+          <p className="text-neutral-500 mb-8">查詢「{query}」無結果</p>
         </div>
       );
     }
@@ -342,18 +342,18 @@ export default function RecipeListPage({
 
       {/* 次導覽列 */}
       <div className="bg-white p-3 flex items-center text-sm">
-        <Link href="/" className="text-gray-600">
+        <Link href="/" className="text-neutral-600">
           首頁
         </Link>
-        <ChevronRight className="mx-1 h-4 w-4 text-gray-400" />
-        <span className="text-gray-900">搜尋食譜</span>
+        <ChevronRight className="mx-1 h-4 w-4 text-neutral-400" />
+        <span className="text-neutral-900">搜尋食譜</span>
       </div>
 
       {/* 搜尋類別與數量 */}
       <div className="border-b p-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">{query || '全部食譜'}</h1>
-          <span className="text-gray-500 text-sm">{totalCount} 道食譜</span>
+          <span className="text-neutral-500 text-sm">{totalCount} 道食譜</span>
         </div>
         <Button
           variant="ghost"

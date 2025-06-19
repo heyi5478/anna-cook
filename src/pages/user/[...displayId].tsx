@@ -74,7 +74,7 @@ export default function UserPage({
           <h2 className="text-2xl font-bold text-red-600 mb-4">
             錯誤 {statusCode}
           </h2>
-          <p className="text-gray-700 mb-6">{errorMessage}</p>
+          <p className="text-neutral-700 mb-6">{errorMessage}</p>
           <button
             onClick={() => router.push('/')}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"

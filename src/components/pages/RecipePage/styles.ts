@@ -28,8 +28,8 @@ export const interactionButtonStyles = cva(
   {
     variants: {
       state: {
-        active: 'text-[#FF5722]',
-        inactive: 'text-gray-600',
+        active: 'text-primary-500',
+        inactive: 'text-neutral-600',
       },
     },
     defaultVariants: {
@@ -73,7 +73,7 @@ export const separatedItemStyles = cva('flex justify-between items-center', {
  * 定義徽章樣式
  */
 export const badgeStyles = cva(
-  'rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700',
+  'rounded-lg py-2 px-4 bg-neutral-100 hover:bg-neutral-200 text-neutral-700',
   {
     variants: {
       variant: {
@@ -90,13 +90,13 @@ export const badgeStyles = cva(
 /**
  * 定義頁面容器樣式
  */
-export const pageContainerStyles = 'flex flex-col min-h-screen bg-gray-50';
+export const pageContainerStyles = 'flex flex-col min-h-screen bg-neutral-50';
 
 /**
  * 定義麵包屑導航樣式
  */
 export const breadcrumbStyles =
-  'flex items-center text-sm px-4 py-2 text-gray-500 bg-white';
+  'flex items-center text-sm px-4 py-2 text-neutral-500 bg-white';
 
 /**
  * 定義主圖樣式

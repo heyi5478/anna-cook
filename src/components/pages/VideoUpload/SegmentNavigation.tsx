@@ -43,7 +43,7 @@ export default function SegmentNavigation({
       <div className="flex items-center justify-between px-4 py-2">
         <button
           onClick={atGoPreviousSegment}
-          className="p-2 text-gray-600"
+          className="p-2 text-neutral-600"
           disabled={currentSegmentIndex === 0}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -53,19 +53,19 @@ export default function SegmentNavigation({
         </div>
         <button
           onClick={atGoNextSegment}
-          className="p-2 text-gray-600"
+          className="p-2 text-neutral-600"
           disabled={currentSegmentIndex === segments.length - 1}
         >
           <ChevronRight className="h-5 w-5" />
         </button>
-        <button onClick={atTogglePlayPause} className="p-2 text-gray-600">
+        <button onClick={atTogglePlayPause} className="p-2 text-neutral-600">
           {isPlaying ? (
             <Pause className="h-5 w-5" />
           ) : (
             <Play className="h-5 w-5" />
           )}
         </button>
-        <button onClick={atAddSegment} className="p-2 text-gray-600">
+        <button onClick={atAddSegment} className="p-2 text-neutral-600">
           <Plus className="h-5 w-5" />
         </button>
       </div>
@@ -75,7 +75,7 @@ export default function SegmentNavigation({
         onClick={atDeleteCurrentSegment}
         variant="outline"
         disabled={segments.length <= 1}
-        className="w-full bg-gray-200 text-gray-700 rounded-md py-2 flex items-center justify-center"
+        className="w-full bg-neutral-200 text-neutral-700 rounded-md py-2 flex items-center justify-center"
       >
         <Trash2 className="h-4 w-4 mr-2" />
         {COMMON_TEXTS.DELETE}此步驟

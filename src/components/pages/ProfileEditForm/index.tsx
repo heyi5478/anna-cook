@@ -258,8 +258,8 @@ export default function ProfileEditForm() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-600">載入個人資料中...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neutral-900 mx-auto mb-4" />
+          <p className="text-neutral-600">載入個人資料中...</p>
         </div>
       </div>
     );
@@ -273,7 +273,7 @@ export default function ProfileEditForm() {
           <div className="text-red-500 text-xl mb-4">
             {ERROR_MESSAGES.LOAD_FAILED}
           </div>
-          <p className="text-gray-700 mb-4">{error}</p>
+          <p className="text-neutral-700 mb-4">{error}</p>
           <Button
             onClick={() => window.location.reload()}
             className="bg-red-500 hover:bg-red-600 text-white"
@@ -286,10 +286,10 @@ export default function ProfileEditForm() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-neutral-100">
       {/* 確認對話框 */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-gray-100">
+        <DialogContent className="bg-neutral-100">
           <DialogHeader>
             <DialogTitle>確認取消變更</DialogTitle>
             <DialogDescription>
@@ -341,7 +341,7 @@ export default function ProfileEditForm() {
             {/* 頭像上傳 */}
             <div className="flex justify-center mb-8">
               <div className="relative">
-                <div className="h-28 w-28 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+                <div className="h-28 w-28 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl || '/placeholder.svg'}
@@ -359,7 +359,7 @@ export default function ProfileEditForm() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-gray-500"
+                      className="text-neutral-500"
                     >
                       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
@@ -368,7 +368,7 @@ export default function ProfileEditForm() {
                 </div>
                 <label
                   htmlFor="avatar-upload"
-                  className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center cursor-pointer"
+                  className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-neutral-500 flex items-center justify-center cursor-pointer"
                 >
                   <Camera className="h-5 w-5 text-white" />
                   <input
@@ -409,7 +409,7 @@ export default function ProfileEditForm() {
                     <FormControl>
                       <Input {...field} className="pr-24" disabled />
                     </FormControl>
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 flex items-center">
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-neutral-500 flex items-center">
                       <ShieldCheck className="mr-1" size={16} />
                       已驗證
                     </div>
@@ -442,7 +442,7 @@ export default function ProfileEditForm() {
             <div className="pt-6 space-y-3">
               <Button
                 type="submit"
-                className="w-full bg-gray-600 hover:bg-gray-700"
+                className="w-full bg-neutral-600 hover:bg-neutral-700"
                 disabled={isSubmitting}
               >
                 {isSubmitting

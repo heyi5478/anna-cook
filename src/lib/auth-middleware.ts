@@ -38,8 +38,6 @@ export const parseJWT = (token: string): { DisplayId: string; Id: number } => {
 /**
  * 從伺服器請求中獲取 JWT Token
  * 此函數可處理 NextApiRequest 並從其 cookies 屬性中提取 token
- * @param req Next.js API 請求物件
- * @returns JWT Token 或 null (如果未找到)
  */
 export const getServerToken = (req: OriginalNextApiRequest): string | null => {
   // 從 Next.js 請求物件的 cookies 屬性中獲取 token

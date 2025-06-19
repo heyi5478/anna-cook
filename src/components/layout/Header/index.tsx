@@ -16,7 +16,7 @@ import { checkAuth } from '@/services/auth';
  * 定義 header 的基本樣式和變體
  */
 const headerVariants = cva(
-  'w-full flex items-center justify-between bg-[#E64300] px-4 py-2 h-16',
+  'w-full flex items-center justify-between bg-primary px-4 py-2 h-16',
   {
     variants: {
       variant: {
@@ -44,7 +44,7 @@ const menuItemVariants = cva(
   {
     variants: {
       active: {
-        true: 'bg-[#E64300] text-white',
+        true: 'bg-primary text-white',
         false: 'hover:bg-gray-100',
       },
     },
@@ -212,14 +212,14 @@ export const Header: React.FC<HeaderProps> = ({
       <Link href="/login" className="w-full" onClick={atMenuItemClick}>
         <div className="flex flex-col items-center p-6 mb-4">
           <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-2">
-            <User className="h-8 w-8 text-gray-500" />
+            <User className="h-8 w-8 text-neutral-500" />
           </div>
           <h2 className="text-xl font-bold">登入/註冊</h2>
         </div>
       </Link>
 
       <div className="w-full">
-        <p className="px-4 py-2 text-gray-500">未登入</p>
+        {/* <p className="px-4 py-2 text-neutral-500">未登入</p> */}
 
         <Link
           href="/upload-recipe-step1"
@@ -334,7 +334,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => {
                 if (atMenuClick) atMenuClick();
               }}
-              className="text-white hover:bg-[#E64300] hover:text-white"
+              className="text-white hover:bg-primary hover:text-white"
               aria-label="選單"
             >
               <Menu className="h-6 w-6" />
@@ -342,7 +342,7 @@ export const Header: React.FC<HeaderProps> = ({
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="p-0 w-80 sm:max-w-sm bg-[#FAFAFA]"
+            className="p-0 w-80 sm:max-w-sm bg-neutral-50"
           >
             {isLoggedIn ? renderUserMenu() : renderGuestMenu()}
           </SheetContent>
@@ -363,15 +363,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       <form onSubmit={atSubmitSearch} className="flex-1 max-w-xl mx-4">
         <div className="relative">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-            <Search className="h-5 w-5" />
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500">
+            <Search className="h-5 w-5 text-primary" />
           </div>
           <Input
             type="search"
             placeholder="關鍵字搜尋"
             className={cn(
               'pl-10 pr-4 py-2 h-10 bg-white rounded-[16px] border-none focus-visible:ring-0 focus-visible:ring-offset-0',
-              'text-base placeholder:text-gray-400',
+              'text-base placeholder:text-neutral-400',
             )}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

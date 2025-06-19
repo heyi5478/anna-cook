@@ -287,7 +287,7 @@ export default function RecipeDraft() {
                   className="object-cover w-full h-full rounded"
                 />
               ) : (
-                <ImageIcon className="w-8 h-8 text-gray-400" />
+                <ImageIcon className="w-8 h-8 text-neutral-400" />
               )}
             </div>
           </div>

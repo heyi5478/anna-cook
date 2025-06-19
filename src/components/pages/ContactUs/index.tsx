@@ -83,11 +83,11 @@ export default function ContactUs() {
 
         {/* Logo 區塊 */}
         <div className="flex justify-center my-6">
-          <div className="bg-gray-100 px-8 py-3 rounded">Logo</div>
+          <div className="bg-neutral-100 px-8 py-3 rounded">Logo</div>
         </div>
 
         {/* 介紹文字 */}
-        <div className="text-gray-700 mb-6">
+        <div className="text-neutral-700 mb-6">
           <p>感謝您使用我們的食譜平台。</p>
           <p>如有任何問題、建議或合作機會，請填寫以下表單，我們將盡快回覆。</p>
         </div>
@@ -179,7 +179,7 @@ export default function ContactUs() {
             <div className="space-y-2 pt-4">
               <Button
                 type="submit"
-                className="w-full bg-gray-500 hover:bg-gray-600"
+                className="w-full bg-neutral-500 hover:bg-neutral-600"
               >
                 送出留言
               </Button>

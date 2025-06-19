@@ -46,7 +46,7 @@ export function ReviewDisplay({
         </Avatar>
         <div className="flex-1">
           <h3 className="font-medium">{username}</h3>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2 text-neutral-700">
             {comment ||
               '詳細說明您對這道食譜的想法。料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！食譜料理中加入花生醬燉煮，醬汁香濃醇厚，滋味甜甜鹹鹹，獨特的風味讓人難忘！'}
           </p>

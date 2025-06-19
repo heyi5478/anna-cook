@@ -13,7 +13,7 @@ export default function CreateRecipeStep2Page() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-gray-600">{COMMON_TEXTS.LOADING}</div>
+        <div className="text-lg text-neutral-600">{COMMON_TEXTS.LOADING}</div>
       </div>
     );
   }

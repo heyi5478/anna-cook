@@ -239,7 +239,7 @@ export default function RecipeUploadForm() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage className="text-gray-500">
+            <BreadcrumbPage className="text-neutral-500">
               上傳食譜名稱
             </BreadcrumbPage>
           </BreadcrumbItem>
@@ -273,12 +273,12 @@ export default function RecipeUploadForm() {
               type="text"
               placeholder="在此輸入食譜名稱"
               className={cn(
-                'w-full px-10 py-3 border rounded-md bg-gray-50',
-                errors.recipeName ? 'border-red-500' : 'border-gray-300',
+                'w-full px-10 py-3 border rounded-md bg-neutral-50',
+                errors.recipeName ? 'border-red-500' : 'border-neutral-300',
               )}
               {...register('recipeName')}
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -324,7 +324,7 @@ export default function RecipeUploadForm() {
                 className="max-h-full max-w-full object-contain"
               />
             ) : (
-              <div className="text-gray-500 flex flex-col items-center">
+              <div className="text-neutral-500 flex flex-col items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="48"
@@ -368,7 +368,7 @@ export default function RecipeUploadForm() {
             </p>
           )}
           {!imagePreview && !errors.coverImage && (
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-neutral-500">
               圖片格式: JPG, PNG (必填)
             </p>
           )}
@@ -396,7 +396,7 @@ export default function RecipeUploadForm() {
         </div>
 
         {/* 顯示表單狀態（開發用） */}
-        <div className="mb-6 p-2 bg-gray-100 rounded text-xs text-gray-700">
+        <div className="mb-6 p-2 bg-neutral-100 rounded text-xs text-neutral-700">
           表單狀態: {isSubmitting ? '提交中' : '未提交'} | 驗證狀態:{' '}
           {isValid ? '有效' : '無效'} | 載入狀態:{' '}
           {isLoading ? '載入中' : '未載入'}
@@ -409,8 +409,8 @@ export default function RecipeUploadForm() {
           className={cn(
             'w-full py-3 text-white rounded-md transition-colors',
             isLoading || isSubmitting
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-gray-400 hover:bg-gray-500',
+              ? 'bg-neutral-300 cursor-not-allowed'
+              : 'bg-neutral-400 hover:bg-neutral-500',
           )}
         >
           {isLoading ? COMMON_TEXTS.UPLOADING : '下一步'}

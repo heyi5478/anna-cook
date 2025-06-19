@@ -65,7 +65,7 @@ export const CookingStep = ({
     return (
       <div className="mb-4">
         <div className="block mb-2 text-sm font-medium">步驟影片</div>
-        <div className="relative aspect-video bg-gray-200 rounded overflow-hidden mb-2">
+        <div className="relative aspect-video bg-neutral-200 rounded overflow-hidden mb-2">
           {step.vimeoId ? (
             <VimeoPlayer
               videoId={step.vimeoId}
@@ -82,7 +82,7 @@ export const CookingStep = ({
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-gray-500 text-sm">影片上傳中 ... 請稍後</p>
+              <p className="text-neutral-500 text-sm">影片上傳中 ... 請稍後</p>
             </div>
           )}
         </div>
@@ -122,7 +122,7 @@ export const CookingStep = ({
               </Button>
             )}
           </div>
-          <div className="p-3 bg-gray-50 rounded border min-h-[100px]">
+          <div className="p-3 bg-neutral-50 rounded border min-h-[100px]">
             {step.description}
           </div>
         </div>
@@ -131,13 +131,15 @@ export const CookingStep = ({
         <div className="grid grid-cols-2 gap-4 mb-2">
           <div>
             <div className="block mb-1 text-sm font-medium">開始時間</div>
-            <div className="p-2 bg-gray-50 rounded border">
+            <div className="p-2 bg-neutral-50 rounded border">
               {step.startTime}
             </div>
           </div>
           <div>
             <div className="block mb-1 text-sm font-medium">結束時間</div>
-            <div className="p-2 bg-gray-50 rounded border">{step.endTime}</div>
+            <div className="p-2 bg-neutral-50 rounded border">
+              {step.endTime}
+            </div>
           </div>
         </div>
       </>
@@ -177,7 +179,7 @@ export const CookingStep = ({
                   e.stopPropagation();
                   onRemoveStep(index);
                 }}
-                className="mr-2 p-1 text-gray-500 z-10"
+                className="mr-2 p-1 text-neutral-500 z-10"
                 aria-label={`${COMMON_TEXTS.DELETE}步驟 ${index + 1}`}
               >
                 <Trash className="w-4 h-4" />

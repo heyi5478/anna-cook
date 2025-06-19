@@ -52,7 +52,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
           onClick={onShareClick}
           aria-label="分享"
         >
-          <Share2 className="h-6 w-6 text-gray-500" />
+          <Share2 className="h-6 w-6 text-neutral-500" />
           <span className="sr-only">分享</span>
         </button>
 
@@ -69,7 +69,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
         <h1 className="text-xl font-bold mb-3">{author.name}</h1>
 
         {/* 食譜和粉絲數量 */}
-        <div className="flex gap-4 mb-4 text-sm text-gray-500">
+        <div className="flex gap-4 mb-4 text-sm text-neutral-500">
           <span>{author.recipeCount || 0} 食譜</span>
           <span>{author.followerCount || author.followersCount || 0} 粉絲</span>
         </div>
@@ -83,15 +83,15 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
           variant={isFollowing ? 'outline' : 'default'}
           className={
             isFollowing
-              ? 'w-28 rounded-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
-              : 'w-28 rounded-sm bg-gray-800 text-white hover:bg-gray-700'
+              ? 'w-28 rounded-sm bg-white text-neutral-800 border-neutral-300 hover:bg-neutral-100'
+              : 'w-28 rounded-sm bg-neutral-800 text-white hover:bg-neutral-700'
           }
           onFollowChange={atFollowChange}
         />
       </div>
 
       {/* 作者簡介 */}
-      <div className="mt-8 text-gray-700 text-sm px-4">
+      <div className="mt-8 text-neutral-700 text-sm px-4">
         <p className="leading-6">{author.bio || author.description}</p>
       </div>
     </div>
