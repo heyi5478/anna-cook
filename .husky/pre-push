@@ -1,0 +1,31 @@
+#!/bin/sh
+
+echo "🚀 執行 Pre-push Hook - 完整部署前驗證"
+echo "⚡ 這可能需要幾分鐘時間，請耐心等待..."
+echo ""
+
+# 執行完整測試套件含覆蓋率 (不強制門檻)
+echo "🧪 1/2 執行完整測試套件 (含覆蓋率報告)..."
+npm test -- --coverage --coverageThreshold='{}' --coverageReporters=text-summary --passWithNoTests
+if [ $? -ne 0 ]; then
+  echo "❌ 測試套件失敗！請確保所有測試都通過後再推送。"
+  exit 1
+fi
+echo "✅ 完整測試套件通過 (覆蓋率報告已顯示)"
+echo ""
+
+# 確保專案可以成功建構
+echo "🏗️  2/2 執行專案建構驗證..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ 專案建構失敗！請修正建構錯誤後再推送。"
+  exit 1
+fi
+echo "✅ 專案建構成功"
+echo ""
+
+echo "🎉 Pre-push Hook 驗證完成！"
+echo "✨ 測試通過，專案建構成功。"
+echo "📊 覆蓋率報告已顯示上方，請持續改善測試覆蓋率。"
+echo "🚀 準備推送到遠端倉庫..."
+echo "" 
