@@ -1,0 +1,35 @@
+#!/bin/sh
+# Pre-commit Hook: 快速代碼品質檢查
+# 目的: 在提交前進行基本的代碼品質驗證，確保不會提交有明顯問題的代碼
+# 執行時間: 約 30-60 秒
+
+echo "🚀 執行 Pre-commit Hook - 代碼品質檢查"
+echo ""
+
+# ESLint 代碼風格檢查
+# 只檢查 staged 檔案以提升效能
+echo "📋 1/2 執行 ESLint 代碼風格檢查..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ ESLint 檢查失敗！請修正代碼風格問題後再提交。"
+  echo "💡 提示: 執行 'npm run lint' 查看詳細錯誤"
+  exit 1
+fi
+echo "✅ ESLint 檢查通過"
+echo ""
+
+# 快速測試 - 只執行測試，遇到失敗立即停止
+# 使用 --bail 和 --maxWorkers=2 優化效能
+echo "🧪 2/2 執行快速測試..."
+npm test -- --bail --maxWorkers=2 --silent --onlyFailures=false
+if [ $? -ne 0 ]; then
+  echo "❌ 測試失敗！請確保所有測試都通過後再提交。"
+  echo "💡 提示: 執行 'npm run test' 查看詳細測試結果"
+  exit 1
+fi
+echo "✅ 快速測試通過"
+echo ""
+
+echo "🎉 Pre-commit Hook 檢查完成！代碼品質良好，可以提交。"
+echo "⏱️  總執行時間約: 30-60 秒"
+echo ""

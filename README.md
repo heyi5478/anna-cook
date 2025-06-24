@@ -29,7 +29,7 @@
 3. 點選登入/註冊
 4. 選擇Gmail註冊登入方式
 5. 登入後再點選漢堡功能列
-6. 點擊”上傳食譜”
+6. 點擊"上傳食譜"
   - **Step1**
     1. 輸入食譜名稱
     2. 選擇上傳食譜封面圖片
@@ -46,16 +46,16 @@
     3. 輸入敘述文字
     4. 待全部步驟都編輯好時，點選全部完成
 7. 回到會員中心
-8. 於”我的食譜 - 草稿”區域點擊草稿卡片右上方”發佈”按鈕
+8. 於"我的食譜 - 草稿"區域點擊草稿卡片右上方"發佈"按鈕
 9. 點擊確認要發佈
 10. 成功發佈食譜
 
 ### 瀏覽者
 1. 進入首頁
 2. 點擊上方搜尋
-3. 輸入關鍵字”蛋餅”
+3. 輸入關鍵字"蛋餅"
 4. 瀏覽食譜列表
-5. 點擊”蛋餅”食譜
+5. 點擊"蛋餅"食譜
 6. 瀏覽食譜資訊
 7. 點擊教學開始進入步驟
 8. 點擊浮動按鈕跳轉上下步驟
@@ -171,6 +171,96 @@ npm run test:watch
 ```
 npm run test:coverage
 ```
+
+## Git Hooks 自動化品質檢查 (Husky)
+
+本專案使用 **Husky** 來管理 Git hooks，確保程式碼品質和專案穩定性。
+
+### 🔧 已配置的 Git Hooks
+
+#### Pre-commit Hook
+在每次 `git commit` 前自動執行：
+- **ESLint 檢查**：確保程式碼風格一致
+- **快速測試**：執行相關測試案例
+
+#### Pre-push Hook
+在每次 `git push` 前自動執行：
+- **完整測試套件**：執行所有測試並生成覆蓋率報告
+- **專案建構驗證**：確保專案可以成功建構
+
+### 🚀 新團隊成員設定步驟
+
+1. **clone 專案後，安裝依賴**：
+   ```bash
+   git clone https://github.com/heyi5478/anna-cook.git
+   cd anna-cook
+   npm install  # 會自動執行 "prepare": "husky" 初始化 hooks
+   ```
+
+2. **驗證 Husky 是否正確安裝**：
+   ```bash
+   npm run hooks:check
+   ```
+
+3. **測試 Git hooks**：
+   ```bash
+   # 測試 pre-commit hook
+   npm run pre-commit
+
+   # 測試 pre-push hook
+   npm run pre-push
+   ```
+
+### ⚠️ 跳過 Hooks 的使用時機
+
+在特殊情況下，可以使用 `--no-verify` 跳過 Git hooks：
+
+```bash
+# 跳過 pre-commit hook（緊急修復時）
+git commit -m "hotfix: 緊急修復" --no-verify
+
+# 跳過 pre-push hook（CI/CD 會進行檢查時）
+git push --no-verify
+```
+
+**⚠️ 注意**：跳過 hooks 只應在緊急情況下使用，務必確保後續修正品質問題。
+
+### 📋 手動執行品質檢查
+
+```bash
+# 執行所有品質檢查（等同於 pre-push）
+npm run quality:all
+
+# 僅執行 ESLint 檢查
+npm run lint
+
+# 僅執行測試
+npm run test
+
+# 僅執行建構檢查
+npm run build
+```
+
+### 🛠️ 故障排除
+
+如果 Git hooks 沒有正常工作：
+
+1. **重新安裝 Husky**：
+   ```bash
+   npm run hooks:reinstall
+   ```
+
+2. **檢查 hooks 檔案權限**：
+   ```bash
+   ls -la .husky/
+   # 應該看到 pre-commit 和 pre-push 具有執行權限 (-rwxr-xr-x)
+   ```
+
+3. **手動設定權限**：
+   ```bash
+   chmod +x .husky/pre-commit
+   chmod +x .husky/pre-push
+   ```
 
 ## Git flow 規範
 ### 分支命名規範：
