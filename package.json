@@ -10,7 +10,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pre-commit": "./.husky/pre-commit",
+    "pre-push": "./.husky/pre-push",
+    "quality:all": "npm run lint && npm run test:coverage && npm run build",
+    "hooks:check": "ls -la .husky/ && echo '✅ Husky hooks are installed'",
+    "hooks:reinstall": "rm -rf .husky && npx husky init && chmod +x .husky/pre-commit && chmod +x .husky/pre-push && echo '✅ Husky hooks reinstalled'"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

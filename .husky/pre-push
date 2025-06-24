@@ -1,24 +1,31 @@
 #!/bin/sh
+# Pre-push Hook: 完整部署前驗證
+# 目的: 在推送前進行完整的品質檢查，確保代碼可以安全部署
+# 執行時間: 約 3-5 分鐘
 
 echo "🚀 執行 Pre-push Hook - 完整部署前驗證"
 echo "⚡ 這可能需要幾分鐘時間，請耐心等待..."
 echo ""
 
 # 執行完整測試套件含覆蓋率 (不強制門檻)
+# 使用優化參數提升執行效能
 echo "🧪 1/2 執行完整測試套件 (含覆蓋率報告)..."
-npm test -- --coverage --coverageThreshold='{}' --coverageReporters=text-summary --passWithNoTests
+npm test -- --coverage --coverageThreshold='{}' --coverageReporters=text-summary --passWithNoTests --maxWorkers=4
 if [ $? -ne 0 ]; then
   echo "❌ 測試套件失敗！請確保所有測試都通過後再推送。"
+  echo "💡 提示: 執行 'npm run test' 檢查失敗的測試"
   exit 1
 fi
 echo "✅ 完整測試套件通過 (覆蓋率報告已顯示)"
 echo ""
 
 # 確保專案可以成功建構
+# 建構驗證確保部署時不會出現問題
 echo "🏗️  2/2 執行專案建構驗證..."
 npm run build
 if [ $? -ne 0 ]; then
   echo "❌ 專案建構失敗！請修正建構錯誤後再推送。"
+  echo "💡 提示: 執行 'npm run build' 查看詳細建構錯誤"
   exit 1
 fi
 echo "✅ 專案建構成功"
@@ -27,5 +34,6 @@ echo ""
 echo "🎉 Pre-push Hook 驗證完成！"
 echo "✨ 測試通過，專案建構成功。"
 echo "📊 覆蓋率報告已顯示上方，請持續改善測試覆蓋率。"
+echo "⏱️  總執行時間約: 3-5 分鐘"
 echo "🚀 準備推送到遠端倉庫..."
 echo "" 
