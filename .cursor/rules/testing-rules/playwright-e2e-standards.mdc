@@ -1,5 +1,458 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# Playwright E2E 測試規範
+
+alwaysApply: false
+globs: ["tests/**/*.test.ts", "playwright.config.ts", "tests/**/*.ts"]
+
+## 專案概述
+這是 anna-cook 料理分享平台的端到端測試專案，使用 Playwright 進行 Web 應用程式的 UI 測試、API 測試和自動化截圖功能，專注於食譜創建、用戶認證、影片處理等核心功能測試。
+
+## 技術棧
+- **主專案**: Next.js + TypeScript + React
+- **測試框架**: Playwright + TypeScript  
+- **單元測試**: Jest + Testing Library (保留在 `src/__tests__/`)
+- **程式語言**: TypeScript
+- **程式碼品質**: ESLint (Airbnb) + Prettier
+- **Node.js**: >= 18.x
+- **NPM**: >= 7.x
+
+## 語言和註解規範
+- 回答一律用正體中文(zh-tw)，但遇到與程式碼有關的專有名詞就改用英文(en)
+- 在每一個函式前一行加上這個函式的功能註解
+- 測試描述使用正體中文，便於團隊理解
+
+## 檔案結構規範
+
+### 目錄組織
+```
+anna-cook/
+├── src/
+│   └── __tests__/              # Jest 單元測試 (保留)
+│       ├── hooks/
+│       └── utils/
+├── tests/                       # Playwright E2E 測試
+│   ├── e2e/                    # 端到端測試
+│   │   ├── auth/               # 認證相關測試
+│   │   │   ├── 01-google-login.test.ts
+│   │   │   ├── 02-email-login.test.ts
+│   │   │   └── 03-logout.test.ts
+│   │   ├── recipes/            # 食譜功能測試
+│   │   │   ├── 01-create-recipe.test.ts
+│   │   │   ├── 02-recipe-draft.test.ts
+│   │   │   ├── 03-recipe-video.test.ts
+│   │   │   └── 04-recipe-publish.test.ts
+│   │   ├── user/               # 用戶功能測試
+│   │   │   ├── 01-profile-edit.test.ts
+│   │   │   ├── 02-user-center.test.ts
+│   │   │   └── 03-author-profile.test.ts
+│   │   ├── video/              # 影片處理測試
+│   │   │   ├── 01-video-upload.test.ts
+│   │   │   └── 02-video-edit.test.ts
+│   │   └── navigation/         # 導覽和頁面測試
+│   │       ├── 01-header-navigation.test.ts
+│   │       └── 02-recipe-search.test.ts
+│   ├── fixtures/               # 測試數據
+│   │   ├── users.json          # 測試用戶數據
+│   │   ├── recipes.json        # 測試食譜數據
+│   │   └── videos/             # 測試影片檔案
+│   ├── helpers/                # 測試輔助函式
+│   │   ├── auth-helpers.ts     # 認證相關輔助函式
+│   │   ├── recipe-helpers.ts   # 食譜相關輔助函式
+│   │   └── video-helpers.ts    # 影片相關輔助函式
+│   └── setup/                  # 測試設定
+│       ├── global-setup.ts     # 全域測試設定
+│       └── auth.setup.ts       # 認證狀態設定
+├── screenshots/                # 截圖輸出目錄
+└── playwright.config.ts        # Playwright 配置
+```
+
+### 檔案命名規範
+- 測試檔案：使用 `*.test.ts` 格式
+- 測試檔案命名：使用數字前綴 + 描述性名稱，如 `01-recipe-creation.test.ts`
+- 輔助函式檔案：使用 `kebab-case`，如 `recipe-helpers.ts`
+- 一般 TypeScript 檔案：使用 `camelCase`
+
+## 程式碼風格規範
+
+### 基本風格
+- **縮排**: 2 個空格
+- **引號**: 單引號 (`'`)
+- **分號**: 必須使用分號
+- **行寬**: 最大 150 字元
+- **尾隨逗號**: 在物件和陣列中使用
+
+### TypeScript 規範
+- 啟用嚴格模式 (`strict: true`)
+- 禁止隱式 `any` 型別
+- 必須明確處理 `null` 和 `undefined`
+- 函式必須有明確的回傳型別（複雜函式）
+
+## 測試撰寫規範
+
+### 測試結構
+```typescript
+import { test, expect } from '@playwright/test';
+
+// 功能描述註解
+test.describe('食譜建立功能', () => {
+  // 測試案例功能註解  
+  test('應該能夠成功建立新食譜', async ({ page }) => {
+    // 測試實作
+  });
+});
+```
+
+### 測試命名規範（anna-cook 特定）
+- **describe**: 使用正體中文功能模組名稱
+  - `'用戶認證功能'`, `'食譜管理功能'`, `'影片上傳功能'`
+- **test**: 使用正體中文描述測試目的，以「應該」開頭
+  - `'應該能夠透過 Google 登入'`
+  - `'應該能夠建立食譜草稿'` 
+  - `'應該能夠上傳和編輯影片'`
+
+### 頁面互動最佳實踐（anna-cook 專用）
+
+#### 1. 頁面導航
+```typescript
+// 導航到特定頁面功能註解
+const navigateToPage = async (page: Page, path: string) => {
+  await page.goto(path, { waitUntil: 'networkidle' });
+};
+
+// 使用範例
+await navigateToPage(page, '/recipe-draft');
+await navigateToPage(page, '/login');
+```
+
+#### 2. 認證相關操作
+```typescript
+// Google 登入流程功能註解
+const performGoogleLogin = async (page: Page) => {
+  await page.click('[data-testid="google-login-btn"]');
+  await page.waitForURL('**/auth/google/callback**');
+};
+
+// Email 登入流程功能註解
+const performEmailLogin = async (page: Page, email: string, password: string) => {
+  await page.fill('[data-testid="email-input"]', email);
+  await page.fill('[data-testid="password-input"]', password);
+  await page.click('[data-testid="login-submit"]');
+};
+```
+
+#### 3. 食譜相關操作
+```typescript
+// 建立食譜功能註解
+const createRecipe = async (page: Page, title: string, description: string) => {
+  await page.fill('[data-testid="recipe-title"]', title);
+  await page.fill('[data-testid="recipe-description"]', description);
+  await page.click('[data-testid="add-ingredient-btn"]');
+};
+
+// 上傳影片功能註解
+const uploadVideo = async (page: Page, videoPath: string) => {
+  const fileInput = page.locator('[data-testid="video-upload-input"]');
+  await fileInput.setInputFiles(videoPath);
+};
+```
+
+#### 4. 元素定位策略（anna-cook 優先級）
+```typescript
+// 1. 優先使用 data-testid
+await page.click('[data-testid="submit-recipe-btn"]');
+
+// 2. 使用語意化定位
+await page.getByRole('button', { name: '發布食譜' });
+
+// 3. 使用特定屬性定位
+await page.click('[data-recipe-id="123"]');
+await page.click('[data-user-id="456"]');
+
+// 4. CSS 選擇器作為最後選擇
+await page.locator('.recipe-card .publish-btn');
+```
+
+### 等待策略規範
+
+#### 1. 頁面載入等待
+```typescript
+// 等待網路請求完成
+await page.goto('https://example.com', { waitUntil: 'networkidle' });
+
+// 等待特定元素出現
+await page.waitForSelector('[data-testid="content-loaded"]');
+```
+
+#### 2. 條件等待
+```typescript
+// 等待載入完成功能註解
+const waitForLoadingComplete = async (page: Page) => {
+  await page.waitForFunction(() => 
+    !document.querySelector('.loading')?.classList.contains('active')
+  );
+};
+
+// 等待影片處理完成功能註解
+const waitForVideoProcessed = async (page: Page) => {
+  await page.waitForSelector('[data-testid="video-processed"]', { 
+    timeout: 60000 
+  });
+};
+```
+
+### 斷言規範（anna-cook 特定）
+
+#### 1. 頁面驗證
+```typescript
+// 頁面標題驗證
+await expect(page).toHaveTitle(/Anna Cook - 料理分享平台/);
+
+// URL 驗證
+expect(page.url()).toContain('/recipe-page/');
+expect(page.url()).toContain('/user-center');
+```
+
+#### 2. 功能驗證
+```typescript
+// 食譜建立成功驗證
+await expect(page.getByText('食譜建立成功')).toBeVisible();
+
+// 用戶登入狀態驗證
+await expect(page.locator('[data-testid="user-avatar"]')).toBeVisible();
+
+// 影片上傳進度驗證
+await expect(page.locator('[data-testid="upload-progress"]')).toContainText('100%');
+
+// 元素計數驗證
+await expect(page.locator('[data-testid="recipe-item"]')).toHaveCount(3);
+```
+
+### API 測試規範（anna-cook 專用）
+```typescript
+// 食譜 API 測試功能註解
+test('食譜 API 應該正確回傳資料', async ({ page, request }) => {
+  // 測試食譜搜尋 API
+  const response = await request.get('/api/recipes/search');
+  expect(response.ok()).toBe(true);
+  
+  const recipes = await response.json();
+  expect(recipes).toHaveProperty('data');
+  expect(Array.isArray(recipes.data)).toBe(true);
+});
+
+// 用戶認證 API 測試功能註解
+test('用戶認證 API 應該正確處理登入', async ({ request }) => {
+  const loginResponse = await request.post('/api/auth/email/login', {
+    data: {
+      email: 'test@example.com',
+      password: 'testPassword'
+    }
+  });
+  expect(loginResponse.ok()).toBe(true);
+});
+```
+
+## 截圖功能規範
+
+### 截圖檔案組織
+```typescript
+// 截圖功能註解
+const takeScreenshot = async (page: Page, feature: string, device: string) => {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const imgFileName = `./screenshots/${device}-${feature}-${timestamp}.jpg`;
+  await page.screenshot({ path: imgFileName, fullPage: true });
+};
+
+// 使用範例
+await takeScreenshot(page, 'recipe-creation', 'desktop');
+await takeScreenshot(page, 'user-profile', 'mobile');
+```
+
+### 失敗截圖
+```typescript
+// 測試失敗時自動截圖功能註解
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    const screenshot = await page.screenshot();
+    await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+  }
+});
+```
+
+## 專案腳本使用
+
+### package.json 腳本
+```json
+{
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:unit": "jest",
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "screenshot": "node ./tests/screenshot/index.js"
+  }
+}
+```
+
+### 程式碼生成
+```bash
+# 自動生成測試程式碼
+npx playwright codegen [URL] --output ./tests/e2e/[feature]/[name].test.ts
+```
+
+## anna-cook 特定最佳實踐
+
+### 1. 測試數據管理
+```typescript
+// 測試數據載入功能註解
+const loadTestData = () => {
+  const testUsers = require('../fixtures/users.json');
+  const testRecipes = require('../fixtures/recipes.json');
+  return { testUsers, testRecipes };
+};
+
+// 使用範例
+const { testUsers } = loadTestData();
+const testUser = testUsers.validUser;
+```
+
+### 2. 認證狀態管理
+```typescript
+// 預設認證狀態設定功能註解
+// 在 auth.setup.ts 中預先設定認證狀態
+// 避免每個測試都重複登入流程
+
+import { test as setup, expect } from '@playwright/test';
+
+// 認證設定檔案
+const authFile = 'playwright/.auth/user.json';
+
+// 設定認證狀態功能註解
+setup('authenticate', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('[data-testid="email-input"]', process.env.TEST_USER_EMAIL!);
+  await page.fill('[data-testid="password-input"]', process.env.TEST_USER_PASSWORD!);
+  await page.click('[data-testid="login-submit"]');
+  
+  await page.waitForURL('**/user-center');
+  await page.context().storageState({ path: authFile });
+});
+```
+
+### 3. 影片測試最佳實踐
+```typescript
+// 影片上傳測試功能註解
+test('應該能夠上傳和處理影片', async ({ page }) => {
+  // 使用較小的測試影片檔案
+  const testVideoPath = './tests/fixtures/videos/small-test-video.mp4';
+  
+  await uploadVideo(page, testVideoPath);
+  
+  // 等待影片處理完成
+  await waitForVideoProcessed(page);
+  
+  // 驗證影片上傳成功
+  await expect(page.getByText('影片上傳成功')).toBeVisible();
+});
+```
+
+### 4. 食譜相關測試模式
+```typescript
+// 完整食譜建立流程測試功能註解
+test('完整食譜建立和發布流程', async ({ page }) => {
+  // 1. 建立食譜基本資訊
+  await createRecipe(page, '測試食譜', '這是一個測試食譜');
+  
+  // 2. 新增食材
+  await page.click('[data-testid="add-ingredient-btn"]');
+  await page.fill('[data-testid="ingredient-name-0"]', '雞蛋');
+  await page.fill('[data-testid="ingredient-amount-0"]', '2個');
+  
+  // 3. 上傳影片
+  await uploadVideo(page, './tests/fixtures/videos/cooking-demo.mp4');
+  await waitForVideoProcessed(page);
+  
+  // 4. 建立烹飪步驟
+  await page.fill('[data-testid="step-description-0"]', '將雞蛋打散');
+  
+  // 5. 預覽和發布
+  await page.click('[data-testid="preview-recipe-btn"]');
+  await page.click('[data-testid="publish-recipe-btn"]');
+  
+  // 驗證發布成功
+  await expect(page.getByText('食譜發布成功')).toBeVisible();
+});
+```
+
+### 5. 錯誤處理和重試機制
+```typescript
+// 重試機制設定
+test.describe.configure({ retries: 2 });
+
+// 網路請求重試功能註解
+const retryApiCall = async (page: Page, apiCall: () => Promise<any>, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await apiCall();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      await page.waitForTimeout(1000 * (i + 1));
+    }
+  }
+};
+```
+
+## 環境變數
+- `CI`: 用於判斷是否在 CI 環境中執行
+- `APP_ENV`: 用於區分不同執行環境（development/staging/production）
+- `TEST_USER_EMAIL`: 測試用戶 email
+- `TEST_USER_PASSWORD`: 測試用戶密碼
+- `BASE_URL`: 測試目標網站 URL
+
+## 程式碼檢查
+專案已配置 ESLint 和 Prettier，請確保：
+- 提交前執行 linting 檢查
+- 使用 Prettier 進行程式碼格式化
+- 遵循既有的程式碼規範
+- 所有函式都有適當的中文註解
+
+## 測試覆蓋率要求
+- **E2E 功能覆蓋率**: 主要用戶流程 100% 覆蓋
+- **關鍵頁面測試**: 所有主要頁面都有對應測試
+- **API 端點測試**: 關鍵 API 端點 80% 覆蓋
+- **跨瀏覽器測試**: Chrome、Safari、Firefox 支援
+
+## 持續整合配置
+```typescript
+// playwright.config.ts CI 配置
+export default defineConfig({
+  use: {
+    baseURL: process.env.CI ? 'https://staging.anna-cook.com' : 'http://localhost:3000',
+  },
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
+      name: 'chromium',
+      use: { 
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+  ],
+  webServer: process.env.CI ? undefined : {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
