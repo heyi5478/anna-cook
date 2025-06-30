@@ -1,0 +1,72 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 在 UI 元件目錄中使用 CVA 建立元件的標準結構和命名規範。
+globs: 
+  - src/components/ui/*.tsx
+alwaysApply: false
+---
+
+# CVA 元件結構規範
+
+## 核心規則
+
+- **CVA 結構**：每個自定義 UI 元件應使用 CVA 結構
+- **基本樣式定義**：使用 `cva()` 定義元件的基本樣式
+- **變體提供**：定義 `variants` 提供元件變體選項
+- **類型標註**：使用 `VariantProps` 進行類型標註
+- **預設屬性**：提供合理的預設 props
+- **邏輯分離**：將樣式與功能邏輯分開
+
+## 元件變體命名標準
+
+- **size**: `'sm' | 'md' | 'lg' | 'xl'`
+- **variant**: `'default' | 'primary' | 'secondary' | 'outline' | 'ghost'`
+- **intent**: `'info' | 'success' | 'warning' | 'error'`
+
+## CVA 元件範例
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+// 定義元件樣式變體
+const alertVariants = cva(
+  'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
+  {
+    variants: {
+      variant: {
+        default: 'bg-background text-foreground',
+        destructive: 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+// 類型定義
+type AlertProps = React.HTMLAttributes<HTMLDivElement> & 
+  VariantProps<typeof alertVariants>;
+
+// 元件實現
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
+      {...props}
+    />
+  )
+);
+
+Alert.displayName = 'Alert';
+
+export { Alert, alertVariants };
+export type { AlertProps };
+```

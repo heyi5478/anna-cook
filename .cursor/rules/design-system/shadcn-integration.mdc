@@ -1,0 +1,64 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 從 shadCN UI 引入和擴展元件的標準方式，確保一致的使用模式。
+globs: 
+  - src/components/ui/*.tsx
+alwaysApply: false
+---
+
+# shadCN 元件引入規範
+
+## 核心規則
+
+- **標準路徑引入**：使用 `@/components/ui` 路徑引入 shadCN 元件
+- **Slot 元件優化**：考慮使用 Slot 元件優化 props 傳遞
+- **className 合併**：使用 `cn()` 或 `twMerge()` 合併 className
+- **CVA 優先**：優先使用 CVA 定義樣式變體而非內聯 Tailwind 類
+- **元件組合**：遵循 shadCN 的元件組合模式
+
+## shadCN 使用範例
+
+```typescript
+import React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from './button-variants';
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  asChild?: boolean;
+  variant?: 'default' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+};
+
+// 使用 shadCN 模式的元件
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+export { Button };
+export type { ButtonProps };
+```
+
+## 元件文檔要求
+
+每個元件檔案應包含：
+- 元件用途的描述性註解
+- 可用變體的清單
+- 示例用法
+- 參數說明
+- 核心功能說明

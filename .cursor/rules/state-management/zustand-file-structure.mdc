@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Zustand 狀態管理的檔案組織和命名規範，確保專案結構一致。
+globs: 
+  - src/stores/**/*.ts
+alwaysApply: false
+---
+
+# Zustand 檔案結構與命名
+
+## 核心規則
+
+- **命名格式**：使用 `use{Feature}Store` 格式，例如 `useUserStore`
+- **共享 store 位置**：放置於 `src/stores` 目錄下，依功能特性組織
+- **元件專用 store**：放置於元件目錄中，命名為 `use{Feature}Store.ts`
+- **引入順序標準化**：遵循標準的 import 順序
+
+## 目錄結構範例
+
+```
+src/
+├── stores/
+│   ├── auth/
+│   │   └── useAuthStore.ts
+│   ├── recipes/
+│   │   ├── useRecipeDraftStore.ts
+│   │   └── useRecipeListStore.ts
+│   └── ui/
+│       └── useThemeStore.ts
+└── components/
+    └── RecipeEditor/
+        └── useRecipeEditorStore.ts  # 元件專用 store
+```
+
+## 引入順序規範
+
+```typescript
+// 1. Zustand 及其中間件
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+
+// 2. 外部庫
+import { toast } from 'sonner';
+
+// 3. 內部類型
+import type { User, Recipe } from '@/types';
+
+// 4. 服務
+import { userService } from '@/services/users';
+import { recipeService } from '@/services/recipes';
+
+// 5. 常量
+import { API_ENDPOINTS } from '@/lib/constants';
+```
+
+## Store 命名範例
+
+```typescript
+// ✅ 正確命名
+export const useUserStore = create<UserStore>()(...);
+export const useRecipeDraftStore = create<RecipeDraftStore>()(...);
+export const useVideoEditStore = create<VideoEditStore>()(...);
+
+// ❌ 錯誤命名
+export const userStore = create<UserStore>()(...);  // 缺少 use 前綴
+export const UseUserStore = create<UserStore>()(...);  // 大寫開頭錯誤
+export const user_store = create<UserStore>()(...);  // 使用底線
+```

@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: TypeScript 程式碼的最佳實踐和開發標準，確保類型安全和代碼品質。
+alwaysApply: true
+---
+
+# TypeScript 使用規範
+
+## 核心規則
+
+- **純 TypeScript 開發**：所有代碼都使用 TypeScript，不使用純 JavaScript
+- **優先使用 type**：優先使用 `type` 而非 `interface` 定義類型
+- **避免 enum**：避免使用 `enum`，改用 `const` 映射或聯合類型
+- **類型安全**：實現適當的類型安全和推斷，避免 `any` 類型
+- **satisfies 運算符**：使用 `satisfies` 運算符進行類型驗證
+
+## 類型定義範例
+
+```typescript
+// 優先使用 type
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+// 使用 const 映射替代 enum
+const UserRole = {
+  ADMIN: 'admin',
+  USER: 'user',
+  MODERATOR: 'moderator'
+} as const;
+
+type UserRoleType = typeof UserRole[keyof typeof UserRole];
+
+// 使用 satisfies 進行類型驗證
+const config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3
+} satisfies ApiConfig;
+```
