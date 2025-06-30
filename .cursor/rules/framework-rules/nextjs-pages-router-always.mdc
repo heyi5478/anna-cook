@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 專案使用 Next.js Pages Router 架構，禁止建議或使用 App Router 相關功能。
+alwaysApply: true
+---
+
+# Next.js Pages Router 規範
+
+## 核心規則
+
+- **Pages Router 專用**：專案使用 Next.js Pages Router，不要建議使用 App Router
+- **禁止 App Router 代碼**：不要提供使用 App Router 的代碼範例或建議
+- **路由結構遵循**：所有路由和頁面應遵循 Pages Router 的結構和模式
+- **元件實現符合**：元件和功能實現應符合 Pages Router 的使用方式
+- **API Routes**：使用 `pages/api/` 目錄結構建立 API 路由
+
+## Pages Router 架構範例
+
+```typescript
+// pages/index.tsx - 首頁
+export default function HomePage() {
+  return <div>首頁內容</div>;
+}
+
+// pages/api/users.ts - API 路由
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  res.status(200).json({ message: 'API 回應' });
+}
+
+// 使用 getServerSideProps 或 getStaticProps
+export async function getServerSideProps() {
+  return {
+    props: {
+      data: 'server side data'
+    }
+  };
+}
+```

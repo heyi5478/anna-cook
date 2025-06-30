@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 設計系統元件的可訪問性要求，確保所有元件符合 WCAG 標準。
+globs: 
+  - src/components/ui/*.tsx
+alwaysApply: false
+---
+
+# 可訪問性標準
+
+## 核心規則
+
+- **ARIA 屬性**：提供適當的 ARIA 屬性和標籤
+- **鍵盤導航**：支援完整的鍵盤導航功能
+- **顏色對比度**：確保適當的顏色對比度（至少 4.5:1）
+- **語義化 HTML**：使用適當的語義化 HTML 元素
+- **螢幕閱讀器**：確保螢幕閱讀器能正確讀取內容
+
+## 可訪問性實現範例
+
+```typescript
+// 可訪問的按鈕元件
+const AccessibleButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ children, disabled, onClick, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        disabled={disabled}
+        onClick={onClick}
+        aria-disabled={disabled}
+        aria-describedby={props['aria-describedby']}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick?.(e as any);
+          }
+        }}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+// 可訪問的表單元件
+const AccessibleInput = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, required, ...props }, ref) => {
+    const id = useId();
+    const errorId = `${id}-error`;
+    
+    return (
+      <div className="space-y-2">
+        <label 
+          htmlFor={id}
+          className="text-sm font-medium"
+        >
+          {label}
+          {required && <span aria-label="必填" className="text-red-500">*</span>}
+        </label>
+        <input
+          ref={ref}
+          id={id}
+          required={required}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
+          {...props}
+        />
+        {error && (
+          <div
+            id={errorId}
+            role="alert"
+            className="text-sm text-red-500"
+          >
+            {error}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+// 可訪問的對話框
+const AccessibleDialog = ({ isOpen, onClose, title, children }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (isOpen) {
+      dialogRef.current?.focus();
+      // 鎖定焦點在對話框內
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, onClose]);
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+    >
+      <div
+        ref={dialogRef}
+        className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg"
+        tabIndex={-1}
+      >
+        <h2 id="dialog-title" className="text-lg font-semibold mb-4">
+          {title}
+        </h2>
+        {children}
+      </div>
+    </div>
+  );
+};
+```
+
+## 檢查清單
+
+每個元件發布前應確認：
+- [ ] 所有互動元件可用鍵盤操作
+- [ ] 焦點指示器清晰可見
+- [ ] 錯誤訊息可被螢幕閱讀器讀取
+- [ ] 顏色對比度符合 WCAG AA 標準
+- [ ] 表單元件有適當的標籤

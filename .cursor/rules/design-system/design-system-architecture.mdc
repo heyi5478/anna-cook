@@ -1,0 +1,45 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: CVA 結合 shadCN UI 和 Tailwind CSS 的設計系統架構指導原則。
+alwaysApply: false
+---
+
+# 設計系統架構
+
+## 核心原則
+
+- **CVA 架構**：使用 CVA (Class Variance Authority) 與 shadCN UI 和 Tailwind CSS 建立一致的設計系統
+- **元件統一性**：所有元件應遵循此設計系統架構
+- **樣式一致性**：確保整個專案的視覺設計保持一致
+- **可維護性**：建立可擴展和易於維護的設計系統
+
+## 設計系統結構
+
+```typescript
+// 使用 CVA 定義元件變體
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-md text-sm font-medium',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+      },
+      size: {
+        sm: 'h-9 px-3',
+        md: 'h-10 px-4 py-2',
+        lg: 'h-11 px-8',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'md',
+    },
+  }
+);

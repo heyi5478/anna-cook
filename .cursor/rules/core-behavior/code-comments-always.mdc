@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 確保所有代碼都有適當的中文註解，並遵循專案的註解規範。這是核心的開發標準，適用於所有檔案。
+alwaysApply: true
+---
+
+# 代碼註解規範
+
+## 核心規則
+
+- **必須添加功能註解**：在每個函式前一行加上該函式的功能註解
+- **保持有用註解**：總是添加有用的註解解釋代碼的功能和邏輯  
+- **保護現有註解**：不要刪除舊的註解，除非因為代碼被重寫或刪除而使註解不再相關
+- **特殊保護標記**：當看到包含 "Do not touch this line Cursor" 的註解時，不要修改、重寫或刪除該行
+- **中文註解**：使用正體中文撰寫註解，但程式碼專有名詞使用英文
+
+## 註解格式範例
+
+```typescript
+// 計算使用者年齡的工具函式
+function calculateAge(birthDate: Date): number {
+  // 獲取當前日期
+  const now = new Date();
+  // 計算年齡差異
+  const age = now.getFullYear() - birthDate.getFullYear();
+  return age;
+}
+```

@@ -1,0 +1,166 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 在 React 元件中使用 Zustand 的最佳實踐，包含選擇器和優化技巧。
+globs: 
+  - src/**/*.tsx
+alwaysApply: false
+---
+
+# Zustand 在元件中的使用方式
+
+## 核心規則
+
+- **選擇器最小化**：使用最小選擇器，只選擇需要的狀態
+- **shallow 比較**：對物件使用 shallow 比較避免不必要重新渲染
+- **避免無選擇器**：避免直接使用 `useStore()` 
+- **靜態訪問**：在事件處理程序中使用 `useStore.getState()`
+- **memo 包裝**：使用 memo 包裝使用 store 的元件
+
+## 選擇器使用方式
+
+```typescript
+import { shallow } from 'zustand/shallow';
+import { useUserStore } from '@/stores/useUserStore';
+
+// ✅ 單值選擇器
+const UserProfile = () => {
+  const userName = useUserStore((state) => state.user?.name);
+  
+  return <div>{userName}</div>;
+};
+
+// ✅ 多值選擇器
+const UserInfo = memo(() => {
+  const { user, isLoading } = useUserStore(
+    (state) => ({ 
+      user: state.user, 
+      isLoading: state.isLoading 
+    }), 
+    shallow
+  );
+
+  if (isLoading) return <div>載入中...</div>;
+  
+  return (
+    <div>
+      <h1>{user?.name}</h1>
+      <p>{user?.email}</p>
+    </div>
+  );
+});
+
+// ✅ 靜態訪問
+const UserActions = () => {
+  const updateUser = useUserStore((state) => state.updateUser);
+  
+  const handleSubmit = useCallback((formData: UserFormData) => {
+    // 在事件處理程序中使用靜態訪問
+    const currentUser = useUserStore.getState().user;
+    if (currentUser) {
+      updateUser({ ...currentUser, ...formData });
+    }
+  }, [updateUser]);
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* 表單內容 */}
+    </form>
+  );
+};
+```
+
+## 優化技巧
+
+```typescript
+// ✅ 使用 memo 包裝元件
+const OptimizedUserCard = memo(() => {
+  const user = useUserStore((state) => state.user);
+  
+  return (
+    <div className="user-card">
+      <h3>{user?.name}</h3>
+    </div>
+  );
+});
+
+// ✅ 使用 useCallback 記憶事件處理程序
+const UserManagement = () => {
+  const { users, addUser, removeUser } = useUserStore(
+    (state) => ({
+      users: state.users,
+      addUser: state.addUser,
+      removeUser: state.removeUser,
+    }),
+    shallow
+  );
+
+  const handleAddUser = useCallback((userData: UserData) => {
+    addUser(userData);
+  }, [addUser]);
+
+  const handleRemoveUser = useCallback((userId: string) => {
+    removeUser(userId);
+  }, [removeUser]);
+
+  return (
+    <div>
+      {users.map(user => (
+        <UserItem
+          key={user.id}
+          user={user}
+          onRemove={handleRemoveUser}
+        />
+      ))}
+      <AddUserForm onAdd={handleAddUser} />
+    </div>
+  );
+};
+
+// ❌ 避免的錯誤模式
+const BadComponent = () => {
+  // 避免：無選擇器使用，會導致不必要的重新渲染
+  const store = useUserStore();
+  
+  // 避免：在每次渲染時創建新物件
+  const userData = useUserStore((state) => {
+    return { name: state.user?.name, email: state.user?.email };
+  });
+  
+  return <div>{store.user?.name}</div>;
+};
+```
+
+## 非同步操作處理
+
+```typescript
+const AsyncUserComponent = () => {
+  const { user, isLoading, error, fetchUser } = useUserStore(
+    (state) => ({
+      user: state.user,
+      isLoading: state.isLoading,
+      error: state.error,
+      fetchUser: state.fetchUser,
+    }),
+    shallow
+  );
+
+  useEffect(() => {
+    fetchUser('user-id');
+  }, [fetchUser]);
+
+  if (isLoading) return <div>載入中...</div>;
+  if (error) return <div>錯誤: {error}</div>;
+  if (!user) return <div>找不到使用者</div>;
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+};
+```
