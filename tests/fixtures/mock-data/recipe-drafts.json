@@ -1,0 +1,224 @@
+{
+  "recipeDrafts": [
+    {
+      "id": "draft-001",
+      "recipeName": "麻婆豆腐",
+      "recipeIntro": "經典川菜，麻辣鮮香的豆腐料理，適合搭配米飯享用",
+      "cookingTime": 30,
+      "portion": 4,
+      "ingredients": [
+        {
+          "name": "嫩豆腐",
+          "amount": "1",
+          "unit": "盒",
+          "isFlavoring": false
+        },
+        {
+          "name": "豬絞肉",
+          "amount": "100",
+          "unit": "g",
+          "isFlavoring": false
+        },
+        {
+          "name": "豆瓣醬",
+          "amount": "2",
+          "unit": "大匙",
+          "isFlavoring": true
+        },
+        {
+          "name": "蔥花",
+          "amount": "適量",
+          "unit": "",
+          "isFlavoring": true
+        },
+        {
+          "name": "蒜泥",
+          "amount": "1",
+          "unit": "大匙",
+          "isFlavoring": true
+        },
+        {
+          "name": "醬油",
+          "amount": "1",
+          "unit": "大匙",
+          "isFlavoring": true
+        }
+      ],
+      "tags": ["川菜", "辣味", "豆腐", "下飯菜"],
+      "steps": [
+        {
+          "description": "將豆腐切成 2cm 方塊，用鹽水汆燙備用",
+          "startTime": "0",
+          "endTime": "60"
+        },
+        {
+          "description": "熱鍋下油，炒散豬絞肉至變色",
+          "startTime": "60",
+          "endTime": "120"
+        },
+        {
+          "description": "加入豆瓣醬和蒜泥炒香",
+          "startTime": "120",
+          "endTime": "180"
+        },
+        {
+          "description": "下豆腐塊，輕輕翻炒均勻",
+          "startTime": "180",
+          "endTime": "240"
+        },
+        {
+          "description": "調味並勾薄芡，撒上蔥花即可",
+          "startTime": "240",
+          "endTime": "300"
+        }
+      ],
+      "createdAt": "2023-12-01T10:00:00Z",
+      "updatedAt": "2023-12-01T10:30:00Z",
+      "status": "draft",
+      "videoUploaded": true,
+      "videoProcessed": true
+    },
+    {
+      "id": "draft-002",
+      "recipeName": "番茄炒蛋",
+      "recipeIntro": "家常菜經典，酸甜開胃，老少皆宜",
+      "cookingTime": 15,
+      "portion": 2,
+      "ingredients": [
+        {
+          "name": "雞蛋",
+          "amount": "3",
+          "unit": "個",
+          "isFlavoring": false
+        },
+        {
+          "name": "番茄",
+          "amount": "2",
+          "unit": "個",
+          "isFlavoring": false
+        },
+        {
+          "name": "糖",
+          "amount": "1",
+          "unit": "小匙",
+          "isFlavoring": true
+        },
+        {
+          "name": "鹽",
+          "amount": "適量",
+          "unit": "",
+          "isFlavoring": true
+        },
+        {
+          "name": "蔥花",
+          "amount": "適量",
+          "unit": "",
+          "isFlavoring": true
+        }
+      ],
+      "tags": ["家常菜", "簡單", "蛋類", "番茄"],
+      "steps": [
+        {
+          "description": "雞蛋打散，加少許鹽調味",
+          "startTime": "0",
+          "endTime": "30"
+        },
+        {
+          "description": "番茄去皮切塊備用",
+          "startTime": "30",
+          "endTime": "90"
+        },
+        {
+          "description": "熱鍋炒蛋至半熟盛起",
+          "startTime": "90",
+          "endTime": "150"
+        },
+        {
+          "description": "炒番茄出汁，加糖調味",
+          "startTime": "150",
+          "endTime": "210"
+        },
+        {
+          "description": "下炒蛋拌勻，撒蔥花即可",
+          "startTime": "210",
+          "endTime": "270"
+        }
+      ],
+      "createdAt": "2023-12-02T14:30:00Z",
+      "updatedAt": "2023-12-02T15:00:00Z",
+      "status": "draft",
+      "videoUploaded": false,
+      "videoProcessed": false
+    },
+    {
+      "id": "draft-003",
+      "recipeName": "蒜蓉炒菠菜",
+      "recipeIntro": "簡單快手的綠色蔬菜，營養豐富",
+      "cookingTime": 10,
+      "portion": 3,
+      "ingredients": [
+        {
+          "name": "菠菜",
+          "amount": "300",
+          "unit": "g",
+          "isFlavoring": false
+        },
+        {
+          "name": "蒜頭",
+          "amount": "3",
+          "unit": "瓣",
+          "isFlavoring": true
+        },
+        {
+          "name": "鹽",
+          "amount": "適量",
+          "unit": "",
+          "isFlavoring": true
+        },
+        {
+          "name": "香油",
+          "amount": "1",
+          "unit": "小匙",
+          "isFlavoring": true
+        }
+      ],
+      "tags": ["素食", "清淡", "蔬菜", "快手菜"],
+      "steps": [
+        {
+          "description": "菠菜洗淨瀝乾，蒜頭切末",
+          "startTime": "0",
+          "endTime": "60"
+        },
+        {
+          "description": "熱鍋下油，爆香蒜末",
+          "startTime": "60",
+          "endTime": "120"
+        },
+        {
+          "description": "下菠菜大火快炒至軟身",
+          "startTime": "120",
+          "endTime": "180"
+        },
+        {
+          "description": "調味並淋香油即可起鍋",
+          "startTime": "180",
+          "endTime": "210"
+        }
+      ],
+      "createdAt": "2023-12-03T09:15:00Z",
+      "updatedAt": "2023-12-03T09:45:00Z",
+      "status": "incomplete",
+      "videoUploaded": false,
+      "videoProcessed": false
+    }
+  ],
+  "metadata": {
+    "totalCount": 3,
+    "statusCounts": {
+      "draft": 2,
+      "incomplete": 1,
+      "published": 0
+    },
+    "lastUpdated": "2023-12-03T09:45:00Z"
+  }
+} 
