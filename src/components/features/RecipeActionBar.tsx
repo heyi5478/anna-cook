@@ -14,7 +14,6 @@ export interface RecipeActionBarProps {
 
 /**
  * 食譜操作按鈕列元件
- * 包含「新增」和「刪除草稿」按鈕
  */
 export function RecipeActionBar({
   onNewRecipe,

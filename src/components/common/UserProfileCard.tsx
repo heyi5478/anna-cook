@@ -5,7 +5,6 @@ import type { UserProfileCardProps } from '@/components/pages/UserCenter/types';
 
 /**
  * 通用的用戶資料展示卡片元件
- * 用於顯示用戶基本資訊、統計數據和操作按鈕
  */
 export function UserProfileCard({
   userName,
