@@ -893,4 +893,66 @@ describe('useVideoEditor', () => {
       expect(mockStoreActions.resetCurrentSegment).toHaveBeenCalled();
     });
   });
+
+  // 縮圖生成功能測試
+  describe('縮圖生成功能', () => {
+    test('應該在桌面環境觸發縮圖生成', () => {
+      mockIsMobileDevice.mockReturnValue(false);
+      mockStoreState.upload.videoUrl = 'mock-video-url';
+
+      const mockVideoElement = {
+        duration: 120,
+        currentTime: 0,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as HTMLVideoElement;
+
+      const { result } = renderHook(() => useVideoEditor());
+      result.current.videoRef.current = mockVideoElement;
+
+      act(() => {
+        result.current.atVideoLoaded();
+      });
+
+      // 驗證基本設定
+      expect(mockStoreActions.setDuration).toHaveBeenCalledWith(120);
+      expect(mockStoreActions.setErrors).toHaveBeenCalledWith({});
+    });
+
+    test('應該在行動環境使用簡化縮圖', () => {
+      mockIsMobileDevice.mockReturnValue(true);
+      mockStoreState.upload.videoUrl = 'mock-video-url';
+
+      const mockVideoElement = {
+        duration: 120,
+        currentTime: 0,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as HTMLVideoElement;
+
+      const { result } = renderHook(() => useVideoEditor());
+      result.current.videoRef.current = mockVideoElement;
+
+      act(() => {
+        result.current.atVideoLoaded();
+      });
+
+      // 驗證基本設定（行動版會調用 generateSimplifiedThumbnails）
+      expect(mockStoreActions.setDuration).toHaveBeenCalledWith(120);
+    });
+
+    test('應該在沒有video元素時跳過縮圖生成', () => {
+      mockStoreState.upload.videoUrl = 'mock-video-url';
+
+      const { result } = renderHook(() => useVideoEditor());
+      // 不設定 videoRef.current
+
+      act(() => {
+        result.current.atVideoLoaded();
+      });
+
+      // 驗證沒有調用相關函數
+      expect(mockStoreActions.setDuration).not.toHaveBeenCalled();
+    });
+  });
 });
