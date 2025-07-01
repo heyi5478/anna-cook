@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 表單處理和資料驗證規範，使用 react-hook-form 和 zod 的標準模式。
+globs: 
+  - "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# 表單處理標準
+
+## 核心規則
+
+- **react-hook-form 統一**：所有表單一律使用 react-hook-form 進行狀態管理
+- **zod 驗證**：使用 zod 進行表單資料驗證
+- **類型推導**：建立表單 schema 時使用 zod 的類型推導
+- **zodResolver 連接**：使用 zodResolver 連接 react-hook-form 和 zod
+- **可重用 schema**：為複雜表單創建可重用的 schema 和驗證邏輯
+
+## 表單實現範例
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Schema 定義
+const userFormSchema = z.object({
+  name: z.string().min(2, '姓名至少需要 2 個字元'),
+  email: z.string().email('請輸入有效的電子郵件'),
+  age: z.number().min(18, '年齡必須大於 18 歲'),
+  preferences: z.object({
+    newsletter: z.boolean(),
+    notifications: z.boolean(),
+  }),
+});
+
+// 類型推導
+type UserFormData = z.infer<typeof userFormSchema>;
+
+// 表單元件
+const UserForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<UserFormData>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      age: 18,
+      preferences: {
+        newsletter: false,
+        notifications: true,
+      },
+    },
+  });
+
+  // 提交處理函式
+  const onSubmit = async (data: UserFormData) => {
+    try {
+      await submitUserData(data);
+      reset();
+    } catch (error) {
+      console.error('表單提交錯誤:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="name">姓名</label>
+        <input
+          {...register('name')}
+          type="text"
+          id="name"
+          className="w-full p-2 border rounded"
+        />
+        {errors.name && (
+          <span className="text-red-500">{errors.name.message}</span>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="email">電子郵件</label>
+        <input
+          {...register('email')}
+          type="email"
+          id="email"
+          className="w-full p-2 border rounded"
+        />
+        {errors.email && (
+          <span className="text-red-500">{errors.email.message}</span>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+      >
+        {isSubmitting ? '提交中...' : '提交'}
+      </button>
+    </form>
+  );
+};

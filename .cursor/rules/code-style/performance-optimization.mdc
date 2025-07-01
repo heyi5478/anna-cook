@@ -1,0 +1,98 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 設計系統元件的效能優化指南，包含 React 最佳實踐和 bundle size 考量。
+alwaysApply: false
+---
+
+# 效能優化指南
+
+## 核心規則
+
+- **避免不必要重新渲染**：使用 React.memo、useMemo 和 useCallback 適當優化
+- **延遲載入**：對大型元件實施延遲載入策略
+- **Context API 謹慎使用**：避免過度使用 context API 導致性能問題
+- **Bundle Size 考量**：元件設計時考慮打包大小影響
+
+## 效能優化範例
+
+```typescript
+import React, { memo, useMemo, useCallback } from 'react';
+
+// 使用 memo 避免不必要的重新渲染
+const OptimizedComponent = memo<ComponentProps>(({ items, onItemClick }) => {
+  // 使用 useMemo 緩存計算結果
+  const expensiveValue = useMemo(() => {
+    return items.reduce((sum, item) => sum + item.value, 0);
+  }, [items]);
+
+  // 使用 useCallback 緩存事件處理程序
+  const handleItemClick = useCallback((id: string) => {
+    onItemClick(id);
+  }, [onItemClick]);
+
+  return (
+    <div>
+      <p>總計: {expensiveValue}</p>
+      {items.map(item => (
+        <ItemComponent
+          key={item.id}
+          item={item}
+          onClick={handleItemClick}
+        />
+      ))}
+    </div>
+  );
+});
+
+// 延遲載入大型元件
+const LazyHeavyComponent = lazy(() => import('./HeavyComponent'));
+
+const ParentComponent = () => {
+  const [showHeavy, setShowHeavy] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setShowHeavy(true)}>
+        載入重型元件
+      </button>
+      {showHeavy && (
+        <Suspense fallback={<div>載入中...</div>}>
+          <LazyHeavyComponent />
+        </Suspense>
+      )}
+    </div>
+  );
+};
+```
+
+## Context 最佳實踐
+
+```typescript
+// 拆分 context 避免過度重新渲染
+const UserContext = createContext<User | null>(null);
+const UserActionsContext = createContext<UserActions | null>(null);
+
+// 使用多個小型 context 替代單一大型 context
+const UserProvider = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  
+  const actions = useMemo(() => ({
+    updateUser: (updates: Partial<User>) => {
+      setUser(prev => prev ? { ...prev, ...updates } : null);
+    },
+    clearUser: () => setUser(null),
+  }), []);
+
+  return (
+    <UserContext.Provider value={user}>
+      <UserActionsContext.Provider value={actions}>
+        {children}
+      </UserActionsContext.Provider>
+    </UserContext.Provider>
+  );
+};
+```

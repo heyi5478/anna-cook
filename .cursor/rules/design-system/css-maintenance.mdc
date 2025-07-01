@@ -1,0 +1,94 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: CSS 程式碼的組織和維護方法，包含共享樣式變數的管理。
+globs: 
+  - src/styles/**/*.css
+alwaysApply: false
+---
+
+# CSS 維護策略
+
+## 核心規則
+
+- **元件內樣式**：元件特定樣式保持在元件檔案內
+- **共享樣式變數**：使用 CSS 變數定義在 Tailwind 配置中，保持設計系統的主題一致
+- **避免硬編碼**：避免硬編碼顏色、間距或圓角值
+- **選擇器簡潔**：避免過度特定的選擇器
+- **@layer 組織**：使用 Tailwind 的 `@layer` 正確組織樣式
+- **Mobile-First**：遵循 mobile-first 響應式設計
+
+## CSS 變數範例
+
+```css
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    
+    /* 間距變數 */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* 圓角變數 */
+    --radius: 0.5rem;
+  }
+  
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    @apply px-4 py-2 rounded-[var(--radius)];
+  }
+}
+```
+
+## Tailwind 配置整合
+
+```javascript
+// tailwind.config.ts
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+      },
+      spacing: {
+        'xs': 'var(--spacing-xs)',
+        'sm': 'var(--spacing-sm)',
+        'md': 'var(--spacing-md)',
+        'lg': 'var(--spacing-lg)',
+        'xl': 'var(--spacing-xl)',
+      },
+      borderRadius: {
+        DEFAULT: 'var(--radius)',
+      },
+    },
+  },
+};
+```

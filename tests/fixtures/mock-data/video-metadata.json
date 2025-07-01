@@ -1,0 +1,257 @@
+{
+  "videoProfiles": [
+    {
+      "id": "mobile-720p",
+      "name": "行動裝置標準畫質",
+      "width": 1280,
+      "height": 720,
+      "framerate": 30,
+      "bitrate": 2500,
+      "format": "mp4",
+      "codec": "h264",
+      "audioCodec": "aac",
+      "estimatedFileSize": "15MB/min"
+    },
+    {
+      "id": "mobile-1080p",
+      "name": "行動裝置高畫質",
+      "width": 1920,
+      "height": 1080,
+      "framerate": 30,
+      "bitrate": 5000,
+      "format": "mp4",
+      "codec": "h264",
+      "audioCodec": "aac",
+      "estimatedFileSize": "30MB/min"
+    },
+    {
+      "id": "desktop-1080p",
+      "name": "桌面高畫質",
+      "width": 1920,
+      "height": 1080,
+      "framerate": 60,
+      "bitrate": 8000,
+      "format": "mp4",
+      "codec": "h264",
+      "audioCodec": "aac",
+      "estimatedFileSize": "50MB/min"
+    },
+    {
+      "id": "desktop-4k",
+      "name": "桌面超高畫質",
+      "width": 3840,
+      "height": 2160,
+      "framerate": 30,
+      "bitrate": 15000,
+      "format": "mp4",
+      "codec": "h265",
+      "audioCodec": "aac",
+      "estimatedFileSize": "100MB/min"
+    }
+  ],
+  "sampleVideos": [
+    {
+      "filename": "cooking-demo-short.mp4",
+      "duration": 30,
+      "width": 1280,
+      "height": 720,
+      "fileSize": "8MB",
+      "description": "短時間烹飪示範影片",
+      "tags": ["demo", "short", "cooking"],
+      "thumbnails": [
+        {
+          "time": 0,
+          "url": "/thumbnails/cooking-demo-short-00.jpg"
+        },
+        {
+          "time": 15,
+          "url": "/thumbnails/cooking-demo-short-15.jpg"
+        },
+        {
+          "time": 30,
+          "url": "/thumbnails/cooking-demo-short-30.jpg"
+        }
+      ]
+    },
+    {
+      "filename": "cooking-demo-medium.mp4",
+      "duration": 120,
+      "width": 1920,
+      "height": 1080,
+      "fileSize": "45MB",
+      "description": "中等長度烹飪教學影片",
+      "tags": ["tutorial", "medium", "cooking"],
+      "thumbnails": [
+        {
+          "time": 0,
+          "url": "/thumbnails/cooking-demo-medium-00.jpg"
+        },
+        {
+          "time": 30,
+          "url": "/thumbnails/cooking-demo-medium-30.jpg"
+        },
+        {
+          "time": 60,
+          "url": "/thumbnails/cooking-demo-medium-60.jpg"
+        },
+        {
+          "time": 90,
+          "url": "/thumbnails/cooking-demo-medium-90.jpg"
+        },
+        {
+          "time": 120,
+          "url": "/thumbnails/cooking-demo-medium-120.jpg"
+        }
+      ]
+    },
+    {
+      "filename": "cooking-demo-long.mp4",
+      "duration": 300,
+      "width": 1920,
+      "height": 1080,
+      "fileSize": "150MB",
+      "description": "完整烹飪課程影片",
+      "tags": ["course", "long", "cooking", "complete"],
+      "thumbnails": [
+        {
+          "time": 0,
+          "url": "/thumbnails/cooking-demo-long-00.jpg"
+        },
+        {
+          "time": 60,
+          "url": "/thumbnails/cooking-demo-long-60.jpg"
+        },
+        {
+          "time": 120,
+          "url": "/thumbnails/cooking-demo-long-120.jpg"
+        },
+        {
+          "time": 180,
+          "url": "/thumbnails/cooking-demo-long-180.jpg"
+        },
+        {
+          "time": 240,
+          "url": "/thumbnails/cooking-demo-long-240.jpg"
+        },
+        {
+          "time": 300,
+          "url": "/thumbnails/cooking-demo-long-300.jpg"
+        }
+      ]
+    }
+  ],
+  "encodingSettings": {
+    "mobile": {
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "preset": "fast",
+      "crf": 23,
+      "maxBitrate": "3000k",
+      "bufsize": "6000k"
+    },
+    "desktop": {
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "preset": "medium",
+      "crf": 20,
+      "maxBitrate": "6000k",
+      "bufsize": "12000k"
+    },
+    "highQuality": {
+      "videoCodec": "h265",
+      "audioCodec": "aac",
+      "preset": "slow",
+      "crf": 18,
+      "maxBitrate": "12000k",
+      "bufsize": "24000k"
+    }
+  },
+  "playbackTestScenarios": [
+    {
+      "id": "basic-playback",
+      "name": "基本播放測試",
+      "description": "測試影片基本播放功能",
+      "videoFile": "cooking-demo-short.mp4",
+      "expectedDuration": 30,
+      "testActions": [
+        "play",
+        "pause",
+        "seek-to-middle",
+        "seek-to-end"
+      ]
+    },
+    {
+      "id": "segment-navigation",
+      "name": "片段導航測試",
+      "description": "測試影片片段間的導航",
+      "videoFile": "cooking-demo-medium.mp4",
+      "segments": [
+        {
+          "name": "準備材料",
+          "startTime": 0,
+          "endTime": 30
+        },
+        {
+          "name": "開始烹飪",
+          "startTime": 30,
+          "endTime": 90
+        },
+        {
+          "name": "完成料理",
+          "startTime": 90,
+          "endTime": 120
+        }
+      ],
+      "testActions": [
+        "jump-to-segment",
+        "next-segment",
+        "previous-segment"
+      ]
+    },
+    {
+      "id": "quality-switching",
+      "name": "畫質切換測試",
+      "description": "測試不同畫質間的切換",
+      "videoFile": "cooking-demo-long.mp4",
+      "availableQualities": ["720p", "1080p"],
+      "testActions": [
+        "switch-to-720p",
+        "switch-to-1080p",
+        "auto-quality"
+      ]
+    }
+  ],
+  "performanceMetrics": {
+    "loadTime": {
+      "acceptable": 3000,
+      "good": 1500,
+      "excellent": 800
+    },
+    "bufferingEvents": {
+      "maximum": 2,
+      "acceptable": 1,
+      "none": 0
+    },
+    "seekAccuracy": {
+      "tolerance": 0.5,
+      "precision": 0.1
+    }
+  },
+  "browserCompatibility": {
+    "chrome": {
+      "supportedFormats": ["mp4", "webm"],
+      "supportedCodecs": ["h264", "h265", "vp9"],
+      "features": ["hls", "dash", "mse"]
+    },
+    "firefox": {
+      "supportedFormats": ["mp4", "webm"],
+      "supportedCodecs": ["h264", "vp9"],
+      "features": ["hls", "mse"]
+    },
+    "safari": {
+      "supportedFormats": ["mp4"],
+      "supportedCodecs": ["h264", "h265"],
+      "features": ["hls"]
+    }
+  }
+} 

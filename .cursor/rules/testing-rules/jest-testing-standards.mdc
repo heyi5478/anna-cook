@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 專精於 Jest 單元測試的專業前端工程師測試開發規範，包含完整的配置和撰寫標準。
+globs: 
+  - "**/*.{test,spec}.{js,jsx,ts,tsx}"
+alwaysApply: false
+---
+
+# Jest 單元測試開發規範
+
+## 專案結構規範
+
+- **測試檔案命名**：`{模組名稱}.test.js`
+- **對應關係**：每個工具模組都應有對應的測試檔案
+- **位置規範**：測試檔案應與被測試檔案在相同目錄層級
+
+## Jest 配置要求
+
+### package.json 配置
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0"
+  }
+}
+```
+
+### jest.config.js 配置
+```javascript
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}'
+  ],
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/index.js',
+    '!src/**/*.test.js'
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  },
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  }
+};
+```
+
+## 測試撰寫規範
+
+### 基本測試結構
+```javascript
+// 導入被測試的函式
+import { functionName } from '../moduleName';
+
+describe('模組名稱', () => {
+  // 在每個函式前加上功能註解
+  // 測試基本功能
+  test('應該正確執行基本功能', () => {
+    // Arrange (準備)
+    const input = 'test input';
+    const expected = 'expected result';
+    
+    // Act (執行)
+    const result = functionName(input);
+    
+    // Assert (驗證)
+    expect(result).toBe(expected);
+  });
+});
+```
+
+### 測試案例命名規範
+- 使用 `describe` 包裝相關測試群組
+- 測試名稱使用正體中文描述預期行為
+- 格式：`應該 + 預期行為` 或 `當 + 條件 + 時應該 + 結果`
+
+### 必要測試類型
+1. **正向測試案例**：`expect(isEmail('test@example.com')).toBeTruthy();`
+2. **負向測試案例**：`expect(isEmail('invalid-email')).toBeFalsy();`
+3. **邊界值測試**：測試邊界條件
+4. **Mock 函式測試**：使用 `jest.fn()` 和驗證調用
+
+## 測試最佳實踐
+
+- **測試隔離**：每個測試應該獨立執行
+- **Mock 使用**：使用 `jest.fn()` 創建 mock 函式（取代 Vitest 的 `vi.fn()`）
+- **覆蓋率要求**：函式、分支、行覆蓋率均需達到 80% 以上
+- **測試數據管理**：測試數據放在 `src/data/` 目錄
+- **錯誤處理測試**：測試異常情況和非同步操作
+- **檔案內容規範**：在每個測試函式前加上中文功能註解

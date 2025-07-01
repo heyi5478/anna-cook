@@ -1,0 +1,113 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 在頁面和其他元件中使用設計系統元件的標準方式。
+globs: 
+  - src/pages/**/*.tsx
+  - src/components/**/*.tsx
+alwaysApply: false
+---
+
+# 元件使用方式
+
+## 核心規則
+
+- **標準路徑引入**：透過 `@/components/ui` 路徑引入設計系統元件
+- **使用預定義變體**：使用已定義的變體，避免過多自定義
+- **抽象共享邏輯**：將共享邏輯抽象為自定義 hooks
+- **遵循組合模式**：遵循 shadCN 的元件組合模式
+
+## 元件使用範例
+
+```typescript
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+
+// 使用設計系統元件的頁面
+const UserProfilePage = () => {
+  const { toast } = useToast();
+
+  // 使用預定義的變體
+  const handleSave = () => {
+    toast({
+      title: '儲存成功',
+      description: '使用者資料已更新',
+    });
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>使用者資料</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input 
+            placeholder="請輸入姓名" 
+            className="w-full"
+          />
+          
+          <div className="flex gap-2">
+            <Button variant="default" onClick={handleSave}>
+              儲存
+            </Button>
+            <Button variant="outline">
+              取消
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// 自定義 hook 抽象共享邏輯
+const useUserProfile = () => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
+    setLoading(true);
+    try {
+      const updated = await userService.updateProfile(data);
+      setProfile(updated);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { profile, loading, updateProfile };
+};
+
+// 元件組合模式
+const ProfileForm = () => {
+  const { profile, loading, updateProfile } = useUserProfile();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>個人資料</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4">
+          <Input 
+            value={profile?.name || ''} 
+            placeholder="姓名"
+          />
+          <Button 
+            type="submit" 
+            disabled={loading}
+            variant={loading ? 'secondary' : 'default'}
+          >
+            {loading ? '更新中...' : '更新資料'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+};

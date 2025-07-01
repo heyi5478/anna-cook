@@ -1,0 +1,96 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Zustand store 的定義與實現方式，包含類型定義和狀態更新模式。
+globs: 
+  - src/stores/**/*.ts
+alwaysApply: false
+---
+
+# Zustand Store 定義與實現
+
+## 核心規則
+
+- **獨立類型定義**：使用獨立的 `State` 和 `Action` 類型定義
+- **返回類型組合**：返回類型使用 `State & Action`
+- **顯式類型註解**：使用顯式類型註解而非推導
+- **標準狀態更新**：使用統一的狀態更新方式
+- **中間件標準格式**：遵循標準的中間件使用格式
+
+## Store 定義範例
+
+```typescript
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+
+// 類型定義
+type State = {
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+};
+
+type Action = {
+  setUser: (user: User) => void;
+  updateUser: (updates: Partial<User>) => void;
+  clearUser: () => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+};
+
+// Store 實現
+export const useUserStore = create<State & Action>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        // 初始狀態
+        user: null,
+        isLoading: false,
+        error: null,
+
+        // 動作實現
+        setUser: (user) => set({ user }),
+        
+        updateUser: (updates) => 
+          set((state) => ({ 
+            user: state.user ? { ...state.user, ...updates } : null 
+          })),
+        
+        clearUser: () => set({ user: null }),
+        
+        setLoading: (isLoading) => set({ isLoading }),
+        
+        setError: (error) => set({ error }),
+      }),
+      {
+        name: 'user-storage',
+        partialize: (state) => ({ user: state.user }),
+      }
+    ),
+    { name: 'UserStore' }
+  )
+);
+```
+
+## 狀態更新方式
+
+```typescript
+// ✅ 直接設置
+set({ property: value })
+
+// ✅ 基於當前狀態設置
+set((state) => ({ property: state.property + value }))
+
+// ✅ 獲取當前狀態
+const currentValue = get().property;
+
+// ✅ 複雜狀態更新
+set((state) => ({
+  items: state.items.map(item => 
+    item.id === id ? { ...item, ...updates } : item
+  )
+}));
+```

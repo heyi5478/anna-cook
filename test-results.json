@@ -1,0 +1,334 @@
+{
+  "config": {
+    "configFile": "/Users/steveho/Documents/GitHub/anna-cook/playwright.config.ts",
+    "rootDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium-no-auth",
+        "name": "chromium-no-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox-no-auth",
+        "name": "firefox-no-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium-auth",
+        "name": "chromium-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "firefox-auth",
+        "name": "firefox-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "webkit-auth",
+        "name": "webkit-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/steveho/Documents/GitHub/anna-cook/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "mobile-chrome-auth",
+        "name": "mobile-chrome-auth",
+        "testDir": "/Users/steveho/Documents/GitHub/anna-cook/tests/e2e",
+        "testIgnore": [
+          "/.*\\/(navigation|public)\\/.*\\.test\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.53.1",
+    "workers": 4,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "navigation/01-homepage.test.ts",
+      "file": "navigation/01-homepage.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "首頁功能",
+          "file": "navigation/01-homepage.test.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "應該能夠正常載入首頁",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-no-auth",
+                  "projectName": "chromium-no-auth",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3877,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-01T05:36:52.317Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adf54eba28ba7e768dff-9d61d0a57c64e4f9e019",
+              "file": "navigation/01-homepage.test.ts",
+              "line": 11,
+              "column": 7
+            },
+            {
+              "title": "應該顯示頁面主要內容",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-no-auth",
+                  "projectName": "chromium-no-auth",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3832,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-01T05:36:52.319Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adf54eba28ba7e768dff-af3d1c7cdd3bd24e3931",
+              "file": "navigation/01-homepage.test.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "應該能夠正常載入首頁",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-no-auth",
+                  "projectName": "firefox-no-auth",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6412,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-01T05:36:52.316Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adf54eba28ba7e768dff-993f94254db40abff611",
+              "file": "navigation/01-homepage.test.ts",
+              "line": 11,
+              "column": 7
+            },
+            {
+              "title": "應該顯示頁面主要內容",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox-no-auth",
+                  "projectName": "firefox-no-auth",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5727,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-01T05:36:52.327Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adf54eba28ba7e768dff-42f68e9d82647c71233f",
+              "file": "navigation/01-homepage.test.ts",
+              "line": 34,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-07-01T05:36:50.065Z",
+    "duration": 11255.911,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
