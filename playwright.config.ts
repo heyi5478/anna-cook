@@ -49,38 +49,57 @@ export default defineConfig({
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
     },
+    // 不需要認證的測試（如首頁、公開頁面）
     {
-      name: 'chromium',
+      name: 'chromium-no-auth',
       use: {
         ...devices['Desktop Chrome'],
-        // 使用預設認證狀態
+      },
+      testMatch: /.*\/(navigation|public)\/.*\.test\.ts/,
+    },
+    {
+      name: 'firefox-no-auth',
+      use: {
+        ...devices['Desktop Firefox'],
+      },
+      testMatch: /.*\/(navigation|public)\/.*\.test\.ts/,
+    },
+    // 需要認證的測試
+    {
+      name: 'chromium-auth',
+      use: {
+        ...devices['Desktop Chrome'],
         storageState: './tests/.auth/user.json',
       },
       dependencies: ['setup'],
+      testIgnore: /.*\/(navigation|public)\/.*\.test\.ts/,
     },
     {
-      name: 'firefox',
+      name: 'firefox-auth',
       use: {
         ...devices['Desktop Firefox'],
         storageState: './tests/.auth/user.json',
       },
       dependencies: ['setup'],
+      testIgnore: /.*\/(navigation|public)\/.*\.test\.ts/,
     },
     {
-      name: 'webkit',
+      name: 'webkit-auth',
       use: {
         ...devices['Desktop Safari'],
         storageState: './tests/.auth/user.json',
       },
       dependencies: ['setup'],
+      testIgnore: /.*\/(navigation|public)\/.*\.test\.ts/,
     },
     {
-      name: 'mobile-chrome',
+      name: 'mobile-chrome-auth',
       use: {
         ...devices['Pixel 5'],
         storageState: './tests/.auth/user.json',
       },
       dependencies: ['setup'],
+      testIgnore: /.*\/(navigation|public)\/.*\.test\.ts/,
     },
   ],
 

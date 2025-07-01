@@ -1,0 +1,221 @@
+{
+  "auth": {
+    "loginSuccess": {
+      "StatusCode": 200,
+      "message": "登入成功",
+      "user": {
+        "userId": 123,
+        "displayId": "test-user",
+        "accountName": "測試用戶",
+        "accountEmail": "test@example.com",
+        "profilePhoto": "/assets/avatars/default.jpg"
+      },
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+    },
+    "loginFailure": {
+      "StatusCode": 401,
+      "message": "帳號或密碼錯誤"
+    },
+    "checkAuthSuccess": {
+      "StatusCode": 200,
+      "message": "用戶已登入",
+      "isAuthenticated": true
+    },
+    "checkAuthFailure": {
+      "StatusCode": 401,
+      "message": "用戶未登入",
+      "isAuthenticated": false
+    }
+  },
+  "recipes": {
+    "createSuccess": {
+      "StatusCode": 200,
+      "message": "食譜建立成功",
+      "recipeId": 456,
+      "recipe": {
+        "id": 456,
+        "recipeName": "測試食譜",
+        "recipeIntro": "這是一個測試食譜",
+        "cookingTime": 30,
+        "portion": 4,
+        "status": "draft"
+      }
+    },
+    "uploadVideoSuccess": {
+      "StatusCode": 200,
+      "message": "影片上傳成功",
+      "videoUri": "https://player.vimeo.com/video/123456789",
+      "videoId": "123456789",
+      "processing": true
+    },
+    "updateStepsSuccess": {
+      "StatusCode": 200,
+      "message": "步驟更新成功",
+      "stepsCount": 5
+    },
+    "publishSuccess": {
+      "StatusCode": 200,
+      "message": "食譜發布成功",
+      "recipeId": 456,
+      "publishedAt": "2023-12-01T12:00:00Z"
+    },
+    "getDraftSuccess": {
+      "StatusCode": 200,
+      "recipe": {
+        "id": 456,
+        "recipeName": "測試食譜",
+        "recipeIntro": "這是一個測試食譜",
+        "cookingTime": 30,
+        "portion": 4,
+        "ingredients": [
+          {
+            "ingredientName": "測試食材",
+            "ingredientAmount": 100,
+            "ingredientUnit": "g",
+            "isFlavoring": false
+          }
+        ],
+        "tags": ["測試", "簡單"],
+        "steps": [
+          {
+            "stepDescription": "測試步驟",
+            "videoStart": 0,
+            "videoEnd": 60
+          }
+        ],
+        "status": "draft",
+        "videoUri": "https://player.vimeo.com/video/123456789"
+      }
+    },
+    "getRecipeFailure": {
+      "StatusCode": 404,
+      "message": "找不到指定的食譜"
+    }
+  },
+  "video": {
+    "uploadProgress": [
+      {
+        "progress": 10,
+        "status": "uploading",
+        "message": "正在上傳影片..."
+      },
+      {
+        "progress": 50,
+        "status": "uploading",
+        "message": "影片上傳中..."
+      },
+      {
+        "progress": 90,
+        "status": "processing",
+        "message": "正在處理影片..."
+      },
+      {
+        "progress": 100,
+        "status": "completed",
+        "message": "影片上傳完成"
+      }
+    ],
+    "processingStatus": {
+      "processing": {
+        "StatusCode": 200,
+        "status": "processing",
+        "message": "影片處理中",
+        "progress": 45
+      },
+      "completed": {
+        "StatusCode": 200,
+        "status": "completed",
+        "message": "影片處理完成",
+        "videoUri": "https://player.vimeo.com/video/123456789",
+        "duration": 300,
+        "thumbnails": [
+          "https://example.com/thumb1.jpg",
+          "https://example.com/thumb2.jpg"
+        ]
+      },
+      "failed": {
+        "StatusCode": 400,
+        "status": "failed",
+        "message": "影片處理失敗",
+        "error": "不支援的影片格式"
+      }
+    }
+  },
+  "user": {
+    "profileSuccess": {
+      "StatusCode": 200,
+      "user": {
+        "userId": 123,
+        "displayId": "test-user",
+        "accountName": "測試用戶",
+        "accountEmail": "test@example.com",
+        "profilePhoto": "/assets/avatars/default.jpg",
+        "description": "這是測試用戶的描述",
+        "followersCount": 42,
+        "followingCount": 15,
+        "favoritedTotal": 28,
+        "myFavoriteCount": 35,
+        "averageRating": 4.5,
+        "totalViewCount": 1250
+      }
+    },
+    "updateProfileSuccess": {
+      "StatusCode": 200,
+      "message": "個人資料更新成功",
+      "user": {
+        "userId": 123,
+        "displayId": "test-user",
+        "accountName": "新的用戶名稱",
+        "accountEmail": "test@example.com",
+        "description": "更新後的描述"
+      }
+    },
+    "followSuccess": {
+      "StatusCode": 200,
+      "message": "追蹤成功",
+      "isFollowing": true
+    },
+    "unfollowSuccess": {
+      "StatusCode": 200,
+      "message": "取消追蹤成功",
+      "isFollowing": false
+    }
+  },
+  "errors": {
+    "validationError": {
+      "StatusCode": 400,
+      "message": "輸入資料驗證失敗",
+      "errors": {
+        "recipeName": "食譜名稱不能為空",
+        "cookingTime": "料理時間必須大於 0"
+      }
+    },
+    "unauthorizedError": {
+      "StatusCode": 401,
+      "message": "未授權的操作，請先登入"
+    },
+    "forbiddenError": {
+      "StatusCode": 403,
+      "message": "沒有權限執行此操作"
+    },
+    "notFoundError": {
+      "StatusCode": 404,
+      "message": "找不到指定的資源"
+    },
+    "serverError": {
+      "StatusCode": 500,
+      "message": "伺服器內部錯誤，請稍後再試"
+    },
+    "fileUploadError": {
+      "StatusCode": 413,
+      "message": "檔案大小超過限制",
+      "maxSize": "100MB",
+      "currentSize": "150MB"
+    },
+    "unsupportedFileError": {
+      "StatusCode": 415,
+      "message": "不支援的檔案格式",
+      "supportedFormats": ["mp4", "webm", "mov"]
+    }
+  }
+} 
