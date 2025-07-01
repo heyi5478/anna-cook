@@ -44,6 +44,26 @@ export interface UserCenterProps {
 }
 
 /**
+ * 統計資料項目類型
+ */
+export interface StatItem {
+  /** 統計標籤 */
+  label: string;
+  /** 統計數值 */
+  value: number;
+}
+
+/**
+ * 操作按鈕配置類型
+ */
+export interface ActionButton {
+  /** 按鈕文字 */
+  text: string;
+  /** 按鈕點擊事件 */
+  onClick: () => void;
+}
+
+/**
  * 用戶資料卡片元件的 Props 類型
  * 用於顯示用戶基本資訊和統計數據
  */
@@ -52,20 +72,10 @@ export interface UserProfileCardProps {
   userName: string;
   /** 用戶頭像 URL */
   userAvatar: string;
-  /** 追蹤中數量 */
-  followingCount: number;
-  /** 粉絲數量 */
-  followerCount: number;
-  /** 被收藏總數 */
-  favoritedTotal: number;
-  /** 總瀏覽次數 */
-  totalViewCount: number;
-  /** 平均評分 */
-  averageRating: number;
-  /** 用戶顯示 ID */
-  displayId: string;
-  /** 編輯資料按鈕點擊事件 */
-  onEditProfile: () => void;
+  /** 統計資料陣列 */
+  stats: StatItem[];
+  /** 可選的操作按鈕 */
+  actionButton?: ActionButton;
 }
 
 /**
@@ -132,16 +142,10 @@ export interface DeleteConfirmDialogProps {
  * 用於食譜的新增和刪除操作按鈕
  */
 export interface RecipeActionBarProps {
-  /** 是否為刪除模式 */
-  isDeleteMode: boolean;
-  /** 已選擇的草稿 ID 列表 */
-  selectedDrafts: number[];
   /** 新增食譜按鈕點擊事件 */
   onNewRecipe: () => void;
   /** 切換刪除模式事件 */
-  onToggleDeleteMode: () => void;
-  /** 顯示刪除確認對話框事件 */
-  onShowDeleteConfirm: () => void;
+  onDeleteMode: () => void;
 }
 
 /**

@@ -1,40 +1,7 @@
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-
-/**
- * 統計資料項目類型
- */
-export interface StatItem {
-  /** 統計標籤 */
-  label: string;
-  /** 統計數值 */
-  value: number;
-}
-
-/**
- * 操作按鈕配置類型
- */
-export interface ActionButton {
-  /** 按鈕文字 */
-  text: string;
-  /** 按鈕點擊事件 */
-  onClick: () => void;
-}
-
-/**
- * 用戶資料卡片元件的 Props 類型
- */
-export interface UserProfileCardProps {
-  /** 用戶名稱 */
-  userName: string;
-  /** 用戶頭像 URL */
-  userAvatar: string;
-  /** 統計資料陣列 */
-  stats: StatItem[];
-  /** 可選的操作按鈕 */
-  actionButton?: ActionButton;
-}
+import type { UserProfileCardProps } from '@/components/pages/UserCenter/types';
 
 /**
  * 通用的用戶資料展示卡片元件

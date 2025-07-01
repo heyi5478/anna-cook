@@ -1,20 +1,10 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  User,
-  Plus,
-  BookmarkIcon,
-  Users,
-  Clock,
-  Star,
-  Trash2,
-  AlertCircle,
-} from 'lucide-react';
+import { BookmarkIcon, Users, Clock, Star, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import {
@@ -28,115 +18,25 @@ import {
   UserFavoriteResponse,
   UserFollowResponse,
 } from '@/types/api';
-import {
-  fetchAuthorRecipes,
-  fetchUserFavoriteFollow,
-  deleteMultipleRecipes,
-} from '@/services/recipes';
-import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { useUserCenter } from '@/hooks/useUserCenter';
+import { UserProfileCard } from '@/components/common';
+import { RecipeActionBar } from '@/components/features';
 import { RecipeStatsItem } from './RecipeStatsItem';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 import { DraftRecipeCard } from './DraftRecipeCard';
 import { FollowedUserCard } from './FollowedUserCard';
-
-// 獲取 API 基礎 URL
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
-
-/**
- * 將相對路徑轉換為完整的圖片 URL
- */
-const getFullImageUrl = (path: string) => {
-  if (!path) return '/placeholder.svg';
-  if (path.startsWith('http')) return path; // 已經是完整URL
-  return `${apiBaseUrl}${path}`;
-};
-
-/**
- * 映射 API 回傳的資料到元件所需的格式
- * 主要處理 id 欄位到 recipeId 的映射
- */
-const mapApiRecipeData = (recipes: any[]) => {
-  return recipes.map((recipe) => ({
-    ...recipe,
-    recipeId: recipe.id, // 確保 recipeId 欄位存在
-  }));
-};
+import type { UserCenterProps } from './types';
 
 /**
  * 用戶中心元件
- * @param defaultTab 預設顯示的標籤，不提供則顯示"總覽"
- * @param userProfileData 用戶資料，包含用戶基本資訊及作者數據
+ * 使用 useUserCenter hook 替換所有本地狀態和方法
  */
-interface UserCenterProps {
-  defaultTab?: string;
-  userProfileData: {
-    StatusCode: number;
-    isMe: boolean;
-    userData: {
-      userId: number;
-      displayId: string;
-      isFollowing: boolean;
-      accountName: string;
-      profilePhoto: string;
-      description: string;
-      recipeCount: number;
-      followerCount: number;
-    } | null;
-    authorData: {
-      userId: number;
-      displayId: string;
-      accountName: string;
-      followingCount: number;
-      followerCount: number;
-      favoritedTotal: number;
-      myFavoriteCount: number;
-      averageRating: number;
-      totalViewCount: number;
-    } | null;
-  };
-}
-
 export default function UserCenter({
   defaultTab,
   userProfileData,
 }: UserCenterProps) {
-  const [isDeleteMode, setIsDeleteMode] = useState(false);
-  const [selectedDrafts, setSelectedDrafts] = useState<number[]>([]);
-  const [activeTab, setActiveTab] = useState(defaultTab || '總覽');
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  // 我的最愛相關狀態
-  const [favoriteTab, setFavoriteTab] = useState<'已追蹤' | '已收藏'>('已追蹤');
-  const [followData, setFollowData] = useState<UserFollowResponse['data']>([]);
-  const [favoriteData, setFavoriteData] = useState<
-    UserFavoriteResponse['data']
-  >([]);
-  const [followPage, setFollowPage] = useState(1);
-  const [favoritePage, setFavoritePage] = useState(1);
-  const [followHasMore, setFollowHasMore] = useState(false);
-  const [favoriteHasMore, setFavoriteHasMore] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [favoriteLoading, setFavoriteLoading] = useState(false);
-  const [followError, setFollowError] = useState<string | null>(null);
-  const [favoriteError, setFavoriteError] = useState<string | null>(null);
-  const [followTotalCount, setFollowTotalCount] = useState(0);
-  const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
-
   const router = useRouter();
-
-  // 食譜資料狀態
-  const [publishedRecipes, setPublishedRecipes] = useState<
-    AuthorRecipesResponse['data']
-  >([]);
-  const [draftRecipes, setDraftRecipes] = useState<
-    AuthorRecipesResponse['data']
-  >([]);
-  const [isLoadingPublished, setIsLoadingPublished] = useState(false);
-  const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // 從 userProfileData 中解構所需資料
   const { userData, authorData } = userProfileData;
@@ -149,270 +49,50 @@ export default function UserCenter({
   const averageRating = authorData?.averageRating || 0;
   const displayId = userData?.displayId || '';
 
-  // 當URL參數變化時更新activeTab
-  useEffect(() => {
-    if (defaultTab) {
-      setActiveTab(defaultTab);
-    }
-  }, [defaultTab]);
-
-  // 當標籤變化時，根據不同的標籤載入相應的數據
-  useEffect(() => {
-    if (displayId) {
-      if (activeTab === '已發布' || activeTab === '數據') {
-        loadPublishedRecipes();
-      }
-      if (activeTab === '草稿') {
-        loadDraftRecipes();
-      }
-    }
-  }, [activeTab, displayId]);
-
-  // 當 favoriteTab 變化時載入資料
-  useEffect(() => {
-    if (displayId) {
-      if (favoriteTab === '已追蹤') {
-        loadFollowData(1);
-      } else {
-        loadFavoriteData(1);
-      }
-    }
-  }, [favoriteTab, displayId]);
-
-  /**
-   * 載入已發佈的食譜
-   */
-  const loadPublishedRecipes = async () => {
-    try {
-      setIsLoadingPublished(true);
-      setError(null);
-
-      const response = await fetchAuthorRecipes(displayId, true);
-      setPublishedRecipes(mapApiRecipeData(response.data));
-    } catch (err) {
-      console.error('載入已發佈食譜失敗:', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : ERROR_MESSAGES.LOAD_PUBLISHED_RECIPES_FAILED,
-      );
-    } finally {
-      setIsLoadingPublished(false);
-    }
-  };
-
-  /**
-   * 載入草稿食譜
-   */
-  const loadDraftRecipes = async () => {
-    try {
-      setIsLoadingDrafts(true);
-      setError(null);
-
-      const response = await fetchAuthorRecipes(displayId, false);
-      setDraftRecipes(mapApiRecipeData(response.data));
-    } catch (err) {
-      console.error('載入草稿食譜失敗:', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : ERROR_MESSAGES.LOAD_DRAFT_RECIPES_FAILED,
-      );
-    } finally {
-      setIsLoadingDrafts(false);
-    }
-  };
-
-  /**
-   * 載入追蹤的用戶資料
-   */
-  const loadFollowData = async (page: number) => {
-    if (!displayId) return;
-
-    try {
-      setFollowLoading(true);
-      setFollowError(null);
-
-      const response = await fetchUserFavoriteFollow(displayId, 'follow', page);
-
-      // 型別守衛：判斷回應是否為 UserFollowResponse
-      if (
-        'data' in response &&
-        response.data[0] &&
-        'name' in response.data[0]
-      ) {
-        const typedResponse = response as UserFollowResponse;
-        if (page === 1) {
-          // 第一頁：替換全部資料
-          setFollowData(typedResponse.data);
-        } else {
-          // 其他頁：添加到現有資料
-          setFollowData((prev: UserFollowResponse['data']) => [
-            ...prev,
-            ...typedResponse.data,
-          ]);
-        }
-        setFollowPage(page);
-        setFollowHasMore(typedResponse.hasMore);
-        setFollowTotalCount(typedResponse.totalCount);
-      }
-    } catch (err) {
-      console.error('載入追蹤的用戶失敗:', err);
-      setFollowError(
-        err instanceof Error
-          ? err.message
-          : ERROR_MESSAGES.LOAD_FOLLOWED_USERS_FAILED,
-      );
-    } finally {
-      setFollowLoading(false);
-    }
-  };
-
-  /**
-   * 載入收藏的食譜資料
-   */
-  const loadFavoriteData = async (page: number) => {
-    if (!displayId) return;
-
-    try {
-      setFavoriteLoading(true);
-      setFavoriteError(null);
-
-      const response = await fetchUserFavoriteFollow(
-        displayId,
-        'favorite',
-        page,
-      );
-
-      // 型別守衛：判斷回應是否為 UserFavoriteResponse
-      if (
-        'data' in response &&
-        response.data[0] &&
-        'recipeName' in response.data[0]
-      ) {
-        const typedResponse = response as UserFavoriteResponse;
-        if (page === 1) {
-          // 第一頁：替換全部資料
-          setFavoriteData(typedResponse.data);
-        } else {
-          // 其他頁：添加到現有資料
-          setFavoriteData((prev: UserFavoriteResponse['data']) => [
-            ...prev,
-            ...typedResponse.data,
-          ]);
-        }
-        setFavoritePage(page);
-        setFavoriteHasMore(typedResponse.hasMore);
-        setFavoriteTotalCount(typedResponse.totalCount);
-      }
-    } catch (err) {
-      console.error('載入收藏的食譜失敗:', err);
-      setFavoriteError(
-        err instanceof Error
-          ? err.message
-          : ERROR_MESSAGES.LOAD_FAVORITE_RECIPES_FAILED,
-      );
-    } finally {
-      setFavoriteLoading(false);
-    }
-  };
-
-  /**
-   * 載入更多追蹤的用戶或收藏的食譜
-   */
-  const loadMore = () => {
-    if (favoriteTab === '已追蹤') {
-      loadFollowData(followPage + 1);
-    } else {
-      loadFavoriteData(favoritePage + 1);
-    }
-  };
-
-  /**
-   * 處理刪除模式切換
-   */
-  const atToggleDeleteMode = () => {
-    // 如果當前不是草稿頁籤，先切換到草稿頁籤
-    if (activeTab !== '草稿') {
-      setActiveTab('草稿');
-    }
-
-    // 然後切換刪除模式
-    setIsDeleteMode((prev) => !prev);
-    setSelectedDrafts([]);
-  };
-
-  /**
-   * 處理草稿選擇狀態變更
-   */
-  const atToggleDraftSelection = (recipeId: number) => {
-    setSelectedDrafts((prev) =>
-      prev.includes(recipeId)
-        ? prev.filter((id) => id !== recipeId)
-        : [...prev, recipeId],
-    );
-  };
-
-  /**
-   * 處理確認刪除對話框
-   */
-  const atShowDeleteConfirm = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  /**
-   * 處理刪除所選草稿
-   */
-  const atConfirmDelete = async () => {
-    if (selectedDrafts.length === 0) return;
-
-    try {
-      setDeleteLoading(true);
-      setDeleteError(null);
-      setDeleteSuccess(null);
-
-      // 調用 API 刪除食譜
-      const response = await deleteMultipleRecipes(selectedDrafts);
-
-      // 設置成功訊息
-      setDeleteSuccess(
-        `成功${COMMON_TEXTS.DELETE} ${response.deletedIds.length} 個食譜`,
-      );
-
-      // 重新載入草稿列表
-      await loadDraftRecipes();
-
-      // 關閉刪除模式並清空選擇
-      setIsDeleteMode(false);
-      setSelectedDrafts([]);
-      setDeleteDialogOpen(false);
-    } catch (err) {
-      console.error('刪除食譜失敗:', err);
-      setDeleteError(
-        err instanceof Error
-          ? err.message
-          : ERROR_MESSAGES.DELETE_MULTIPLE_RECIPES_FAILED,
-      );
-    } finally {
-      setDeleteLoading(false);
-    }
-  };
-
-  /**
-   * 處理食譜草稿卡片點擊事件
-   */
-  const atDraftCardClick = (id: number) => {
-    if (!isDeleteMode) {
-      router.push(`/recipe-draft?recipeId=${id}`);
-    }
-  };
-
-  /**
-   * 轉到新增食譜頁面
-   */
-  const atNewRecipe = () => {
-    router.push('/create-recipe');
-  };
+  // 使用 useUserCenter hook 替換所有本地狀態和方法
+  const {
+    isDeleteMode,
+    selectedDrafts,
+    activeTab,
+    deleteDialogOpen,
+    deleteLoading,
+    deleteSuccess,
+    deleteError,
+    favoriteTab,
+    followData,
+    favoriteData,
+    followPage,
+    favoritePage,
+    followHasMore,
+    favoriteHasMore,
+    followLoading,
+    favoriteLoading,
+    followError,
+    favoriteError,
+    followTotalCount,
+    favoriteTotalCount,
+    publishedRecipes,
+    draftRecipes,
+    isLoadingPublished,
+    isLoadingDrafts,
+    error,
+    loadPublishedRecipes,
+    loadDraftRecipes,
+    loadMore,
+    atToggleDeleteMode,
+    atToggleDraftSelection,
+    atShowDeleteConfirm,
+    atConfirmDelete,
+    atDraftCardClick,
+    atNewRecipe,
+    handleFavoriteTabChange,
+    setActiveTab,
+    setDeleteDialogOpen,
+    getFullImageUrl,
+  } = useUserCenter({
+    displayId,
+    defaultTab,
+  });
 
   // 數據標籤頁內容 - 顯示食譜統計資訊
   const renderDataContent = () => {
@@ -666,11 +346,6 @@ export default function UserCenter({
     );
   };
 
-  // 處理「我的最愛」標籤切換
-  const handleFavoriteTabChange = (value: string) => {
-    setFavoriteTab(value as '已追蹤' | '已收藏');
-  };
-
   // 渲染「已追蹤」標籤內容
   const renderFollowContent = () => {
     if (followLoading && followPage === 1) {
@@ -805,61 +480,29 @@ export default function UserCenter({
         <span className="text-neutral-800">會員中心</span>
       </div>
 
-      <div className="flex flex-col items-center pb-4">
-        <Avatar className="w-16 h-16 mb-2">
-          <AvatarImage src={userAvatar} alt={`${userName}的頭像`} />
-          <AvatarFallback>
-            <User className="h-8 w-8" />
-          </AvatarFallback>
-        </Avatar>
-        <h2 className="text-lg font-medium">{userName}</h2>
-
-        <div className="flex justify-center gap-6 my-2 text-sm text-neutral-500">
-          <div className="text-center">
-            <div>{followingCount}</div>
-            <div>追蹤中</div>
-          </div>
-          <div className="text-center">
-            <div>{followerCount}</div>
-            <div>粉絲</div>
-          </div>
-          <div className="text-center">
-            <div>{favoritedTotal}</div>
-            <div>收藏</div>
-          </div>
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full mt-2 rounded-lg font-normal text-neutral-700"
-          onClick={() => router.push('/user-center-edit')}
-        >
-          編輯個人資料
-        </Button>
-      </div>
+      {/* 用戶資料卡片 */}
+      <UserProfileCard
+        userName={userName}
+        userAvatar={userAvatar}
+        stats={[
+          { label: '追蹤中', value: followingCount },
+          { label: '粉絲', value: followerCount },
+          { label: '收藏', value: favoritedTotal },
+        ]}
+        actionButton={{
+          text: '編輯個人資料',
+          onClick: () => router.push('/user-center-edit'),
+        }}
+      />
 
       {/* 我的食譜區 */}
       <div className="mt-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-medium">我的食譜</h3>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
-              onClick={atNewRecipe}
-            >
-              <Plus className="h-5 w-5" />
-              <span>新增</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-10 rounded-lg flex items-center gap-1 bg-white font-normal"
-              onClick={atToggleDeleteMode}
-            >
-              <Trash2 className="h-5 w-5" />
-              <span>{COMMON_TEXTS.DELETE}草稿</span>
-            </Button>
-          </div>
+          <RecipeActionBar
+            onNewRecipe={atNewRecipe}
+            onDeleteMode={atToggleDeleteMode}
+          />
         </div>
 
         <Tabs
