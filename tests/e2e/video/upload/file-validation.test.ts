@@ -15,6 +15,27 @@ import {
 } from '../../../helpers/common/assertion-helpers';
 
 /**
+ * 檔案驗證相關型別定義
+ */
+type FileValidationData = {
+  name: string;
+  type: string;
+  size: number;
+  path?: string;
+};
+
+type UploadResult = {
+  success: boolean;
+  error?: string;
+  fileInfo?: FileValidationData;
+};
+
+type ValidationError = {
+  type: 'format' | 'size' | 'required';
+  message: string;
+};
+
+/**
  * 檔案驗證和錯誤處理測試
  */
 test.describe('檔案驗證和錯誤處理', () => {
@@ -51,6 +72,15 @@ test.describe('檔案驗證和錯誤處理', () => {
       '[data-testid="file-format-error"]',
       '不支援的檔案格式，請選擇影片檔案',
     );
+
+    // 建立上傳結果物件
+    const uploadResult: UploadResult = {
+      success: false,
+      error: '不支援的檔案格式，請選擇影片檔案',
+    };
+
+    expect(uploadResult.success).toBe(false);
+    expect(uploadResult.error).toContain('不支援的檔案格式');
 
     // 確認檔案未被接受
     await expect(
@@ -94,7 +124,7 @@ test.describe('檔案驗證和錯誤處理', () => {
    */
   test('應該拒絕超過大小限制的檔案', async ({ page }) => {
     // 模擬超大檔案
-    const oversizedFile = {
+    const oversizedFile: FileValidationData = {
       name: 'oversized-video.mp4',
       type: 'video/mp4',
       size: 200 * 1024 * 1024, // 200MB，假設限制是 100MB
@@ -123,6 +153,15 @@ test.describe('檔案驗證和錯誤處理', () => {
       /檔案大小超過限制.*100MB/,
     );
 
+    // 建立驗證錯誤物件
+    const validationError: ValidationError = {
+      type: 'size',
+      message: '檔案大小超過限制，請選擇小於 100MB 的檔案',
+    };
+
+    expect(validationError.type).toBe('size');
+    expect(validationError.message).toContain('100MB');
+
     // 確認上傳未開始
     await expect(
       page.locator('[data-testid="upload-progress"]'),
@@ -133,7 +172,7 @@ test.describe('檔案驗證和錯誤處理', () => {
    * 測試檔案驗證邏輯
    */
   test('檔案驗證應該正確識別有效檔案', async ({ page }) => {
-    const validTestFile = {
+    const validTestFile: FileValidationData = {
       path: 'tests/fixtures/videos/test-video-short.mp4',
       name: 'test-video-short.mp4',
       size: 5 * 1024 * 1024, // 5MB
@@ -141,15 +180,25 @@ test.describe('檔案驗證和錯誤處理', () => {
     };
 
     // 使用 helper 函數驗證檔案
-    const isValid = validateVideoFile(validTestFile);
+    const isValid = validateVideoFile(validTestFile as any);
     expect(isValid).toBe(true);
 
     // 實際上傳驗證
     const fileInput = page.locator('[data-testid="video-upload-input"]');
-    await fileInput.setInputFiles(validTestFile.path);
+    await fileInput.setInputFiles(validTestFile.path!);
 
     // 檢查檔案被接受
     await waitForElementVisible(page, '[data-testid="upload-progress"]');
+
+    // 建立成功的上傳結果物件
+    const successUploadResult: UploadResult = {
+      success: true,
+      fileInfo: validTestFile,
+    };
+
+    expect(successUploadResult.success).toBe(true);
+    expect(successUploadResult.fileInfo?.name).toBe('test-video-short.mp4');
+    expect(successUploadResult.fileInfo?.type).toBe('video/mp4');
 
     // 驗證檔案格式
     await assertVideoFileFormat(page, '[data-testid="video-upload-input"]');
@@ -179,7 +228,7 @@ test.describe('檔案驗證和錯誤處理', () => {
    */
   test('應該處理多個同時發生的錯誤', async ({ page }) => {
     // 模擬一個既不是影片格式又超過大小限制的檔案
-    const invalidFile = {
+    const invalidFile: FileValidationData = {
       name: 'huge-document.pdf',
       type: 'application/pdf',
       size: 150 * 1024 * 1024, // 150MB

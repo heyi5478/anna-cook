@@ -3,6 +3,52 @@ import { waitForNetworkIdle } from '../../../helpers/common/wait-utils';
 import { getTestFilePath } from '../../../helpers/common/test-data';
 
 /**
+ * Safari/WebKit 瀏覽器功能檢測相關型別定義
+ */
+type SafariCodecSupport = {
+  h264: string;
+  hevc: string;
+  mp4: string;
+  mov: string;
+  hls: string;
+  webm: string;
+};
+
+type SafariTouchSupport = {
+  touchEvents: boolean;
+  touchAction: boolean;
+  pointerEvents: boolean;
+  gestureEvents: boolean;
+};
+
+type SafariCssSupport = {
+  webkitBackdropFilter: boolean;
+  backdropFilter: boolean;
+  webkitMask: boolean;
+  webkitClipPath: boolean;
+  webkitTransform: boolean;
+  transform: boolean;
+  flexbox: boolean;
+  grid: boolean;
+  cssVariables: boolean;
+  objectFit: boolean;
+};
+
+type SafariJavaScriptSupport = {
+  es6Classes: boolean;
+  asyncAwait: boolean;
+  arrow: boolean;
+  templateLiterals: boolean;
+  destructuring: boolean;
+  spread: boolean;
+  symbols: boolean;
+  proxy: boolean;
+  weakMap: boolean;
+  set: boolean;
+  map: boolean;
+};
+
+/**
  * Safari/WebKit 兼容性測試
  */
 test.describe('Safari/WebKit 瀏覽器兼容性', () => {
@@ -20,7 +66,7 @@ test.describe('Safari/WebKit 瀏覽器兼容性', () => {
    */
   test('應該支援 Safari 的媒體格式', async ({ page }) => {
     // 檢查 Safari 支援的編解碼器
-    const codecSupport = await page.evaluate(() => {
+    const codecSupport: SafariCodecSupport = await page.evaluate(() => {
       const video = document.createElement('video');
       return {
         h264: video.canPlayType('video/mp4; codecs="avc1.42E01E"'),
@@ -71,7 +117,7 @@ test.describe('Safari/WebKit 瀏覽器兼容性', () => {
    */
   test('應該支援 Safari 的觸控功能', async ({ page }) => {
     // 檢查觸控 API 支援
-    const touchSupport = await page.evaluate(() => {
+    const touchSupport: SafariTouchSupport = await page.evaluate(() => {
       return {
         touchEvents: 'ontouchstart' in window,
         touchAction: 'touchAction' in document.body.style,
@@ -104,7 +150,7 @@ test.describe('Safari/WebKit 瀏覽器兼容性', () => {
    */
   test('應該支援 Safari 的 CSS 功能', async ({ page }) => {
     // 檢查 Safari CSS 特性
-    const cssSupport = await page.evaluate(() => {
+    const cssSupport: SafariCssSupport = await page.evaluate(() => {
       const testEl = document.createElement('div');
       const { style } = testEl;
 
@@ -188,7 +234,7 @@ test.describe('Safari/WebKit 瀏覽器兼容性', () => {
    */
   test('應該適應 Safari 的 JavaScript 限制', async ({ page }) => {
     // 檢查 Safari JavaScript 功能
-    const jsSupport = await page.evaluate(() => {
+    const jsSupport: SafariJavaScriptSupport = await page.evaluate(() => {
       return {
         es6Classes: (() => {
           try {

@@ -3,6 +3,35 @@ import { waitForNetworkIdle } from '../../../helpers/common/wait-utils';
 import { getTestFilePath } from '../../../helpers/common/test-data';
 
 /**
+ * Chrome 瀏覽器功能檢測相關型別定義
+ */
+type ChromeApiSupport = {
+  fileSystemAccess: boolean;
+  webSerial: boolean;
+  webUsb: boolean;
+  webShare: boolean;
+  webLocks: boolean;
+  trustedTypes: boolean;
+  resizeObserver: boolean;
+  intersectionObserver: boolean;
+};
+
+type ChromeMemoryInfo = {
+  usedJSHeapSize?: number;
+  totalJSHeapSize?: number;
+  jsHeapSizeLimit?: number;
+  available: boolean;
+};
+
+type CodecSupport = {
+  h264: string;
+  vp8: string;
+  vp9: string;
+  av1: string;
+  hevc: string;
+};
+
+/**
  * Chrome 特定功能測試
  */
 test.describe('Chrome 瀏覽器特定功能', () => {
@@ -75,7 +104,7 @@ test.describe('Chrome 瀏覽器特定功能', () => {
    */
   test('應該支援 Chrome 特有的 Web API', async ({ page }) => {
     // 檢查 Chrome 特有 API 支援
-    const apiSupport = await page.evaluate(() => {
+    const apiSupport: ChromeApiSupport = await page.evaluate(() => {
       return {
         fileSystemAccess: 'showOpenFilePicker' in window,
         webSerial: 'serial' in navigator,
@@ -100,7 +129,7 @@ test.describe('Chrome 瀏覽器特定功能', () => {
    */
   test('應該正確監控 Chrome 的記憶體使用', async ({ page }) => {
     // 檢查 Chrome 的 performance.memory API
-    const memoryInfo = await page.evaluate(() => {
+    const memoryInfo: ChromeMemoryInfo = await page.evaluate(() => {
       if ('memory' in performance) {
         const { memory } = performance as any;
         return {
@@ -126,7 +155,7 @@ test.describe('Chrome 瀏覽器特定功能', () => {
    * 測試 Chrome 的影片編解碼器支援
    */
   test('應該支援 Chrome 的影片編解碼器', async ({ page }) => {
-    const codecSupport = await page.evaluate(() => {
+    const codecSupport: CodecSupport = await page.evaluate(() => {
       const video = document.createElement('video');
       return {
         h264: video.canPlayType('video/mp4; codecs="avc1.42E01E"'),
