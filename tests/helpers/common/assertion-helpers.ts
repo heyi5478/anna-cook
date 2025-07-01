@@ -405,3 +405,38 @@ export const assertElementStyle = async (
 
   console.log(`元素 ${selector} 樣式 ${styleName} 驗證通過: ${actualValue}`);
 };
+
+// ===========================================
+// 便利函式 (Convenience Functions)
+// ===========================================
+
+/**
+ * 驗證頁面標題包含指定文字（簡化版本）
+ */
+export const expectPageTitle = async (
+  page: Page,
+  titleText: string,
+): Promise<void> => {
+  await expect(page).toHaveTitle(new RegExp(titleText, 'i'));
+};
+
+/**
+ * 驗證 URL 包含指定路徑（簡化版本）
+ */
+export const expectUrlContains = async (
+  page: Page,
+  path: string,
+): Promise<void> => {
+  await expect(page).toHaveURL(new RegExp(path));
+};
+
+/**
+ * 驗證元素包含指定文字（簡化版本）
+ */
+export const expectElementText = async (
+  page: Page,
+  selector: string,
+  text: string,
+): Promise<void> => {
+  await expect(page.locator(selector)).toContainText(text);
+};
