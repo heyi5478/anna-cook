@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 
 /**
  * 從 localStorage 中獲取用戶的 displayId
- * @returns {string} 用戶的 displayId，若不存在則返回空字串
  */
 export function useUserDisplayId(): string {
   const [displayId, setDisplayId] = useState<string>('');
