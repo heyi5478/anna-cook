@@ -74,19 +74,19 @@ export interface UserProfileCardProps {
  */
 export interface RecipeStatsItemProps {
   /** 食譜標題 */
-  title?: string;
+  title: string;
   /** 評分 */
-  rating?: number;
+  rating: number;
   /** 瀏覽次數 */
-  views?: number;
+  views: number;
   /** 收藏次數 */
-  bookmarks?: number;
+  bookmarks: number;
   /** 留言次數 */
-  comments?: number;
+  comments: number;
   /** 分享次數 */
-  shares?: number;
+  shares: number;
   /** 封面圖片 URL */
-  imageSrc?: string;
+  imageSrc: string;
 }
 
 /**
@@ -95,15 +95,15 @@ export interface RecipeStatsItemProps {
  */
 export interface FollowedUserCardProps {
   /** 用戶名稱 */
-  username?: string;
+  username: string;
   /** 個人簡介 */
-  bio?: string;
+  bio: string;
   /** 食譜數量 */
-  recipesCount?: number;
+  recipesCount: number;
   /** 粉絲數量 */
-  followersCount?: number;
+  followersCount: number;
   /** 頭像 URL */
-  avatarSrc?: string;
+  avatarSrc: string;
 }
 
 /**
@@ -142,4 +142,50 @@ export interface RecipeActionBarProps {
   onToggleDeleteMode: () => void;
   /** 顯示刪除確認對話框事件 */
   onShowDeleteConfirm: () => void;
+}
+
+/**
+ * 已發布食譜卡片元件的 Props 類型
+ * 用於顯示已發布的食譜資訊和操作按鈕
+ */
+export interface PublishedRecipeCardProps {
+  /** 食譜標題 */
+  title: string;
+  /** 食譜描述 */
+  description: string;
+  /** 封面圖片 URL */
+  imageSrc: string;
+  /** 收藏次數 */
+  likes: number;
+  /** 留言次數 */
+  comments: number;
+  /** 評分 */
+  rating: number;
+  /** 食譜 ID */
+  recipeId: number;
+  /** 轉為草稿回調函數 */
+  onToDraft?: (recipeId: number) => void;
+  /** 狀態變更回調函數 */
+  onStatusChanged?: () => void;
+}
+
+/**
+ * 草稿食譜卡片元件的 Props 類型
+ * 用於顯示草稿食譜資訊和操作按鈕
+ */
+export interface DraftRecipeCardProps {
+  /** 食譜標題 */
+  title: string;
+  /** 食譜描述 */
+  description: string;
+  /** 封面圖片 URL */
+  imageSrc: string;
+  /** 食譜 ID */
+  recipeId: number;
+  /** 發布回調函數 */
+  onPublish?: (recipeId: number) => void;
+  /** 是否為刪除模式 */
+  isDeleteMode: boolean;
+  /** 狀態變更回調函數 */
+  onStatusChanged?: () => void;
 }

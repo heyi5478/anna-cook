@@ -18,32 +18,18 @@ import {
 import { useState } from 'react';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-
-/**
- * PublishedRecipeCard 元件的 props 類型
- */
-type PublishedRecipeCardProps = {
-  title?: string;
-  description?: string;
-  imageSrc?: string;
-  likes?: number;
-  comments?: number;
-  rating?: number;
-  recipeId?: number;
-  onToDraft?: (recipeId: number) => void;
-  onStatusChanged?: () => void;
-};
+import { PublishedRecipeCardProps } from './types';
 
 /**
  * 顯示已發布的食譜卡片
  */
 export function PublishedRecipeCard({
-  title = '馬鈴薯烤蛋',
-  description = '食譜故事敘述食譜故事敘述食譜故事敘述...',
-  imageSrc = '/placeholder.svg',
-  likes = 3,
-  comments = 2,
-  rating = 4.3,
+  title,
+  description,
+  imageSrc,
+  likes,
+  comments,
+  rating,
   recipeId,
   onToDraft,
   onStatusChanged,

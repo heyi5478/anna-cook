@@ -12,30 +12,18 @@ import { useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-
-/**
- * DraftRecipeCard 元件的 props 類型
- */
-type DraftRecipeCardProps = {
-  title?: string;
-  description?: string;
-  imageSrc?: string;
-  recipeId?: number;
-  onPublish?: (recipeId: number) => void;
-  isDeleteMode?: boolean;
-  onStatusChanged?: () => void;
-};
+import { DraftRecipeCardProps } from './types';
 
 /**
  * 顯示草稿的食譜卡片
  */
 export function DraftRecipeCard({
-  title = '馬鈴薯烤蛋',
-  description = '食譜故事敘述食譜故事敘述食譜故事敘述...',
-  imageSrc = '/placeholder.svg',
+  title,
+  description,
+  imageSrc,
   recipeId,
   onPublish,
-  isDeleteMode = false,
+  isDeleteMode,
   onStatusChanged,
 }: DraftRecipeCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
