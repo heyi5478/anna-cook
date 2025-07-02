@@ -1,17 +1,18 @@
 import Image from 'next/image';
+import { RecipeStatsItemProps } from './types';
 
 /**
  * 顯示單一食譜的數據統計項目
  */
 export function RecipeStatsItem({
-  title = '馬鈴薯烤蛋',
-  rating = 4.5,
-  views = 200,
-  bookmarks = 5,
-  comments = 3,
-  shares = 2,
-  imageSrc = '/placeholder.svg',
-}) {
+  title,
+  rating,
+  views,
+  bookmarks,
+  comments,
+  shares,
+  imageSrc,
+}: RecipeStatsItemProps) {
   return (
     <div className="mb-6">
       <div className="flex items-center gap-4 mb-3">

@@ -1,16 +1,17 @@
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FollowedUserCardProps } from './types';
 
 /**
  * 顯示已追蹤的用戶卡片
  */
 export function FollowedUserCard({
-  username = '使用者名稱',
-  bio = '個人簡介個人簡介個人簡介個人簡介個人簡介個人簡介',
-  recipesCount = 15,
-  followersCount = 20,
-  avatarSrc = '/placeholder.svg',
-}) {
+  username,
+  bio,
+  recipesCount,
+  followersCount,
+  avatarSrc,
+}: FollowedUserCardProps) {
   return (
     <div className="border rounded-lg p-4 flex items-center">
       <Avatar className="w-14 h-14 mr-3">
