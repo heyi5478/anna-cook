@@ -565,3 +565,334 @@ export const successDescriptionVariants = cva('text-neutral-500 text-center', {
     size: 'default',
   },
 });
+
+/**
+ * 收藏標籤頁容器樣式
+ */
+export const favoriteTabContainerVariants = cva('space-y-2', {
+  variants: {
+    spacing: {
+      compact: 'space-y-1',
+      default: 'space-y-2',
+      relaxed: 'space-y-3',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 追蹤標籤頁容器樣式
+ */
+export const followTabContainerVariants = cva('space-y-4', {
+  variants: {
+    spacing: {
+      compact: 'space-y-2',
+      default: 'space-y-4',
+      relaxed: 'space-y-6',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 統計計數文字樣式
+ */
+export const statsCountTextVariants = cva('text-sm text-neutral-500 mb-1', {
+  variants: {
+    size: {
+      small: 'text-xs',
+      default: 'text-sm',
+      large: 'text-base',
+    },
+    spacing: {
+      default: 'mb-1',
+      compact: 'mb-0.5',
+      relaxed: 'mb-2',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 收藏項目容器樣式
+ */
+export const favoriteItemContainerVariants = cva(
+  'flex border rounded-md overflow-hidden hover:bg-gray-50 transition-colors cursor-pointer',
+  {
+    variants: {
+      state: {
+        default: 'hover:bg-gray-50',
+        active: 'bg-gray-100',
+        disabled: 'opacity-50 cursor-not-allowed',
+      },
+      border: {
+        default: 'border',
+        none: 'border-0',
+        thick: 'border-2',
+      },
+    },
+    defaultVariants: {
+      state: 'default',
+      border: 'default',
+    },
+  },
+);
+
+/**
+ * 追蹤項目容器樣式
+ */
+export const followItemContainerVariants = cva(
+  'hover:bg-gray-50 rounded-md transition-colors cursor-pointer',
+  {
+    variants: {
+      state: {
+        default: 'hover:bg-gray-50',
+        active: 'bg-gray-100',
+        disabled: 'opacity-50 cursor-not-allowed',
+      },
+    },
+    defaultVariants: {
+      state: 'default',
+    },
+  },
+);
+
+/**
+ * 項目圖片容器樣式
+ */
+export const itemImageContainerVariants = cva('bg-gray-200 shrink-0 relative', {
+  variants: {
+    size: {
+      small: 'w-16 h-16',
+      default: 'w-20 h-20',
+      large: 'w-24 h-24',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 項目內容區域樣式
+ */
+export const itemContentAreaVariants = cva('flex-1 p-2', {
+  variants: {
+    padding: {
+      compact: 'p-1',
+      default: 'p-2',
+      relaxed: 'p-3',
+    },
+  },
+  defaultVariants: {
+    padding: 'default',
+  },
+});
+
+/**
+ * 項目標題行樣式
+ */
+export const itemTitleRowVariants = cva('flex justify-between', {
+  variants: {
+    alignment: {
+      default: 'justify-between',
+      start: 'justify-start',
+      center: 'justify-center',
+    },
+  },
+  defaultVariants: {
+    alignment: 'default',
+  },
+});
+
+/**
+ * 項目標題樣式
+ */
+export const itemTitleVariants = cva('font-medium', {
+  variants: {
+    size: {
+      small: 'text-sm font-medium',
+      default: 'text-base font-medium',
+      large: 'text-lg font-medium',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 項目圖標樣式
+ */
+export const itemIconVariants = cva('', {
+  variants: {
+    size: {
+      small: 'h-3 w-3',
+      default: 'h-4 w-4',
+      large: 'h-5 w-5',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 項目描述文字樣式
+ */
+export const itemDescriptionVariants = cva(
+  'text-xs text-neutral-500 line-clamp-2',
+  {
+    variants: {
+      size: {
+        small: 'text-xs',
+        default: 'text-sm',
+      },
+      lines: {
+        single: 'line-clamp-1',
+        default: 'line-clamp-2',
+        multiple: 'line-clamp-3',
+      },
+    },
+    defaultVariants: {
+      size: 'small',
+      lines: 'default',
+    },
+  },
+);
+
+/**
+ * 項目統計資訊行樣式
+ */
+export const itemStatsRowVariants = cva(
+  'flex items-center mt-1 text-xs text-neutral-500',
+  {
+    variants: {
+      spacing: {
+        compact: 'mt-0.5',
+        default: 'mt-1',
+        relaxed: 'mt-2',
+      },
+      size: {
+        small: 'text-xs',
+        default: 'text-sm',
+      },
+    },
+    defaultVariants: {
+      spacing: 'default',
+      size: 'small',
+    },
+  },
+);
+
+/**
+ * 統計項目圖標樣式
+ */
+export const statsIconVariants = cva('h-3 w-3 mr-1', {
+  variants: {
+    size: {
+      small: 'h-3 w-3',
+      default: 'h-4 w-4',
+    },
+    spacing: {
+      default: 'mr-1',
+      compact: 'mr-0.5',
+      relaxed: 'mr-2',
+    },
+  },
+  defaultVariants: {
+    size: 'small',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 統計項目間距樣式
+ */
+export const statsItemSpacingVariants = cva('mr-2', {
+  variants: {
+    spacing: {
+      compact: 'mr-1',
+      default: 'mr-2',
+      relaxed: 'mr-3',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 載入更多狀態樣式
+ */
+export const loadMoreStateVariants = cva('text-center py-4', {
+  variants: {
+    state: {
+      loading: 'text-neutral-500',
+      error: 'text-red-500',
+    },
+    spacing: {
+      compact: 'py-2',
+      default: 'py-4',
+      relaxed: 'py-6',
+    },
+  },
+  defaultVariants: {
+    state: 'loading',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 載入更多按鈕樣式
+ */
+export const loadMoreButtonVariants = cva(
+  'w-full py-2 flex items-center justify-center gap-1 text-neutral-500',
+  {
+    variants: {
+      size: {
+        compact: 'py-1',
+        default: 'py-2',
+        relaxed: 'py-3',
+      },
+      gap: {
+        small: 'gap-0.5',
+        default: 'gap-1',
+        large: 'gap-2',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+      gap: 'default',
+    },
+  },
+);
+
+/**
+ * 空狀態樣式（重用現有的 loadingStateVariants）
+ */
+export const tabEmptyStateVariants = cva('text-center py-8', {
+  variants: {
+    type: {
+      loading: 'text-neutral-500',
+      error: 'text-red-500',
+      empty: 'text-neutral-600',
+    },
+    spacing: {
+      compact: 'py-4',
+      default: 'py-8',
+      relaxed: 'py-12',
+    },
+  },
+  defaultVariants: {
+    type: 'empty',
+    spacing: 'default',
+  },
+});

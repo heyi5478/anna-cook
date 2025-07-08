@@ -1,8 +1,17 @@
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { UserFollowResponse } from '@/types/api';
 import { FollowedUserCard } from './FollowedUserCard';
+import {
+  followTabContainerVariants,
+  statsCountTextVariants,
+  followItemContainerVariants,
+  loadMoreStateVariants,
+  loadMoreButtonVariants,
+  tabEmptyStateVariants,
+} from './styles';
 
 interface FollowTabContentProps {
   followLoading: boolean;
@@ -30,29 +39,48 @@ export function FollowTabContent({
 }: FollowTabContentProps) {
   const router = useRouter();
 
+  /**
+   * 處理用戶項目點擊事件
+   */
+  const atUserClick = (displayId: string) => {
+    router.push(`/user/${displayId}`);
+  };
+
   if (followLoading && followPage === 1) {
-    return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'loading' }))}>
+        {COMMON_TEXTS.LOADING}
+      </div>
+    );
   }
 
   if (followError) {
-    return <div className="text-center py-8 text-red-500">{followError}</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'error' }))}>
+        {followError}
+      </div>
+    );
   }
 
   if (followData.length === 0) {
-    return <div className="text-center py-8">目前沒有追蹤的用戶</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'empty' }))}>
+        目前沒有追蹤的用戶
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-neutral-500 mb-1">
+    <div className={cn(followTabContainerVariants())}>
+      <p className={cn(statsCountTextVariants())}>
         共{followTotalCount}位追蹤中
       </p>
 
       {followData.map((user: UserFollowResponse['data'][0]) => (
         <div
           key={`followed-${user.id}`}
-          className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
-          onClick={() => router.push(`/user/${user.displayId}`)}
+          className={cn(followItemContainerVariants())}
+          onClick={() => atUserClick(user.displayId)}
         >
           <FollowedUserCard
             username={user.name}
@@ -64,12 +92,16 @@ export function FollowTabContent({
         </div>
       ))}
 
-      {followLoading && <div className="text-center py-4">載入更多中...</div>}
+      {followLoading && (
+        <div className={cn(loadMoreStateVariants({ state: 'loading' }))}>
+          載入更多中...
+        </div>
+      )}
 
       {followHasMore && !followLoading && (
         <Button
           variant="ghost"
-          className="w-full py-2 flex items-center justify-center gap-1 text-neutral-500"
+          className={cn(loadMoreButtonVariants())}
           onClick={loadMore}
         >
           <span>更多追蹤</span>
