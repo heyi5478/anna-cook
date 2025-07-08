@@ -6,9 +6,11 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/router';
+import { cn } from '@/lib/utils';
 import type { Author } from '@/types/recipe';
 import { AuthorInfo } from './AuthorInfo';
 import { AuthorRecipes } from './AuthorRecipes';
+import { profileContainerVariants, authorCardVariants } from './styles';
 
 interface AuthorProfileProps {
   author: Author;
@@ -54,9 +56,9 @@ export const AuthorProfile = ({
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-8">
+    <main className={cn(profileContainerVariants())}>
       {/* 麵包屑導航 */}
-      <div className="bg-white p-4">
+      <div className={cn(authorCardVariants())}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

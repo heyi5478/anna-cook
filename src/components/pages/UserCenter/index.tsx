@@ -11,6 +11,16 @@ import { PublishedTabContent } from './PublishedTabContent';
 import { DraftTabContent } from './DraftTabContent';
 import { FollowTabContent } from './FollowTabContent';
 import { FavoriteTabContent } from './FavoriteTabContent';
+import {
+  breadcrumbVariants,
+  tabTriggerVariants,
+  tabContentVariants,
+  cardContainerVariants,
+  statsItemVariants,
+  sectionTitleVariants,
+  sectionContainerVariants,
+  tabsListVariants,
+} from './styles';
 import type { UserCenterProps } from './types';
 
 /**
@@ -82,7 +92,7 @@ export default function UserCenter({
   return (
     <div className="bg-white p-4">
       {/* 麵包屑導航 */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className={cn(breadcrumbVariants())}>
         <Link href="/" className="text-neutral-600">
           首頁
         </Link>
@@ -106,9 +116,11 @@ export default function UserCenter({
       />
 
       {/* 我的食譜區 */}
-      <div className="mt-4">
+      <div className={cn(sectionContainerVariants())}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-medium">我的食譜</h3>
+          <h3 className={cn(sectionTitleVariants({ spacing: 'withMargin' }))}>
+            我的食譜
+          </h3>
           <RecipeActionBar
             onNewRecipe={atNewRecipe}
             onDeleteMode={atToggleDeleteMode}
@@ -121,13 +133,8 @@ export default function UserCenter({
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
-            <TabsTrigger
-              value="總覽"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+          <TabsList className={cn(tabsListVariants())}>
+            <TabsTrigger value="總覽" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -147,12 +154,7 @@ export default function UserCenter({
               </svg>
               總覽
             </TabsTrigger>
-            <TabsTrigger
-              value="數據"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+            <TabsTrigger value="數據" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -169,12 +171,7 @@ export default function UserCenter({
               </svg>
               數據
             </TabsTrigger>
-            <TabsTrigger
-              value="已發布"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+            <TabsTrigger value="已發布" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -192,12 +189,7 @@ export default function UserCenter({
               </svg>
               已發布
             </TabsTrigger>
-            <TabsTrigger
-              value="草稿"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+            <TabsTrigger value="草稿" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -216,7 +208,7 @@ export default function UserCenter({
               草稿
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="總覽" className="mt-4 px-0">
+          <TabsContent value="總覽" className={cn(tabContentVariants())}>
             <Card className="border-0 shadow-none">
               <CardContent className="p-0">
                 <h4 className="font-medium mb-1">創作者總覽</h4>
@@ -224,16 +216,16 @@ export default function UserCenter({
                   您的食譜表現情況
                 </p>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
+                <div className={cn(cardContainerVariants())}>
+                  <div className={cn(statsItemVariants())}>
                     <div className="text-sm text-neutral-500">總瀏覽次數</div>
                     <div className="font-bold">{totalViewCount}</div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className={cn(statsItemVariants())}>
                     <div className="text-sm text-neutral-500">總收讚次數</div>
                     <div className="font-bold">{favoritedTotal}</div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className={cn(statsItemVariants())}>
                     <div className="text-sm text-neutral-500">平均評分</div>
                     <div className="font-bold">{averageRating.toFixed(1)}</div>
                   </div>
@@ -241,7 +233,7 @@ export default function UserCenter({
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="數據" className="mt-4">
+          <TabsContent value="數據" className={cn(tabContentVariants())}>
             <DataTabContent
               isLoadingPublished={isLoadingPublished}
               error={error}
@@ -249,7 +241,7 @@ export default function UserCenter({
               getFullImageUrl={getFullImageUrl}
             />
           </TabsContent>
-          <TabsContent value="已發布" className="mt-4">
+          <TabsContent value="已發布" className={cn(tabContentVariants())}>
             <PublishedTabContent
               isLoadingPublished={isLoadingPublished}
               error={error}
@@ -258,7 +250,7 @@ export default function UserCenter({
               loadPublishedRecipes={loadPublishedRecipes}
             />
           </TabsContent>
-          <TabsContent value="草稿" className="mt-4">
+          <TabsContent value="草稿" className={cn(tabContentVariants())}>
             <DraftTabContent
               isLoadingDrafts={isLoadingDrafts}
               error={error}
@@ -283,9 +275,9 @@ export default function UserCenter({
       </div>
 
       {/* 我的最愛區 */}
-      <div className="mt-8">
+      <div className={cn(sectionContainerVariants({ spacing: 'relaxed' }))}>
         <div className="mb-4">
-          <h3 className="text-xl font-medium">我的最愛</h3>
+          <h3 className={cn(sectionTitleVariants())}>我的最愛</h3>
         </div>
 
         <Tabs
@@ -293,13 +285,8 @@ export default function UserCenter({
           onValueChange={handleFavoriteTabChange}
           className="w-full"
         >
-          <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
-            <TabsTrigger
-              value="已追蹤"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+          <TabsList className={cn(tabsListVariants())}>
+            <TabsTrigger value="已追蹤" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -319,12 +306,7 @@ export default function UserCenter({
               </svg>
               已追蹤
             </TabsTrigger>
-            <TabsTrigger
-              value="已收藏"
-              className={cn(
-                'flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-orange-500 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-orange-500 font-normal data-[state=active]:font-normal',
-              )}
-            >
+            <TabsTrigger value="已收藏" className={cn(tabTriggerVariants())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -342,7 +324,10 @@ export default function UserCenter({
               已收藏
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="已追蹤" className="mt-4 px-0">
+          <TabsContent
+            value="已追蹤"
+            className={cn(tabContentVariants({ padding: 'none' }))}
+          >
             <FollowTabContent
               followLoading={followLoading}
               followError={followError}
@@ -354,7 +339,10 @@ export default function UserCenter({
               loadMore={loadMore}
             />
           </TabsContent>
-          <TabsContent value="已收藏" className="mt-4 px-0">
+          <TabsContent
+            value="已收藏"
+            className={cn(tabContentVariants({ padding: 'none' }))}
+          >
             <FavoriteTabContent
               favoriteLoading={favoriteLoading}
               favoriteError={favoriteError}
