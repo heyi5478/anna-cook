@@ -1,4 +1,11 @@
+import type React from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause, Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  stepNavigationVariants,
+  stepNavigationButtonVariants,
+  stepIndicatorVariants,
+} from './styles';
 
 type StepNavigationProps = {
   currentStep: number;
@@ -9,10 +16,11 @@ type StepNavigationProps = {
   onStepChange: (direction: 'prev' | 'next') => void;
   onTogglePlay: () => void;
   onAddStep: () => void;
+  disabled?: boolean;
 };
 
 /**
- * 步驟導航元件
+ * 步驟導航元件，提供步驟切換、播放控制和新增步驟功能
  */
 export const StepNavigation: React.FC<StepNavigationProps> = ({
   currentStep,
@@ -23,34 +31,79 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
   onStepChange,
   onTogglePlay,
   onAddStep,
-}) => (
-  <div className="flex items-center justify-between px-4 py-2">
-    <button
-      onClick={() => onStepChange('prev')}
-      className="p-2 text-neutral-600"
-      disabled={currentStep === 1}
-    >
-      <ChevronLeft className="h-5 w-5" />
-    </button>
-    <div className="text-sm">
-      步驟 {currentStep}/{totalSteps}
+  disabled = false,
+}) => {
+  // 確定導航容器狀態
+  let navigationState: 'normal' | 'disabled' | 'transitioning' = 'normal';
+  if (disabled) {
+    navigationState = 'disabled';
+  } else if (isStepChanging) {
+    navigationState = 'transitioning';
+  }
+
+  // 確定各按鈕狀態
+  const isPrevDisabled = disabled || currentStep === 1;
+  const isNextDisabled = disabled || currentStep === totalSteps;
+  const isPlayDisabled = disabled || isDragging || isStepChanging;
+
+  const prevButtonState = isPrevDisabled ? 'disabled' : 'normal';
+  const nextButtonState = isNextDisabled ? 'disabled' : 'normal';
+  const playButtonState = isPlayDisabled ? 'restricted' : 'active';
+  const addButtonState = disabled ? 'disabled' : 'normal';
+
+  // 確定步驟指示器狀態
+  const indicatorState = isStepChanging ? 'transitioning' : 'normal';
+
+  return (
+    <div className={cn(stepNavigationVariants({ state: navigationState }))}>
+      {/* 上一步按鈕 */}
+      <button
+        onClick={() => onStepChange('prev')}
+        className={cn(stepNavigationButtonVariants({ state: prevButtonState }))}
+        disabled={isPrevDisabled}
+        aria-label="上一步"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+
+      {/* 步驟指示器 */}
+      <div className={cn(stepIndicatorVariants({ state: indicatorState }))}>
+        步驟 {currentStep}/{totalSteps}
+      </div>
+
+      {/* 下一步按鈕 */}
+      <button
+        onClick={() => onStepChange('next')}
+        className={cn(stepNavigationButtonVariants({ state: nextButtonState }))}
+        disabled={isNextDisabled}
+        aria-label="下一步"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
+      {/* 播放/暫停按鈕 */}
+      <button
+        onClick={onTogglePlay}
+        className={cn(stepNavigationButtonVariants({ state: playButtonState }))}
+        disabled={isPlayDisabled}
+        aria-label={isPlaying ? '暫停' : '播放'}
+      >
+        {isPlaying ? (
+          <Pause className="h-5 w-5" />
+        ) : (
+          <Play className="h-5 w-5" />
+        )}
+      </button>
+
+      {/* 新增步驟按鈕 */}
+      <button
+        onClick={onAddStep}
+        className={cn(stepNavigationButtonVariants({ state: addButtonState }))}
+        disabled={disabled}
+        aria-label="新增步驟"
+      >
+        <Plus className="h-5 w-5" />
+      </button>
     </div>
-    <button
-      onClick={() => onStepChange('next')}
-      className="p-2 text-neutral-600"
-      disabled={currentStep === totalSteps}
-    >
-      <ChevronRight className="h-5 w-5" />
-    </button>
-    <button
-      onClick={onTogglePlay}
-      className={`p-2 ${isDragging || isStepChanging ? 'text-neutral-400' : 'text-neutral-600'}`}
-      disabled={isDragging || isStepChanging}
-    >
-      {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-    </button>
-    <button onClick={onAddStep} className="p-2 text-neutral-600">
-      <Plus className="h-5 w-5" />
-    </button>
-  </div>
-);
+  );
+};

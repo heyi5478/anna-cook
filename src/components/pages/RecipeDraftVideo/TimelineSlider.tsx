@@ -1,8 +1,18 @@
+import type React from 'react';
 import { Slider } from '@/components/ui/slider';
 import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/common/VimeoPlayer';
+import { cn } from '@/lib/utils';
+import {
+  timelineVariants,
+  timelineMarkerVariants,
+  timelineControlVariants,
+  sliderVariants,
+  sliderThumbVariants,
+  timeRangeDisplayVariants,
+} from './styles';
 
 type TimelineSliderProps = {
   startTime: number;
@@ -11,10 +21,11 @@ type TimelineSliderProps = {
   isDragging: boolean;
   onTimeRangeChange: (values: number[]) => void;
   onSliderCommitted: (values: number[]) => void;
+  disabled?: boolean;
 };
 
 /**
- * 時間軸滑桿元件
+ * 時間軸滑桿元件，提供影片時間範圍選擇功能
  */
 export const TimelineSlider: React.FC<TimelineSliderProps> = ({
   startTime,
@@ -23,34 +34,68 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
   isDragging,
   onTimeRangeChange,
   onSliderCommitted,
-}) => (
-  <>
-    {/* 時間軸 */}
-    <div className="px-4 py-2">
-      <div className="flex justify-between text-xs text-neutral-500 mb-1">
-        <span>0:00</span>
-        <span>{formatTimeHMS(videoDuration)}</span>
-      </div>
-      <div className="py-6">
-        <Slider
-          defaultValue={[startTime, endTime]}
-          value={[startTime, endTime]}
-          max={videoDuration}
-          min={0}
-          step={0.1}
-          onValueChange={onTimeRangeChange}
-          onValueCommit={onSliderCommitted}
-          className={`[&>span:first-child]:h-3 [&>span:first-child]:bg-neutral-200 [&>span:first-child]:rounded-md [&>span:nth-child(2)]:bg-neutral-400 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          thumbClassName="h-6 w-4 bg-white border-2 border-neutral-400 rounded-sm shadow-md hover:border-neutral-600 focus:border-neutral-600 focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-colors"
-          disabled={false}
-        />
-      </div>
-    </div>
+  disabled = false,
+}) => {
+  // 確定時間軸狀態
+  let timelineState: 'normal' | 'dragging' | 'disabled' = 'normal';
+  if (disabled) {
+    timelineState = 'disabled';
+  } else if (isDragging) {
+    timelineState = 'dragging';
+  }
 
-    {/* 起點和終點 */}
-    <div className="flex justify-between px-4 py-2 text-sm">
-      <div>起點: {formatSec(startTime)}</div>
-      <div>終點: {formatSec(endTime)}</div>
-    </div>
-  </>
-);
+  // 確定滑桿狀態
+  let sliderState: 'normal' | 'dragging' | 'disabled' = 'normal';
+  if (disabled) {
+    sliderState = 'disabled';
+  } else if (isDragging) {
+    sliderState = 'dragging';
+  }
+
+  // 確定交互狀態
+  let interactionState: 'grab' | 'grabbing' | 'disabled' = 'grab';
+  if (disabled) {
+    interactionState = 'disabled';
+  } else if (isDragging) {
+    interactionState = 'grabbing';
+  }
+
+  return (
+    <>
+      {/* 時間軸滑桿控制區域 */}
+      <div className={cn(timelineVariants({ state: timelineState }))}>
+        {/* 時間軸刻度標記 */}
+        <div className={cn(timelineMarkerVariants())}>
+          <span>0:00</span>
+          <span>{formatTimeHMS(videoDuration)}</span>
+        </div>
+
+        {/* 時間軸控制器 */}
+        <div
+          className={cn(
+            timelineControlVariants({ interaction: interactionState }),
+          )}
+        >
+          <Slider
+            defaultValue={[startTime, endTime]}
+            value={[startTime, endTime]}
+            max={videoDuration}
+            min={0}
+            step={0.1}
+            onValueChange={onTimeRangeChange}
+            onValueCommit={onSliderCommitted}
+            className={cn(sliderVariants({ state: sliderState }))}
+            thumbClassName={cn(sliderThumbVariants())}
+            disabled={disabled}
+          />
+        </div>
+      </div>
+
+      {/* 起點和終點時間顯示 */}
+      <div className={cn(timeRangeDisplayVariants({ style: 'default' }))}>
+        <div>起點: {formatSec(startTime)}</div>
+        <div>終點: {formatSec(endTime)}</div>
+      </div>
+    </>
+  );
+};
