@@ -1,5 +1,61 @@
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ListOrdered, StepBack, StepForward, ChevronsLeft } from 'lucide-react';
+import { cva } from 'class-variance-authority';
+
+// 面板容器樣式變體
+const stepPanelVariants = cva('flex flex-col h-full overflow-auto relative', {
+  variants: {
+    state: {
+      expanded: 'w-[200px] bg-gray-800 text-white p-6',
+      collapsed: 'w-0 h-0 opacity-0 pointer-events-none',
+    },
+  },
+  defaultVariants: {
+    state: 'expanded',
+  },
+});
+
+// 按鈕樣式變體
+const stepButtonVariants = cva(
+  'flex items-center justify-center rounded-lg transition-colors',
+  {
+    variants: {
+      variant: {
+        navigation:
+          'bg-gray-900 hover:bg-gray-700 text-white p-2 disabled:opacity-50 disabled:cursor-not-allowed',
+        navigationAlt:
+          'bg-neutral-900 hover:bg-neutral-700 text-white p-2 disabled:opacity-50 disabled:cursor-not-allowed',
+        stepList: 'w-full bg-neutral-700 hover:bg-neutral-600 text-white p-3',
+        panelToggle:
+          'bg-gray-700 hover:bg-gray-600 text-white p-1.5 absolute top-2 left-2 z-10',
+      },
+    },
+    defaultVariants: {
+      variant: 'navigation',
+    },
+  },
+);
+
+// 步驟項目樣式變體
+const stepItemVariants = cva(
+  'p-4 rounded-lg cursor-pointer flex flex-col justify-center items-center border border-gray-700 transition',
+  {
+    variants: {
+      state: {
+        current: 'bg-orange-500 text-white',
+        normal: 'bg-white text-neutral-800 hover:bg-neutral-100',
+      },
+    },
+    defaultVariants: {
+      state: 'normal',
+    },
+  },
+);
+
+// 收起狀態按鈕樣式變體
+const collapsedButtonVariants = cva(
+  'absolute right-0 top-2 bg-gray-800 text-white p-1.5 rounded-l-lg z-20',
+);
 
 type Step = {
   id: number;
@@ -48,20 +104,17 @@ export const StepPanel = ({
 }: StepPanelProps) => {
   if (!showRightPanel) {
     return (
-      <button
-        className="absolute right-0 top-2 bg-gray-800 text-white p-1.5 rounded-l-lg z-20"
-        onClick={onTogglePanel}
-      >
+      <button className={collapsedButtonVariants()} onClick={onTogglePanel}>
         <ChevronsLeft className="w-4 h-4" />
       </button>
     );
   }
 
   return (
-    <div className="w-[200px] bg-gray-800 text-white p-6 flex flex-col h-full overflow-auto relative">
+    <div className={stepPanelVariants({ state: 'expanded' })}>
       {/* 面板內的收起按鈕 */}
       <button
-        className="absolute top-2 left-2 bg-gray-700 hover:bg-gray-600 text-white p-1.5 rounded-lg z-10"
+        className={stepButtonVariants({ variant: 'panelToggle' })}
         onClick={onTogglePanel}
       >
         <ChevronsLeft className="w-4 h-4 rotate-180" />
@@ -71,7 +124,7 @@ export const StepPanel = ({
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <button
-              className="bg-gray-900 hover:bg-gray-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className={stepButtonVariants({ variant: 'navigation' })}
               onClick={onPrevStep}
               disabled={currentStepIndex === 0}
             >
@@ -81,7 +134,7 @@ export const StepPanel = ({
               {currentStepIndex + 1}/{steps.length}
             </div>
             <button
-              className="bg-neutral-900 hover:bg-neutral-700 text-white p-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className={stepButtonVariants({ variant: 'navigationAlt' })}
               onClick={onNextStep}
               disabled={currentStepIndex === steps.length - 1}
             >
@@ -103,7 +156,7 @@ export const StepPanel = ({
       <div className="mt-auto pt-4">
         <Dialog open={dialogOpen} onOpenChange={onToggleDialog}>
           <DialogTrigger asChild>
-            <button className="w-full bg-neutral-700 hover:bg-neutral-600 text-white p-3 rounded-lg flex items-center justify-center">
+            <button className={stepButtonVariants({ variant: 'stepList' })}>
               <ListOrdered className="w-5 h-5 mr-2" />
               步驟列表
             </button>
@@ -113,11 +166,9 @@ export const StepPanel = ({
               {steps.map((step, index) => (
                 <div
                   key={step.id}
-                  className={`p-4 rounded-lg cursor-pointer flex flex-col justify-center items-center border border-gray-700 transition ${
-                    index === currentStepIndex
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-white text-neutral-800 hover:bg-neutral-100'
-                  }`}
+                  className={stepItemVariants({
+                    state: index === currentStepIndex ? 'current' : 'normal',
+                  })}
                   onClick={() => onSelectStep(index)}
                 >
                   <span className="text-lg font-semibold">
