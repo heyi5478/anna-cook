@@ -1,11 +1,17 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { formatTime } from '@/lib/utils';
+import { formatTime, cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import {
+  videoPlayerVariants,
+  videoPlayerContainerVariants,
+  playControlButtonVariants,
+  timeDisplayVariants,
+} from './styles';
 
 /**
- * 影片播放器元件，處理影片的顯示、播放與暫停控制
+ * 影片播放器元件屬性
  */
 type VideoPlayerProps = {
   videoUrl: string;
@@ -18,6 +24,7 @@ type VideoPlayerProps = {
   atVideoLoaded: () => void;
 };
 
+// 影片播放器元件 - 處理影片的顯示、播放與暫停控制
 export default function VideoPlayer({
   videoUrl,
   isPlaying,
@@ -28,10 +35,26 @@ export default function VideoPlayer({
   atTimeUpdate,
   atVideoLoaded,
 }: VideoPlayerProps) {
+  // 獲取播放器狀態
+  const getPlayerState = () => {
+    if (!videoUrl) return 'loading';
+    if (isPlaying) return 'playing';
+    return 'paused';
+  };
+
+  // 獲取容器狀態
+  const getContainerState = () => {
+    if (!videoUrl) return 'loading';
+    if (duration === 0) return 'loading';
+    return 'ready';
+  };
+
   return (
-    <div className="space-y-4">
+    <div className={videoPlayerVariants({ state: getPlayerState() })}>
       {/* 影片預覽 */}
-      <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+      <div
+        className={videoPlayerContainerVariants({ state: getContainerState() })}
+      >
         {videoUrl ? (
           <video
             ref={videoRef}
@@ -59,7 +82,13 @@ export default function VideoPlayer({
             <Button
               variant="ghost"
               size="icon"
-              className="h-16 w-16 rounded-full bg-black/30 text-white hover:bg-black/50"
+              className={cn(
+                playControlButtonVariants({
+                  size: 'default',
+                  state: 'normal',
+                }),
+                'h-16 w-16',
+              )}
               onClick={atTogglePlayPause}
             >
               {isPlaying ? (
@@ -73,7 +102,7 @@ export default function VideoPlayer({
       </div>
 
       {/* 時間顯示 */}
-      <div className="flex justify-between px-4 py-2 text-sm">
+      <div className={timeDisplayVariants({ style: 'default' })}>
         <div>當前: {formatTime(currentTime)} 秒</div>
         <div>總長: {formatTime(duration)} 秒</div>
       </div>
