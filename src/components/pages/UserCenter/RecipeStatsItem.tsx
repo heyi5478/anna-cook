@@ -1,5 +1,19 @@
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 import { RecipeStatsItemProps } from './types';
+import {
+  recipeStatsContainerVariants,
+  recipeInfoContainerVariants,
+  recipeImageContainerVariants,
+  recipeImageVariants,
+  recipeContentContainerVariants,
+  recipeTitleVariants,
+  recipeRatingInfoVariants,
+  statsGridVariants,
+  statsItemCardVariants,
+  statsLabelVariants,
+  statsValueVariants,
+} from './styles';
 
 /**
  * 顯示單一食譜的數據統計項目
@@ -14,36 +28,36 @@ export function RecipeStatsItem({
   imageSrc,
 }: RecipeStatsItemProps) {
   return (
-    <div className="mb-6">
-      <div className="flex items-center gap-4 mb-3">
-        <div className="w-20 h-20 bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
+    <div className={cn(recipeStatsContainerVariants())}>
+      <div className={cn(recipeInfoContainerVariants())}>
+        <div className={cn(recipeImageContainerVariants())}>
           <Image
             src={imageSrc || '/placeholder.svg'}
             alt={title}
             fill
-            className="object-cover"
+            className={cn(recipeImageVariants())}
           />
         </div>
-        <div className="flex-1">
-          <h4 className="text-lg font-medium mb-1">{title}</h4>
-          <div className="text-sm text-neutral-500">
+        <div className={cn(recipeContentContainerVariants())}>
+          <h4 className={cn(recipeTitleVariants())}>{title}</h4>
+          <div className={cn(recipeRatingInfoVariants())}>
             評分: {rating} • 瀏覽: {views}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-neutral-500 mb-1">收藏</div>
-          <div className="text-lg font-medium">{bookmarks}</div>
+      <div className={cn(statsGridVariants())}>
+        <div className={cn(statsItemCardVariants())}>
+          <div className={cn(statsLabelVariants())}>收藏</div>
+          <div className={cn(statsValueVariants())}>{bookmarks}</div>
         </div>
-        <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-neutral-500 mb-1">留言</div>
-          <div className="text-lg font-medium">{comments}</div>
+        <div className={cn(statsItemCardVariants())}>
+          <div className={cn(statsLabelVariants())}>留言</div>
+          <div className={cn(statsValueVariants())}>{comments}</div>
         </div>
-        <div className="bg-gray-50 p-3 text-center rounded-md">
-          <div className="text-xs text-neutral-500 mb-1">分享</div>
-          <div className="text-lg font-medium">{shares}</div>
+        <div className={cn(statsItemCardVariants())}>
+          <div className={cn(statsLabelVariants())}>分享</div>
+          <div className={cn(statsValueVariants())}>{shares}</div>
         </div>
       </div>
     </div>

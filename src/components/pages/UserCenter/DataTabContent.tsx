@@ -1,6 +1,14 @@
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
+import { cn } from '@/lib/utils';
 import { RecipeStatsItem } from './RecipeStatsItem';
+import {
+  dataTabContainerVariants,
+  dataTitleVariants,
+  dataDescriptionVariants,
+  dataCardContainerVariants,
+  tabEmptyStateVariants,
+} from './styles';
 
 interface DataTabContentProps {
   isLoadingPublished: boolean;
@@ -19,29 +27,38 @@ export function DataTabContent({
   getFullImageUrl,
 }: DataTabContentProps) {
   if (isLoadingPublished) {
-    return <div className="text-center py-8">{COMMON_TEXTS.LOADING}</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'loading' }))}>
+        {COMMON_TEXTS.LOADING}
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-500">{error}</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'error' }))}>
+        {error}
+      </div>
+    );
   }
 
   if (publishedRecipes.length === 0) {
-    return <div className="text-center py-8">目前沒有發布的食譜</div>;
+    return (
+      <div className={cn(tabEmptyStateVariants({ type: 'empty' }))}>
+        目前沒有發布的食譜
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className={cn(dataTabContainerVariants())}>
       <div>
-        <h3 className="text-lg font-bold mb-1">食譜數據</h3>
-        <p className="text-neutral-500">深入了解您的食譜表現</p>
+        <h3 className={cn(dataTitleVariants())}>食譜數據</h3>
+        <p className={cn(dataDescriptionVariants())}>深入了解您的食譜表現</p>
       </div>
 
       {publishedRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => (
-        <div
-          key={recipe.recipeId}
-          className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
-        >
+        <div key={recipe.recipeId} className={cn(dataCardContainerVariants())}>
           <RecipeStatsItem
             title={recipe.title}
             imageSrc={getFullImageUrl(recipe.coverPhoto)}

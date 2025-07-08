@@ -1,6 +1,15 @@
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 import { FollowedUserCardProps } from './types';
+import {
+  userCardContainerVariants,
+  userAvatarContainerVariants,
+  userInfoContainerVariants,
+  usernameVariants,
+  userBioVariants,
+  userStatsVariants,
+} from './styles';
 
 /**
  * 顯示已追蹤的用戶卡片
@@ -13,18 +22,18 @@ export function FollowedUserCard({
   avatarSrc,
 }: FollowedUserCardProps) {
   return (
-    <div className="border rounded-lg p-4 flex items-center">
-      <Avatar className="w-14 h-14 mr-3">
+    <div className={cn(userCardContainerVariants())}>
+      <Avatar className={cn(userAvatarContainerVariants())}>
         <AvatarImage src={avatarSrc} alt={username} />
         <AvatarFallback>
           <User className="h-6 w-6" />
         </AvatarFallback>
       </Avatar>
 
-      <div className="flex-1">
-        <h3 className="text-lg font-medium">{username}</h3>
-        <p className="text-neutral-500 text-sm line-clamp-1 mb-1">{bio}</p>
-        <div className="flex gap-4 text-sm text-neutral-500">
+      <div className={cn(userInfoContainerVariants())}>
+        <h3 className={cn(usernameVariants())}>{username}</h3>
+        <p className={cn(userBioVariants())}>{bio}</p>
+        <div className={cn(userStatsVariants())}>
           <span>{recipesCount} 食譜</span>
           <span>{followersCount} 粉絲</span>
         </div>

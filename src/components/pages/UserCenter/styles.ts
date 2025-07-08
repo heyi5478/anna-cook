@@ -896,3 +896,489 @@ export const tabEmptyStateVariants = cva('text-center py-8', {
     spacing: 'default',
   },
 });
+
+/**
+ * 數據標籤頁容器樣式
+ */
+export const dataTabContainerVariants = cva('space-y-6', {
+  variants: {
+    spacing: {
+      compact: 'space-y-4',
+      default: 'space-y-6',
+      relaxed: 'space-y-8',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 數據標題樣式
+ */
+export const dataTitleVariants = cva('text-lg font-bold mb-1', {
+  variants: {
+    size: {
+      small: 'text-base font-semibold',
+      default: 'text-lg font-bold',
+      large: 'text-xl font-bold',
+    },
+    spacing: {
+      default: 'mb-1',
+      compact: 'mb-0.5',
+      relaxed: 'mb-2',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 數據描述樣式
+ */
+export const dataDescriptionVariants = cva('text-neutral-500', {
+  variants: {
+    size: {
+      small: 'text-sm text-neutral-500',
+      default: 'text-base text-neutral-500',
+      large: 'text-lg text-neutral-500',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 數據卡片容器樣式
+ */
+export const dataCardContainerVariants = cva(
+  'hover:bg-gray-50 rounded-md transition-colors cursor-pointer',
+  {
+    variants: {
+      hover: {
+        default: 'hover:bg-gray-50',
+        subtle: 'hover:bg-neutral-50',
+        none: '',
+      },
+      interactive: {
+        true: 'cursor-pointer',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      hover: 'default',
+      interactive: true,
+    },
+  },
+);
+
+/**
+ * 食譜統計項目容器樣式
+ */
+export const recipeStatsContainerVariants = cva('mb-6', {
+  variants: {
+    spacing: {
+      compact: 'mb-4',
+      default: 'mb-6',
+      relaxed: 'mb-8',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 食譜資訊容器樣式
+ */
+export const recipeInfoContainerVariants = cva('flex items-center gap-4 mb-3', {
+  variants: {
+    gap: {
+      compact: 'gap-2',
+      default: 'gap-4',
+      relaxed: 'gap-6',
+    },
+    spacing: {
+      compact: 'mb-2',
+      default: 'mb-3',
+      relaxed: 'mb-4',
+    },
+  },
+  defaultVariants: {
+    gap: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 食譜圖片容器樣式
+ */
+export const recipeImageContainerVariants = cva(
+  'w-20 h-20 bg-gray-200 shrink-0 rounded-md overflow-hidden relative',
+  {
+    variants: {
+      size: {
+        small: 'w-16 h-16',
+        default: 'w-20 h-20',
+        large: 'w-24 h-24',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+);
+
+/**
+ * 食譜圖片樣式
+ */
+export const recipeImageVariants = cva('object-cover', {
+  variants: {
+    fit: {
+      cover: 'object-cover',
+      contain: 'object-contain',
+    },
+  },
+  defaultVariants: {
+    fit: 'cover',
+  },
+});
+
+/**
+ * 食譜內容容器樣式
+ */
+export const recipeContentContainerVariants = cva('flex-1', {
+  variants: {
+    spacing: {
+      default: '',
+      padded: 'px-2',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 食譜標題樣式
+ */
+export const recipeTitleVariants = cva('text-lg font-medium mb-1', {
+  variants: {
+    size: {
+      small: 'text-base font-medium',
+      default: 'text-lg font-medium',
+      large: 'text-xl font-medium',
+    },
+    spacing: {
+      default: 'mb-1',
+      compact: 'mb-0.5',
+      relaxed: 'mb-2',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 食譜評分資訊樣式
+ */
+export const recipeRatingInfoVariants = cva('text-sm text-neutral-500', {
+  variants: {
+    size: {
+      small: 'text-xs text-neutral-500',
+      default: 'text-sm text-neutral-500',
+      large: 'text-base text-neutral-500',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 統計網格樣式
+ */
+export const statsGridVariants = cva('grid grid-cols-3 gap-2', {
+  variants: {
+    columns: {
+      two: 'grid-cols-2',
+      three: 'grid-cols-3',
+      four: 'grid-cols-4',
+    },
+    gap: {
+      compact: 'gap-1',
+      default: 'gap-2',
+      relaxed: 'gap-3',
+    },
+  },
+  defaultVariants: {
+    columns: 'three',
+    gap: 'default',
+  },
+});
+
+/**
+ * 統計項目樣式
+ */
+export const statsItemCardVariants = cva(
+  'bg-gray-50 p-3 text-center rounded-md',
+  {
+    variants: {
+      background: {
+        default: 'bg-gray-50',
+        light: 'bg-neutral-50',
+        white: 'bg-white',
+      },
+      padding: {
+        compact: 'p-2',
+        default: 'p-3',
+        relaxed: 'p-4',
+      },
+    },
+    defaultVariants: {
+      background: 'default',
+      padding: 'default',
+    },
+  },
+);
+
+/**
+ * 統計標籤樣式
+ */
+export const statsLabelVariants = cva('text-xs text-neutral-500 mb-1', {
+  variants: {
+    size: {
+      small: 'text-xs',
+      default: 'text-sm',
+    },
+    spacing: {
+      default: 'mb-1',
+      compact: 'mb-0.5',
+      relaxed: 'mb-2',
+    },
+  },
+  defaultVariants: {
+    size: 'small',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 統計數值樣式
+ */
+export const statsValueVariants = cva('text-lg font-medium', {
+  variants: {
+    size: {
+      small: 'text-base font-medium',
+      default: 'text-lg font-medium',
+      large: 'text-xl font-medium',
+    },
+    color: {
+      default: 'text-foreground',
+      primary: 'text-primary',
+      secondary: 'text-neutral-600',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    color: 'default',
+  },
+});
+
+/**
+ * 用戶卡片容器樣式
+ */
+export const userCardContainerVariants = cva(
+  'border rounded-lg p-4 flex items-center',
+  {
+    variants: {
+      variant: {
+        default: 'border rounded-lg',
+        outlined: 'border-2 rounded-lg',
+        subtle: 'border-neutral-200 rounded-lg',
+      },
+      padding: {
+        compact: 'p-3',
+        default: 'p-4',
+        relaxed: 'p-5',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      padding: 'default',
+    },
+  },
+);
+
+/**
+ * 用戶頭像容器樣式
+ */
+export const userAvatarContainerVariants = cva('w-14 h-14 mr-3', {
+  variants: {
+    size: {
+      small: 'w-12 h-12',
+      default: 'w-14 h-14',
+      large: 'w-16 h-16',
+    },
+    spacing: {
+      compact: 'mr-2',
+      default: 'mr-3',
+      relaxed: 'mr-4',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 用戶資訊容器樣式
+ */
+export const userInfoContainerVariants = cva('flex-1', {
+  variants: {
+    spacing: {
+      default: '',
+      padded: 'px-2',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 用戶名樣式
+ */
+export const usernameVariants = cva('text-lg font-medium', {
+  variants: {
+    size: {
+      small: 'text-base font-medium',
+      default: 'text-lg font-medium',
+      large: 'text-xl font-medium',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
+/**
+ * 用戶個人簡介樣式
+ */
+export const userBioVariants = cva(
+  'text-neutral-500 text-sm line-clamp-1 mb-1',
+  {
+    variants: {
+      size: {
+        small: 'text-xs',
+        default: 'text-sm',
+        large: 'text-base',
+      },
+      lines: {
+        single: 'line-clamp-1',
+        double: 'line-clamp-2',
+        triple: 'line-clamp-3',
+      },
+      spacing: {
+        default: 'mb-1',
+        compact: 'mb-0.5',
+        relaxed: 'mb-2',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+      lines: 'single',
+      spacing: 'default',
+    },
+  },
+);
+
+/**
+ * 用戶統計資訊樣式
+ */
+export const userStatsVariants = cva('flex gap-4 text-sm text-neutral-500', {
+  variants: {
+    gap: {
+      compact: 'gap-2',
+      default: 'gap-4',
+      relaxed: 'gap-6',
+    },
+    size: {
+      small: 'text-xs',
+      default: 'text-sm',
+      large: 'text-base',
+    },
+  },
+  defaultVariants: {
+    gap: 'default',
+    size: 'default',
+  },
+});
+
+/**
+ * 已發布標籤頁容器樣式
+ */
+export const publishedTabContainerVariants = cva('space-y-4', {
+  variants: {
+    spacing: {
+      compact: 'space-y-2',
+      default: 'space-y-4',
+      relaxed: 'space-y-6',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 已發布計數文字樣式
+ */
+export const publishedCountTextVariants = cva('text-neutral-500 mb-2', {
+  variants: {
+    size: {
+      small: 'text-sm text-neutral-500',
+      default: 'text-base text-neutral-500',
+      large: 'text-lg text-neutral-500',
+    },
+    spacing: {
+      default: 'mb-2',
+      compact: 'mb-1',
+      relaxed: 'mb-3',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+    spacing: 'default',
+  },
+});
+
+/**
+ * 已發布卡片容器樣式
+ */
+export const publishedCardContainerVariants = cva(
+  'hover:bg-gray-50 rounded-md transition-colors cursor-pointer',
+  {
+    variants: {
+      hover: {
+        default: 'hover:bg-gray-50',
+        subtle: 'hover:bg-neutral-50',
+        none: '',
+      },
+      interactive: {
+        true: 'cursor-pointer',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      hover: 'default',
+      interactive: true,
+    },
+  },
+);
