@@ -16,9 +16,28 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
 import { PublishedRecipeCardProps } from './types';
+import {
+  cardContainerBaseVariants,
+  cardImageVariants,
+  cardContentVariants,
+  cardTitleVariants,
+  cardDescriptionVariants,
+  cardStatsVariants,
+  cardStatsItemVariants,
+  cardActionButtonVariants,
+  dialogVariants,
+  dialogTitleVariants,
+  statusMessageVariants,
+  dialogButtonContainerVariants,
+  dialogActionButtonVariants,
+  successStateVariants,
+  successTitleVariants,
+  successDescriptionVariants,
+} from './styles';
 
 /**
  * 顯示已發布的食譜卡片
@@ -82,8 +101,8 @@ export function PublishedRecipeCard({
   };
 
   return (
-    <div className="border rounded-lg p-4 flex relative">
-      <div className="w-[132px] h-[132px] bg-gray-200 shrink-0 rounded-none overflow-hidden relative">
+    <div className={cn(cardContainerBaseVariants())}>
+      <div className={cn(cardImageVariants({ size: 'large' }))}>
         <Image
           src={imageSrc || '/placeholder.svg'}
           alt={title}
@@ -92,22 +111,20 @@ export function PublishedRecipeCard({
         />
       </div>
 
-      <div className="flex-1 ml-4 flex flex-col">
-        <h3 className="text-lg font-medium mb-1">{title}</h3>
-        <p className="text-neutral-500 text-sm mb-auto line-clamp-2">
-          {description}
-        </p>
+      <div className={cn(cardContentVariants())}>
+        <h3 className={cn(cardTitleVariants())}>{title}</h3>
+        <p className={cn(cardDescriptionVariants())}>{description}</p>
 
-        <div className="flex items-center gap-6 mt-2 text-sm text-neutral-800">
-          <div className="flex items-center gap-1">
+        <div className={cn(cardStatsVariants())}>
+          <div className={cn(cardStatsItemVariants())}>
             <BookmarkIcon className="h-5 w-5" />
             <span>{comments}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className={cn(cardStatsItemVariants())}>
             <MessageSquare className="h-5 w-5" />
             <span>{likes}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className={cn(cardStatsItemVariants())}>
             <Star className="h-5 w-5 text-amber-400" />
             <span>{rating}</span>
           </div>
@@ -118,7 +135,7 @@ export function PublishedRecipeCard({
         <DialogTrigger asChild>
           <Button
             variant="secondary"
-            className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-red-50 hover:bg-red-100 text-red-500 border border-red-200 font-normal text-sm"
+            className={cn(cardActionButtonVariants({ variant: 'toDraft' }))}
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -126,40 +143,48 @@ export function PublishedRecipeCard({
             轉草稿
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-white rounded-lg p-6">
+        <DialogContent className={cn(dialogVariants())}>
           {changeSuccess ? (
-            <div className="flex flex-col items-center justify-center py-8">
+            <div className={cn(successStateVariants())}>
               <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
-              <h2 className="text-lg font-medium text-center mb-2">
+              <h2 className={cn(successTitleVariants())}>
                 {SUCCESS_MESSAGES.CONVERT_SUCCESS}
               </h2>
-              <p className="text-neutral-500 text-center">
+              <p className={cn(successDescriptionVariants())}>
                 {SUCCESS_MESSAGES.RECIPE_TO_DRAFT}
               </p>
             </div>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle className="text-center font-medium text-xl mb-2">
+                <DialogTitle
+                  className={cn(dialogTitleVariants({ size: 'large' }))}
+                >
                   是否將所選食譜轉成草稿狀態?
                 </DialogTitle>
               </DialogHeader>
 
               {changeError && (
-                <div className="p-3 rounded-md bg-red-50 text-red-700 mb-4 flex items-center">
+                <div
+                  className={cn(
+                    statusMessageVariants({ variant: 'error', withIcon: true }),
+                  )}
+                >
                   <AlertCircle className="h-4 w-4 mr-2" />
                   {changeError}
                 </div>
               )}
 
-              <div className="flex justify-between mt-6 space-x-4">
+              <div className={cn(dialogButtonContainerVariants())}>
                 <Button
                   variant="destructive"
                   onClick={(e) => {
                     e.stopPropagation();
                     atConfirmToDraft();
                   }}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  className={cn(
+                    dialogActionButtonVariants({ variant: 'confirm' }),
+                  )}
                   disabled={isChanging}
                 >
                   {isChanging ? COMMON_TEXTS.SUBMITTING : COMMON_TEXTS.CONFIRM}
@@ -171,7 +196,9 @@ export function PublishedRecipeCard({
                       e.stopPropagation();
                       setDialogOpen(false);
                     }}
-                    className="flex-1 border border-neutral-200"
+                    className={cn(
+                      dialogActionButtonVariants({ variant: 'cancel' }),
+                    )}
                     disabled={isChanging}
                   >
                     {COMMON_TEXTS.CANCEL}
