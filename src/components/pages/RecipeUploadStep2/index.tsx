@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeStep2Data } from '@/types/api';
@@ -17,6 +16,16 @@ import {
 import { updateRecipeStep2 } from '@/services/recipes';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
+import {
+  uploadPageVariants,
+  uploadFieldVariants,
+  uploadButtonVariants,
+  errorMessageVariants,
+  stepContainerVariants,
+  labelVariants,
+  tagVariants,
+  ingredientRowVariants,
+} from '@/styles/upload-forms';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -61,6 +70,7 @@ const recipeStep2Schema = z.object({
 // 定義表單資料型別
 type RecipeStep2Values = z.infer<typeof recipeStep2Schema>;
 
+// 食譜上傳第二步主組件
 export default function RecipeUploadStep2() {
   // 初始化路由器取得 recipeId
   const router = useRouter();
@@ -255,7 +265,7 @@ export default function RecipeUploadStep2() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className={uploadPageVariants()}>
       {/* 麵包屑導航 */}
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
@@ -280,11 +290,13 @@ export default function RecipeUploadStep2() {
       </Breadcrumb>
 
       {/* 步驟指示器 */}
-      <StepIndicator currentStep={currentStep} />
+      <div className={stepContainerVariants()}>
+        <StepIndicator currentStep={currentStep} />
+      </div>
 
       {/* 錯誤訊息顯示 */}
       {errorMsg && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-600 rounded-md">
+        <div className={errorMessageVariants({ variant: 'banner' })}>
           {errorMsg}
         </div>
       )}
@@ -292,77 +304,54 @@ export default function RecipeUploadStep2() {
       {/* 表單 */}
       <form onSubmit={handleSubmit(atSubmit)}>
         {/* 食譜標題 */}
-        <div className="mb-6 border-t border-b border-dashed border-gray-300 py-4">
+        <div className={stepContainerVariants({ variant: 'titleSection' })}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">
               {recipeName || '馬鈴薯燉肉'}
             </h2>
-            {/* <button
-              type="button"
-              className="text-neutral-500"
-              aria-label="編輯食譜標題"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              </svg>
-            </button> */}
           </div>
         </div>
 
         {/* 食譜介紹 */}
-        <div className="mb-6">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label
-            htmlFor="recipeDescription"
-            className="block text-lg font-medium mb-2"
-          >
+        <div className={stepContainerVariants()}>
+          <div className={labelVariants()} id="recipeDescription-label">
             輸入食譜介紹
-          </label>
+          </div>
           <textarea
             id="recipeDescription"
             rows={10}
             placeholder="食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！"
-            className={cn(
-              'w-full p-3 border rounded-md bg-neutral-50',
-              errors.recipeDescription
-                ? 'border-red-500'
-                : 'border-neutral-300',
-            )}
+            aria-labelledby="recipeDescription-label"
+            className={uploadFieldVariants({
+              variant: 'textarea',
+              state: errors.recipeDescription ? 'error' : 'default',
+            })}
             {...register('recipeDescription')}
           />
           {errors.recipeDescription && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className={errorMessageVariants()}>
               {errors.recipeDescription.message}
             </p>
           )}
         </div>
 
         {/* 所需食材 */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-2">所需食材</h2>
+        <div className={stepContainerVariants()}>
+          <h2 className={labelVariants()}>所需食材</h2>
 
           {ingredientFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2 mb-2">
+            <div key={field.id} className={ingredientRowVariants()}>
               <div className="flex-1">
                 <input
                   type="text"
                   placeholder="食材"
-                  className={cn(
-                    'w-full p-2 border rounded-md',
-                    errors.ingredients?.[index]?.name
-                      ? 'border-red-500'
-                      : 'border-gray-300',
-                  )}
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    state: errors.ingredients?.[index]?.name
+                      ? 'error'
+                      : 'default',
+                    size: 'sm',
+                  })}
                   {...register(`ingredients.${index}.name`)}
                 />
               </div>
@@ -370,12 +359,13 @@ export default function RecipeUploadStep2() {
                 <input
                   type="text"
                   placeholder="數量"
-                  className={cn(
-                    'w-full p-2 border rounded-md',
-                    errors.ingredients?.[index]?.amount
-                      ? 'border-red-500'
-                      : 'border-gray-300',
-                  )}
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    state: errors.ingredients?.[index]?.amount
+                      ? 'error'
+                      : 'default',
+                    size: 'sm',
+                  })}
                   {...register(`ingredients.${index}.amount`)}
                 />
               </div>
@@ -383,14 +373,20 @@ export default function RecipeUploadStep2() {
                 <input
                   type="text"
                   placeholder="單位"
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    size: 'sm',
+                  })}
                   {...register(`ingredients.${index}.unit`)}
                 />
               </div>
               <button
                 type="button"
                 onClick={() => removeIngredient(index)}
-                className="text-neutral-500"
+                className={uploadButtonVariants({
+                  variant: 'add',
+                  size: 'icon',
+                })}
                 aria-label={`${COMMON_TEXTS.DELETE}食材`}
               >
                 <svg
@@ -414,7 +410,10 @@ export default function RecipeUploadStep2() {
           <button
             type="button"
             onClick={atAddIngredient}
-            className="flex items-center text-neutral-500 mt-2"
+            className={uploadButtonVariants({
+              variant: 'add',
+              size: 'sm',
+            })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -436,21 +435,22 @@ export default function RecipeUploadStep2() {
         </div>
 
         {/* 所需調料 */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-2">所需調料</h2>
+        <div className={stepContainerVariants()}>
+          <h2 className={labelVariants()}>所需調料</h2>
 
           {seasoningFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2 mb-2">
+            <div key={field.id} className={ingredientRowVariants()}>
               <div className="flex-1">
                 <input
                   type="text"
                   placeholder="調料"
-                  className={cn(
-                    'w-full p-2 border rounded-md',
-                    errors.seasonings?.[index]?.name
-                      ? 'border-red-500'
-                      : 'border-gray-300',
-                  )}
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    state: errors.seasonings?.[index]?.name
+                      ? 'error'
+                      : 'default',
+                    size: 'sm',
+                  })}
                   {...register(`seasonings.${index}.name`)}
                 />
               </div>
@@ -458,12 +458,13 @@ export default function RecipeUploadStep2() {
                 <input
                   type="text"
                   placeholder="數量"
-                  className={cn(
-                    'w-full p-2 border rounded-md',
-                    errors.seasonings?.[index]?.amount
-                      ? 'border-red-500'
-                      : 'border-gray-300',
-                  )}
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    state: errors.seasonings?.[index]?.amount
+                      ? 'error'
+                      : 'default',
+                    size: 'sm',
+                  })}
                   {...register(`seasonings.${index}.amount`)}
                 />
               </div>
@@ -471,14 +472,20 @@ export default function RecipeUploadStep2() {
                 <input
                   type="text"
                   placeholder="單位"
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className={uploadFieldVariants({
+                    variant: 'input',
+                    size: 'sm',
+                  })}
                   {...register(`seasonings.${index}.unit`)}
                 />
               </div>
               <button
                 type="button"
                 onClick={() => removeSeasoning(index)}
-                className="text-neutral-500"
+                className={uploadButtonVariants({
+                  variant: 'add',
+                  size: 'icon',
+                })}
                 aria-label={`${COMMON_TEXTS.DELETE}調料`}
               >
                 <svg
@@ -502,7 +509,10 @@ export default function RecipeUploadStep2() {
           <button
             type="button"
             onClick={atAddSeasoning}
-            className="flex items-center text-neutral-500 mt-2"
+            className={uploadButtonVariants({
+              variant: 'add',
+              size: 'sm',
+            })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -524,14 +534,9 @@ export default function RecipeUploadStep2() {
         </div>
 
         {/* 食譜標籤 */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-2">食譜標籤</h2>
-          <div
-            className={cn(
-              'bg-neutral-50 p-3 rounded-md border',
-              errors.tags ? 'border-red-500' : 'border-neutral-300',
-            )}
-          >
+        <div className={stepContainerVariants()}>
+          <h2 className={labelVariants()}>食譜標籤</h2>
+          <div className={stepContainerVariants({ variant: 'infoSection' })}>
             <div className="flex justify-between items-center mb-2">
               <span>增加新標籤 ({tags.length}/5)</span>
             </div>
@@ -539,7 +544,10 @@ export default function RecipeUploadStep2() {
               <input
                 type="text"
                 placeholder="輸入自訂標籤"
-                className="flex-1 p-2 border border-neutral-300 rounded-md bg-white"
+                className={uploadFieldVariants({
+                  variant: 'input',
+                  state: 'default',
+                })}
                 value={customTag}
                 onChange={(e) => setCustomTag(e.target.value)}
                 onKeyDown={atTagKeyDown}
@@ -547,7 +555,14 @@ export default function RecipeUploadStep2() {
               />
               <button
                 type="button"
-                className="px-3 py-2 bg-neutral-200 text-neutral-700 rounded-md disabled:opacity-50"
+                className={uploadButtonVariants({
+                  variant: 'secondary',
+                  state:
+                    !customTag.trim() || tags.length >= 5
+                      ? 'disabled'
+                      : 'default',
+                  size: 'sm',
+                })}
                 onClick={atAddTag}
                 disabled={!customTag.trim() || tags.length >= 5}
               >
@@ -561,7 +576,7 @@ export default function RecipeUploadStep2() {
                 {tags.map((tag) => (
                   <div
                     key={tag}
-                    className="bg-neutral-200 text-neutral-700 px-2 py-1 rounded-full flex items-center"
+                    className={tagVariants({ variant: 'removable' })}
                   >
                     <span>{tag}</span>
                     <button
@@ -591,62 +606,56 @@ export default function RecipeUploadStep2() {
             )}
 
             {errors.tags && (
-              <p className="mt-1 text-sm text-red-500">{errors.tags.message}</p>
+              <p className={errorMessageVariants()}>{errors.tags.message}</p>
             )}
           </div>
         </div>
 
         {/* 烹調時間和人份 */}
-        <div className="mb-6 flex gap-4">
+        <div className={stepContainerVariants({ variant: 'timeSection' })}>
           <div className="flex-1">
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label
-              htmlFor="cookingTime"
-              className="block text-lg font-medium mb-2"
-            >
+            <div className={labelVariants()} id="cookingTime-label">
               烹調時間
-            </label>
+            </div>
             <div className="flex items-center">
               <input
                 id="cookingTime"
                 type="number"
-                className={cn(
-                  'w-full p-2 border rounded-md',
-                  errors.cookingTime ? 'border-red-500' : 'border-neutral-300',
-                )}
+                aria-labelledby="cookingTime-label"
+                className={uploadFieldVariants({
+                  variant: 'number',
+                  state: errors.cookingTime ? 'error' : 'default',
+                })}
                 {...register('cookingTime')}
               />
               <span className="ml-2">分鐘</span>
             </div>
             {errors.cookingTime && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className={errorMessageVariants()}>
                 {errors.cookingTime.message}
               </p>
             )}
           </div>
 
           <div className="flex-1">
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label
-              htmlFor="servings"
-              className="block text-lg font-medium mb-2"
-            >
+            <div className={labelVariants()} id="servings-label">
               幾人份
-            </label>
+            </div>
             <div className="flex items-center">
               <input
                 id="servings"
                 type="number"
-                className={cn(
-                  'w-full p-2 border rounded-md',
-                  errors.servings ? 'border-red-500' : 'border-neutral-300',
-                )}
+                aria-labelledby="servings-label"
+                className={uploadFieldVariants({
+                  variant: 'number',
+                  state: errors.servings ? 'error' : 'default',
+                })}
                 {...register('servings')}
               />
               <span className="ml-2">人份</span>
             </div>
             {errors.servings && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className={errorMessageVariants()}>
                 {errors.servings.message}
               </p>
             )}
@@ -657,12 +666,10 @@ export default function RecipeUploadStep2() {
         <button
           type="submit"
           disabled={isLoading}
-          className={cn(
-            'w-full py-3 text-white rounded-md transition-colors',
-            isLoading
-              ? 'bg-neutral-300 cursor-not-allowed'
-              : 'bg-neutral-400 hover:bg-neutral-500',
-          )}
+          className={uploadButtonVariants({
+            variant: 'primary',
+            state: isLoading ? 'loading' : 'default',
+          })}
         >
           {isLoading ? COMMON_TEXTS.SUBMITTING : '下一步'}
         </button>
