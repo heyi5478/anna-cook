@@ -45,6 +45,19 @@ import {
   SUPPORTED_IMAGE_TYPES,
   FILE_VALIDATION_MESSAGES,
 } from '@/lib/constants/file';
+import {
+  profilePageVariants,
+  profileFormVariants,
+  avatarContainerVariants,
+  avatarUploadButtonVariants,
+  profileFieldVariants,
+  verificationBadgeVariants,
+  profileButtonVariants,
+  loadingStateVariants,
+  errorStateVariants,
+  dialogVariants,
+  breadcrumbVariants,
+} from './styles';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
@@ -61,6 +74,40 @@ const profileFormSchema = z.object({
 
 // 定義表單值類型
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+/**
+ * 獲取頁面狀態樣式
+ */
+const getPageState = (isLoading: boolean, error: string | null) => {
+  if (isLoading) return 'loading';
+  if (error) return 'error';
+  return 'default';
+};
+
+/**
+ * 獲取表單狀態樣式
+ */
+const getFormState = (isSubmitting: boolean) => {
+  if (isSubmitting) return 'submitting';
+  return 'default';
+};
+
+/**
+ * 獲取按鈕狀態樣式
+ */
+const getButtonState = (isSubmitting: boolean, disabled: boolean = false) => {
+  if (isSubmitting) return 'submitting';
+  if (disabled) return 'disabled';
+  return 'default';
+};
+
+/**
+ * 獲取頭像上傳按鈕狀態
+ */
+const getAvatarUploadState = (isSubmitting: boolean) => {
+  if (isSubmitting) return 'uploading';
+  return 'default';
+};
 
 export default function ProfileEditForm() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -256,10 +303,12 @@ export default function ProfileEditForm() {
   // 顯示載入中狀態
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neutral-900 mx-auto mb-4" />
-          <p className="text-neutral-600">載入個人資料中...</p>
+      <div className={loadingStateVariants()}>
+        <div className={loadingStateVariants({ layout: 'center' })}>
+          <div className={loadingStateVariants({ spinner: 'default' })} />
+          <p className={loadingStateVariants({ text: 'default' })}>
+            載入個人資料中...
+          </p>
         </div>
       </div>
     );
@@ -268,15 +317,22 @@ export default function ProfileEditForm() {
   // 顯示錯誤狀態
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
-          <div className="text-red-500 text-xl mb-4">
+      <div className={loadingStateVariants()}>
+        <div className={errorStateVariants({ layout: 'default' })}>
+          <div
+            className={errorStateVariants({
+              severity: 'error',
+              title: 'default',
+            })}
+          >
             {ERROR_MESSAGES.LOAD_FAILED}
           </div>
-          <p className="text-neutral-700 mb-4">{error}</p>
+          <p className={errorStateVariants({ description: 'default' })}>
+            {error}
+          </p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-red-500 hover:bg-red-600 text-white"
+            className={profileButtonVariants({ variant: 'destructive' })}
           >
             重新載入
           </Button>
@@ -286,10 +342,12 @@ export default function ProfileEditForm() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-100">
+    <div
+      className={profilePageVariants({ state: getPageState(isLoading, error) })}
+    >
       {/* 確認對話框 */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-neutral-100">
+        <DialogContent className={dialogVariants({ background: 'neutral' })}>
           <DialogHeader>
             <DialogTitle>確認取消變更</DialogTitle>
             <DialogDescription>
@@ -300,10 +358,15 @@ export default function ProfileEditForm() {
             <Button
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
+              className={profileButtonVariants({ variant: 'outline' })}
             >
               返回編輯
             </Button>
-            <Button variant="destructive" onClick={confirmReset}>
+            <Button
+              variant="destructive"
+              onClick={confirmReset}
+              className={profileButtonVariants({ variant: 'destructive' })}
+            >
               {COMMON_TEXTS.CONFIRM}取消
             </Button>
           </DialogFooter>
@@ -311,7 +374,7 @@ export default function ProfileEditForm() {
       </Dialog>
 
       {/* 麵包屑導航 */}
-      <Breadcrumb className="px-4 py-3">
+      <Breadcrumb className={breadcrumbVariants()}>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">首頁</BreadcrumbLink>
@@ -332,16 +395,28 @@ export default function ProfileEditForm() {
       </Breadcrumb>
 
       {/* 主要內容 */}
-      <main className="flex-1 px-4 py-6 md:max-w-2xl md:mx-auto w-full">
+      <main
+        className={profileFormVariants({
+          maxWidth: 'default',
+          state: getFormState(isSubmitting),
+        })}
+      >
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit, onError)}
-            className="space-y-6"
+            className={profileFormVariants({ layout: 'default' })}
           >
             {/* 頭像上傳 */}
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <div className="h-28 w-28 rounded-full overflow-hidden flex items-center justify-center bg-neutral-200">
+            <div className={avatarContainerVariants({ layout: 'default' })}>
+              <div className={avatarContainerVariants()}>
+                <div
+                  className={avatarContainerVariants({
+                    size: 'default',
+                    shape: 'circle',
+                    background: 'default',
+                    state: 'default',
+                  })}
+                >
                   {avatarUrl ? (
                     <img
                       src={avatarUrl || '/placeholder.svg'}
@@ -368,7 +443,11 @@ export default function ProfileEditForm() {
                 </div>
                 <label
                   htmlFor="avatar-upload"
-                  className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-neutral-500 flex items-center justify-center cursor-pointer"
+                  className={avatarUploadButtonVariants({
+                    size: 'default',
+                    color: 'default',
+                    state: getAvatarUploadState(isSubmitting),
+                  })}
                 >
                   <Camera className="h-5 w-5 text-white" />
                   <input
@@ -378,6 +457,7 @@ export default function ProfileEditForm() {
                     className="hidden"
                     onChange={handleAvatarChange}
                     ref={avatarFileInputRef}
+                    disabled={isSubmitting}
                   />
                 </label>
               </div>
@@ -387,11 +467,20 @@ export default function ProfileEditForm() {
             <FormField<ProfileFormValues>
               control={form.control}
               name="nickname"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>暱稱</FormLabel>
                   <FormControl>
-                    <Input placeholder="請輸入暱稱" {...field} />
+                    <Input
+                      placeholder="請輸入暱稱"
+                      className={profileFieldVariants({
+                        type: 'default',
+                        state: fieldState.error ? 'error' : 'default',
+                        width: 'full',
+                      })}
+                      disabled={isSubmitting}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -407,9 +496,21 @@ export default function ProfileEditForm() {
                   <FormLabel>電子郵件</FormLabel>
                   <div className="relative">
                     <FormControl>
-                      <Input {...field} className="pr-24" disabled />
+                      <Input
+                        className={profileFieldVariants({
+                          type: 'email',
+                          state: 'verified',
+                          width: 'full',
+                        })}
+                        disabled
+                        {...field}
+                      />
                     </FormControl>
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-neutral-500 flex items-center">
+                    <div
+                      className={verificationBadgeVariants({
+                        status: 'verified',
+                      })}
+                    >
                       <ShieldCheck className="mr-1" size={16} />
                       已驗證
                     </div>
@@ -423,13 +524,18 @@ export default function ProfileEditForm() {
             <FormField<ProfileFormValues>
               control={form.control}
               name="bio"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>簡介</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="介紹一下自己..."
-                      className="resize-none h-32"
+                      className={profileFieldVariants({
+                        type: 'textarea',
+                        state: fieldState.error ? 'error' : 'default',
+                        width: 'full',
+                      })}
+                      disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
@@ -439,10 +545,14 @@ export default function ProfileEditForm() {
             />
 
             {/* 按鈕區域 */}
-            <div className="pt-6 space-y-3">
+            <div className={profileButtonVariants({ spacing: 'group' })}>
               <Button
                 type="submit"
-                className="w-full bg-neutral-600 hover:bg-neutral-700"
+                className={profileButtonVariants({
+                  variant: 'primary',
+                  size: 'full',
+                  state: getButtonState(isSubmitting),
+                })}
                 disabled={isSubmitting}
               >
                 {isSubmitting
@@ -452,7 +562,11 @@ export default function ProfileEditForm() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className={profileButtonVariants({
+                  variant: 'outline',
+                  size: 'full',
+                  state: getButtonState(false, isSubmitting),
+                })}
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
