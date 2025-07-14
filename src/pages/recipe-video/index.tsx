@@ -39,7 +39,7 @@ export default function RecipeVideoPage() {
   // 使用自定義 hooks
   const { teachingData, steps, videoId, loading, error } =
     useRecipeTeaching(recipeId);
-  useScreenOrientation();
+  useScreenOrientation(); // CSS-First 方向偵測
 
   // 重置狀態當組件卸載時
   useEffect(() => {
