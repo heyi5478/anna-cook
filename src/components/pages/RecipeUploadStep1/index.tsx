@@ -27,13 +27,13 @@ import {
   uploadPageVariants,
   uploadFieldVariants,
   uploadButtonVariants,
-  errorMessageVariants,
-  uploadAreaVariants,
+  recipeUploadErrorMessageVariants as errorMessageVariants,
+  recipeUploadAreaVariants as uploadAreaVariants,
   stepContainerVariants,
-  labelVariants,
+  recipeUploadLabelVariants as labelVariants,
   inputIconVariants,
-  successMessageVariants,
-} from '@/styles/upload-forms';
+  recipeUploadSuccessMessageVariants as successMessageVariants,
+} from '@/styles/cva';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({

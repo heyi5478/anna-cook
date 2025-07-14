@@ -1,10 +1,7 @@
 /**
- * CVA 樣式集中管理
+ * CVA (Class Variance Authority) 樣式集中管理系統
  */
-/**
- * 食譜草稿頁面樣式變體
- * 用於食譜編輯、草稿保存等功能
- */
+
 // =============================================================================
 // 樣式工具函數
 // =============================================================================
@@ -12,6 +9,10 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+/**
+ * 食譜草稿頁面樣式變體
+ * 用於食譜編輯、草稿保存等功能
+ */
 export * from './recipe-draft';
 
 /**
@@ -299,6 +300,51 @@ export type {
   AuthorBioVariantsProps,
   ShareButtonVariantsProps,
 } from './author-profile';
+
+/**
+ * 食譜上傳樣式變體
+ * 用於食譜建立、上傳表單、步驟編輯等功能
+ *
+ * 包含功能：
+ * - 食譜基本資訊上傳（第一步）
+ * - 食材調料配置（第二步）
+ * - 檔案上傳區域
+ * - 表單驗證狀態
+ * - 動態欄位管理
+ */
+export {
+  // 重新命名避免衝突的變體
+  uploadErrorMessageVariants as recipeUploadErrorMessageVariants,
+  uploadAreaVariants as recipeUploadAreaVariants,
+  // 其他變體保持原樣
+  uploadPageVariants,
+  uploadFormVariants,
+  uploadFieldVariants,
+  uploadButtonVariants,
+  tagVariants as recipeUploadTagVariants,
+  ingredientRowVariants,
+  stepContainerVariants,
+  labelVariants as recipeUploadLabelVariants,
+  inputIconVariants,
+  successMessageVariants as recipeUploadSuccessMessageVariants,
+  uploadStyles,
+} from './recipe-upload';
+
+// Recipe Upload 類型導出
+export type {
+  UploadPageVariantsProps,
+  UploadFormVariantsProps,
+  UploadFieldVariantsProps,
+  UploadButtonVariantsProps,
+  UploadErrorMessageVariantsProps as RecipeUploadErrorMessageVariantsProps,
+  UploadAreaVariantsProps as RecipeUploadAreaVariantsProps,
+  TagVariantsProps as RecipeUploadTagVariantsProps,
+  IngredientRowVariantsProps,
+  StepContainerVariantsProps,
+  LabelVariantsProps as RecipeUploadLabelVariantsProps,
+  InputIconVariantsProps,
+  SuccessMessageVariantsProps as RecipeUploadSuccessMessageVariantsProps,
+} from './recipe-upload';
 
 /**
  * 聯絡我們頁面樣式變體

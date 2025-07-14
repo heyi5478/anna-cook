@@ -20,12 +20,12 @@ import {
   uploadPageVariants,
   uploadFieldVariants,
   uploadButtonVariants,
-  errorMessageVariants,
+  recipeUploadErrorMessageVariants as errorMessageVariants,
   stepContainerVariants,
-  labelVariants,
-  tagVariants,
+  recipeUploadLabelVariants as labelVariants,
+  recipeUploadTagVariants as tagVariants,
   ingredientRowVariants,
-} from '@/styles/upload-forms';
+} from '@/styles/cva';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
