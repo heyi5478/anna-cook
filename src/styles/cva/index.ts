@@ -322,10 +322,10 @@ export {
   uploadFieldVariants,
   uploadButtonVariants,
   tagVariants as recipeUploadTagVariants,
-  ingredientRowVariants,
-  stepContainerVariants,
+  ingredientRowVariants as recipeUploadIngredientRowVariants,
+  stepContainerVariants as recipeUploadStepContainerVariants,
   labelVariants as recipeUploadLabelVariants,
-  inputIconVariants,
+  inputIconVariants as recipeUploadInputIconVariants,
   successMessageVariants as recipeUploadSuccessMessageVariants,
   uploadStyles,
 } from './recipe-upload';
@@ -339,10 +339,10 @@ export type {
   UploadErrorMessageVariantsProps as RecipeUploadErrorMessageVariantsProps,
   UploadAreaVariantsProps as RecipeUploadAreaVariantsProps,
   TagVariantsProps as RecipeUploadTagVariantsProps,
-  IngredientRowVariantsProps,
-  StepContainerVariantsProps,
+  IngredientRowVariantsProps as RecipeUploadIngredientRowVariantsProps,
+  StepContainerVariantsProps as RecipeUploadStepContainerVariantsProps,
   LabelVariantsProps as RecipeUploadLabelVariantsProps,
-  InputIconVariantsProps,
+  InputIconVariantsProps as RecipeUploadInputIconVariantsProps,
   SuccessMessageVariantsProps as RecipeUploadSuccessMessageVariantsProps,
 } from './recipe-upload';
 

@@ -21,10 +21,10 @@ import {
   uploadFieldVariants,
   uploadButtonVariants,
   recipeUploadErrorMessageVariants as errorMessageVariants,
-  stepContainerVariants,
+  recipeUploadStepContainerVariants as stepContainerVariants,
   recipeUploadLabelVariants as labelVariants,
   recipeUploadTagVariants as tagVariants,
-  ingredientRowVariants,
+  recipeUploadIngredientRowVariants as ingredientRowVariants,
 } from '@/styles/cva';
 
 // 定義表單驗證 schema

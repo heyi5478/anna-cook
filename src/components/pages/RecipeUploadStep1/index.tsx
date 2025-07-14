@@ -29,9 +29,9 @@ import {
   uploadButtonVariants,
   recipeUploadErrorMessageVariants as errorMessageVariants,
   recipeUploadAreaVariants as uploadAreaVariants,
-  stepContainerVariants,
+  recipeUploadStepContainerVariants as stepContainerVariants,
   recipeUploadLabelVariants as labelVariants,
-  inputIconVariants,
+  recipeUploadInputIconVariants as inputIconVariants,
   recipeUploadSuccessMessageVariants as successMessageVariants,
 } from '@/styles/cva';
 
