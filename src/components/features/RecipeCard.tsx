@@ -1,18 +1,67 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Clock, Users, Star } from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { Recipe } from '@/types/recipe';
+
+// 管理食譜卡片容器的樣式變體
+const recipeCardVariants = cva('overflow-hidden w-full mb-4', {
+  variants: {
+    spacing: {
+      default: '',
+    },
+    interactive: {
+      default: '',
+    },
+    background: {
+      default: '',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+    interactive: 'default',
+    background: 'default',
+  },
+});
+
+// 管理食譜卡片內容區域的樣式變體
+const recipeContentVariants = cva('flex flex-row items-center bg-neutral-50', {
+  variants: {
+    spacing: {
+      default: '',
+    },
+    interactive: {
+      default: '',
+    },
+    background: {
+      default: '',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+    interactive: 'default',
+    background: 'default',
+  },
+});
 
 export type RecipeCardProps = {
   recipe: Recipe;
   className?: string;
-};
+} & VariantProps<typeof recipeCardVariants>;
 
 /**
  * 顯示食譜內容的卡片元件，包含圖片、標題、描述和食譜相關資訊
  */
-export function RecipeCard({ recipe, className }: RecipeCardProps) {
+export function RecipeCard({
+  recipe,
+  className,
+  spacing,
+  interactive,
+  background,
+  ...props
+}: RecipeCardProps) {
   /**
    * 渲染食譜的圖片部分
    */
@@ -55,8 +104,18 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
 
   return (
     <Link href={`/recipe-page/${recipe.id}`} className="block">
-      <Card className={`overflow-hidden w-full mb-4 ${className || ''}`}>
-        <div className="flex flex-row items-center bg-neutral-50">
+      <Card
+        className={cn(
+          recipeCardVariants({ spacing, interactive, background }),
+          className,
+        )}
+        {...props}
+      >
+        <div
+          className={cn(
+            recipeContentVariants({ spacing, interactive, background }),
+          )}
+        >
           {renderImage()}
           <CardContent className="flex-1 px-4 py-6">
             <h2 className="text-[22px] font-bold text-neutral-800 mb-2">

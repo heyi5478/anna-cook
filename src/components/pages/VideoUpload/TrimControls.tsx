@@ -1,11 +1,33 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { cn, formatTime } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
 import { VIDEO_SEGMENT_LIMITS, VIDEO_SEGMENT_STATUS } from '@/lib/constants';
+import {
+  trimControlVariants,
+  timelineContainerVariants,
+  timeMarkerVariants,
+  thumbnailContainerVariants,
+  thumbnailVariants,
+  segmentMarkerVariants,
+  segmentMarkerLabelVariants,
+  maskVariants,
+  playbackIndicatorVariants,
+  playbackIndicatorMarkerVariants,
+  sliderHandleVariants,
+  sliderHandleMarkerVariants,
+  timeRangeDisplayVariants,
+  markButtonGroupVariants,
+  markButtonVariants,
+  statusIndicatorVariants,
+  statusIndicatorContentVariants,
+  statusLightVariants,
+  statusTextVariants,
+  resetButtonVariants,
+} from '@/styles/cva/video-upload';
 
 /**
- * 影片剪輯控制元件，處理影片片段的時間軸及剪輯控制
+ * 影片剪輯控制元件屬性
  */
 type TrimControlsProps = {
   duration: number;
@@ -27,6 +49,7 @@ type TrimControlsProps = {
   currentSegmentIndex: number;
 };
 
+// 影片剪輯控制元件 - 處理影片片段的時間軸及剪輯控制
 export default function TrimControls({
   duration,
   currentTime,
@@ -48,12 +71,58 @@ export default function TrimControls({
     description: '',
   };
 
+  // 獲取狀態指示器狀態
+  const getStatusIndicatorState = () => {
+    const segmentDuration = currentSegment.endTime - currentSegment.startTime;
+
+    if (
+      segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION ||
+      segmentDuration > VIDEO_SEGMENT_LIMITS.MAX_DURATION
+    ) {
+      return 'error';
+    }
+    if (
+      (segmentDuration >= VIDEO_SEGMENT_LIMITS.MIN_DURATION &&
+        segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN) ||
+      (segmentDuration > VIDEO_SEGMENT_LIMITS.IDEAL_MAX &&
+        segmentDuration <= VIDEO_SEGMENT_LIMITS.MAX_DURATION)
+    ) {
+      return 'warning';
+    }
+    return 'success';
+  };
+
+  // 獲取狀態文字
+  const getStatusText = () => {
+    const segmentDuration = currentSegment.endTime - currentSegment.startTime;
+
+    if (
+      segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION ||
+      segmentDuration > VIDEO_SEGMENT_LIMITS.MAX_DURATION
+    ) {
+      return segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION
+        ? VIDEO_SEGMENT_STATUS.TOO_SHORT
+        : VIDEO_SEGMENT_STATUS.TOO_LONG;
+    }
+    if (
+      (segmentDuration >= VIDEO_SEGMENT_LIMITS.MIN_DURATION &&
+        segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN) ||
+      (segmentDuration > VIDEO_SEGMENT_LIMITS.IDEAL_MAX &&
+        segmentDuration <= VIDEO_SEGMENT_LIMITS.MAX_DURATION)
+    ) {
+      return segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN
+        ? VIDEO_SEGMENT_STATUS.SLIGHTLY_SHORT
+        : VIDEO_SEGMENT_STATUS.SLIGHTLY_LONG;
+    }
+    return VIDEO_SEGMENT_STATUS.IDEAL;
+  };
+
   return (
-    <div className="space-y-4">
+    <div className={trimControlVariants()}>
       {/* 雙滑桿剪輯 (YouTube 風格) */}
-      <div className="space-y-2 mt-6">
+      <div className={timelineContainerVariants()}>
         {/* 時間標記 */}
-        <div className="flex justify-between text-xs text-neutral-500">
+        <div className={timeMarkerVariants()}>
           <span>0:00</span>
           <span>
             {Math.floor(duration / 60)}:
@@ -64,9 +133,9 @@ export default function TrimControls({
         </div>
 
         {/* 整合縮圖預覽和滑桿 */}
-        <div className="relative h-16">
+        <div className={thumbnailContainerVariants()}>
           {/* 縮圖容器 */}
-          <div className="absolute inset-0 flex rounded overflow-hidden">
+          <div className={thumbnailVariants()}>
             {thumbnails.map((thumbnail, i) => {
               // 生成唯一且穩定的 key，使用縮圖資料的前10字元作為唯一標識
               const uniqueId = `${i}-${thumbnail.slice(-10)}`;
@@ -90,26 +159,21 @@ export default function TrimControls({
           {segments.map((segment, index) => (
             <div
               key={segment.id}
-              className={cn(
-                'absolute top-0 bottom-0 border-2 pointer-events-none z-10',
-                index === currentSegmentIndex
-                  ? 'border-blue-500 bg-blue-500/10'
-                  : 'border-blue-300 bg-blue-300/10',
-              )}
+              className={segmentMarkerVariants({
+                state: index === currentSegmentIndex ? 'current' : 'normal',
+              })}
               style={{
                 left: `${segment.startPercent}%`,
                 width: `${segment.endPercent - segment.startPercent}%`,
               }}
             >
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-medium px-1 py-0.5 rounded bg-blue-600 text-white">
-                {index + 1}
-              </div>
+              <div className={segmentMarkerLabelVariants()}>{index + 1}</div>
             </div>
           ))}
 
           {/* 非選中區域遮罩 (左側) */}
           <div
-            className="absolute top-0 bottom-0 bg-black/50 pointer-events-none z-10 rounded-l"
+            className={maskVariants({ side: 'left' })}
             style={{
               left: 0,
               width: `${trimValues[0]}%`,
@@ -118,7 +182,7 @@ export default function TrimControls({
 
           {/* 非選中區域遮罩 (右側) */}
           <div
-            className="absolute top-0 bottom-0 bg-black/50 pointer-events-none z-10 rounded-r"
+            className={maskVariants({ side: 'right' })}
             style={{
               right: 0,
               width: `${100 - trimValues[1]}%`,
@@ -127,12 +191,12 @@ export default function TrimControls({
 
           {/* 當前播放位置指示器 */}
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+            className={playbackIndicatorVariants()}
             style={{
               left: `${(currentTime / duration) * 100}%`,
             }}
           >
-            <div className="absolute -top-1 -ml-1.5 w-3 h-3 bg-red-500 rounded-full" />
+            <div className={playbackIndicatorMarkerVariants()} />
           </div>
 
           {/* 自定義樣式的 Slider */}
@@ -148,20 +212,20 @@ export default function TrimControls({
 
           {/* 左側把手 (與 Slider 的第一個滑塊對齊) */}
           <div
-            className="absolute top-0 bottom-0 w-1 bg-blue-500 z-40 pointer-events-none"
+            className={sliderHandleVariants()}
             style={{ left: `${trimValues[0]}%` }}
           >
-            <div className="absolute h-6 w-6 bg-blue-500 rounded-full -ml-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+            <div className={sliderHandleMarkerVariants()}>
               <div className="h-4 w-0.5 bg-white" />
             </div>
           </div>
 
           {/* 右側把手 (與 Slider 的第二個滑塊對齊) */}
           <div
-            className="absolute top-0 bottom-0 w-1 bg-blue-500 z-40 pointer-events-none"
+            className={sliderHandleVariants()}
             style={{ left: `${trimValues[1]}%` }}
           >
-            <div className="absolute h-6 w-6 bg-blue-500 rounded-full -ml-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+            <div className={sliderHandleMarkerVariants()}>
               <div className="h-4 w-0.5 bg-white" />
             </div>
           </div>
@@ -169,73 +233,55 @@ export default function TrimControls({
       </div>
 
       {/* 剪輯時間顯示 */}
-      <div className="flex justify-between text-sm">
+      <div className={timeRangeDisplayVariants()}>
         <span>起點: {formatTime(currentSegment.startTime)} 秒</span>
         <span>終點: {formatTime(currentSegment.endTime)} 秒</span>
       </div>
 
       {/* 標記按鈕 */}
-      <div className="flex justify-between gap-4 mt-4">
-        <Button onClick={atMarkStartPoint} variant="outline" className="flex-1">
+      <div className={markButtonGroupVariants()}>
+        <Button
+          onClick={atMarkStartPoint}
+          variant="outline"
+          className={markButtonVariants()}
+        >
           標記起點
         </Button>
-        <Button onClick={atMarkEndPoint} variant="outline" className="flex-1">
+        <Button
+          onClick={atMarkEndPoint}
+          variant="outline"
+          className={markButtonVariants()}
+        >
           標記終點
         </Button>
       </div>
 
-      {/* 紅綠燈警示 */}
-      <div className="mt-3 mb-1">
-        {(() => {
-          const segmentDuration =
-            currentSegment.endTime - currentSegment.startTime;
-          let statusColor = '';
-          let statusText = '';
-
-          if (
-            segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION ||
-            segmentDuration > VIDEO_SEGMENT_LIMITS.MAX_DURATION
-          ) {
-            statusColor = 'bg-red-500';
-            statusText =
-              segmentDuration < VIDEO_SEGMENT_LIMITS.MIN_DURATION
-                ? VIDEO_SEGMENT_STATUS.TOO_SHORT
-                : VIDEO_SEGMENT_STATUS.TOO_LONG;
-          } else if (
-            (segmentDuration >= VIDEO_SEGMENT_LIMITS.MIN_DURATION &&
-              segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN) ||
-            (segmentDuration > VIDEO_SEGMENT_LIMITS.IDEAL_MAX &&
-              segmentDuration <= VIDEO_SEGMENT_LIMITS.MAX_DURATION)
-          ) {
-            statusColor = 'bg-yellow-500';
-            statusText =
-              segmentDuration < VIDEO_SEGMENT_LIMITS.IDEAL_MIN
-                ? VIDEO_SEGMENT_STATUS.SLIGHTLY_SHORT
-                : VIDEO_SEGMENT_STATUS.SLIGHTLY_LONG;
-          } else {
-            statusColor = 'bg-green-500';
-            statusText = VIDEO_SEGMENT_STATUS.IDEAL;
-          }
-
-          return (
-            <div className="flex items-center">
-              <div className={`w-4 h-4 rounded-full ${statusColor} mr-2`} />
-              <div className="text-sm text-neutral-700">
-                <span>步驟時長: {segmentDuration.toFixed(2)} 秒</span>
-                <span className="ml-2 text-xs text-neutral-500">
-                  {statusText}
-                </span>
-              </div>
-            </div>
-          );
-        })()}
+      {/* 狀態指示器 */}
+      <div className={statusIndicatorVariants()}>
+        <div className={statusIndicatorContentVariants()}>
+          <div
+            className={statusLightVariants({
+              status: getStatusIndicatorState(),
+            })}
+          />
+          <div className={statusTextVariants()}>
+            <span>
+              步驟時長:{' '}
+              {(currentSegment.endTime - currentSegment.startTime).toFixed(2)}{' '}
+              秒
+            </span>
+            <span className="ml-2 text-xs text-neutral-500">
+              {getStatusText()}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* 重置按鈕 */}
       <Button
         onClick={atResetCurrentSegment}
         variant="outline"
-        className="w-full flex items-center justify-center"
+        className={resetButtonVariants()}
       >
         <span className="mr-2">↻</span>
         該步驟重置

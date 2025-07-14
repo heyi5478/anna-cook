@@ -18,6 +18,17 @@ import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
 import type { Ingredient, Seasoning } from '@/types/recipe';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import {
+  draftPageVariants,
+  draftSectionVariants,
+  draftFieldVariants,
+  draftLabelVariants,
+  errorMessageVariants,
+  loadingStateVariants,
+  videoContainerVariants,
+  spacingVariants,
+  draftStyles,
+} from '@/styles/cva/recipe-draft';
 import { recipeFormSchema, type RecipeFormValues } from './schema';
 import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';
@@ -30,6 +41,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 /**
  * 食譜草稿編輯器元件 - 用於建立和編輯食譜草稿
  * 主要負責視覺呈現和表單管理，商業邏輯由 store 處理
+ * 使用 CVA 樣式系統統一管理所有樣式變體
  */
 export default function RecipeDraft() {
   const router = useRouter();
@@ -207,27 +219,46 @@ export default function RecipeDraft() {
   // 監聽表單值變化
   const formValues = watch();
 
+  /**
+   * 載入狀態顯示 - 使用 CVA 載入狀態樣式
+   */
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl font-semibold">載入食譜草稿中...</div>
+      <div
+        className={loadingStateVariants({
+          layout: 'default',
+          state: 'loading',
+        })}
+      >
+        <div className={loadingStateVariants({ text: 'default' })}>
+          載入食譜草稿中...
+        </div>
       </div>
     );
   }
 
+  /**
+   * 錯誤狀態顯示 - 使用 CVA 錯誤狀態樣式
+   */
   if (error) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <div className="text-xl font-semibold text-red-500">{error}</div>
+      <div
+        className={loadingStateVariants({ layout: 'column', state: 'error' })}
+      >
+        <div
+          className={errorMessageVariants({ size: 'xl', state: 'critical' })}
+        >
+          {error}
+        </div>
         <Button onClick={() => router.push('/')}>回首頁</Button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* 麵包屑導航 */}
-      <div className="p-4">
+    <div className={draftPageVariants({ layout: 'default' })}>
+      {/* 麵包屑導航區域 - 使用 CVA 間距樣式 */}
+      <div className={spacingVariants({ padding: 'default' })}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -249,33 +280,63 @@ export default function RecipeDraft() {
         </Breadcrumb>
       </div>
 
-      {/* 主要內容 */}
-      <main className="flex-1 p-4">
-        <form className="max-w-md mx-auto" onSubmit={atSaveRecipe}>
-          {/* 食譜名稱 */}
-          <div className="mb-4">
-            <h2 className="mb-2 text-lg font-medium">食譜名稱</h2>
+      {/* 主要內容區域 - 使用 CVA 區塊容器樣式 */}
+      <main className={draftSectionVariants({ layout: 'mainContent' })}>
+        <form
+          className={draftSectionVariants({ layout: 'formContainer' })}
+          onSubmit={atSaveRecipe}
+        >
+          {/* 食譜名稱區塊 - 使用 CVA 表單區塊樣式 */}
+          <div className={draftSectionVariants({ spacing: 'default' })}>
+            <h2
+              className={draftLabelVariants({
+                size: 'default',
+                spacing: 'default',
+              })}
+            >
+              食譜名稱
+            </h2>
             <Controller
               name="name"
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
-                  className="w-full"
+                  className={draftFieldVariants({ size: 'full' })}
                   placeholder="請輸入食譜名稱"
                   aria-label="食譜名稱"
                 />
               )}
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+              <p
+                className={errorMessageVariants({
+                  size: 'sm',
+                  spacing: 'default',
+                })}
+              >
+                {errors.name.message}
+              </p>
             )}
           </div>
 
-          {/* 封面圖片 */}
-          <div className="mb-4">
-            <h2 className="mb-2 text-lg font-medium">封面圖片</h2>
-            <div className="flex items-center justify-center w-full h-40 bg-gray-200 rounded">
+          {/* 封面圖片區塊 - 使用 CVA 影片容器樣式 */}
+          <div className={draftSectionVariants({ spacing: 'default' })}>
+            <h2
+              className={draftLabelVariants({
+                size: 'default',
+                spacing: 'default',
+              })}
+            >
+              封面圖片
+            </h2>
+            <div
+              className={videoContainerVariants({
+                size: 'default',
+                background: 'light',
+                aspect: 'video',
+              })}
+            >
               {recipeImage ? (
                 <img
                   src={
@@ -292,29 +353,44 @@ export default function RecipeDraft() {
             </div>
           </div>
 
-          {/* 食譜簡介 */}
-          <div className="mb-4">
-            <h2 className="mb-2 text-lg font-medium">食譜簡介</h2>
+          {/* 食譜簡介區塊 - 使用 CVA 表單欄位樣式 */}
+          <div className={draftSectionVariants({ spacing: 'default' })}>
+            <h2
+              className={draftLabelVariants({
+                size: 'default',
+                spacing: 'default',
+              })}
+            >
+              食譜簡介
+            </h2>
             <Controller
               name="description"
               control={control}
               render={({ field }) => (
                 <Textarea
                   {...field}
-                  className="bg-[#FAFAFA] w-full min-h-[64px]"
+                  className={draftFieldVariants({
+                    type: 'textarea',
+                    size: 'full',
+                  })}
                   placeholder="請輸入食譜簡介"
                   aria-label="食譜簡介"
                 />
               )}
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-500">
+              <p
+                className={errorMessageVariants({
+                  size: 'sm',
+                  spacing: 'default',
+                })}
+              >
                 {errors.description.message}
               </p>
             )}
           </div>
 
-          {/* 食材和調味料清單 */}
+          {/* 食材和調味料清單 - 保持子組件介面不變 */}
           <IngredientList
             ingredients={ingredientFields}
             seasonings={seasoningFields}
@@ -330,7 +406,7 @@ export default function RecipeDraft() {
             }}
           />
 
-          {/* 食譜標籤 */}
+          {/* 食譜標籤 - 保持子組件介面不變 */}
           <TagSection
             tags={formValues.tags}
             newTag={newTag}
@@ -339,7 +415,7 @@ export default function RecipeDraft() {
             onRemoveTag={atRemoveTag}
           />
 
-          {/* 烹飪時間和份量 */}
+          {/* 烹飪時間和份量 - 保持子組件介面不變 */}
           <CookingInfo
             cookingTimeValue={formValues.cookingTimeValue}
             cookingTimeUnit={formValues.cookingTimeUnit}
@@ -355,15 +431,19 @@ export default function RecipeDraft() {
             }}
           />
 
-          {/* 料理步驟 */}
+          {/* 料理步驟 - 保持子組件介面不變 */}
           <CookingStep
             steps={recipeSteps}
             onRemoveStep={removeStep}
             onNavigateToVideoEdit={atNavigateToVideoEdit}
           />
 
-          {/* 儲存按鈕 */}
-          <Button type="submit" className="w-full mb-4" disabled={saving}>
+          {/* 儲存按鈕區域 - 使用 CVA 預設按鈕樣式 */}
+          <Button
+            type="submit"
+            className={draftStyles.button.submitButton}
+            disabled={saving}
+          >
             {saving ? COMMON_TEXTS.SUBMITTING : `${COMMON_TEXTS.SAVE}草稿`}
           </Button>
         </form>

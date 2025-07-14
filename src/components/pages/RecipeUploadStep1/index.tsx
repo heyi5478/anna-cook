@@ -23,6 +23,17 @@ import {
   SUPPORTED_IMAGE_TYPES,
   FILE_VALIDATION_MESSAGES,
 } from '@/lib/constants/file';
+import {
+  uploadPageVariants,
+  uploadFieldVariants,
+  uploadButtonVariants,
+  recipeUploadErrorMessageVariants as errorMessageVariants,
+  recipeUploadAreaVariants as uploadAreaVariants,
+  recipeUploadStepContainerVariants as stepContainerVariants,
+  recipeUploadLabelVariants as labelVariants,
+  recipeUploadInputIconVariants as inputIconVariants,
+  recipeUploadSuccessMessageVariants as successMessageVariants,
+} from '@/styles/cva';
 
 // 定義表單驗證 schema
 const recipeFormSchema = z.object({
@@ -66,6 +77,7 @@ const recipeFormSchema = z.object({
 // 定義表單資料型別
 type RecipeFormValues = z.infer<typeof recipeFormSchema>;
 
+// 食譜上傳第一步主組件
 export default function RecipeUploadForm() {
   // 初始化路由器
   const router = useRouter();
@@ -228,7 +240,7 @@ export default function RecipeUploadForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className={uploadPageVariants()}>
       {/* 麵包屑導航 */}
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
@@ -247,11 +259,13 @@ export default function RecipeUploadForm() {
       </Breadcrumb>
 
       {/* 步驟指示器 */}
-      <StepIndicator currentStep={currentStep} />
+      <div className={stepContainerVariants()}>
+        <StepIndicator currentStep={currentStep} />
+      </div>
 
       {/* 錯誤訊息顯示 */}
       {errorMsg && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-600 rounded-md">
+        <div className={errorMessageVariants({ variant: 'banner' })}>
           {errorMsg}
         </div>
       )}
@@ -259,26 +273,29 @@ export default function RecipeUploadForm() {
       {/* 表單 */}
       <form onSubmit={handleSubmit(atSubmit, atError)}>
         {/* 食譜名稱輸入 */}
-        <div className="mb-6">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label
-            htmlFor="recipeName"
-            className="block text-lg font-medium mb-2"
-          >
+        <div className={stepContainerVariants()}>
+          <div className={labelVariants()} id="recipeName-label">
             輸入食譜名稱
-          </label>
+          </div>
           <div className="relative">
             <input
               id="recipeName"
               type="text"
               placeholder="在此輸入食譜名稱"
+              aria-labelledby="recipeName-label"
               className={cn(
-                'w-full px-10 py-3 border rounded-md bg-neutral-50',
-                errors.recipeName ? 'border-red-500' : 'border-neutral-300',
+                uploadFieldVariants({
+                  variant: 'iconInput',
+                  state: errors.recipeName ? 'error' : 'default',
+                }),
               )}
               {...register('recipeName')}
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+            <div
+              className={inputIconVariants({
+                color: errors.recipeName ? 'error' : 'default',
+              })}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -295,26 +312,25 @@ export default function RecipeUploadForm() {
             </div>
           </div>
           {errors.recipeName && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className={errorMessageVariants()}>
               {errors.recipeName.message}
             </p>
           )}
         </div>
 
         {/* 上傳封面圖片 */}
-        <div className="mb-6">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label
-            htmlFor="coverImage"
-            className="block text-lg font-medium mb-2"
-          >
+        <div className={stepContainerVariants()}>
+          <div className={labelVariants()}>
             上傳封面圖片<span className="text-red-500 ml-1">*</span>
-          </label>
+          </div>
           <div
-            className={cn(
-              'border rounded-md bg-gray-50 p-4 h-64 flex items-center justify-center cursor-pointer',
-              errors.coverImage ? 'border-red-500' : 'border-gray-300',
-            )}
+            className={uploadAreaVariants({
+              state: (() => {
+                if (errors.coverImage) return 'error';
+                if (imagePreview) return 'success';
+                return 'default';
+              })(),
+            })}
             onClick={() => document.getElementById('coverImage')?.click()}
           >
             {imagePreview ? (
@@ -357,13 +373,13 @@ export default function RecipeUploadForm() {
             />
           </div>
           {errors.coverImage && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className={errorMessageVariants()}>
               {errors.coverImage.message?.toString() ||
                 VALIDATION_MESSAGES.UPLOAD_COVER_IMAGE}
             </p>
           )}
           {imagePreview && (
-            <p className="mt-1 text-sm text-green-500">
+            <p className={successMessageVariants()}>
               已選擇圖片，可點擊重新選擇
             </p>
           )}
@@ -375,7 +391,7 @@ export default function RecipeUploadForm() {
         </div>
 
         {/* 同意條款 */}
-        <div className="mb-6">
+        <div className={stepContainerVariants()}>
           <label htmlFor="agreement" className="flex items-center">
             <input
               id="agreement"
@@ -389,9 +405,7 @@ export default function RecipeUploadForm() {
             <span className="text-sm">我已同意XX公司隱私及著作權條款</span>
           </label>
           {errors.agreement && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.agreement.message}
-            </p>
+            <p className={errorMessageVariants()}>{errors.agreement.message}</p>
           )}
         </div>
 
@@ -406,12 +420,10 @@ export default function RecipeUploadForm() {
         <button
           type="submit"
           disabled={isLoading || isSubmitting}
-          className={cn(
-            'w-full py-3 text-white rounded-md transition-colors',
-            isLoading || isSubmitting
-              ? 'bg-neutral-300 cursor-not-allowed'
-              : 'bg-neutral-400 hover:bg-neutral-500',
-          )}
+          className={uploadButtonVariants({
+            variant: 'primary',
+            state: isLoading || isSubmitting ? 'loading' : 'default',
+          })}
         >
           {isLoading ? COMMON_TEXTS.UPLOADING : '下一步'}
         </button>

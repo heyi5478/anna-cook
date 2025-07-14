@@ -3,6 +3,14 @@ import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/features/RecipeCard';
 import { fetchUserRecipes } from '@/services/users';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { cn } from '@/lib/utils';
+import {
+  recipesSectionVariants,
+  recipeTitleVariants,
+  recipeListVariants,
+  loadMoreButtonVariants,
+  loadingStateVariants,
+} from '@/styles/cva/author-profile';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
@@ -98,19 +106,33 @@ export const AuthorRecipes = ({
     }
 
     if (loading && page === 1) {
-      return <p className="text-center py-4">{COMMON_TEXTS.LOADING}</p>;
+      return (
+        <p className={cn(loadingStateVariants({ state: 'loading' }))}>
+          {COMMON_TEXTS.LOADING}
+        </p>
+      );
     }
 
     if (error) {
-      return <p className="text-center py-4 text-red-500">{error}</p>;
+      return (
+        <p className={cn(loadingStateVariants({ state: 'error' }))}>{error}</p>
+      );
     }
 
-    return <p className="text-center py-4">尚無食譜</p>;
+    return (
+      <p className={cn(loadingStateVariants({ state: 'empty' }))}>尚無食譜</p>
+    );
   };
 
   return (
-    <div className={`mt-6 ${isMe ? 'bg-gray-50' : 'bg-white'}`}>
-      <div className="bg-white px-4 py-3 mb-2">
+    <div
+      className={cn(
+        recipesSectionVariants({
+          background: isMe ? 'gray' : 'default',
+        }),
+      )}
+    >
+      <div className={cn(recipeTitleVariants())}>
         <h2 className="text-lg font-medium">
           {isMe ? '我的食譜' : '個人食譜'}
         </h2>
@@ -120,18 +142,24 @@ export const AuthorRecipes = ({
         <p className="text-sm text-neutral-500 mb-2">共{recipeCount}篇食譜</p>
 
         {/* 食譜列表 */}
-        <div className="space-y-3">{renderRecipeList()}</div>
+        <div className={cn(recipeListVariants())}>{renderRecipeList()}</div>
 
         {/* 載入中狀態 */}
         {loading && page > 1 && (
-          <p className="text-center py-2">{COMMON_TEXTS.LOADING}</p>
+          <p
+            className={cn(
+              loadingStateVariants({ state: 'loading', size: 'compact' }),
+            )}
+          >
+            {COMMON_TEXTS.LOADING}
+          </p>
         )}
 
         {/* 更多食譜按鈕 */}
         {hasMore && !loading && (
           <div className="mt-4 flex justify-center">
             <button
-              className="flex items-center text-neutral-500 py-2"
+              className={cn(loadMoreButtonVariants())}
               onClick={atLoadMore}
             >
               <span className="mr-1">更多食譜</span>

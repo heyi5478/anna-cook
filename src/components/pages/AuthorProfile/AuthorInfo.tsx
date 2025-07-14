@@ -2,7 +2,15 @@ import { Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { FollowButton } from '@/components/features/FollowButton';
+import { cn } from '@/lib/utils';
 import type { Author } from '@/types/recipe';
+import {
+  authorCardVariants,
+  authorInfoVariants,
+  authorStatsVariants,
+  authorBioVariants,
+  shareButtonVariants,
+} from '@/styles/cva/author-profile';
 
 interface AuthorInfoProps {
   author: Author;
@@ -44,11 +52,11 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
   console.log('AuthorInfo.tsx - 渲染按鈕狀態:', { isFollowing });
 
   return (
-    <div className="bg-white p-4">
-      <div className="flex flex-col items-center relative mb-4">
+    <div className={cn(authorCardVariants())}>
+      <div className={cn(authorInfoVariants())}>
         {/* 分享按鈕 */}
         <button
-          className="absolute right-0 top-4"
+          className={cn(shareButtonVariants())}
           onClick={onShareClick}
           aria-label="分享"
         >
@@ -69,7 +77,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
         <h1 className="text-xl font-bold mb-3">{author.name}</h1>
 
         {/* 食譜和粉絲數量 */}
-        <div className="flex gap-4 mb-4 text-sm text-neutral-500">
+        <div className={cn(authorStatsVariants())}>
           <span>{author.recipeCount || 0} 食譜</span>
           <span>{author.followerCount || author.followersCount || 0} 粉絲</span>
         </div>
@@ -91,7 +99,7 @@ export const AuthorInfo = ({ author, onShareClick }: AuthorInfoProps) => {
       </div>
 
       {/* 作者簡介 */}
-      <div className="mt-8 text-neutral-700 text-sm px-4">
+      <div className={cn(authorBioVariants())}>
         <p className="leading-6">{author.bio || author.description}</p>
       </div>
     </div>
