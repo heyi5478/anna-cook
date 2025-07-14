@@ -139,7 +139,15 @@ export default function RecipeVideoPage() {
   }
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div
+      className="
+      relative w-full h-screen bg-black overflow-hidden
+      mobile-portrait:transform mobile-portrait:rotate-90 mobile-portrait:origin-center
+      mobile-portrait:[width:100vh] mobile-portrait:[height:100vw]
+      mobile-portrait:fixed mobile-portrait:top-0 mobile-portrait:left-0
+      mobile-portrait:z-50
+    "
+    >
       <Head>
         <title>{teachingData.recipeName} - 教學視頻 | Anna Cook</title>
         <meta
@@ -153,7 +161,7 @@ export default function RecipeVideoPage() {
       </Head>
 
       {/* 視頻區域 */}
-      <div className="relative flex h-full">
+      <div className="relative flex h-full mobile-portrait:w-full mobile-portrait:h-full mobile-portrait:transform-gpu">
         <NavigationBar recipeId={recipeId} currentTime={currentTime} />
 
         <VideoPlayer
