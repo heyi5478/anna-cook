@@ -10,32 +10,37 @@ import {
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-
-/**
- * DraftRecipeCard 元件的 props 類型
- */
-type DraftRecipeCardProps = {
-  title?: string;
-  description?: string;
-  imageSrc?: string;
-  recipeId?: number;
-  onPublish?: (recipeId: number) => void;
-  isDeleteMode?: boolean;
-  onStatusChanged?: () => void;
-};
+import {
+  cardContainerBaseVariants,
+  cardImageVariants,
+  cardContentVariants,
+  cardTitleVariants,
+  cardDescriptionVariants,
+  cardActionButtonVariants,
+  dialogVariants,
+  dialogTitleVariants,
+  statusMessageVariants,
+  dialogButtonContainerVariants,
+  dialogActionButtonVariants,
+  successStateVariants,
+  successTitleVariants,
+  successDescriptionVariants,
+} from '@/styles/cva/user-center';
+import { DraftRecipeCardProps } from './types';
 
 /**
  * 顯示草稿的食譜卡片
  */
 export function DraftRecipeCard({
-  title = '馬鈴薯烤蛋',
-  description = '食譜故事敘述食譜故事敘述食譜故事敘述...',
-  imageSrc = '/placeholder.svg',
+  title,
+  description,
+  imageSrc,
   recipeId,
   onPublish,
-  isDeleteMode = false,
+  isDeleteMode,
   onStatusChanged,
 }: DraftRecipeCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -86,8 +91,8 @@ export function DraftRecipeCard({
   };
 
   return (
-    <div className="border rounded-lg p-4 flex relative ">
-      <div className="w-[96px] h-[96px] bg-gray-200 shrink-0 rounded-md overflow-hidden relative">
+    <div className={cn(cardContainerBaseVariants())}>
+      <div className={cn(cardImageVariants({ size: 'small' }))}>
         <Image
           src={imageSrc || '/placeholder.svg'}
           alt={title}
@@ -96,9 +101,9 @@ export function DraftRecipeCard({
         />
       </div>
 
-      <div className="flex-1 ml-4 flex flex-col">
-        <h3 className="text-lg font-medium mb-1">{title}</h3>
-        <p className="text-neutral-500 text-sm mb-auto line-clamp-2 mt-3">
+      <div className={cn(cardContentVariants())}>
+        <h3 className={cn(cardTitleVariants())}>{title}</h3>
+        <p className={cn(cardDescriptionVariants({ spacing: 'withMargin' }))}>
           {description}
         </p>
       </div>
@@ -108,7 +113,7 @@ export function DraftRecipeCard({
           <DialogTrigger asChild>
             <Button
               variant="destructive"
-              className="absolute top-4 right-4 px-5 py-1 h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white font-normal text-sm"
+              className={cn(cardActionButtonVariants({ variant: 'toPublish' }))}
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -116,40 +121,51 @@ export function DraftRecipeCard({
               轉發佈
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md bg-white rounded-lg p-6">
+          <DialogContent className={cn(dialogVariants())}>
             {publishSuccess ? (
-              <div className="flex flex-col items-center justify-center py-8">
+              <div className={cn(successStateVariants())}>
                 <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
-                <h2 className="text-lg font-medium text-center mb-2">
+                <h2 className={cn(successTitleVariants())}>
                   {SUCCESS_MESSAGES.PUBLISH_SUCCESS}
                 </h2>
-                <p className="text-neutral-500 text-center">
+                <p className={cn(successDescriptionVariants())}>
                   {SUCCESS_MESSAGES.RECIPE_PUBLISHED}
                 </p>
               </div>
             ) : (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-center font-medium text-xl mb-2">
+                  <DialogTitle
+                    className={cn(dialogTitleVariants({ size: 'large' }))}
+                  >
                     是否將所選食譜轉成發佈狀態?
                   </DialogTitle>
                 </DialogHeader>
 
                 {publishError && (
-                  <div className="p-3 rounded-md bg-red-50 text-red-700 mb-4 flex items-center">
+                  <div
+                    className={cn(
+                      statusMessageVariants({
+                        variant: 'error',
+                        withIcon: true,
+                      }),
+                    )}
+                  >
                     <AlertCircle className="h-4 w-4 mr-2" />
                     {publishError}
                   </div>
                 )}
 
-                <div className="flex justify-between mt-6 space-x-4">
+                <div className={cn(dialogButtonContainerVariants())}>
                   <Button
                     variant="destructive"
                     onClick={(e) => {
                       e.stopPropagation();
                       atConfirmPublish();
                     }}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600"
+                    className={cn(
+                      dialogActionButtonVariants({ variant: 'confirm' }),
+                    )}
                     disabled={isPublishing}
                   >
                     {isPublishing
@@ -163,7 +179,9 @@ export function DraftRecipeCard({
                         e.stopPropagation();
                         setDialogOpen(false);
                       }}
-                      className="flex-1 border border-neutral-200"
+                      className={cn(
+                        dialogActionButtonVariants({ variant: 'cancel' }),
+                      )}
                       disabled={isPublishing}
                     >
                       {COMMON_TEXTS.CANCEL}

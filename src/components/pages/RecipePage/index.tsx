@@ -52,7 +52,7 @@ import {
   authorContainerStyles,
   ingredientListStyles,
   tagsContainerStyles,
-} from './styles';
+} from '@/styles/cva/recipe-page';
 
 interface RecipePageProps {
   recipeData: {
@@ -277,7 +277,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
    */
   const renderRecipeTags = () => {
     return (
-      <div className={tagsContainerStyles}>
+      <div className={cn(tagsContainerStyles())}>
         {tags.map((tag) => (
           <Badge
             key={tag.id}
@@ -292,9 +292,9 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
   };
 
   return (
-    <div className={pageContainerStyles}>
+    <div className={cn(pageContainerStyles())}>
       {/* 麵包屑導航 */}
-      <Breadcrumb className={breadcrumbStyles}>
+      <Breadcrumb className={cn(breadcrumbStyles())}>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/" className="hover:text-[#FF5722]">
@@ -319,7 +319,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
       <main className="flex-1">
         {/* 食譜主圖 */}
-        <div className={mainImageStyles}>
+        <div className={cn(mainImageStyles())}>
           <Image
             src={getImageUrl(recipe.coverPhoto)}
             alt={recipe.recipeName}
@@ -330,13 +330,13 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         </div>
 
         {/* 食譜標題 */}
-        <div className={cardStyles({ spacing: 'none' })}>
-          <h1 className={headingStyles({ size: 'large' })}>
+        <div className={cn(cardStyles({ spacing: 'none' }))}>
+          <h1 className={cn(headingStyles({ size: 'large' }))}>
             {recipe.recipeName}
           </h1>
 
           <div className="flex items-center justify-between mb-3">
-            <div className={recipeInfoItemStyles}>
+            <div className={cn(recipeInfoItemStyles())}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -359,14 +359,14 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               </span>
             </div>
 
-            <div className={recipeInfoItemStyles}>
+            <div className={cn(recipeInfoItemStyles())}>
               <Clock className="w-4 h-4 text-neutral-400" />
               <span className="text-sm text-neutral-600">
                 {recipe.cookingTime}分鐘
               </span>
             </div>
 
-            <div className={recipeInfoItemStyles}>
+            <div className={cn(recipeInfoItemStyles())}>
               <Star className="w-4 h-4 text-[#FF5722] fill-[#FF5722]" />
               <span className="text-sm text-neutral-600">
                 {recipe.rating.toFixed(1)}
@@ -387,8 +387,8 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         </div>
 
         {/* 作者資訊 */}
-        <div className={cardStyles()}>
-          <div className={authorContainerStyles}>
+        <div className={cn(cardStyles())}>
+          <div className={cn(authorContainerStyles())}>
             <Link
               href={`/user/${author.displayId}`}
               className="flex items-center flex-1 cursor-pointer"
@@ -421,7 +421,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         </div>
 
         {/* 食譜描述 */}
-        <div className={cardStyles()}>
+        <div className={cn(cardStyles())}>
           <p className="text-sm text-neutral-700 leading-relaxed">
             {recipe.description}
           </p>
@@ -429,20 +429,20 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
         {/* 食譜標籤 */}
         {tags.length > 0 && (
-          <div className={cardStyles()}>
-            <h3 className={headingStyles()}>料理標籤</h3>
+          <div className={cn(cardStyles())}>
+            <h3 className={cn(headingStyles())}>料理標籤</h3>
             {renderRecipeTags()}
           </div>
         )}
 
         {/* 食材清單 */}
         {regularIngredients.length > 0 && (
-          <div className={cardStyles()}>
-            <h3 className={headingStyles({ size: 'small' })}>食材清單</h3>
-            <div className={ingredientListStyles}>
+          <div className={cn(cardStyles())}>
+            <h3 className={cn(headingStyles({ size: 'small' }))}>食材清單</h3>
+            <div className={cn(ingredientListStyles())}>
               {regularIngredients.map((ingredient, index) => (
                 <div key={ingredient.ingredientId}>
-                  <div className={separatedItemStyles()}>
+                  <div className={cn(separatedItemStyles())}>
                     <span className="text-sm">{ingredient.ingredientName}</span>
                     <span className="text-sm text-neutral-500">
                       {ingredient.amount} {ingredient.unit}
@@ -457,12 +457,12 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
         {/* 調味料 */}
         {flavorings.length > 0 && (
-          <div className={cardStyles()}>
-            <h3 className={headingStyles({ size: 'small' })}>調味料</h3>
-            <div className={ingredientListStyles}>
+          <div className={cn(cardStyles())}>
+            <h3 className={cn(headingStyles({ size: 'small' }))}>調味料</h3>
+            <div className={cn(ingredientListStyles())}>
               {flavorings.map((flavor, index) => (
                 <div key={flavor.ingredientId}>
-                  <div className={separatedItemStyles()}>
+                  <div className={cn(separatedItemStyles())}>
                     <span className="text-sm">{flavor.ingredientName}</span>
                     <span className="text-sm text-neutral-500">
                       {flavor.amount} {flavor.unit}
@@ -476,7 +476,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         )}
 
         {/* 推薦產品 */}
-        <div className={cardStyles()}>
+        <div className={cn(cardStyles())}>
           <div className="space-y-4">
             <ProductCard
               id="1"
@@ -489,8 +489,8 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         </div>
 
         {/* 社交互動區塊 */}
-        <div className={cardStyles()}>
-          <div className={interactionContainerStyles}>
+        <div className={cn(cardStyles())}>
+          <div className={cn(interactionContainerStyles())}>
             <button
               className={cn(
                 interactionButtonStyles(),
@@ -539,15 +539,15 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         </div>
 
         {/* 評論區 */}
-        <div className={cardStyles()}>
+        <div className={cn(cardStyles())}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className={headingStyles()}>用戶評論</h3>
+            <h3 className={cn(headingStyles())}>用戶評論</h3>
             <span className="text-sm text-neutral-500">
               共 {totalComments} 則評論
             </span>
           </div>
 
-          <div className={reviewListStyles}>
+          <div className={cn(reviewListStyles())}>
             {commentError && (
               <p className="text-sm text-red-500 text-center py-4">
                 {commentError}

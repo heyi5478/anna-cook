@@ -16,7 +16,7 @@ import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
 
 // 工具函數
-import { convertApiStepsToComponentSteps } from '@/lib/utils';
+import { convertApiStepsToComponentSteps, cn } from '@/lib/utils';
 import { formatSeconds as formatSec } from '@/components/common/VimeoPlayer';
 
 // 子元件
@@ -25,6 +25,11 @@ import {
   COMMON_TEXTS,
   ERROR_MESSAGES,
 } from '@/lib/constants/messages';
+import {
+  draftVideoEditorVariants,
+  loadingStateVariants,
+  errorStateVariants,
+} from '@/styles/cva/recipe-draft-video';
 import { BreadcrumbNavigation } from './BreadcrumbNavigation';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { StepNavigation } from './StepNavigation';
@@ -32,6 +37,8 @@ import { TimelineSlider } from './TimelineSlider';
 import { TimeMarkButtons } from './TimeMarkButtons';
 import { StepDescription } from './StepDescription';
 import { SubmitButton } from './SubmitButton';
+
+// 樣式系統
 
 /**
  * 構建提交草稿的資料
@@ -129,6 +136,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
    * 從 API 獲取食譜草稿資料
    */
   useEffect(() => {
+    // 獲取食譜草稿資料
     const fetchRecipeData = async () => {
       setLoading(true);
       setError('');
@@ -334,20 +342,34 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
     }
   };
 
+  // 確定編輯器狀態
+  let editorState: 'loading' | 'ready' | 'submitting' | 'error' = 'ready';
+  if (loading) {
+    editorState = 'loading';
+  } else if (error) {
+    editorState = 'error';
+  } else if (submitting) {
+    editorState = 'submitting';
+  }
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-40">
+      <div className={cn(loadingStateVariants({ type: 'message' }))}>
         {COMMON_TEXTS.LOADING}
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-red-500 p-4">{error}</div>;
+    return (
+      <div className={cn(errorStateVariants({ severity: 'error' }))}>
+        {error}
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto bg-white">
+    <div className={cn(draftVideoEditorVariants({ state: editorState }))}>
       <BreadcrumbNavigation userDisplayId={userDisplayId} />
 
       <VideoPlayerSection
@@ -360,6 +382,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         onLoaded={handleVideoLoaded}
         currentTime={currentTime}
         videoDuration={videoDuration}
+        loading={loading}
+        error={!!error}
       />
 
       <StepNavigation
@@ -371,6 +395,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         onStepChange={handleStepChange}
         onTogglePlay={atTogglePlay}
         onAddStep={addStep}
+        disabled={submitting}
       />
 
       <TimelineSlider
@@ -380,6 +405,7 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
         isDragging={isDragging}
         onTimeRangeChange={handleTimeRangeChange}
         onSliderCommitted={onSliderCommitted}
+        disabled={submitting}
       />
 
       <TimeMarkButtons

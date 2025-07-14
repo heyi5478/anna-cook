@@ -11,6 +11,14 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import type { Step } from '@/types/recipe';
+import {
+  draftSectionVariants,
+  draftLabelVariants,
+  draftButtonVariants,
+  stepAccordionVariants,
+  videoContainerVariants,
+  draftFieldVariants,
+} from '@/styles/cva/recipe-draft';
 
 type CookingStepProps = {
   steps: Step[];
@@ -21,6 +29,7 @@ type CookingStepProps = {
 /**
  * 料理步驟元件 - 顯示烹飪過程的步驟列表及相關影片
  * 純視覺組件，不包含導航邏輯
+ * 使用 CVA 樣式系統統一管理手風琴和影片容器樣式
  */
 export const CookingStep = ({
   steps,
@@ -56,16 +65,31 @@ export const CookingStep = ({
   };
 
   /**
-   * 渲染步驟影片區塊
+   * 渲染步驟影片區塊 - 使用 CVA 影片容器樣式
    */
   const renderStepVideo = (step: Step, index: number) => {
     const stepId = step.id || `step-${index}`;
     const isPlaying = playingSteps[stepId] || false;
 
     return (
-      <div className="mb-4">
-        <div className="block mb-2 text-sm font-medium">步驟影片</div>
-        <div className="relative aspect-video bg-neutral-200 rounded overflow-hidden mb-2">
+      <div className={draftSectionVariants({ spacing: 'default' })}>
+        <div
+          className={draftLabelVariants({
+            size: 'sm',
+            display: 'block',
+            spacing: 'default',
+          })}
+        >
+          步驟影片
+        </div>
+        <div
+          className={videoContainerVariants({
+            aspect: 'video',
+            background: 'default',
+            spacing: 'default',
+            state: step.vimeoId ? 'default' : 'loading',
+          })}
+        >
           {step.vimeoId ? (
             <VimeoPlayer
               videoId={step.vimeoId}
@@ -82,7 +106,15 @@ export const CookingStep = ({
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-neutral-500 text-sm">影片上傳中 ... 請稍後</p>
+              <p
+                className={`${draftLabelVariants({
+                  size: 'sm',
+                  weight: 'normal',
+                  spacing: 'none',
+                })} text-neutral-500`}
+              >
+                影片上傳中 ... 請稍後
+              </p>
             </div>
           )}
         </div>
@@ -91,7 +123,7 @@ export const CookingStep = ({
   };
 
   /**
-   * 渲染步驟資訊區塊
+   * 渲染步驟資訊區塊 - 使用 CVA 區塊和欄位樣式
    */
   const renderStepInfo = (step: Step, index: number) => {
     const stepId = step.id ? String(step.id) : `step-${index}`;
@@ -99,10 +131,15 @@ export const CookingStep = ({
 
     return (
       <>
-        {/* 步驟描述與播放按鈕 */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-sm font-medium">步驟描述</div>
+        {/* 步驟描述與播放按鈕 - 使用 CVA 區塊樣式 */}
+        <div className={draftSectionVariants({ spacing: 'default' })}>
+          <div
+            className={draftSectionVariants({
+              layout: 'flexBetween',
+              spacing: 'default',
+            })}
+          >
+            <div className={draftLabelVariants({ size: 'sm' })}>步驟描述</div>
             {step.vimeoId && (
               <Button
                 variant="outline"
@@ -122,22 +159,43 @@ export const CookingStep = ({
               </Button>
             )}
           </div>
-          <div className="p-3 bg-neutral-50 rounded border min-h-[100px]">
+          <div className={draftFieldVariants({ type: 'description' })}>
             {step.description}
           </div>
         </div>
 
-        {/* 影片時間點 - 只讀 */}
-        <div className="grid grid-cols-2 gap-4 mb-2">
+        {/* 影片時間點 - 只讀，使用 CVA 網格和欄位樣式 */}
+        <div
+          className={draftSectionVariants({
+            layout: 'grid',
+            spacing: 'sm',
+          })}
+        >
           <div>
-            <div className="block mb-1 text-sm font-medium">開始時間</div>
-            <div className="p-2 bg-neutral-50 rounded border">
+            <div
+              className={draftLabelVariants({
+                size: 'sm',
+                display: 'block',
+                spacing: 'tight',
+              })}
+            >
+              開始時間
+            </div>
+            <div className={draftFieldVariants({ type: 'readonly' })}>
               {step.startTime}
             </div>
           </div>
           <div>
-            <div className="block mb-1 text-sm font-medium">結束時間</div>
-            <div className="p-2 bg-neutral-50 rounded border">
+            <div
+              className={draftLabelVariants({
+                size: 'sm',
+                display: 'block',
+                spacing: 'tight',
+              })}
+            >
+              結束時間
+            </div>
+            <div className={draftFieldVariants({ type: 'readonly' })}>
               {step.endTime}
             </div>
           </div>
@@ -147,12 +205,17 @@ export const CookingStep = ({
   };
 
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-medium">料理步驟</h2>
+    <div className={draftSectionVariants({ spacing: 'default' })}>
+      <div
+        className={draftSectionVariants({
+          layout: 'flexBetween',
+          spacing: 'default',
+        })}
+      >
+        <h2 className={draftLabelVariants({ size: 'default' })}>料理步驟</h2>
         <button
           type="button"
-          className="p-1"
+          className={draftButtonVariants({ size: 'icon' })}
           aria-label="修改步驟"
           onClick={atHandleNavigateToVideoEdit}
         >
@@ -160,18 +223,32 @@ export const CookingStep = ({
         </button>
       </div>
 
-      <Accordion type="multiple" defaultValue={defaultValue} className="w-full">
+      <Accordion
+        type="multiple"
+        defaultValue={defaultValue}
+        className={stepAccordionVariants()}
+      >
         {steps.map((step, index) => (
           <AccordionItem
             key={
               step.id || `step-${step.description}-${step.startTime}-${index}`
             }
             value={`step-${index}`}
-            className="mb-2 border rounded"
+            className={stepAccordionVariants({ item: 'default' })}
           >
-            <div className="grid grid-cols-[1fr_auto] items-center">
-              <AccordionTrigger className="px-2 py-3 hover:no-underline">
-                <h3 className="font-medium text-left">步驟 {index + 1}</h3>
+            <div className={stepAccordionVariants({ grid: 'default' })}>
+              <AccordionTrigger
+                className={stepAccordionVariants({ trigger: 'default' })}
+              >
+                <h3
+                  className={draftLabelVariants({
+                    weight: 'medium',
+                    position: 'left',
+                    spacing: 'none',
+                  })}
+                >
+                  步驟 {index + 1}
+                </h3>
               </AccordionTrigger>
               <button
                 type="button"
@@ -179,13 +256,15 @@ export const CookingStep = ({
                   e.stopPropagation();
                   onRemoveStep(index);
                 }}
-                className="mr-2 p-1 text-neutral-500 z-10"
+                className={draftButtonVariants({ variant: 'edit' })}
                 aria-label={`${COMMON_TEXTS.DELETE}步驟 ${index + 1}`}
               >
                 <Trash className="w-4 h-4" />
               </button>
             </div>
-            <AccordionContent className="p-4 pt-2 border-t">
+            <AccordionContent
+              className={stepAccordionVariants({ content: 'default' })}
+            >
               {renderStepVideo(step, index)}
               {renderStepInfo(step, index)}
             </AccordionContent>

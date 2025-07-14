@@ -28,12 +28,11 @@ export const fetchUserProfile = async (
 
     // 解析回應資料
     const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
 
     let responseData;
     try {
       responseData = JSON.parse(responseText);
-      console.log('回應資料:', responseData);
+      console.log('User profile fetched successfully');
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
@@ -65,7 +64,7 @@ export const fetchCurrentUserProfile =
 
       // 解析回應資料
       const responseData = await res.json();
-      console.log('解析後的回應資料:', responseData);
+      console.log('Current user profile fetched successfully');
 
       // 處理錯誤狀態碼
       if (responseData.StatusCode !== HTTP_STATUS.OK) {
@@ -95,7 +94,9 @@ export const updateUserProfile = async (
 ): Promise<UpdateUserProfileResponse> => {
   try {
     console.log(`發送請求: PUT /api/user/profile`);
-    console.log('請求資料:', { ...data, profilePhoto: profilePhoto?.name });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('請求資料:', { ...data, profilePhoto: profilePhoto?.name });
+    }
 
     // 創建 FormData 物件
     const formData = new FormData();
@@ -125,12 +126,11 @@ export const updateUserProfile = async (
 
     // 解析回應資料
     const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
 
     let responseData;
     try {
       responseData = JSON.parse(responseText);
-      console.log('解析後的回應資料:', responseData);
+      console.log('User profile updated successfully');
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
@@ -200,7 +200,7 @@ export const fetchUserRecipes = async (
     // 解析回應資料
     try {
       const data = JSON.parse(responseText);
-      console.log('回應資料:', data);
+      console.log('User recipes fetched successfully');
 
       return data;
     } catch (e) {
@@ -230,7 +230,7 @@ export const followUser = async (userId: number): Promise<FollowResponse> => {
 
     // 解析回應資料
     const data = await res.json();
-    console.log('回應資料:', data);
+    console.log('User followed successfully');
 
     return data;
   } catch (error) {
@@ -256,7 +256,7 @@ export const unfollowUser = async (userId: number): Promise<FollowResponse> => {
 
     // 解析回應資料
     const data = await res.json();
-    console.log('回應資料:', data);
+    console.log('User unfollowed successfully');
 
     return data;
   } catch (error) {

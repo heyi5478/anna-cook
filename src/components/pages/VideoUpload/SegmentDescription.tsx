@@ -1,9 +1,16 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  descriptionFieldVariants,
+  descriptionFieldTitleVariants,
+  characterCounterVariants,
+  descriptionTextareaVariants,
+  errorMessageVariants,
+} from '@/styles/cva/video-upload';
 
 /**
- * 片段說明輸入元件，處理說明文字的輸入和驗證
+ * 片段說明輸入元件屬性
  */
 type SegmentDescriptionProps = {
   segments: {
@@ -16,6 +23,7 @@ type SegmentDescriptionProps = {
   validateForm: () => void;
 };
 
+// 片段說明輸入元件 - 處理說明文字的輸入和驗證
 export default function SegmentDescription({
   segments,
   currentSegmentIndex,
@@ -23,29 +31,46 @@ export default function SegmentDescription({
   atDescriptionChange,
   validateForm,
 }: SegmentDescriptionProps) {
+  // 獲取當前描述
+  const currentDescription = segments[currentSegmentIndex]?.description || '';
+  const currentLength = currentDescription.trim().length;
+
+  // 獲取文字區域狀態
+  const getTextareaState = () => {
+    if (error) return 'error';
+    if (currentLength >= 10) return 'valid';
+    return 'normal';
+  };
+
   return (
-    <div className="mt-4">
-      <h3 className="text-sm font-medium text-neutral-700 mb-2">
+    <div className={descriptionFieldVariants()}>
+      <h3 className={descriptionFieldTitleVariants()}>
         說明文字 (步驟 {currentSegmentIndex + 1})
-        <span className="ml-2 text-xs text-neutral-500">
-          {segments[currentSegmentIndex]?.description?.trim().length || 0}
-          /10 字元
+        <span className={characterCounterVariants()}>
+          {currentLength}/10 字元
         </span>
       </h3>
       <textarea
-        value={segments[currentSegmentIndex]?.description || ''}
+        value={currentDescription}
         onChange={atDescriptionChange}
         onBlur={() => validateForm()}
-        className={cn(
-          'w-full p-2 text-sm border rounded-md min-h-[80px] resize-none',
-          error
-            ? 'border-red-500 bg-red-50'
-            : 'border-neutral-300 text-neutral-600',
-        )}
+        className={descriptionTextareaVariants({
+          state: getTextareaState(),
+        })}
         placeholder="請輸入此步驟的說明文字，至少需要10個字元..."
+        aria-label="片段說明文字"
+        aria-describedby={error ? 'description-error' : undefined}
+        aria-invalid={!!error}
       />
       {error && (
-        <div className="text-red-500 text-sm mt-1 flex items-center error-message">
+        <div
+          id="description-error"
+          className={cn(
+            errorMessageVariants({ type: 'general' }),
+            'error-message',
+          )}
+          role="alert"
+        >
           <AlertCircle className="h-4 w-4 mr-1" aria-hidden="true" />
           {error}
         </div>
