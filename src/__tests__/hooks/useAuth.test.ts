@@ -118,7 +118,7 @@ describe('useAuth', () => {
 
       expect(checkAuth).toHaveBeenCalled();
       expect(console.log).toHaveBeenCalledWith('驗證身份中...');
-      expect(console.log).toHaveBeenCalledWith('身份驗證成功:', mockResponse);
+      expect(console.log).toHaveBeenCalledWith('身份驗證成功');
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'userData',
         JSON.stringify(mockUserData),
