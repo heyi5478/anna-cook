@@ -97,7 +97,9 @@ export default function UserPage({
 
   // 判斷是顯示個人中心還是作者頁面
   const { userData } = userProfileData;
-  console.log('[...displayId].tsx - userData:', userData);
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[...displayId].tsx - userData loaded');
+  }
 
   // 轉換 API 資料為 AuthorProfile 所需的格式
   const author = userData

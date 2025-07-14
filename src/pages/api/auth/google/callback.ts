@@ -19,7 +19,6 @@ export default async function handler(
   try {
     // 從查詢參數中獲取授權碼
     const { code } = req.query;
-    console.log('code', code);
 
     // 驗證是否有 code 參數
     if (!code) {
@@ -27,12 +26,12 @@ export default async function handler(
       return res.status(401).json({ StatusCode: 401, msg: '未收到授權碼' });
     }
 
-    console.log('收到 Google 回調，授權碼:', code);
+    console.log('OAuth callback received');
 
     // 使用 API 服務發送授權碼給後端
     const data = await exchangeGoogleCodeForToken(code as string);
     const { token } = data;
-    console.log('token', token);
+    console.log('Token generated successfully');
 
     if (!token) {
       throw new Error('後端未提供 token');

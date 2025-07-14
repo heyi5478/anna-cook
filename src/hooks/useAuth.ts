@@ -40,7 +40,7 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
         console.log('驗證身份中...');
         const response = await checkAuth();
 
-        console.log('身份驗證成功:', response);
+        console.log('身份驗證成功');
 
         // 驗證成功，設置身份已驗證
         setAuthStatus({

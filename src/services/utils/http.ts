@@ -1,5 +1,5 @@
 import { authConfig } from '@/config';
-import { DEV_TEST_TOKEN, COMMON_TEXTS, COOKIE_EXPIRES } from '@/lib/constants';
+import { DEV_TEST_TOKEN, COOKIE_EXPIRES } from '@/lib/constants';
 import { setClientCookie } from '@/lib/utils';
 
 /**
@@ -8,7 +8,7 @@ import { setClientCookie } from '@/lib/utils';
 export const getAuthToken = (): string | null => {
   // 開發環境下使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log(COMMON_TEXTS.DEV_ENVIRONMENT_TOKEN);
+    console.log('Using development test token');
     return DEV_TEST_TOKEN;
   }
 
