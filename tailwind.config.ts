@@ -11,6 +11,23 @@ export default {
     data: {
       active: 'active~="true"',
     },
+    screens: {
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+      // 添加 orientation 媒體查詢支援
+      portrait: { raw: '(orientation: portrait)' },
+      landscape: { raw: '(orientation: landscape)' },
+      // 結合螢幕尺寸和 orientation 的查詢
+      'mobile-portrait': {
+        raw: '(max-width: 768px) and (orientation: portrait)',
+      },
+      'mobile-landscape': {
+        raw: '(max-width: 768px) and (orientation: landscape)',
+      },
+    },
     extend: {
       colors: {
         /* ============ Brand Color System ============ */
