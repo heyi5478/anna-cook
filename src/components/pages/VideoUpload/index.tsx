@@ -9,7 +9,7 @@ import {
   debugButtonVariants,
   stepIndicatorContainerVariants,
   contentAreaVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 // 引入子元件
 import UploadArea from './UploadArea';

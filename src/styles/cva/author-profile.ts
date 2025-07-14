@@ -1,257 +1,244 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
 /**
- * 作者個人資料頁面的樣式變體定義
- * 用於作者展示、作品列表、關注等相關功能的樣式管理
+ * 作者資料頁面主容器樣式
  */
-
-// 作者個人資料主容器樣式變體
-export const authorProfileContainer = cva('w-full mx-auto bg-white', {
+export const profileContainerVariants = cva('min-h-screen bg-gray-50 pb-8', {
   variants: {
-    variant: {
-      default: 'max-w-6xl',
-      wide: 'max-w-7xl',
-      full: 'max-w-full',
-    },
-    layout: {
-      single: 'grid grid-cols-1 gap-6',
-      sidebar: 'grid grid-cols-1 lg:grid-cols-4 gap-6',
-      split: 'grid grid-cols-1 md:grid-cols-2 gap-8',
+    background: {
+      default: 'bg-gray-50',
+      light: 'bg-white',
+      neutral: 'bg-neutral-50',
     },
     padding: {
-      none: 'p-0',
-      sm: 'p-4',
-      md: 'p-6',
-      lg: 'p-8',
+      default: 'pb-8',
+      compact: 'pb-4',
+      relaxed: 'pb-12',
     },
   },
   defaultVariants: {
-    variant: 'default',
-    layout: 'single',
-    padding: 'md',
+    background: 'default',
+    padding: 'default',
   },
 });
 
-// 作者資訊卡片樣式變體
-export const authorProfileHeader = cva(
-  'bg-white rounded-lg shadow-sm border border-gray-200 p-6',
-  {
-    variants: {
-      variant: {
-        default: 'border-gray-200',
-        featured: 'border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50',
-        minimal: 'border-none shadow-none p-4',
-      },
-      layout: {
-        horizontal: 'flex items-center space-x-6',
-        vertical: 'text-center space-y-4',
-        split: 'grid grid-cols-1 md:grid-cols-3 gap-6 items-center',
-      },
-      size: {
-        sm: 'p-4',
-        md: 'p-6',
-        lg: 'p-8',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      layout: 'horizontal',
-      size: 'md',
-    },
-  },
-);
-
-// 作者頭像樣式變體
-export const authorProfileAvatar = cva(
-  'rounded-full border-4 border-white shadow-lg',
-  {
-    variants: {
-      size: {
-        sm: 'w-16 h-16',
-        md: 'w-24 h-24',
-        lg: 'w-32 h-32',
-        xl: 'w-40 h-40',
-      },
-      variant: {
-        default: 'border-white',
-        primary: 'border-blue-500',
-        gold: 'border-yellow-400',
-      },
-      interactive: {
-        true: 'hover:scale-105 transition-transform duration-200 cursor-pointer',
-        false: '',
-      },
-    },
-    defaultVariants: {
-      size: 'lg',
-      variant: 'default',
-      interactive: false,
-    },
-  },
-);
-
-// 作者統計數據樣式變體
-export const authorProfileStats = cva(
-  'flex items-center justify-center text-center p-4 rounded-lg',
-  {
-    variants: {
-      variant: {
-        default: 'bg-gray-50 border border-gray-200',
-        primary: 'bg-blue-50 border border-blue-200',
-        success: 'bg-green-50 border border-green-200',
-        featured:
-          'bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200',
-      },
-      layout: {
-        vertical: 'flex-col space-y-1',
-        horizontal: 'flex-row space-x-4',
-        grid: 'grid grid-cols-3 gap-4 text-center',
-      },
-      size: {
-        sm: 'p-2 text-sm',
-        md: 'p-4',
-        lg: 'p-6 text-lg',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      layout: 'vertical',
-      size: 'md',
-    },
-  },
-);
-
-// 關注按鈕樣式變體
-export const authorProfileFollowButton = cva(
-  'px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2',
-  {
-    variants: {
-      variant: {
-        follow: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-        following:
-          'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-        unfollow:
-          'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
-        outline:
-          'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-      },
-      size: {
-        sm: 'px-4 py-2 text-sm',
-        md: 'px-6 py-3',
-        lg: 'px-8 py-4 text-lg',
-      },
-      width: {
-        auto: 'w-auto',
-        full: 'w-full',
-        fit: 'w-fit',
-      },
-      state: {
-        default: '',
-        loading: 'opacity-70 cursor-not-allowed',
-        disabled: 'opacity-50 cursor-not-allowed',
-      },
-    },
-    defaultVariants: {
-      variant: 'follow',
-      size: 'md',
-      width: 'auto',
-      state: 'default',
-    },
-  },
-);
-
-// 作品網格樣式變體
-export const authorProfileGrid = cva('grid gap-6', {
+/**
+ * 作者資料卡片容器樣式
+ */
+export const authorCardVariants = cva('bg-white p-4', {
   variants: {
-    columns: {
-      '1': 'grid-cols-1',
-      '2': 'grid-cols-1 md:grid-cols-2',
-      '3': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-      '4': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+    padding: {
+      default: 'p-4',
+      compact: 'p-2',
+      relaxed: 'p-6',
+    },
+  },
+  defaultVariants: {
+    padding: 'default',
+  },
+});
+
+/**
+ * 作者資訊區域樣式
+ */
+export const authorInfoVariants = cva(
+  'flex flex-col items-center relative mb-4',
+  {
+    variants: {
+      spacing: {
+        default: 'mb-4',
+        compact: 'mb-2',
+        relaxed: 'mb-6',
+      },
+      alignment: {
+        center: 'items-center',
+        start: 'items-start',
+        stretch: 'items-stretch',
+      },
+    },
+    defaultVariants: {
+      spacing: 'default',
+      alignment: 'center',
+    },
+  },
+);
+
+/**
+ * 作者統計項目樣式
+ */
+export const authorStatsVariants = cva(
+  'flex gap-4 mb-4 text-sm text-neutral-500',
+  {
+    variants: {
+      spacing: {
+        default: 'gap-4 mb-4',
+        compact: 'gap-2 mb-2',
+        relaxed: 'gap-6 mb-6',
+      },
+      size: {
+        default: 'text-sm',
+        large: 'text-base',
+        small: 'text-xs',
+      },
+    },
+    defaultVariants: {
+      spacing: 'default',
+      size: 'default',
+    },
+  },
+);
+
+/**
+ * 食譜列表容器樣式
+ */
+export const recipeListVariants = cva('space-y-3', {
+  variants: {
+    spacing: {
+      compact: 'space-y-2',
+      default: 'space-y-3',
+      relaxed: 'space-y-4',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 食譜區域容器樣式
+ */
+export const recipesSectionVariants = cva('mt-6', {
+  variants: {
+    background: {
+      default: 'bg-white',
+      gray: 'bg-gray-50',
+      transparent: 'bg-transparent',
     },
     spacing: {
-      tight: 'gap-3',
-      normal: 'gap-6',
-      loose: 'gap-8',
-    },
-    responsive: {
-      true: 'gap-4 md:gap-6 lg:gap-8',
-      false: '',
+      default: 'mt-6',
+      compact: 'mt-4',
+      relaxed: 'mt-8',
     },
   },
   defaultVariants: {
-    columns: '3',
-    spacing: 'normal',
-    responsive: true,
+    background: 'default',
+    spacing: 'default',
   },
 });
 
-// 作品卡片樣式變體
-export const authorProfileRecipeCard = cva(
-  'bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-200',
+/**
+ * 食譜標題容器樣式
+ */
+export const recipeTitleVariants = cva('bg-white px-4 py-3 mb-2', {
+  variants: {
+    spacing: {
+      default: 'py-3 mb-2',
+      compact: 'py-2 mb-1',
+      relaxed: 'py-4 mb-3',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+  },
+});
+
+/**
+ * 載入更多按鈕樣式
+ */
+export const loadMoreButtonVariants = cva(
+  'flex items-center text-neutral-500 py-2',
   {
     variants: {
-      variant: {
-        default: 'hover:shadow-md hover:border-gray-300',
-        featured: 'border-blue-200 bg-blue-50',
-        minimal: 'border-gray-100 shadow-none',
-      },
-      interactive: {
-        true: 'cursor-pointer hover:scale-[1.02] hover:shadow-lg',
-        false: '',
-      },
       size: {
-        sm: 'p-3',
-        md: 'p-4',
-        lg: 'p-6',
+        default: 'py-2',
+        compact: 'py-1',
+        relaxed: 'py-3',
       },
     },
     defaultVariants: {
-      variant: 'default',
-      interactive: true,
-      size: 'md',
+      size: 'default',
     },
   },
 );
 
-// 簡介文字樣式變體
-export const authorProfileBio = cva('text-gray-600 leading-relaxed', {
+/**
+ * 載入狀態樣式
+ */
+export const loadingStateVariants = cva('text-center py-4', {
   variants: {
-    variant: {
-      default: '',
-      highlighted: 'bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500',
-      quote: 'italic bg-gray-50 p-4 rounded-lg border border-gray-200',
+    state: {
+      loading: 'text-neutral-500',
+      error: 'text-red-500',
+      empty: 'text-neutral-600',
     },
     size: {
-      sm: 'text-sm',
-      md: 'text-base',
-      lg: 'text-lg',
-    },
-    maxLines: {
-      '3': 'line-clamp-3',
-      '5': 'line-clamp-5',
-      none: '',
+      default: 'py-4',
+      compact: 'py-2',
+      relaxed: 'py-6',
     },
   },
   defaultVariants: {
-    variant: 'default',
-    size: 'md',
-    maxLines: 'none',
+    state: 'loading',
+    size: 'default',
   },
 });
 
-// TypeScript 類型導出
-export type AuthorProfileContainerProps = VariantProps<
-  typeof authorProfileContainer
+/**
+ * 作者簡介區域樣式
+ */
+export const authorBioVariants = cva('mt-8 text-neutral-700 text-sm px-4', {
+  variants: {
+    spacing: {
+      default: 'mt-8 px-4',
+      compact: 'mt-4 px-2',
+      relaxed: 'mt-12 px-6',
+    },
+    textSize: {
+      default: 'text-sm',
+      large: 'text-base',
+      small: 'text-xs',
+    },
+  },
+  defaultVariants: {
+    spacing: 'default',
+    textSize: 'default',
+  },
+});
+
+/**
+ * 分享按鈕樣式
+ */
+export const shareButtonVariants = cva('absolute right-0 top-4', {
+  variants: {
+    position: {
+      default: 'top-4 right-0',
+      center: 'top-4 right-4',
+      edge: 'top-2 right-2',
+    },
+  },
+  defaultVariants: {
+    position: 'default',
+  },
+});
+
+// ================== TypeScript 類型定義 ==================
+
+export type ProfileContainerVariantsProps = VariantProps<
+  typeof profileContainerVariants
 >;
-export type AuthorProfileHeaderProps = VariantProps<typeof authorProfileHeader>;
-export type AuthorProfileAvatarProps = VariantProps<typeof authorProfileAvatar>;
-export type AuthorProfileStatsProps = VariantProps<typeof authorProfileStats>;
-export type AuthorProfileFollowButtonProps = VariantProps<
-  typeof authorProfileFollowButton
+export type AuthorCardVariantsProps = VariantProps<typeof authorCardVariants>;
+export type AuthorInfoVariantsProps = VariantProps<typeof authorInfoVariants>;
+export type AuthorStatsVariantsProps = VariantProps<typeof authorStatsVariants>;
+export type RecipeListVariantsProps = VariantProps<typeof recipeListVariants>;
+export type RecipesSectionVariantsProps = VariantProps<
+  typeof recipesSectionVariants
 >;
-export type AuthorProfileGridProps = VariantProps<typeof authorProfileGrid>;
-export type AuthorProfileRecipeCardProps = VariantProps<
-  typeof authorProfileRecipeCard
+export type RecipeTitleVariantsProps = VariantProps<typeof recipeTitleVariants>;
+export type LoadMoreButtonVariantsProps = VariantProps<
+  typeof loadMoreButtonVariants
 >;
-export type AuthorProfileBioProps = VariantProps<typeof authorProfileBio>;
+export type LoadingStateVariantsProps = VariantProps<
+  typeof loadingStateVariants
+>;
+export type AuthorBioVariantsProps = VariantProps<typeof authorBioVariants>;
+export type ShareButtonVariantsProps = VariantProps<typeof shareButtonVariants>;

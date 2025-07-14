@@ -24,7 +24,7 @@ import {
   statusLightVariants,
   statusTextVariants,
   resetButtonVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 影片剪輯控制元件屬性

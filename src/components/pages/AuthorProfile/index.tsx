@@ -8,9 +8,12 @@ import {
 import { useRouter } from 'next/router';
 import { cn } from '@/lib/utils';
 import type { Author } from '@/types/recipe';
+import {
+  profileContainerVariants,
+  authorCardVariants,
+} from '@/styles/cva/author-profile';
 import { AuthorInfo } from './AuthorInfo';
 import { AuthorRecipes } from './AuthorRecipes';
-import { profileContainerVariants, authorCardVariants } from './styles';
 
 interface AuthorProfileProps {
   author: Author;

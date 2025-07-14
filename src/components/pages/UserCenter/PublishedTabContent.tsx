@@ -2,13 +2,13 @@ import { useRouter } from 'next/router';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
-import { PublishedRecipeCard } from './PublishedRecipeCard';
 import {
   publishedTabContainerVariants,
   publishedCountTextVariants,
   publishedCardContainerVariants,
   tabEmptyStateVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { PublishedRecipeCard } from './PublishedRecipeCard';
 
 interface PublishedTabContentProps {
   isLoadingPublished: boolean;

@@ -5,6 +5,13 @@
  * 食譜草稿頁面樣式變體
  * 用於食譜編輯、草稿保存等功能
  */
+// =============================================================================
+// 樣式工具函數
+// =============================================================================
+
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
 export * from './recipe-draft';
 
 /**
@@ -17,25 +24,281 @@ export * from './recipe-page';
  * 食譜草稿影片頁面樣式變體
  * 用於食譜影片編輯、時間標記、步驟同步等功能
  */
-export * from './recipe-draft-video';
+export {
+  // 重新命名避免衝突的變體
+  loadingStateVariants as videoDraftLoadingStateVariants,
+  videoContainerVariants as videoDraftVideoContainerVariants,
+  errorStateVariants as videoDraftErrorStateVariants,
+  timeDisplayVariants as videoDraftTimeDisplayVariants,
+  timeRangeDisplayVariants as videoDraftTimeRangeDisplayVariants,
+  // 其他變體保持原樣
+  draftVideoEditorVariants,
+  videoPlayerSectionVariants,
+  stepNavigationVariants,
+  stepNavigationButtonVariants,
+  stepIndicatorVariants,
+  timelineVariants,
+  timelineMarkerVariants,
+  timelineControlVariants,
+  sliderVariants,
+  sliderThumbVariants,
+  submitControlVariants,
+  breadcrumbNavigationVariants,
+  transitionVariants,
+  interactionStateVariants,
+} from './recipe-draft-video';
+
+// Recipe Draft Video 類型導出
+export type {
+  DraftVideoEditorVariantsProps,
+  VideoPlayerSectionVariantsProps,
+  VideoContainerVariantsProps as VideoDraftVideoContainerVariantsProps,
+  TimeDisplayVariantsProps as VideoDraftTimeDisplayVariantsProps,
+  StepNavigationVariantsProps,
+  StepNavigationButtonVariantsProps,
+  StepIndicatorVariantsProps,
+  TimelineVariantsProps,
+  TimelineMarkerVariantsProps,
+  TimelineControlVariantsProps,
+  SliderVariantsProps,
+  SliderThumbVariantsProps,
+  TimeRangeDisplayVariantsProps as VideoDraftTimeRangeDisplayVariantsProps,
+  SubmitControlVariantsProps,
+  LoadingStateVariantsProps as VideoDraftLoadingStateVariantsProps,
+  ErrorStateVariantsProps as VideoDraftErrorStateVariantsProps,
+  BreadcrumbNavigationVariantsProps,
+  TransitionVariantsProps,
+  InteractionStateVariantsProps,
+} from './recipe-draft-video';
 
 /**
  * 用戶中心頁面樣式變體
  * 用於用戶個人資料、收藏、草稿等功能
  */
-export * from './user-center';
+export {
+  // 重新命名避免衝突的變體
+  loadingStateVariants as userCenterLoadingStateVariants,
+  breadcrumbVariants as userCenterBreadcrumbVariants,
+  dialogVariants as userCenterDialogVariants,
+  loadMoreButtonVariants as userCenterLoadMoreButtonVariants,
+  recipeTitleVariants as userCenterRecipeTitleVariants,
+  // 其他變體保持原樣
+  tabTriggerVariants,
+  tabContentVariants,
+  cardContainerVariants,
+  statsItemVariants,
+  sectionTitleVariants,
+  sectionContainerVariants,
+  tabsListVariants,
+  draftTabContainerVariants,
+  statusMessageVariants,
+  countTextVariants,
+  cardContainerBaseVariants,
+  draftCardInteractionVariants,
+  checkboxVariants,
+  cardImageVariants,
+  cardContentVariants,
+  cardTitleVariants,
+  cardDescriptionVariants,
+  cardStatsVariants,
+  cardStatsItemVariants,
+  cardActionButtonVariants,
+  dialogTitleVariants,
+  dialogIconVariants,
+  dialogButtonContainerVariants,
+  dialogActionButtonVariants,
+  itemListContainerVariants,
+  itemContentVariants,
+  successStateVariants,
+  successTitleVariants,
+  successDescriptionVariants,
+  favoriteTabContainerVariants,
+  followTabContainerVariants,
+  statsCountTextVariants,
+  favoriteItemContainerVariants,
+  followItemContainerVariants,
+  itemImageContainerVariants,
+  itemContentAreaVariants,
+  itemTitleRowVariants,
+  itemTitleVariants,
+  itemIconVariants,
+  itemDescriptionVariants,
+  itemStatsRowVariants,
+  statsIconVariants,
+  statsItemSpacingVariants,
+  loadMoreStateVariants,
+  tabEmptyStateVariants,
+  dataTabContainerVariants,
+  dataTitleVariants,
+  dataDescriptionVariants,
+  dataCardContainerVariants,
+  recipeStatsContainerVariants,
+  recipeInfoContainerVariants,
+  recipeImageContainerVariants,
+  recipeImageVariants,
+  recipeContentContainerVariants,
+  recipeRatingInfoVariants,
+  statsGridVariants,
+  statsItemCardVariants,
+  statsLabelVariants,
+  statsValueVariants,
+  userCardContainerVariants,
+  userAvatarContainerVariants,
+  userInfoContainerVariants,
+  usernameVariants,
+  userBioVariants,
+  userStatsVariants,
+  publishedTabContainerVariants,
+  publishedCountTextVariants,
+  publishedCardContainerVariants,
+} from './user-center';
+
+// User Center 類型導出
+export type {
+  BreadcrumbVariantsProps as UserCenterBreadcrumbVariantsProps,
+  TabTriggerVariantsProps,
+  TabContentVariantsProps,
+  CardContainerVariantsProps,
+  StatsItemVariantsProps,
+  LoadingStateVariantsProps as UserCenterLoadingStateVariantsProps,
+  SectionTitleVariantsProps,
+  SectionContainerVariantsProps,
+  TabsListVariantsProps,
+  DraftTabContainerVariantsProps,
+  StatusMessageVariantsProps,
+  CountTextVariantsProps,
+  CardContainerBaseVariantsProps,
+  DraftCardInteractionVariantsProps,
+  CheckboxVariantsProps,
+  CardImageVariantsProps,
+  CardContentVariantsProps,
+  CardTitleVariantsProps,
+  CardDescriptionVariantsProps,
+  CardStatsVariantsProps,
+  CardStatsItemVariantsProps,
+  CardActionButtonVariantsProps,
+  DialogVariantsProps as UserCenterDialogVariantsProps,
+  DialogTitleVariantsProps,
+  DialogIconVariantsProps,
+  DialogButtonContainerVariantsProps,
+  DialogActionButtonVariantsProps,
+  ItemListContainerVariantsProps,
+  ItemContentVariantsProps,
+  SuccessStateVariantsProps,
+  SuccessTitleVariantsProps,
+  SuccessDescriptionVariantsProps,
+  FavoriteTabContainerVariantsProps,
+  FollowTabContainerVariantsProps,
+  StatsCountTextVariantsProps,
+  FavoriteItemContainerVariantsProps,
+  FollowItemContainerVariantsProps,
+  ItemImageContainerVariantsProps,
+  ItemContentAreaVariantsProps,
+  ItemTitleRowVariantsProps,
+  ItemTitleVariantsProps,
+  ItemIconVariantsProps,
+  ItemDescriptionVariantsProps,
+  ItemStatsRowVariantsProps,
+  StatsIconVariantsProps,
+  StatsItemSpacingVariantsProps,
+  LoadMoreStateVariantsProps,
+  LoadMoreButtonVariantsProps as UserCenterLoadMoreButtonVariantsProps,
+  TabEmptyStateVariantsProps,
+  DataTabContainerVariantsProps,
+  DataTitleVariantsProps,
+  DataDescriptionVariantsProps,
+  DataCardContainerVariantsProps,
+  RecipeStatsContainerVariantsProps,
+  RecipeInfoContainerVariantsProps,
+  RecipeImageContainerVariantsProps,
+  RecipeImageVariantsProps,
+  RecipeContentContainerVariantsProps,
+  RecipeTitleVariantsProps as UserCenterRecipeTitleVariantsProps,
+  RecipeRatingInfoVariantsProps,
+  StatsGridVariantsProps,
+  StatsItemCardVariantsProps,
+  StatsLabelVariantsProps,
+  StatsValueVariantsProps,
+  UserCardContainerVariantsProps,
+  UserAvatarContainerVariantsProps,
+  UserInfoContainerVariantsProps,
+  UsernameVariantsProps,
+  UserBioVariantsProps,
+  UserStatsVariantsProps,
+  PublishedTabContainerVariantsProps,
+  PublishedCountTextVariantsProps,
+  PublishedCardContainerVariantsProps,
+} from './user-center';
 
 /**
  * 個人資料編輯表單樣式變體
  * 用於用戶資料編輯、設定修改等功能
  */
-export * from './profile-edit-form';
+export {
+  // 重新命名避免衝突的變體
+  loadingStateVariants as profileEditLoadingStateVariants,
+  errorStateVariants as profileEditErrorStateVariants,
+  breadcrumbVariants as profileEditBreadcrumbVariants,
+  dialogVariants as profileEditDialogVariants,
+  // 其他變體保持原樣
+  profilePageVariants,
+  profileFormVariants,
+  avatarContainerVariants,
+  avatarUploadButtonVariants,
+  profileFieldVariants,
+  verificationBadgeVariants,
+  profileButtonVariants,
+} from './profile-edit-form';
+
+// Profile Edit Form 類型導出
+export type {
+  LoadingStateVariants as ProfileEditLoadingStateVariants,
+  ErrorStateVariants as ProfileEditErrorStateVariants,
+  BreadcrumbVariants as ProfileEditBreadcrumbVariants,
+  DialogVariants as ProfileEditDialogVariants,
+  ProfilePageVariants,
+  ProfileFormVariants,
+  AvatarContainerVariants,
+  AvatarUploadButtonVariants,
+  ProfileFieldVariants,
+  VerificationBadgeVariants,
+  ProfileButtonVariants,
+} from './profile-edit-form';
 
 /**
  * 作者個人資料頁面樣式變體
  * 用於作者展示、作品列表、關注等功能
  */
-export * from './author-profile';
+export {
+  // 重新命名避免衝突的變體
+  loadingStateVariants as authorProfileLoadingStateVariants,
+  loadMoreButtonVariants as authorProfileLoadMoreButtonVariants,
+  recipeTitleVariants as authorProfileRecipeTitleVariants,
+  // 其他變體保持原樣
+  profileContainerVariants as authorProfileContainerVariants,
+  authorCardVariants,
+  authorInfoVariants,
+  authorStatsVariants,
+  recipeListVariants,
+  recipesSectionVariants,
+  authorBioVariants,
+  shareButtonVariants,
+} from './author-profile';
+
+// Author Profile 類型導出
+export type {
+  ProfileContainerVariantsProps as AuthorProfileContainerVariantsProps,
+  AuthorCardVariantsProps,
+  AuthorInfoVariantsProps,
+  AuthorStatsVariantsProps,
+  RecipeListVariantsProps,
+  RecipesSectionVariantsProps,
+  RecipeTitleVariantsProps as AuthorProfileRecipeTitleVariantsProps,
+  LoadMoreButtonVariantsProps as AuthorProfileLoadMoreButtonVariantsProps,
+  LoadingStateVariantsProps as AuthorProfileLoadingStateVariantsProps,
+  AuthorBioVariantsProps,
+  ShareButtonVariantsProps,
+} from './author-profile';
 
 /**
  * 聯絡我們頁面樣式變體
@@ -47,7 +310,106 @@ export * from './contact-us';
  * 影片上傳頁面樣式變體
  * 用於影片上傳、編輯、分段等功能
  */
-export * from './video-upload';
+export {
+  // 重新命名避免衝突的變體
+  errorMessageVariants as videoUploadErrorMessageVariants,
+  timeDisplayVariants as videoUploadTimeDisplayVariants,
+  timeRangeDisplayVariants as videoUploadTimeRangeDisplayVariants,
+  // 其他變體保持原樣
+  videoEditorContainerVariants,
+  videoPlayerVariants as videoUploadVideoPlayerVariants,
+  videoPlayerContainerVariants,
+  playControlButtonVariants,
+  uploadAreaVariants,
+  uploadContainerVariants,
+  controlButtonVariants,
+  progressIndicatorVariants,
+  debugButtonVariants,
+  stepIndicatorContainerVariants,
+  contentAreaVariants,
+  segmentNavigationVariants as videoUploadSegmentNavigationVariants,
+  segmentNavigationControlsVariants,
+  segmentNavigationButtonVariants as videoUploadSegmentNavigationButtonVariants,
+  segmentIndicatorVariants,
+  segmentDeleteButtonVariants,
+  trimControlVariants,
+  timelineContainerVariants,
+  timeMarkerVariants,
+  thumbnailContainerVariants,
+  thumbnailVariants,
+  segmentMarkerVariants,
+  segmentMarkerLabelVariants,
+  maskVariants,
+  playbackIndicatorVariants,
+  playbackIndicatorMarkerVariants,
+  sliderHandleVariants,
+  sliderHandleMarkerVariants,
+  markButtonGroupVariants,
+  markButtonVariants,
+  statusIndicatorVariants,
+  statusIndicatorContentVariants,
+  statusLightVariants,
+  statusTextVariants,
+  resetButtonVariants,
+  actionButtonVariants,
+  buttonGroupVariants,
+  primaryActionButtonVariants,
+  forceSubmitButtonVariants,
+  descriptionFieldVariants,
+  descriptionFieldTitleVariants,
+  characterCounterVariants,
+  descriptionTextareaVariants,
+} from './video-upload';
+
+// Video Upload 類型導出
+export type {
+  VideoEditorContainerVariantsProps,
+  VideoPlayerVariantsProps as VideoUploadVideoPlayerVariantsProps,
+  VideoPlayerContainerVariantsProps,
+  PlayControlButtonVariantsProps,
+  UploadAreaVariantsProps,
+  UploadContainerVariantsProps,
+  ControlButtonVariantsProps,
+  ProgressIndicatorVariantsProps,
+  ErrorMessageVariantsProps as VideoUploadErrorMessageVariantsProps,
+  TimeDisplayVariantsProps as VideoUploadTimeDisplayVariantsProps,
+  DebugButtonVariantsProps,
+  StepIndicatorContainerVariantsProps,
+  ContentAreaVariantsProps,
+  SegmentNavigationVariantsProps as VideoUploadSegmentNavigationVariantsProps,
+  SegmentNavigationControlsVariantsProps,
+  SegmentNavigationButtonVariantsProps as VideoUploadSegmentNavigationButtonVariantsProps,
+  SegmentIndicatorVariantsProps,
+  SegmentDeleteButtonVariantsProps,
+  TrimControlVariantsProps,
+  TimelineContainerVariantsProps,
+  TimeMarkerVariantsProps,
+  ThumbnailContainerVariantsProps,
+  ThumbnailVariantsProps,
+  SegmentMarkerVariantsProps,
+  SegmentMarkerLabelVariantsProps,
+  MaskVariantsProps,
+  PlaybackIndicatorVariantsProps,
+  PlaybackIndicatorMarkerVariantsProps,
+  SliderHandleVariantsProps,
+  SliderHandleMarkerVariantsProps,
+  TimeRangeDisplayVariantsProps as VideoUploadTimeRangeDisplayVariantsProps,
+  MarkButtonGroupVariantsProps,
+  MarkButtonVariantsProps,
+  StatusIndicatorVariantsProps,
+  StatusIndicatorContentVariantsProps,
+  StatusLightVariantsProps,
+  StatusTextVariantsProps,
+  ResetButtonVariantsProps,
+  ActionButtonVariantsProps,
+  ButtonGroupVariantsProps,
+  PrimaryActionButtonVariantsProps,
+  ForceSubmitButtonVariantsProps,
+  DescriptionFieldVariantsProps,
+  DescriptionFieldTitleVariantsProps,
+  CharacterCounterVariantsProps,
+  DescriptionTextareaVariantsProps,
+} from './video-upload';
 
 /**
  * 通用變體配置類型
@@ -94,29 +456,156 @@ export interface InteractiveVariants {
   spacing?: 'tight' | 'normal' | 'loose';
 }
 
-// =============================================================================
-// 樣式工具函數
-// =============================================================================
+/**
+ * 通用樣式組合函數 - 結合 clsx 和 tailwind-merge
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 /**
- * 組合多個 CVA 樣式的工具函數
+ * 條件樣式應用函數
  */
-export const combineStyles = (
-  ...classes: (string | undefined | null | false)[]
-): string => {
-  return classes.filter(Boolean).join(' ');
-};
-
-/**
- * 根據條件應用樣式的工具函數
- */
-export const conditionalStyle = (
+export function conditionalStyles(
   condition: boolean,
-  trueStyle: string,
-  falseStyle?: string,
-): string => {
-  return condition ? trueStyle : falseStyle || '';
-};
+  trueStyles: string,
+  falseStyles?: string,
+): string {
+  return condition ? trueStyles : falseStyles || '';
+}
+
+/**
+ * 根據狀態映射樣式的函數
+ */
+export function stateStyles<T extends string>(
+  state: T,
+  styleMap: Record<T, string>,
+  defaultStyles?: string,
+): string {
+  return styleMap[state] || defaultStyles || '';
+}
+
+/**
+ * 組合多個 CVA 變體樣式的函數
+ */
+export function combineVariants(
+  baseStyles: string,
+  ...variants: (string | undefined | null | false)[]
+): string {
+  return cn(baseStyles, ...variants.filter(Boolean));
+}
+
+/**
+ * 響應式樣式應用函數
+ */
+export function responsiveStyles(breakpointStyles: {
+  base?: string;
+  sm?: string;
+  md?: string;
+  lg?: string;
+  xl?: string;
+  '2xl'?: string;
+}): string {
+  const { base, sm, md, lg, xl, '2xl': xl2 } = breakpointStyles;
+
+  return cn(
+    base,
+    sm && `sm:${sm.replace('sm:', '')}`,
+    md && `md:${md.replace('md:', '')}`,
+    lg && `lg:${lg.replace('lg:', '')}`,
+    xl && `xl:${xl.replace('xl:', '')}`,
+    xl2 && `2xl:${xl2.replace('2xl:', '')}`,
+  );
+}
+
+/**
+ * 動畫過渡樣式函數
+ */
+export function animationStyles(config: {
+  property?: 'all' | 'colors' | 'opacity' | 'shadow' | 'transform';
+  duration?: '75' | '100' | '150' | '200' | '300' | '500' | '700' | '1000';
+  timing?: 'linear' | 'in' | 'out' | 'in-out';
+  delay?: '75' | '100' | '150' | '200' | '300' | '500' | '700' | '1000';
+}): string {
+  const {
+    property = 'all',
+    duration = '200',
+    timing = 'in-out',
+    delay,
+  } = config;
+
+  return cn(
+    `transition-${property}`,
+    `duration-${duration}`,
+    `ease-${timing}`,
+    delay && `delay-${delay}`,
+  );
+}
+
+// ================== 常用樣式組合 ==================
+
+/**
+ * 常用的卡片樣式組合
+ */
+export const commonCardStyles = {
+  base: 'bg-white rounded-lg border border-gray-200 shadow-sm',
+  elevated:
+    'bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-shadow',
+  interactive:
+    'bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer',
+  minimal: 'bg-white rounded-lg border border-gray-100',
+} as const;
+
+/**
+ * 常用的按鈕樣式組合
+ */
+export const commonButtonStyles = {
+  primary:
+    'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2',
+  secondary:
+    'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-2 focus:ring-secondary focus:ring-offset-2',
+  outline:
+    'border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  ghost:
+    'hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  destructive:
+    'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-2 focus:ring-destructive focus:ring-offset-2',
+} as const;
+
+/**
+ * 常用的文字樣式組合
+ */
+export const commonTextStyles = {
+  heading1: 'text-3xl font-bold tracking-tight',
+  heading2: 'text-2xl font-semibold tracking-tight',
+  heading3: 'text-xl font-semibold',
+  heading4: 'text-lg font-semibold',
+  body: 'text-sm',
+  small: 'text-xs',
+  muted: 'text-muted-foreground',
+  error: 'text-destructive',
+  success: 'text-green-600',
+  warning: 'text-yellow-600',
+} as const;
+
+/**
+ * 常用的間距樣式組合
+ */
+export const commonSpacingStyles = {
+  none: '',
+  xs: 'space-y-1',
+  sm: 'space-y-2',
+  md: 'space-y-4',
+  lg: 'space-y-6',
+  xl: 'space-y-8',
+} as const;
+
+// ================== 類型導出 ==================
+
+export type CommonCardStyleKey = keyof typeof commonCardStyles;
+export type CommonButtonStyleKey = keyof typeof commonButtonStyles;
+export type CommonTextStyleKey = keyof typeof commonTextStyles;
+export type CommonSpacingStyleKey = keyof typeof commonSpacingStyles;
 
 // =============================================================================
 // 預設配置

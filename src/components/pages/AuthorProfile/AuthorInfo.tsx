@@ -10,7 +10,7 @@ import {
   authorStatsVariants,
   authorBioVariants,
   shareButtonVariants,
-} from './styles';
+} from '@/styles/cva/author-profile';
 
 interface AuthorInfoProps {
   author: Author;

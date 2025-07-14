@@ -9,7 +9,7 @@ import {
   buttonGroupVariants,
   primaryActionButtonVariants,
   forceSubmitButtonVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 操作按鈕元件屬性

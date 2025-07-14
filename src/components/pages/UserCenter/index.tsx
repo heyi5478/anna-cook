@@ -6,11 +6,6 @@ import { cn } from '@/lib/utils';
 import { useUserCenter } from '@/hooks/useUserCenter';
 import { UserProfileCard } from '@/components/common';
 import { RecipeActionBar } from '@/components/features';
-import { DataTabContent } from './DataTabContent';
-import { PublishedTabContent } from './PublishedTabContent';
-import { DraftTabContent } from './DraftTabContent';
-import { FollowTabContent } from './FollowTabContent';
-import { FavoriteTabContent } from './FavoriteTabContent';
 import {
   breadcrumbVariants,
   tabTriggerVariants,
@@ -20,7 +15,12 @@ import {
   sectionTitleVariants,
   sectionContainerVariants,
   tabsListVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { DataTabContent } from './DataTabContent';
+import { PublishedTabContent } from './PublishedTabContent';
+import { DraftTabContent } from './DraftTabContent';
+import { FollowTabContent } from './FollowTabContent';
+import { FavoriteTabContent } from './FavoriteTabContent';
 import type { UserCenterProps } from './types';
 
 /**

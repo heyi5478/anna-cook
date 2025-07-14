@@ -16,7 +16,7 @@ import {
   segmentNavigationButtonVariants,
   segmentIndicatorVariants,
   segmentDeleteButtonVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 片段導航元件屬性

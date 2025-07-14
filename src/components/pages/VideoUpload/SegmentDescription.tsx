@@ -7,7 +7,7 @@ import {
   characterCounterVariants,
   descriptionTextareaVariants,
   errorMessageVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 片段說明輸入元件屬性

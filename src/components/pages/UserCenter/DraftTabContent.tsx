@@ -9,7 +9,6 @@ import {
 import { cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
-import { DraftRecipeCard } from './DraftRecipeCard';
 import {
   draftTabContainerVariants,
   statusMessageVariants,
@@ -23,7 +22,8 @@ import {
   dialogIconVariants,
   dialogButtonContainerVariants,
   dialogActionButtonVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { DraftRecipeCard } from './DraftRecipeCard';
 
 interface DraftTabContentProps {
   isLoadingDrafts: boolean;

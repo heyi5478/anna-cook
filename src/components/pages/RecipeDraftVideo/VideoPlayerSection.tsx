@@ -8,7 +8,7 @@ import {
   videoPlayerSectionVariants,
   videoContainerVariants,
   timeDisplayVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft-video';
 
 type VideoPlayerSectionProps = {
   actualVideoId: string | number;

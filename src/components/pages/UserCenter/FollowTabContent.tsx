@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { UserFollowResponse } from '@/types/api';
-import { FollowedUserCard } from './FollowedUserCard';
 import {
   followTabContainerVariants,
   statsCountTextVariants,
@@ -11,7 +10,8 @@ import {
   loadMoreStateVariants,
   loadMoreButtonVariants,
   tabEmptyStateVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { FollowedUserCard } from './FollowedUserCard';
 
 interface FollowTabContentProps {
   followLoading: boolean;

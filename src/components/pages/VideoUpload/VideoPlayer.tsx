@@ -8,7 +8,7 @@ import {
   videoPlayerContainerVariants,
   playControlButtonVariants,
   timeDisplayVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 影片播放器元件屬性

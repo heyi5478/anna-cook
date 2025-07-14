@@ -19,7 +19,6 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-import { PublishedRecipeCardProps } from './types';
 import {
   cardContainerBaseVariants,
   cardImageVariants,
@@ -37,7 +36,8 @@ import {
   successStateVariants,
   successTitleVariants,
   successDescriptionVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { PublishedRecipeCardProps } from './types';
 
 /**
  * 顯示已發布的食譜卡片

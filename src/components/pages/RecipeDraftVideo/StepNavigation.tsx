@@ -5,7 +5,7 @@ import {
   stepNavigationVariants,
   stepNavigationButtonVariants,
   stepIndicatorVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft-video';
 
 type StepNavigationProps = {
   currentStep: number;

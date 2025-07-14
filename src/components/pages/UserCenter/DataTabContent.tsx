@@ -1,14 +1,14 @@
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
 import { cn } from '@/lib/utils';
-import { RecipeStatsItem } from './RecipeStatsItem';
 import {
   dataTabContainerVariants,
   dataTitleVariants,
   dataDescriptionVariants,
   dataCardContainerVariants,
   tabEmptyStateVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { RecipeStatsItem } from './RecipeStatsItem';
 
 interface DataTabContentProps {
   isLoadingPublished: boolean;

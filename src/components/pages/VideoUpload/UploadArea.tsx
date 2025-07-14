@@ -8,7 +8,7 @@ import {
   uploadContainerVariants,
   progressIndicatorVariants,
   errorMessageVariants,
-} from './styles';
+} from '@/styles/cva/video-upload';
 
 /**
  * 上傳區域元件屬性

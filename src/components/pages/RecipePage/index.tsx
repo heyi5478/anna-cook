@@ -52,7 +52,7 @@ import {
   authorContainerStyles,
   ingredientListStyles,
   tagsContainerStyles,
-} from './styles';
+} from '@/styles/cva/recipe-page';
 
 interface RecipePageProps {
   recipeData: {

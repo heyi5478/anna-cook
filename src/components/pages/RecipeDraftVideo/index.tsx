@@ -25,6 +25,11 @@ import {
   COMMON_TEXTS,
   ERROR_MESSAGES,
 } from '@/lib/constants/messages';
+import {
+  draftVideoEditorVariants,
+  loadingStateVariants,
+  errorStateVariants,
+} from '@/styles/cva/recipe-draft-video';
 import { BreadcrumbNavigation } from './BreadcrumbNavigation';
 import { VideoPlayerSection } from './VideoPlayerSection';
 import { StepNavigation } from './StepNavigation';
@@ -34,11 +39,6 @@ import { StepDescription } from './StepDescription';
 import { SubmitButton } from './SubmitButton';
 
 // 樣式系統
-import {
-  draftVideoEditorVariants,
-  loadingStateVariants,
-  errorStateVariants,
-} from './styles';
 
 /**
  * 構建提交草稿的資料

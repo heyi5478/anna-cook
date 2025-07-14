@@ -12,7 +12,7 @@ import {
   sliderVariants,
   sliderThumbVariants,
   timeRangeDisplayVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft-video';
 
 type TimelineSliderProps = {
   startTime: number;

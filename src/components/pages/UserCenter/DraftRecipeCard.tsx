@@ -13,7 +13,6 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-import { DraftRecipeCardProps } from './types';
 import {
   cardContainerBaseVariants,
   cardImageVariants,
@@ -29,7 +28,8 @@ import {
   successStateVariants,
   successTitleVariants,
   successDescriptionVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { DraftRecipeCardProps } from './types';
 
 /**
  * 顯示草稿的食譜卡片

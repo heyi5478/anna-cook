@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { RecipeStatsItemProps } from './types';
 import {
   recipeStatsContainerVariants,
   recipeInfoContainerVariants,
@@ -13,7 +12,8 @@ import {
   statsItemCardVariants,
   statsLabelVariants,
   statsValueVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
+import { RecipeStatsItemProps } from './types';
 
 /**
  * 顯示單一食譜的數據統計項目

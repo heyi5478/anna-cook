@@ -21,7 +21,7 @@ import {
   loadMoreStateVariants,
   loadMoreButtonVariants,
   tabEmptyStateVariants,
-} from './styles';
+} from '@/styles/cva/user-center';
 
 interface FavoriteTabContentProps {
   favoriteLoading: boolean;
