@@ -20,9 +20,11 @@ export const SORT_TYPES = {
   CREATED_AT: 'createdAt',
 } as const;
 
-// 開發環境測試 Token
+// 開發環境測試 Token (從環境變數中取得，僅在開發環境使用)
 export const DEV_TEST_TOKEN =
-  'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6MjksIkRpc3BsYXlJZCI6Ik0wMDAwMDIiLCJBY2NvdW50RW1haWwiOiJhMTIzQGdtYWlsLmNvbSIsIkFjY291bnROYW1lIjoiQWxpY2UiLCJSb2xlIjowLCJMb2dpblByb3ZpZGVyIjowLCJFeHAiOiIyMDI1LTA0LTI3VDEyOjM4OjA0LjIyNDg3OTlaIn0.MjTGyLcMjwBKq_BkySyPk2aIjfKmx_SzY8O3cLcRNYfY5ksh4oPbAXCTwYRTJTAANAzyGwC3F1siYfXh5FYl5g';
+  process.env.NODE_ENV === 'development'
+    ? process.env.DEV_TEST_TOKEN || ''
+    : '';
 
 // 分頁預設值
 export const PAGINATION_DEFAULTS = {
