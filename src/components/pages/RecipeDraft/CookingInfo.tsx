@@ -1,11 +1,10 @@
 import { Input } from '@/components/ui/input';
-// 導入 CVA 樣式系統
 import {
   draftSectionVariants,
   draftFieldVariants,
   draftLabelVariants,
   errorMessageVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft';
 
 type CookingInfoProps = {
   cookingTimeValue: string;

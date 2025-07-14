@@ -2,13 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-// 導入 CVA 樣式系統
 import {
   draftSectionVariants,
   draftFieldVariants,
   draftLabelVariants,
   tagItemVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft';
 
 type TagSectionProps = {
   tags: string[];

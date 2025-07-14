@@ -18,12 +18,6 @@ import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
 import type { Ingredient, Seasoning } from '@/types/recipe';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
-import { recipeFormSchema, type RecipeFormValues } from './schema';
-import { IngredientList } from './IngredientList';
-import { TagSection } from './TagsSection';
-import { CookingInfo } from './CookingInfo';
-import { CookingStep } from './CookingSteps';
-// 導入 CVA 樣式系統
 import {
   draftPageVariants,
   draftSectionVariants,
@@ -34,7 +28,12 @@ import {
   videoContainerVariants,
   spacingVariants,
   draftStyles,
-} from './styles';
+} from '@/styles/cva/recipe-draft';
+import { recipeFormSchema, type RecipeFormValues } from './schema';
+import { IngredientList } from './IngredientList';
+import { TagSection } from './TagsSection';
+import { CookingInfo } from './CookingInfo';
+import { CookingStep } from './CookingSteps';
 
 // API 基礎 URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import type { Step } from '@/types/recipe';
-// 導入 CVA 樣式系統
 import {
   draftSectionVariants,
   draftLabelVariants,
@@ -19,7 +18,7 @@ import {
   stepAccordionVariants,
   videoContainerVariants,
   draftFieldVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft';
 
 type CookingStepProps = {
   steps: Step[];

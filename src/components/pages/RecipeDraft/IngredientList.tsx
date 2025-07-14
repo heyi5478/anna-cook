@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input';
 import { Plus, X } from 'lucide-react';
 import { useId } from 'react';
 import type { Ingredient, Seasoning } from '@/types/recipe';
-// 導入 CVA 樣式系統
 import {
   draftSectionVariants,
   draftFieldVariants,
@@ -11,7 +10,7 @@ import {
   draftButtonVariants,
   errorMessageVariants,
   ingredientRowVariants,
-} from './styles';
+} from '@/styles/cva/recipe-draft';
 
 type IngredientListProps = {
   ingredients: Ingredient[];
