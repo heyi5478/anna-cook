@@ -2,12 +2,7 @@ import { IncomingMessage } from 'http';
 import { getApiConfig, authConfig } from '@/config';
 import { getServerToken as getNextApiServerToken } from '@/lib/auth-middleware';
 import type { NextApiRequest } from 'next';
-import {
-  DEV_TEST_TOKEN,
-  COMMON_TEXTS,
-  HTTP_STATUS,
-  SORT_TYPES,
-} from '@/lib/constants';
+import { DEV_TEST_TOKEN, HTTP_STATUS, SORT_TYPES } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
@@ -49,7 +44,7 @@ export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
 
   // 在開發環境中使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log(COMMON_TEXTS.DEV_SERVER_TOKEN);
+    console.log('Using development test token');
     return DEV_TEST_TOKEN;
   }
 

@@ -22,7 +22,7 @@ export const fetchGoogleAuthUrl = async (): Promise<string> => {
     }
 
     const data: GoogleAuthResponse = await res.json();
-    console.log('回應資料:', data);
+    console.log('Google auth URL fetched successfully');
     return data.redirectUri;
   } catch (error) {
     console.error('獲取 Google 登入 URL 失敗:', error);
@@ -52,7 +52,7 @@ export const exchangeGoogleCodeForToken = async (
     }
 
     const data = await res.json();
-    console.log('回應資料:', data);
+    console.log('Google code exchange completed');
     return data;
   } catch (error) {
     console.error('Google code 換取 token 失敗:', error);
@@ -78,7 +78,7 @@ export const checkAuth = async (): Promise<CheckAuthResponse> => {
 
     // 解析回應資料
     const responseData = await res.json();
-    console.log('解析後的回應資料:', responseData);
+    console.log('Authentication check completed');
 
     // 檢查回應是否成功
     if (responseData.Status === false) {
@@ -123,12 +123,11 @@ export const registerWithEmail = async (
 
     // 解析回應資料
     const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
 
     let responseData;
     try {
       responseData = JSON.parse(responseText);
-      console.log('解析後的回應資料:', responseData);
+      console.log('Registration request processed successfully');
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
@@ -173,12 +172,11 @@ export const loginWithEmail = async (
 
     // 解析回應資料
     const responseText = await res.text();
-    console.log('回應原始文本:', responseText);
 
     let responseData;
     try {
       responseData = JSON.parse(responseText);
-      console.log('解析後的回應資料:', responseData);
+      console.log('Authentication successful');
     } catch (e) {
       console.error('解析 JSON 失敗:', e);
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
