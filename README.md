@@ -107,7 +107,7 @@ anna-cook/
 │   │   ├── hooks/              # Custom Hooks 測試
 │   │   └── utils/              # 工具函式測試
 │   ├── components/             # React 元件 (分層架構)
-│   │   ├── ui/                 # UI 基礎元件 (shadcn/ui + CVA)
+│   │   ├── ui/                 # UI 基礎元件 (shadcn/ui)
 │   │   ├── common/             # 通用/共用元件
 │   │   ├── features/           # 功能特定元件
 │   │   ├── pages/              # 頁面專用元件
@@ -134,6 +134,7 @@ anna-cook/
 │   │   ├── ui.ts               # UI 元件型別
 │   │   └── video-editor.ts     # 影片編輯器型別
 │   ├── config/                 # 應用程式設定
+│   │   ├── colors.ts           # 色彩設定
 │   │   └── index.ts            # 設定統一匯出
 │   ├── pages/                  # Next.js 頁面 (Pages Router)
 │   │   ├── api/                # API 路由
@@ -141,6 +142,17 @@ anna-cook/
 │   │   ├── _document.tsx       # Document 元件
 │   │   └── [各功能頁面目錄]/    # 功能頁面
 │   ├── styles/                 # 樣式檔案
+│   │   ├── cva/                # CVA 樣式變體管理 (按功能分組)
+│   │   │   ├── author-profile.ts      # 作者檔案頁面樣式
+│   │   │   ├── contact-us.ts          # 聯絡我們頁面樣式
+│   │   │   ├── profile-edit-form.ts   # 個人資料編輯表單樣式
+│   │   │   ├── recipe-draft.ts        # 食譜草稿樣式
+│   │   │   ├── recipe-draft-video.ts  # 食譜草稿影片樣式
+│   │   │   ├── recipe-page.ts         # 食譜頁面樣式
+│   │   │   ├── recipe-upload.ts       # 食譜上傳樣式
+│   │   │   ├── user-center.ts         # 用戶中心樣式
+│   │   │   ├── video-upload.ts        # 影片上傳樣式
+│   │   │   └── index.ts               # 樣式統一匯出
 │   │   └── globals.css         # 全域樣式 (Tailwind CSS)
 │   └── setupTests.js           # Jest 測試環境設定
 │
