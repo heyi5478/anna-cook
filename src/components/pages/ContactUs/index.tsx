@@ -29,15 +29,15 @@ import {
 import { ISSUE_TYPES } from '@/lib/constants';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
-import { contactFormSchema, type ContactFormValues } from './schema';
-// 導入 CVA 樣式系統
 import {
   contactPageVariants,
   contactFormVariants,
   contactFieldVariants,
   contactButtonVariants,
   contactStyles,
-} from './styles';
+} from '@/styles/cva/contact-us';
+import { contactFormSchema, type ContactFormValues } from './schema';
+// 導入 CVA 樣式系統
 
 /**
  * 聯絡我們表單元件，提供使用者留言功能

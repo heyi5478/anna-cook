@@ -57,7 +57,7 @@ import {
   errorStateVariants,
   dialogVariants,
   breadcrumbVariants,
-} from './styles';
+} from '@/styles/cva/profile-edit-form';
 
 // 定義表單驗證結構
 const profileFormSchema = z.object({
