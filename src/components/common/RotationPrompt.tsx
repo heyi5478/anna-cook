@@ -104,7 +104,7 @@ export function RotationPrompt({
             className={cn(
               rotationIconVariants({
                 size: 'medium',
-                animation: 'spin',
+                animation: 'spinSlow',
                 color: theme === 'dark' ? 'accent' : 'warning',
               }),
             )}

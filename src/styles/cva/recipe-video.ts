@@ -73,6 +73,7 @@ export const rotationIconVariants = cva('mx-auto transition-all duration-300', {
     animation: {
       none: '',
       spin: 'animate-spin',
+      spinSlow: 'animate-[spin_3s_linear_infinite]',
       pulse: 'animate-pulse',
       bounce: 'animate-bounce',
       wiggle: 'animate-[wiggle_1s_ease-in-out_infinite]',
