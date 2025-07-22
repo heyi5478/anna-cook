@@ -9,6 +9,9 @@ import { useScreenOrientation } from '@/hooks/useScreenOrientation';
 import { VideoPlayer } from '@/components/features/VideoPlayer';
 import { StepPanel } from '@/components/features/StepPanel';
 import { NavigationBar } from '@/components/features/NavigationBar';
+import { RotationPrompt } from '@/components/common';
+import { cn } from '@/lib/utils';
+import { videoPageContainerVariants } from '@/styles/cva/recipe-video';
 
 /**
  * 食譜視頻頁面組件
@@ -39,7 +42,10 @@ export default function RecipeVideoPage() {
   // 使用自定義 hooks
   const { teachingData, steps, videoId, loading, error } =
     useRecipeTeaching(recipeId);
-  useScreenOrientation(); // CSS-First 方向偵測
+  const { isMobile, isPortrait } = useScreenOrientation();
+
+  // 計算是否顯示旋轉提示
+  const shouldShowRotationPrompt = isMobile && isPortrait;
 
   // 重置狀態當組件卸載時
   useEffect(() => {
@@ -140,13 +146,14 @@ export default function RecipeVideoPage() {
 
   return (
     <div
-      className="
-      relative w-full h-screen bg-black overflow-hidden
-      mobile-portrait:transform mobile-portrait:rotate-90 mobile-portrait:origin-center
-      mobile-portrait:[width:100vh] mobile-portrait:[height:100vw]
-      mobile-portrait:fixed mobile-portrait:top-0 mobile-portrait:left-0
-      mobile-portrait:z-50
-    "
+      className={cn(
+        videoPageContainerVariants({
+          orientation: 'landscape',
+          layout: 'fullscreen',
+          background: 'dark',
+        }),
+        'h-screen bg-black overflow-hidden',
+      )}
     >
       <Head>
         <title>{teachingData.recipeName} - 教學視頻 | Anna Cook</title>
@@ -160,8 +167,21 @@ export default function RecipeVideoPage() {
         />
       </Head>
 
+      {/* 旋轉提示組件 */}
+      <RotationPrompt
+        show={shouldShowRotationPrompt}
+        title="請旋轉您的裝置"
+        description="為了獲得最佳的影片觀看體驗，請將您的手機轉為橫向模式"
+        theme="dark"
+      />
+
       {/* 視頻區域 */}
-      <div className="relative flex h-full mobile-portrait:w-full mobile-portrait:h-full mobile-portrait:transform-gpu">
+      <div
+        className={cn(
+          'relative flex h-full',
+          shouldShowRotationPrompt && 'opacity-0 pointer-events-none',
+        )}
+      >
         <NavigationBar recipeId={recipeId} currentTime={currentTime} />
 
         <VideoPlayer

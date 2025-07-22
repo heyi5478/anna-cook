@@ -49,6 +49,34 @@ export {
   interactionStateVariants,
 } from './recipe-draft-video';
 
+/**
+ * 食譜影片頁面樣式變體
+ * 用於影片播放、旋轉提示等功能
+ */
+export {
+  rotationPromptOverlayVariants,
+  rotationPromptContentVariants,
+  rotationIconVariants,
+  rotationTextVariants,
+  videoPageContainerVariants,
+  // 重新命名避免衝突的變體
+  videoPlayerContainerVariants as recipeVideoPlayerContainerVariants,
+  responsiveVariants as recipeVideoResponsiveVariants,
+  animationVariants as recipeVideoAnimationVariants,
+} from './recipe-video';
+
+// Recipe Video 類型導出
+export type {
+  RotationPromptOverlayVariantsProps,
+  RotationPromptContentVariantsProps,
+  RotationIconVariantsProps,
+  RotationTextVariantsProps,
+  VideoPageContainerVariantsProps,
+  VideoPlayerContainerVariantsProps as RecipeVideoPlayerContainerVariantsProps,
+  ResponsiveVariantsProps as RecipeVideoResponsiveVariantsProps,
+  AnimationVariantsProps as RecipeVideoAnimationVariantsProps,
+} from './recipe-video';
+
 // Recipe Draft Video 類型導出
 export type {
   DraftVideoEditorVariantsProps,
