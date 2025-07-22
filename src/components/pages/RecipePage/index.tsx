@@ -45,7 +45,6 @@ import {
   separatedItemStyles,
   pageContainerStyles,
   breadcrumbStyles,
-  mainImageStyles,
   interactionContainerStyles,
   recipeInfoItemStyles,
   reviewListStyles,
@@ -319,7 +318,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
       <main className="flex-1">
         {/* 食譜主圖 */}
-        <div className={cn(mainImageStyles())}>
+        <div className="relative w-full h-[400px] bg-black rounded-lg overflow-hidden">
           <Image
             src={getImageUrl(recipe.coverPhoto)}
             alt={recipe.recipeName}
