@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: CSS 程式碼的組織和維護方法，包含共享樣式變數的管理。

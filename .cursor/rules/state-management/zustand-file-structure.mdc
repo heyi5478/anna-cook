@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: Zustand 狀態管理的檔案組織和命名規範，確保專案結構一致。

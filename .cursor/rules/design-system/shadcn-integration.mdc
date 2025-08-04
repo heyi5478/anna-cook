@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 從 shadCN UI 引入和擴展元件的標準方式，確保一致的使用模式。

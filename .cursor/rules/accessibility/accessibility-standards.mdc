@@ -1,13 +1,10 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 設計系統元件的可訪問性要求，確保所有元件符合 WCAG 標準。
 globs: 
   - src/components/ui/*.tsx
-alwaysApply: false
 ---
 
 # 可訪問性標準

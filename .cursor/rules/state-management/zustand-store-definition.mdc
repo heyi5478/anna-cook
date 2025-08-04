@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: Zustand store 的定義與實現方式，包含類型定義和狀態更新模式。
