@@ -93,7 +93,7 @@ export const uploadButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-neutral-400 text-white hover:bg-neutral-500 active:bg-neutral-600',
+          'bg-primary text-white hover:bg-primary-600 active:bg-primary-700',
         secondary:
           'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 active:bg-neutral-400',
         outline:
