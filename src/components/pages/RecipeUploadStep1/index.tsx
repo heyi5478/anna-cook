@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
@@ -25,13 +26,11 @@ import {
 } from '@/lib/constants/file';
 import {
   uploadPageVariants,
-  uploadFieldVariants,
   uploadButtonVariants,
   recipeUploadErrorMessageVariants as errorMessageVariants,
   recipeUploadAreaVariants as uploadAreaVariants,
   recipeUploadStepContainerVariants as stepContainerVariants,
   recipeUploadLabelVariants as labelVariants,
-  recipeUploadInputIconVariants as inputIconVariants,
   recipeUploadSuccessMessageVariants as successMessageVariants,
 } from '@/styles/cva';
 
@@ -284,31 +283,30 @@ export default function RecipeUploadForm() {
               placeholder="在此輸入食譜名稱"
               aria-labelledby="recipeName-label"
               className={cn(
-                uploadFieldVariants({
-                  variant: 'iconInput',
-                  state: errors.recipeName ? 'error' : 'default',
-                }),
+                'w-full rounded-lg transition-colors duration-200',
+                'pl-12 pr-4 py-3', // 左邊留 48px (16px + 24px + 8px)，右邊 16px
+                'bg-[#FAFAFA] border border-[#A3A3A3]',
+                'text-base placeholder:text-[#A3A3A3]',
+                'font-normal leading-6',
+                'focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500',
+                errors.recipeName &&
+                  'border-red-500 focus:border-red-500 focus:ring-red-200',
               )}
+              style={{
+                fontFamily: 'Noto Sans TC, sans-serif',
+                borderWidth: '0.67px',
+              }}
               {...register('recipeName')}
             />
-            <div
-              className={inputIconVariants({
-                color: errors.recipeName ? 'error' : 'default',
-              })}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              </svg>
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
+              <Pencil
+                size={20}
+                strokeWidth={2}
+                className={cn(
+                  'text-[#A3A3A3]',
+                  errors.recipeName && 'text-red-500',
+                )}
+              />
             </div>
           </div>
           {errors.recipeName && (

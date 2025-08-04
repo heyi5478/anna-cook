@@ -244,7 +244,7 @@ export const ingredientRowVariants = cva('flex gap-3 items-start', {
  * 步驟容器樣式變體
  * 控制料理步驟區塊的樣式
  */
-export const stepContainerVariants = cva('space-y-4 p-4 border rounded-lg', {
+export const stepContainerVariants = cva('space-y-4 p-4 rounded-lg', {
   variants: {
     variant: {
       default: 'border-neutral-200 bg-white',
