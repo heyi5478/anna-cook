@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 設計系統元件的效能優化指南，包含 React 最佳實踐和 bundle size 考量。

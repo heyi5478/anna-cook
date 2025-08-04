@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 專精於 Jest 單元測試的專業前端工程師測試開發規範，包含完整的配置和撰寫標準。

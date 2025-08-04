@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 在 React 元件中使用 Zustand 的最佳實踐，包含選擇器和優化技巧。

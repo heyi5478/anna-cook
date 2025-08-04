@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 專案使用 Next.js Pages Router 架構，禁止建議或使用 App Router 相關功能。

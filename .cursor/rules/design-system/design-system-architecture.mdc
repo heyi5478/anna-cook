@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: CVA 結合 shadCN UI 和 Tailwind CSS 的設計系統架構指導原則。

@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: TypeScript 程式碼的最佳實踐和開發標準，確保類型安全和代碼品質。

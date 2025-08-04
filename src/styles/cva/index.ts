@@ -58,7 +58,7 @@ export {
   rotationPromptContentVariants,
   rotationIconVariants,
   rotationTextVariants,
-  videoPageContainerVariants,
+  videoPlayerContainerVariants,
   // 重新命名避免衝突的變體
   videoPlayerContainerVariants as recipeVideoPlayerContainerVariants,
   responsiveVariants as recipeVideoResponsiveVariants,
@@ -71,7 +71,7 @@ export type {
   RotationPromptContentVariantsProps,
   RotationIconVariantsProps,
   RotationTextVariantsProps,
-  VideoPageContainerVariantsProps,
+  VideoPlayerContainerVariantsProps,
   VideoPlayerContainerVariantsProps as RecipeVideoPlayerContainerVariantsProps,
   ResponsiveVariantsProps as RecipeVideoResponsiveVariantsProps,
   AnimationVariantsProps as RecipeVideoAnimationVariantsProps,
@@ -392,7 +392,7 @@ export {
   // 其他變體保持原樣
   videoEditorContainerVariants,
   videoPlayerVariants as videoUploadVideoPlayerVariants,
-  videoPlayerContainerVariants,
+  videoPlayerContainerVariants as videoUploadVideoPlayerContainerVariants,
   playControlButtonVariants,
   uploadAreaVariants,
   uploadContainerVariants,
@@ -439,7 +439,7 @@ export {
 export type {
   VideoEditorContainerVariantsProps,
   VideoPlayerVariantsProps as VideoUploadVideoPlayerVariantsProps,
-  VideoPlayerContainerVariantsProps,
+  VideoPlayerContainerVariantsProps as VideoUploadVideoPlayerContainerVariantsProps,
   PlayControlButtonVariantsProps,
   UploadAreaVariantsProps,
   UploadContainerVariantsProps,

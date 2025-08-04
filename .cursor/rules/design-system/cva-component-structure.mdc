@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 在 UI 元件目錄中使用 CVA 建立元件的標準結構和命名規範。
