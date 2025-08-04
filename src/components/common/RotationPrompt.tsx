@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, RotateCcw } from 'lucide-react';
+import { Smartphone, RotateCcw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   rotationPromptOverlayVariants,
@@ -19,6 +19,7 @@ export type RotationPromptProps = {
   description?: string;
   theme?: 'dark' | 'light' | 'accent';
   className?: string;
+  onDismiss?: () => void;
 } & Pick<RotationPromptOverlayVariantsProps, 'backdrop'> &
   Pick<RotationPromptContentVariantsProps, 'size' | 'animation'>;
 
@@ -34,6 +35,7 @@ export function RotationPrompt({
   size = 'normal',
   animation = 'scale',
   className,
+  onDismiss,
 }: RotationPromptProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
@@ -82,8 +84,20 @@ export function RotationPrompt({
             animation: isVisible ? animation : 'none',
             theme,
           }),
+          'relative', // 為絕對定位的關閉按鈕提供相對定位容器
         )}
       >
+        {/* 關閉按鈕 */}
+        {onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors duration-200 p-1 rounded-full hover:bg-gray-700/50"
+            aria-label="關閉提示"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+
         {/* 圖示區域 */}
         <div className="flex items-center justify-center space-x-3 mb-4">
           {/* 手機圖示 */}
@@ -166,6 +180,18 @@ export function RotationPrompt({
           >
             此提示將在您旋轉裝置後自動消失
           </p>
+
+          {/* 暫時關閉按鈕 */}
+          {onDismiss && (
+            <div className="pt-4 mt-4 border-t border-gray-600/30">
+              <button
+                onClick={onDismiss}
+                className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-600/50 rounded-md transition-colors duration-200"
+              >
+                暫時關閉
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
