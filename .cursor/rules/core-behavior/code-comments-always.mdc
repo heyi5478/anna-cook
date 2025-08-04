@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 確保所有代碼都有適當的中文註解，並遵循專案的註解規範。這是核心的開發標準，適用於所有檔案。

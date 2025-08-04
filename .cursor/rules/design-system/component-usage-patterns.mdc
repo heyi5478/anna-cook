@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 在頁面和其他元件中使用設計系統元件的標準方式。

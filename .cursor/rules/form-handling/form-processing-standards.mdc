@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: 表單處理和資料驗證規範，使用 react-hook-form 和 zod 的標準模式。
