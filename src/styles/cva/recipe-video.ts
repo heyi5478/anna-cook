@@ -125,46 +125,6 @@ export const rotationTextVariants = cva(
 );
 
 /**
- * 影片頁面容器樣式變體
- */
-export const videoPageContainerVariants = cva(
-  'relative w-full mx-auto transition-all duration-300',
-  {
-    variants: {
-      layout: {
-        mobile: 'max-w-full px-4',
-        tablet: 'max-w-2xl px-6',
-        desktop: 'max-w-4xl px-8',
-        fullscreen: 'max-w-full px-0',
-      },
-      orientation: {
-        portrait: 'min-h-screen flex flex-col',
-        landscape: 'min-h-screen flex flex-row',
-        auto: 'min-h-screen',
-      },
-      state: {
-        normal: '',
-        loading: 'opacity-75 pointer-events-none',
-        error: 'bg-red-50 border border-red-200',
-        disabled: 'opacity-50 pointer-events-none',
-      },
-      background: {
-        default: 'bg-white',
-        neutral: 'bg-neutral-50',
-        dark: 'bg-neutral-900 text-white',
-        transparent: 'bg-transparent',
-      },
-    },
-    defaultVariants: {
-      layout: 'desktop',
-      orientation: 'auto',
-      state: 'normal',
-      background: 'default',
-    },
-  },
-);
-
-/**
  * 影片播放器容器樣式變體
  */
 export const videoPlayerContainerVariants = cva(
@@ -267,9 +227,6 @@ export type RotationIconVariantsProps = VariantProps<
 >;
 export type RotationTextVariantsProps = VariantProps<
   typeof rotationTextVariants
->;
-export type VideoPageContainerVariantsProps = VariantProps<
-  typeof videoPageContainerVariants
 >;
 export type VideoPlayerContainerVariantsProps = VariantProps<
   typeof videoPlayerContainerVariants
