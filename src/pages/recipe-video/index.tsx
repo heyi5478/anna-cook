@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,9 +9,7 @@ import { useScreenOrientation } from '@/hooks/useScreenOrientation';
 import { VideoPlayer } from '@/components/features/VideoPlayer';
 import { StepPanel } from '@/components/features/StepPanel';
 import { NavigationBar } from '@/components/features/NavigationBar';
-import { RotationPrompt } from '@/components/common';
-import { cn } from '@/lib/utils';
-import { videoPageContainerVariants } from '@/styles/cva/recipe-video';
+import { RotationPrompt } from '@/components/common/RotationPrompt';
 
 /**
  * 食譜視頻頁面組件
@@ -42,10 +40,27 @@ export default function RecipeVideoPage() {
   // 使用自定義 hooks
   const { teachingData, steps, videoId, loading, error } =
     useRecipeTeaching(recipeId);
-  const { isMobile, isPortrait } = useScreenOrientation();
+  const { isMobile, isPortrait } = useScreenOrientation(); // CSS-First 方向偵測
 
-  // 計算是否顯示旋轉提示
-  const shouldShowRotationPrompt = isMobile && isPortrait;
+  // 旋轉提示狀態管理
+  const [isRotationPromptDismissed, setIsRotationPromptDismissed] =
+    useState(false);
+  const shouldShowRotationPrompt =
+    isMobile && isPortrait && !isRotationPromptDismissed;
+
+  /**
+   * 處理關閉旋轉提示
+   */
+  const handleDismissRotationPrompt = () => {
+    setIsRotationPromptDismissed(true);
+  };
+
+  // 當設備轉為橫向時重置提示狀態
+  useEffect(() => {
+    if (isMobile && !isPortrait) {
+      setIsRotationPromptDismissed(false);
+    }
+  }, [isMobile, isPortrait]);
 
   // 重置狀態當組件卸載時
   useEffect(() => {
@@ -145,16 +160,7 @@ export default function RecipeVideoPage() {
   }
 
   return (
-    <div
-      className={cn(
-        videoPageContainerVariants({
-          orientation: 'landscape',
-          layout: 'fullscreen',
-          background: 'dark',
-        }),
-        'h-screen bg-black overflow-hidden',
-      )}
-    >
+    <div className="relative w-full h-screen bg-black overflow-hidden">
       <Head>
         <title>{teachingData.recipeName} - 教學視頻 | Anna Cook</title>
         <meta
@@ -167,21 +173,8 @@ export default function RecipeVideoPage() {
         />
       </Head>
 
-      {/* 旋轉提示組件 */}
-      <RotationPrompt
-        show={shouldShowRotationPrompt}
-        title="請旋轉您的裝置"
-        description="為了獲得最佳的影片觀看體驗，請將您的手機轉為橫向模式"
-        theme="dark"
-      />
-
       {/* 視頻區域 */}
-      <div
-        className={cn(
-          'relative flex h-full',
-          shouldShowRotationPrompt && 'opacity-0 pointer-events-none',
-        )}
-      >
+      <div className="relative flex h-full">
         <NavigationBar recipeId={recipeId} currentTime={currentTime} />
 
         <VideoPlayer
@@ -207,6 +200,15 @@ export default function RecipeVideoPage() {
           onSelectStep={atSelectStep}
         />
       </div>
+
+      {/* 旋轉提示組件 - 作為覆蓋層 */}
+      <RotationPrompt
+        show={shouldShowRotationPrompt}
+        title="建議旋轉裝置"
+        description="為了獲得最佳的影片觀看體驗，建議將裝置轉為橫向模式"
+        theme="dark"
+        onDismiss={handleDismissRotationPrompt}
+      />
     </div>
   );
 }
