@@ -285,12 +285,12 @@ export default function RecipeUploadForm() {
               className={cn(
                 'w-full rounded-lg transition-colors duration-200',
                 'pl-12 pr-4 py-3', // 左邊留 48px (16px + 24px + 8px)，右邊 16px
-                'bg-[#FAFAFA] border border-[#A3A3A3]',
-                'text-base placeholder:text-[#A3A3A3]',
+                'bg-neutral-50 border border-neutral-400',
+                'text-base placeholder:text-neutral-400',
                 'font-normal leading-6',
                 'focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500',
                 errors.recipeName &&
-                  'border-red-500 focus:border-red-500 focus:ring-red-200',
+                  'border-error focus:border-error focus:ring-red-200',
               )}
               style={{
                 fontFamily: 'Noto Sans TC, sans-serif',
@@ -303,8 +303,8 @@ export default function RecipeUploadForm() {
                 size={20}
                 strokeWidth={2}
                 className={cn(
-                  'text-[#A3A3A3]',
-                  errors.recipeName && 'text-red-500',
+                  'text-neutral-400',
+                  errors.recipeName && 'text-error',
                 )}
               />
             </div>
@@ -319,7 +319,7 @@ export default function RecipeUploadForm() {
         {/* 上傳封面圖片 */}
         <div className={stepContainerVariants()}>
           <div className={labelVariants()}>
-            上傳封面圖片<span className="text-red-500 ml-1">*</span>
+            上傳封面圖片<span className="text-error ml-1">*</span>
           </div>
           <div
             className={uploadAreaVariants({
@@ -357,7 +357,7 @@ export default function RecipeUploadForm() {
                 <span className="mt-2 text-sm text-center">
                   點擊上傳圖片
                   <br />
-                  <span className="text-red-500">(必填)</span>
+                  <span className="text-error">(必填)</span>
                 </span>
               </div>
             )}
@@ -396,7 +396,7 @@ export default function RecipeUploadForm() {
               type="checkbox"
               className={cn(
                 'w-5 h-5 mr-2',
-                errors.agreement ? 'border-red-500' : '',
+                errors.agreement ? 'border-error' : '',
               )}
               {...register('agreement')}
             />
