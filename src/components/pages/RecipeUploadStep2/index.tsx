@@ -26,6 +26,7 @@ import {
   recipeUploadTagVariants as tagVariants,
   recipeUploadIngredientRowVariants as ingredientRowVariants,
 } from '@/styles/cva';
+import { separatorVariants } from '@/styles/cva/recipe-upload';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -336,201 +337,197 @@ export default function RecipeUploadStep2() {
         </div>
 
         {/* 所需食材 */}
-        <div className={stepContainerVariants()}>
+        <div className="mb-6">
           <h2 className={labelVariants()}>所需食材</h2>
 
-          {ingredientFields.map((field, index) => (
-            <div key={field.id} className={ingredientRowVariants()}>
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="食材"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    state: errors.ingredients?.[index]?.name
-                      ? 'error'
-                      : 'default',
-                    size: 'sm',
-                  })}
-                  {...register(`ingredients.${index}.name`)}
-                />
-              </div>
-              <div className="w-16">
-                <input
-                  type="text"
-                  placeholder="數量"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    state: errors.ingredients?.[index]?.amount
-                      ? 'error'
-                      : 'default',
-                    size: 'sm',
-                  })}
-                  {...register(`ingredients.${index}.amount`)}
-                />
-              </div>
-              <div className="w-16">
-                <input
-                  type="text"
-                  placeholder="單位"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    size: 'sm',
-                  })}
-                  {...register(`ingredients.${index}.unit`)}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => removeIngredient(index)}
-                className={uploadButtonVariants({
-                  variant: 'add',
-                  size: 'icon',
-                })}
-                aria-label={`${COMMON_TEXTS.DELETE}食材`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={atAddIngredient}
-            className={uploadButtonVariants({
-              variant: 'add',
-              size: 'sm',
+          <div
+            className={stepContainerVariants({
+              variant: 'ingredientsContainer',
             })}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            {ingredientFields.map((field, index) => (
+              <div key={field.id}>
+                <div
+                  className={ingredientRowVariants({
+                    variant: field.name ? 'filled' : 'empty',
+                  })}
+                >
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="食材"
+                      className="w-full bg-transparent border-none outline-none placeholder-neutral-400"
+                      {...register(`ingredients.${index}.name`)}
+                    />
+                  </div>
+                  <div className="w-0 h-6 border-l border-neutral-300" />
+                  <div className="w-20 text-center">
+                    <input
+                      type="text"
+                      placeholder="份量"
+                      className="w-full bg-transparent border-none outline-none text-center placeholder-neutral-400"
+                      {...register(`ingredients.${index}.amount`)}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeIngredient(index)}
+                    className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
+                    aria-label={`${COMMON_TEXTS.DELETE}食材`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+                {index < ingredientFields.length - 1 && (
+                  <div
+                    className={separatorVariants({
+                      variant: 'dashed',
+                      spacing: 'sm',
+                    })}
+                  />
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={atAddIngredient}
+              className={uploadButtonVariants({
+                variant: 'addIngredient',
+                size: 'default',
+              })}
             >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v8" />
-              <path d="M8 12h8" />
-            </svg>
-            <span className="ml-1">食材</span>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m12 8 0 8" />
+                <path d="m8 12 8 0" />
+              </svg>
+              <span>食材</span>
+            </button>
+          </div>
         </div>
 
         {/* 所需調料 */}
-        <div className={stepContainerVariants()}>
+        <div className="mb-6">
           <h2 className={labelVariants()}>所需調料</h2>
 
-          {seasoningFields.map((field, index) => (
-            <div key={field.id} className={ingredientRowVariants()}>
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="調料"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    state: errors.seasonings?.[index]?.name
-                      ? 'error'
-                      : 'default',
-                    size: 'sm',
-                  })}
-                  {...register(`seasonings.${index}.name`)}
-                />
-              </div>
-              <div className="w-16">
-                <input
-                  type="text"
-                  placeholder="數量"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    state: errors.seasonings?.[index]?.amount
-                      ? 'error'
-                      : 'default',
-                    size: 'sm',
-                  })}
-                  {...register(`seasonings.${index}.amount`)}
-                />
-              </div>
-              <div className="w-16">
-                <input
-                  type="text"
-                  placeholder="單位"
-                  className={uploadFieldVariants({
-                    variant: 'input',
-                    size: 'sm',
-                  })}
-                  {...register(`seasonings.${index}.unit`)}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => removeSeasoning(index)}
-                className={uploadButtonVariants({
-                  variant: 'add',
-                  size: 'icon',
-                })}
-                aria-label={`${COMMON_TEXTS.DELETE}調料`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
-              </button>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={atAddSeasoning}
-            className={uploadButtonVariants({
-              variant: 'add',
-              size: 'sm',
+          <div
+            className={stepContainerVariants({
+              variant: 'ingredientsContainer',
             })}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            {seasoningFields.map((field, index) => (
+              <div key={field.id}>
+                <div
+                  className={ingredientRowVariants({
+                    variant: field.name ? 'filled' : 'empty',
+                  })}
+                >
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="調料"
+                      className="w-full bg-transparent border-none outline-none placeholder-neutral-400"
+                      {...register(`seasonings.${index}.name`)}
+                    />
+                  </div>
+                  <div className="w-0 h-6 border-l border-neutral-300" />
+                  <div className="w-20 text-center">
+                    <input
+                      type="text"
+                      placeholder="份量"
+                      className="w-full bg-transparent border-none outline-none text-center placeholder-neutral-400"
+                      {...register(`seasonings.${index}.amount`)}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeSeasoning(index)}
+                    className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
+                    aria-label={`${COMMON_TEXTS.DELETE}調料`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+                {index < seasoningFields.length - 1 && (
+                  <div
+                    className={separatorVariants({
+                      variant: 'dashed',
+                      spacing: 'sm',
+                    })}
+                  />
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={atAddSeasoning}
+              className={uploadButtonVariants({
+                variant: 'addIngredient',
+                size: 'default',
+              })}
             >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v8" />
-              <path d="M8 12h8" />
-            </svg>
-            <span className="ml-1">調料</span>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m12 8 0 8" />
+                <path d="m8 12 8 0" />
+              </svg>
+              <span>調料</span>
+            </button>
+          </div>
         </div>
 
         {/* 食譜標籤 */}
