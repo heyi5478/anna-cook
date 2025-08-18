@@ -170,18 +170,34 @@ export default function RecipeUploadStep2() {
         portion: parseInt(data.servings, 10),
         ingredients: [
           // 將食材和調料合併，並區分 isFlavoring
-          ...data.ingredients.map((item) => ({
-            ingredientName: item.name,
-            ingredientAmount: parseFloat(item.amount),
-            ingredientUnit: item.unit || '',
-            isFlavoring: false,
-          })),
-          ...data.seasonings.map((item) => ({
-            ingredientName: item.name,
-            ingredientAmount: parseFloat(item.amount),
-            ingredientUnit: item.unit || '',
-            isFlavoring: true,
-          })),
+          ...data.ingredients
+            .filter((item) => item.name.trim() && item.amount.trim())
+            .map((item) => {
+              const amount = parseFloat(item.amount.trim());
+              if (Number.isNaN(amount) || amount <= 0) {
+                throw new Error(`食材「${item.name}」的數量無效`);
+              }
+              return {
+                ingredientName: item.name.trim(),
+                ingredientAmount: amount,
+                ingredientUnit: item.unit?.trim() || 'g',
+                isFlavoring: false,
+              };
+            }),
+          ...data.seasonings
+            .filter((item) => item.name.trim() && item.amount.trim())
+            .map((item) => {
+              const amount = parseFloat(item.amount.trim());
+              if (Number.isNaN(amount) || amount <= 0) {
+                throw new Error(`調料「${item.name}」的數量無效`);
+              }
+              return {
+                ingredientName: item.name.trim(),
+                ingredientAmount: amount,
+                ingredientUnit: item.unit?.trim() || 'g',
+                isFlavoring: true,
+              };
+            }),
         ],
         tags: data.tags,
       };
