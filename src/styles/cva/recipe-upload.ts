@@ -93,12 +93,14 @@ export const uploadButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-neutral-400 text-white hover:bg-neutral-500 active:bg-neutral-600',
+          'bg-primary text-white hover:bg-primary-600 active:bg-primary-700',
         secondary:
           'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 active:bg-neutral-400',
         outline:
           'border border-neutral-300 text-neutral-700 hover:bg-neutral-50 active:bg-neutral-100',
         add: 'flex items-center text-neutral-500 hover:text-neutral-700',
+        addIngredient:
+          'flex items-center justify-start gap-2 p-4 rounded-lg border border-neutral-300 bg-neutral-50 text-neutral-500 hover:bg-neutral-100 transition-colors',
         destructive: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
         success:
           'bg-green-500 text-white hover:bg-green-600 active:bg-green-700',
@@ -220,12 +222,12 @@ export const tagVariants = cva(
  * 食材行樣式變體
  * 控制食材輸入行的佈局和樣式
  */
-export const ingredientRowVariants = cva('flex gap-3 items-start', {
+export const ingredientRowVariants = cva('flex gap-2 items-center', {
   variants: {
     layout: {
-      default: 'flex gap-3 items-start',
-      compact: 'flex gap-2 items-start',
-      wide: 'flex gap-4 items-start',
+      default: 'flex gap-2 items-center',
+      compact: 'flex gap-2 items-center',
+      wide: 'flex gap-4 items-center',
     },
     state: {
       default: '',
@@ -233,10 +235,16 @@ export const ingredientRowVariants = cva('flex gap-3 items-start', {
       error: 'bg-red-50 p-2 rounded-md',
       disabled: 'opacity-50 pointer-events-none',
     },
+    variant: {
+      default: 'border border-neutral-300 bg-neutral-100 p-4 rounded-lg gap-2',
+      filled: 'border border-neutral-300 bg-neutral-100 p-4 rounded-lg gap-2',
+      empty: 'border border-neutral-300 bg-neutral-50 p-4 rounded-lg gap-2',
+    },
   },
   defaultVariants: {
     layout: 'default',
     state: 'default',
+    variant: 'default',
   },
 });
 
@@ -244,7 +252,7 @@ export const ingredientRowVariants = cva('flex gap-3 items-start', {
  * 步驟容器樣式變體
  * 控制料理步驟區塊的樣式
  */
-export const stepContainerVariants = cva('space-y-4 p-4 border rounded-lg', {
+export const stepContainerVariants = cva('space-y-4 p-4 rounded-lg', {
   variants: {
     variant: {
       default: 'border-neutral-200 bg-white',
@@ -256,6 +264,8 @@ export const stepContainerVariants = cva('space-y-4 p-4 border rounded-lg', {
       infoSection:
         'mb-6 bg-neutral-50 p-3 rounded-md border border-neutral-300',
       timeSection: 'mb-6 flex gap-4',
+      ingredientsContainer:
+        'mb-6 space-y-4 p-6 rounded-xl border border-dashed border-neutral-400',
     },
     size: {
       sm: 'p-3 space-y-3',
@@ -420,6 +430,29 @@ export const uploadStyles = {
   },
 } as const;
 
+/**
+ * 分隔線樣式變體
+ * 控制分隔線的顯示樣式
+ */
+export const separatorVariants = cva('w-full', {
+  variants: {
+    variant: {
+      default: 'border-t border-neutral-200',
+      dashed: 'border-t border-dashed border-neutral-300',
+      thick: 'border-t-2 border-neutral-300',
+    },
+    spacing: {
+      sm: 'my-2',
+      default: 'my-4',
+      lg: 'my-6',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    spacing: 'default',
+  },
+});
+
 // TypeScript 類型導出
 
 export type UploadPageVariantsProps = VariantProps<typeof uploadPageVariants>;
@@ -444,3 +477,4 @@ export type InputIconVariantsProps = VariantProps<typeof inputIconVariants>;
 export type SuccessMessageVariantsProps = VariantProps<
   typeof successMessageVariants
 >;
+export type SeparatorVariantsProps = VariantProps<typeof separatorVariants>;

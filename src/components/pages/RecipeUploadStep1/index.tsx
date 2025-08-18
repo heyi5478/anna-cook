@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
@@ -25,13 +26,11 @@ import {
 } from '@/lib/constants/file';
 import {
   uploadPageVariants,
-  uploadFieldVariants,
   uploadButtonVariants,
   recipeUploadErrorMessageVariants as errorMessageVariants,
   recipeUploadAreaVariants as uploadAreaVariants,
   recipeUploadStepContainerVariants as stepContainerVariants,
   recipeUploadLabelVariants as labelVariants,
-  recipeUploadInputIconVariants as inputIconVariants,
   recipeUploadSuccessMessageVariants as successMessageVariants,
 } from '@/styles/cva';
 
@@ -284,31 +283,30 @@ export default function RecipeUploadForm() {
               placeholder="在此輸入食譜名稱"
               aria-labelledby="recipeName-label"
               className={cn(
-                uploadFieldVariants({
-                  variant: 'iconInput',
-                  state: errors.recipeName ? 'error' : 'default',
-                }),
+                'w-full rounded-lg transition-colors duration-200',
+                'pl-12 pr-4 py-3', // 左邊留 48px (16px + 24px + 8px)，右邊 16px
+                'bg-neutral-50 border border-neutral-400',
+                'text-base placeholder:text-neutral-400',
+                'font-normal leading-6',
+                'focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500',
+                errors.recipeName &&
+                  'border-error focus:border-error focus:ring-red-200',
               )}
+              style={{
+                fontFamily: 'Noto Sans TC, sans-serif',
+                borderWidth: '0.67px',
+              }}
               {...register('recipeName')}
             />
-            <div
-              className={inputIconVariants({
-                color: errors.recipeName ? 'error' : 'default',
-              })}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              </svg>
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
+              <Pencil
+                size={20}
+                strokeWidth={2}
+                className={cn(
+                  'text-neutral-400',
+                  errors.recipeName && 'text-error',
+                )}
+              />
             </div>
           </div>
           {errors.recipeName && (
@@ -321,7 +319,7 @@ export default function RecipeUploadForm() {
         {/* 上傳封面圖片 */}
         <div className={stepContainerVariants()}>
           <div className={labelVariants()}>
-            上傳封面圖片<span className="text-red-500 ml-1">*</span>
+            上傳封面圖片<span className="text-error ml-1">*</span>
           </div>
           <div
             className={uploadAreaVariants({
@@ -359,7 +357,7 @@ export default function RecipeUploadForm() {
                 <span className="mt-2 text-sm text-center">
                   點擊上傳圖片
                   <br />
-                  <span className="text-red-500">(必填)</span>
+                  <span className="text-error">(必填)</span>
                 </span>
               </div>
             )}
@@ -398,7 +396,7 @@ export default function RecipeUploadForm() {
               type="checkbox"
               className={cn(
                 'w-5 h-5 mr-2',
-                errors.agreement ? 'border-red-500' : '',
+                errors.agreement ? 'border-error' : '',
               )}
               {...register('agreement')}
             />
@@ -409,12 +407,14 @@ export default function RecipeUploadForm() {
           )}
         </div>
 
-        {/* 顯示表單狀態（開發用） */}
-        <div className="mb-6 p-2 bg-neutral-100 rounded text-xs text-neutral-700">
-          表單狀態: {isSubmitting ? '提交中' : '未提交'} | 驗證狀態:{' '}
-          {isValid ? '有效' : '無效'} | 載入狀態:{' '}
-          {isLoading ? '載入中' : '未載入'}
-        </div>
+        {/* 顯示表單狀態（僅開發環境） */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-6 p-2 bg-neutral-100 rounded text-xs text-neutral-700">
+            表單狀態: {isSubmitting ? '提交中' : '未提交'} | 驗證狀態:{' '}
+            {isValid ? '有效' : '無效'} | 載入狀態:{' '}
+            {isLoading ? '載入中' : '未載入'}
+          </div>
+        )}
 
         {/* 下一步按鈕 */}
         <button
