@@ -407,12 +407,14 @@ export default function RecipeUploadForm() {
           )}
         </div>
 
-        {/* 顯示表單狀態（開發用） */}
-        <div className="mb-6 p-2 bg-neutral-100 rounded text-xs text-neutral-700">
-          表單狀態: {isSubmitting ? '提交中' : '未提交'} | 驗證狀態:{' '}
-          {isValid ? '有效' : '無效'} | 載入狀態:{' '}
-          {isLoading ? '載入中' : '未載入'}
-        </div>
+        {/* 顯示表單狀態（僅開發環境） */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-6 p-2 bg-neutral-100 rounded text-xs text-neutral-700">
+            表單狀態: {isSubmitting ? '提交中' : '未提交'} | 驗證狀態:{' '}
+            {isValid ? '有效' : '無效'} | 載入狀態:{' '}
+            {isLoading ? '載入中' : '未載入'}
+          </div>
+        )}
 
         {/* 下一步按鈕 */}
         <button
