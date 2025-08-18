@@ -476,7 +476,7 @@ export const dialogActionButtonVariants = cva('flex-1', {
       confirm: 'bg-orange-500 hover:bg-orange-600',
       cancel: 'border border-neutral-200',
       cancelGray: 'border border-neutral-300 text-black font-normal',
-      delete: 'bg-zinc-800 hover:bg-zinc-700 text-white font-normal',
+      delete: '',
     },
   },
   defaultVariants: {
