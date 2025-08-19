@@ -671,6 +671,49 @@ export const useVideoEditor = () => {
   };
 
   /**
+   * 創建影片時間同步回調函數
+   */
+  const createVideoTimeSyncCallback = () => {
+    return (startTime: number) => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = startTime;
+      }
+    };
+  };
+
+  /**
+   * 包裝的新增片段函數，確保同步影片時間軸
+   */
+  const atAddSegment = () => {
+    const onSegmentAdded = createVideoTimeSyncCallback();
+    addSegment(onSegmentAdded);
+  };
+
+  /**
+   * 包裝的前一個片段函數，確保同步影片時間
+   */
+  const atGoToPreviousSegment = () => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    goToPreviousSegment(onSegmentChange);
+  };
+
+  /**
+   * 包裝的下一個片段函數，確保同步影片時間
+   */
+  const atGoToNextSegment = () => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    goToNextSegment(onSegmentChange);
+  };
+
+  /**
+   * 包裝的設置當前片段索引函數，確保同步影片時間
+   */
+  const atSetCurrentSegmentIndex = (index: number) => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    setCurrentSegmentIndex(index, onSegmentChange);
+  };
+
+  /**
    * 獲取當前片段文字描述
    */
   const getCurrentDescription = () => {
@@ -712,11 +755,12 @@ export const useVideoEditor = () => {
     validateForm,
     getCurrentDescription,
 
-    // 導航
-    addSegment,
+    // 導航 (使用包裝函數確保影片時間同步)
+    atAddSegment,
     deleteCurrentSegment,
-    atGoPreviousSegment: goToPreviousSegment,
-    atGoNextSegment: goToNextSegment,
+    atGoPreviousSegment: atGoToPreviousSegment,
+    atGoNextSegment: atGoToNextSegment,
+    atSetCurrentSegmentIndex,
     resetCurrentSegment,
   };
 };

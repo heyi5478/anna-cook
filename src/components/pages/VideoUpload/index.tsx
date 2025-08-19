@@ -65,7 +65,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     atCancel: handleCancel,
     validateForm,
 
-    addSegment,
+    atAddSegment,
     deleteCurrentSegment,
     atGoPreviousSegment,
     atGoNextSegment,
@@ -167,7 +167,7 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             atGoPreviousSegment={atGoPreviousSegment}
             atGoNextSegment={atGoNextSegment}
             atTogglePlayPause={atTogglePlayPause}
-            atAddSegment={addSegment}
+            atAddSegment={atAddSegment}
             atDeleteCurrentSegment={deleteCurrentSegment}
           />
 
