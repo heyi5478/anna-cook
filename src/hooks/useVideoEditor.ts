@@ -70,20 +70,10 @@ export const useVideoEditor = () => {
   }, [videoUrl]);
 
   /**
-   * 初始驗證說明文字
+   * 初始驗證說明文字 - 移除無限迴圈的 useEffect
    */
-  useEffect(() => {
-    // 初始驗證說明文字
-    if (
-      segments[currentSegmentIndex]?.description &&
-      segments[currentSegmentIndex]?.description.trim().length < 10
-    ) {
-      setErrors({
-        ...errors,
-        description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
-      });
-    }
-  }, [segments, currentSegmentIndex, setErrors, errors]);
+  // 移除此 useEffect 以避免無限迴圈問題
+  // 驗證邏輯改在 atDescriptionChange 和 validateForm 中處理
 
   /**
    * 處理影片檔案上傳
@@ -213,6 +203,7 @@ export const useVideoEditor = () => {
     // 驗證說明文字
     if (value.trim().length < 10) {
       console.log('說明文字不足 10 字，設置錯誤');
+      // 避免無限迴圈，不依賴當前 errors 狀態
       setErrors({
         ...errors,
         description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
