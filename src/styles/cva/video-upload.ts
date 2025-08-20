@@ -441,39 +441,6 @@ export const resetButtonVariants = cva(
 );
 
 /**
- * 操作按鈕樣式變體
- */
-export const actionButtonVariants = cva('space-y-4');
-
-/**
- * 按鈕組樣式變體
- */
-export const buttonGroupVariants = cva('flex gap-3 mt-6');
-
-/**
- * 主要操作按鈕樣式變體
- */
-export const primaryActionButtonVariants = cva('w-1/2', {
-  variants: {
-    state: {
-      normal: '',
-      loading: 'opacity-70 cursor-wait',
-      disabled: 'opacity-50 cursor-not-allowed',
-    },
-  },
-  defaultVariants: {
-    state: 'normal',
-  },
-});
-
-/**
- * 強制提交按鈕樣式變體
- */
-export const forceSubmitButtonVariants = cva(
-  'w-full mt-2 bg-green-600 hover:bg-green-700 text-white',
-);
-
-/**
  * 描述欄位樣式變體
  */
 export const descriptionFieldVariants = cva('mt-4');
@@ -599,16 +566,6 @@ export type StatusIndicatorContentVariantsProps = VariantProps<
 export type StatusLightVariantsProps = VariantProps<typeof statusLightVariants>;
 export type StatusTextVariantsProps = VariantProps<typeof statusTextVariants>;
 export type ResetButtonVariantsProps = VariantProps<typeof resetButtonVariants>;
-export type ActionButtonVariantsProps = VariantProps<
-  typeof actionButtonVariants
->;
-export type ButtonGroupVariantsProps = VariantProps<typeof buttonGroupVariants>;
-export type PrimaryActionButtonVariantsProps = VariantProps<
-  typeof primaryActionButtonVariants
->;
-export type ForceSubmitButtonVariantsProps = VariantProps<
-  typeof forceSubmitButtonVariants
->;
 export type DescriptionFieldVariantsProps = VariantProps<
   typeof descriptionFieldVariants
 >;

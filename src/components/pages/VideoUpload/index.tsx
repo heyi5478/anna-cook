@@ -28,11 +28,10 @@ export type VideoTrimmerProps = {
     segments: Segment[];
     description?: string;
   }) => void;
-  onCancel: () => void;
 };
 
 // 影片剪輯器主元件 - 提供完整的視頻上傳、編輯和剪輯功能
-export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
+export default function VideoTrimmer({ onSave }: VideoTrimmerProps) {
   // 使用自定義 hook 管理視頻編輯狀態
   const {
     videoFile,
@@ -62,7 +61,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
     atMarkStartPoint,
     atMarkEndPoint,
     atSubmit,
-    atCancel: handleCancel,
     validateForm,
 
     atAddSegment,
@@ -108,11 +106,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
       );
     }
     return null;
-  };
-
-  // 處理取消
-  const handleAtCancel = () => {
-    handleCancel(onCancel);
   };
 
   // 處理提交
@@ -214,7 +207,6 @@ export default function VideoTrimmer({ onSave, onCancel }: VideoTrimmerProps) {
             isSubmitting={isSubmitting}
             errors={errors}
             apiError={apiError}
-            atCancel={handleAtCancel}
             atSubmit={handleAtSubmit}
             setErrors={() => {}}
           />
