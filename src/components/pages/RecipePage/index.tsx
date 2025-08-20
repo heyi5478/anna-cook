@@ -45,13 +45,14 @@ import {
   separatedItemStyles,
   pageContainerStyles,
   breadcrumbStyles,
+  mainImageStyles,
   interactionContainerStyles,
   recipeInfoItemStyles,
   reviewListStyles,
   authorContainerStyles,
   ingredientListStyles,
   tagsContainerStyles,
-} from '@/styles/cva/recipe-page';
+} from './styles';
 
 interface RecipePageProps {
   recipeData: {
@@ -276,7 +277,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
    */
   const renderRecipeTags = () => {
     return (
-      <div className={cn(tagsContainerStyles())}>
+      <div className={tagsContainerStyles}>
         {tags.map((tag) => (
           <Badge
             key={tag.id}
@@ -291,9 +292,9 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
   };
 
   return (
-    <div className={cn(pageContainerStyles())}>
+    <div className={pageContainerStyles}>
       {/* 麵包屑導航 */}
-      <Breadcrumb className={cn(breadcrumbStyles())}>
+      <Breadcrumb className={breadcrumbStyles}>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/" className="hover:text-[#FF5722]">
@@ -318,7 +319,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
       <main className="flex-1">
         {/* 食譜主圖 */}
-        <div className="relative w-full h-[400px] bg-black rounded-lg overflow-hidden">
+        <div className={mainImageStyles}>
           <Image
             src={getImageUrl(recipe.coverPhoto)}
             alt={recipe.recipeName}
@@ -335,7 +336,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
           </h1>
 
           <div className="flex items-center justify-between mb-3">
-            <div className={cn(recipeInfoItemStyles())}>
+            <div className={recipeInfoItemStyles}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -358,14 +359,14 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               </span>
             </div>
 
-            <div className={cn(recipeInfoItemStyles())}>
+            <div className={recipeInfoItemStyles}>
               <Clock className="w-4 h-4 text-neutral-400" />
               <span className="text-sm text-neutral-600">
                 {recipe.cookingTime}分鐘
               </span>
             </div>
 
-            <div className={cn(recipeInfoItemStyles())}>
+            <div className={recipeInfoItemStyles}>
               <Star className="w-4 h-4 text-[#FF5722] fill-[#FF5722]" />
               <span className="text-sm text-neutral-600">
                 {recipe.rating.toFixed(1)}
@@ -387,7 +388,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
         {/* 作者資訊 */}
         <div className={cn(cardStyles())}>
-          <div className={cn(authorContainerStyles())}>
+          <div className={authorContainerStyles}>
             <Link
               href={`/user/${author.displayId}`}
               className="flex items-center flex-1 cursor-pointer"
@@ -438,7 +439,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         {regularIngredients.length > 0 && (
           <div className={cn(cardStyles())}>
             <h3 className={cn(headingStyles({ size: 'small' }))}>食材清單</h3>
-            <div className={cn(ingredientListStyles())}>
+            <div className={ingredientListStyles}>
               {regularIngredients.map((ingredient, index) => (
                 <div key={ingredient.ingredientId}>
                   <div className={cn(separatedItemStyles())}>
@@ -458,7 +459,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         {flavorings.length > 0 && (
           <div className={cn(cardStyles())}>
             <h3 className={cn(headingStyles({ size: 'small' }))}>調味料</h3>
-            <div className={cn(ingredientListStyles())}>
+            <div className={ingredientListStyles}>
               {flavorings.map((flavor, index) => (
                 <div key={flavor.ingredientId}>
                   <div className={cn(separatedItemStyles())}>
@@ -489,7 +490,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
 
         {/* 社交互動區塊 */}
         <div className={cn(cardStyles())}>
-          <div className={cn(interactionContainerStyles())}>
+          <div className={interactionContainerStyles}>
             <button
               className={cn(
                 interactionButtonStyles(),
@@ -521,7 +522,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
               </span>
             </button>
             <button
-              className={interactionButtonStyles()}
+              className={cn(interactionButtonStyles())}
               onClick={atShareClick}
               aria-label="分享"
             >
@@ -546,7 +547,7 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
             </span>
           </div>
 
-          <div className={cn(reviewListStyles())}>
+          <div className={reviewListStyles}>
             {commentError && (
               <p className="text-sm text-red-500 text-center py-4">
                 {commentError}
