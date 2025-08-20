@@ -9,20 +9,6 @@ import {
 import { cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
-import {
-  draftTabContainerVariants,
-  statusMessageVariants,
-  countTextVariants,
-  loadingStateVariants,
-  draftCardInteractionVariants,
-  checkboxVariants,
-  itemListContainerVariants,
-  itemContentVariants,
-  dialogVariants,
-  dialogIconVariants,
-  dialogButtonContainerVariants,
-  dialogActionButtonVariants,
-} from '@/styles/cva/user-center';
 import { DraftRecipeCard } from './DraftRecipeCard';
 
 interface DraftTabContentProps {
@@ -69,72 +55,50 @@ export function DraftTabContent({
 }: DraftTabContentProps) {
   if (isLoadingDrafts) {
     return (
-      <div
-        className={cn(
-          loadingStateVariants({ state: 'loading', size: 'relaxed' }),
-        )}
-      >
+      <div className="text-center py-6 text-neutral-500">
         {COMMON_TEXTS.LOADING}
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div
-        className={cn(
-          loadingStateVariants({ state: 'error', size: 'relaxed' }),
-        )}
-      >
-        {error}
-      </div>
-    );
+    return <div className="text-center py-6 text-red-500">{error}</div>;
   }
 
   if (draftRecipes.length === 0) {
     return (
-      <div
-        className={cn(
-          loadingStateVariants({ state: 'empty', size: 'relaxed' }),
-        )}
-      >
-        目前沒有草稿
-      </div>
+      <div className="text-center py-6 text-neutral-600">目前沒有草稿</div>
     );
   }
 
   return (
-    <div className={cn(draftTabContainerVariants())}>
+    <div className="space-y-4">
       {deleteSuccess && (
-        <div className={cn(statusMessageVariants({ variant: 'success' }))}>
+        <div className="p-3 rounded-md mb-4 bg-green-50 text-green-700">
           {deleteSuccess}
         </div>
       )}
 
       {deleteError && (
-        <div className={cn(statusMessageVariants({ variant: 'error' }))}>
+        <div className="p-3 rounded-md mb-4 bg-red-50 text-red-700">
           {deleteError}
         </div>
       )}
 
-      <p className={cn(countTextVariants())}>
+      <p className="text-neutral-500 mb-2">
         共{draftRecipes.length || 0}篇食譜
       </p>
 
       {draftRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => {
         return (
-          <div
-            key={recipe.recipeId}
-            className={cn(itemListContainerVariants())}
-          >
+          <div key={recipe.recipeId} className="flex items-center">
             {isDeleteMode && (
               <div
                 className={cn(
-                  checkboxVariants({
-                    state: selectedDrafts.includes(recipe.recipeId)
-                      ? 'checked'
-                      : 'unchecked',
-                  }),
+                  'mr-2 w-6 h-6 flex-shrink-0 border rounded flex items-center justify-center cursor-pointer',
+                  selectedDrafts.includes(recipe.recipeId)
+                    ? 'bg-orange-500 border-orange-500 text-white'
+                    : 'border-neutral-300',
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -160,9 +124,7 @@ export function DraftTabContent({
                 )}
               </div>
             )}
-            <div
-              className={cn(itemContentVariants({ withMargin: isDeleteMode }))}
-            >
+            <div className={cn('flex-1', isDeleteMode && 'ml-1')}>
               <div
                 onClick={() => {
                   if (isDeleteMode) {
@@ -172,12 +134,10 @@ export function DraftTabContent({
                   }
                 }}
                 className={cn(
-                  draftCardInteractionVariants({
-                    state:
-                      isDeleteMode && selectedDrafts.includes(recipe.recipeId)
-                        ? 'selected'
-                        : 'normal',
-                  }),
+                  'cursor-pointer rounded-md transition-all',
+                  isDeleteMode && selectedDrafts.includes(recipe.recipeId)
+                    ? 'bg-orange-50 border border-orange-200'
+                    : 'hover:bg-gray-50 active:bg-gray-100',
                 )}
               >
                 <DraftRecipeCard
@@ -195,15 +155,11 @@ export function DraftTabContent({
       })}
 
       {isDeleteMode && (
-        <div
-          className={cn(
-            dialogButtonContainerVariants({ direction: 'horizontal' }),
-          )}
-        >
+        <div className="flex justify-between mt-6 space-x-4">
           <Button
             variant="outline"
             onClick={atToggleDeleteMode}
-            className={cn(dialogActionButtonVariants({ variant: 'cancel' }))}
+            className="flex-1 border border-neutral-200"
           >
             {COMMON_TEXTS.CANCEL}刪除
           </Button>
@@ -217,9 +173,7 @@ export function DraftTabContent({
                     atShowDeleteConfirm();
                   }
                 }}
-                className={cn(
-                  dialogActionButtonVariants({ variant: 'confirm' }),
-                )}
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
                 disabled={selectedDrafts.length === 0}
               >
                 {COMMON_TEXTS.CONFIRM}
@@ -228,30 +182,22 @@ export function DraftTabContent({
               </Button>
             </DialogTrigger>
             <DialogContent
-              className={cn(
-                dialogVariants({ size: 'default', withBorder: true }),
-              )}
+              className="bg-white rounded-lg p-6 border border-gray-200 shadow-lg"
               style={{ maxWidth: '400px' }}
             >
               <div className="flex flex-col items-center justify-center py-4">
-                <div className={cn(dialogIconVariants())}>
+                <div className="rounded-full border-2 border-gray-400 flex items-center justify-center mb-4 w-12 h-12">
                   <AlertCircle className="h-6 w-6 text-neutral-500" />
                 </div>
                 <h2 className="text-lg font-medium text-center mb-6">
                   是否{COMMON_TEXTS.DELETE}所選食譜?
                 </h2>
-                <div
-                  className={cn(
-                    dialogButtonContainerVariants({ fullWidth: true }),
-                  )}
-                >
+                <div className="flex justify-between mt-6 space-x-4 w-full">
                   <DialogClose asChild>
                     <Button
                       variant="outline"
                       onClick={() => setDeleteDialogOpen(false)}
-                      className={cn(
-                        dialogActionButtonVariants({ variant: 'cancelGray' }),
-                      )}
+                      className="flex-1 border border-neutral-300 text-black font-normal"
                     >
                       {COMMON_TEXTS.CANCEL}
                     </Button>
@@ -259,9 +205,7 @@ export function DraftTabContent({
                   <Button
                     variant="destructive"
                     onClick={atConfirmDelete}
-                    className={cn(
-                      dialogActionButtonVariants({ variant: 'delete' }),
-                    )}
+                    className="flex-1"
                     disabled={deleteLoading}
                   >
                     {deleteLoading

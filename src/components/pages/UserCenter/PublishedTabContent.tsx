@@ -1,13 +1,6 @@
 import { useRouter } from 'next/router';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
-import { cn } from '@/lib/utils';
-import {
-  publishedTabContainerVariants,
-  publishedCountTextVariants,
-  publishedCardContainerVariants,
-  tabEmptyStateVariants,
-} from '@/styles/cva/user-center';
 import { PublishedRecipeCard } from './PublishedRecipeCard';
 
 interface PublishedTabContentProps {
@@ -38,7 +31,7 @@ export function PublishedTabContent({
   // 處理載入狀態
   if (isLoadingPublished) {
     return (
-      <div className={cn(tabEmptyStateVariants({ type: 'loading' }))}>
+      <div className="text-center py-8 text-neutral-500">
         {COMMON_TEXTS.LOADING}
       </div>
     );
@@ -46,32 +39,28 @@ export function PublishedTabContent({
 
   // 處理錯誤狀態
   if (error) {
-    return (
-      <div className={cn(tabEmptyStateVariants({ type: 'error' }))}>
-        {error}
-      </div>
-    );
+    return <div className="text-center py-8 text-red-500">{error}</div>;
   }
 
   // 處理空狀態
   if (publishedRecipes.length === 0) {
     return (
-      <div className={cn(tabEmptyStateVariants({ type: 'empty' }))}>
+      <div className="text-center py-8 text-neutral-600">
         目前沒有發布的食譜
       </div>
     );
   }
 
   return (
-    <div className={cn(publishedTabContainerVariants())}>
-      <p className={cn(publishedCountTextVariants())}>
+    <div className="space-y-4">
+      <p className="text-neutral-500 mb-2">
         共{publishedRecipes.length || 0}篇食譜
       </p>
 
       {publishedRecipes.map((recipe: AuthorRecipesResponse['data'][0]) => (
         <div
           key={recipe.recipeId}
-          className={cn(publishedCardContainerVariants())}
+          className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
           onClick={() => handleRecipeClick(recipe.recipeId)}
         >
           <PublishedRecipeCard

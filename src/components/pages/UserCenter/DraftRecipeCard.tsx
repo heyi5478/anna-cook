@@ -10,25 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { toggleRecipePublishStatus } from '@/services/recipes';
 import { SUCCESS_MESSAGES, COMMON_TEXTS } from '@/lib/constants/messages';
-import {
-  cardContainerBaseVariants,
-  cardImageVariants,
-  cardContentVariants,
-  cardTitleVariants,
-  cardDescriptionVariants,
-  cardActionButtonVariants,
-  dialogVariants,
-  dialogTitleVariants,
-  statusMessageVariants,
-  dialogButtonContainerVariants,
-  dialogActionButtonVariants,
-  successStateVariants,
-  successTitleVariants,
-  successDescriptionVariants,
-} from '@/styles/cva/user-center';
 import { DraftRecipeCardProps } from './types';
 
 /**
@@ -91,8 +74,8 @@ export function DraftRecipeCard({
   };
 
   return (
-    <div className={cn(cardContainerBaseVariants())}>
-      <div className={cn(cardImageVariants({ size: 'small' }))}>
+    <div className="flex bg-white rounded-lg border p-4 gap-4">
+      <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden">
         <Image
           src={imageSrc || '/placeholder.svg'}
           alt={title}
@@ -101,9 +84,11 @@ export function DraftRecipeCard({
         />
       </div>
 
-      <div className={cn(cardContentVariants())}>
-        <h3 className={cn(cardTitleVariants())}>{title}</h3>
-        <p className={cn(cardDescriptionVariants({ spacing: 'withMargin' }))}>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-base font-medium text-neutral-900 mb-2 truncate">
+          {title}
+        </h3>
+        <p className="text-sm text-neutral-600 mb-3 line-clamp-2">
           {description}
         </p>
       </div>
@@ -113,7 +98,7 @@ export function DraftRecipeCard({
           <DialogTrigger asChild>
             <Button
               variant="destructive"
-              className={cn(cardActionButtonVariants({ variant: 'toPublish' }))}
+              className="ml-auto bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm"
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -121,51 +106,40 @@ export function DraftRecipeCard({
               轉發佈
             </Button>
           </DialogTrigger>
-          <DialogContent className={cn(dialogVariants())}>
+          <DialogContent className="bg-white rounded-lg p-6 border border-gray-200 shadow-lg max-w-md">
             {publishSuccess ? (
-              <div className={cn(successStateVariants())}>
+              <div className="flex flex-col items-center justify-center py-6">
                 <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
-                <h2 className={cn(successTitleVariants())}>
+                <h2 className="text-lg font-medium text-center mb-2">
                   {SUCCESS_MESSAGES.PUBLISH_SUCCESS}
                 </h2>
-                <p className={cn(successDescriptionVariants())}>
+                <p className="text-sm text-neutral-600 text-center">
                   {SUCCESS_MESSAGES.RECIPE_PUBLISHED}
                 </p>
               </div>
             ) : (
               <>
                 <DialogHeader>
-                  <DialogTitle
-                    className={cn(dialogTitleVariants({ size: 'large' }))}
-                  >
+                  <DialogTitle className="text-lg font-medium text-center mb-4">
                     是否將所選食譜轉成發佈狀態?
                   </DialogTitle>
                 </DialogHeader>
 
                 {publishError && (
-                  <div
-                    className={cn(
-                      statusMessageVariants({
-                        variant: 'error',
-                        withIcon: true,
-                      }),
-                    )}
-                  >
+                  <div className="flex items-center p-3 rounded-md mb-4 bg-red-50 text-red-700">
                     <AlertCircle className="h-4 w-4 mr-2" />
                     {publishError}
                   </div>
                 )}
 
-                <div className={cn(dialogButtonContainerVariants())}>
+                <div className="flex justify-between mt-6 space-x-4">
                   <Button
                     variant="destructive"
                     onClick={(e) => {
                       e.stopPropagation();
                       atConfirmPublish();
                     }}
-                    className={cn(
-                      dialogActionButtonVariants({ variant: 'confirm' }),
-                    )}
+                    className="flex-1"
                     disabled={isPublishing}
                   >
                     {isPublishing
@@ -179,9 +153,7 @@ export function DraftRecipeCard({
                         e.stopPropagation();
                         setDialogOpen(false);
                       }}
-                      className={cn(
-                        dialogActionButtonVariants({ variant: 'cancel' }),
-                      )}
+                      className="flex-1 border border-neutral-300 text-black font-normal"
                       disabled={isPublishing}
                     >
                       {COMMON_TEXTS.CANCEL}

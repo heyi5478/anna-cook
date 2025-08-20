@@ -1,18 +1,4 @@
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import {
-  recipeStatsContainerVariants,
-  recipeInfoContainerVariants,
-  recipeImageContainerVariants,
-  recipeImageVariants,
-  recipeContentContainerVariants,
-  recipeTitleVariants,
-  recipeRatingInfoVariants,
-  statsGridVariants,
-  statsItemCardVariants,
-  statsLabelVariants,
-  statsValueVariants,
-} from '@/styles/cva/user-center';
 import { RecipeStatsItemProps } from './types';
 
 /**
@@ -28,36 +14,42 @@ export function RecipeStatsItem({
   imageSrc,
 }: RecipeStatsItemProps) {
   return (
-    <div className={cn(recipeStatsContainerVariants())}>
-      <div className={cn(recipeInfoContainerVariants())}>
-        <div className={cn(recipeImageContainerVariants())}>
+    <div className="bg-white rounded-lg border p-4">
+      <div className="flex items-center mb-4">
+        <div className="relative w-16 h-16 mr-4 flex-shrink-0 rounded-md overflow-hidden">
           <Image
             src={imageSrc || '/placeholder.svg'}
             alt={title}
             fill
-            className={cn(recipeImageVariants())}
+            className="object-cover"
           />
         </div>
-        <div className={cn(recipeContentContainerVariants())}>
-          <h4 className={cn(recipeTitleVariants())}>{title}</h4>
-          <div className={cn(recipeRatingInfoVariants())}>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-base font-medium text-neutral-900 mb-1 truncate">
+            {title}
+          </h4>
+          <div className="text-sm text-neutral-600">
             評分: {rating} • 瀏覽: {views}
           </div>
         </div>
       </div>
 
-      <div className={cn(statsGridVariants())}>
-        <div className={cn(statsItemCardVariants())}>
-          <div className={cn(statsLabelVariants())}>收藏</div>
-          <div className={cn(statsValueVariants())}>{bookmarks}</div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-neutral-50 rounded-lg p-3 text-center">
+          <div className="text-xs text-neutral-600 mb-1">收藏</div>
+          <div className="text-lg font-semibold text-neutral-900">
+            {bookmarks}
+          </div>
         </div>
-        <div className={cn(statsItemCardVariants())}>
-          <div className={cn(statsLabelVariants())}>留言</div>
-          <div className={cn(statsValueVariants())}>{comments}</div>
+        <div className="bg-neutral-50 rounded-lg p-3 text-center">
+          <div className="text-xs text-neutral-600 mb-1">留言</div>
+          <div className="text-lg font-semibold text-neutral-900">
+            {comments}
+          </div>
         </div>
-        <div className={cn(statsItemCardVariants())}>
-          <div className={cn(statsLabelVariants())}>分享</div>
-          <div className={cn(statsValueVariants())}>{shares}</div>
+        <div className="bg-neutral-50 rounded-lg p-3 text-center">
+          <div className="text-xs text-neutral-600 mb-1">分享</div>
+          <div className="text-lg font-semibold text-neutral-900">{shares}</div>
         </div>
       </div>
     </div>
