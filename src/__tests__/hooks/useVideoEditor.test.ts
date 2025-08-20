@@ -839,11 +839,11 @@ describe('useVideoEditor', () => {
   // 測試導航功能
   describe('navigation functions', () => {
     // 測試添加片段
-    test('應該呼叫 addSegment', () => {
+    test('應該呼叫 atAddSegment', () => {
       const { result } = renderHook(() => useVideoEditor());
 
       act(() => {
-        result.current.addSegment();
+        result.current.atAddSegment();
       });
 
       expect(mockStoreActions.addSegment).toHaveBeenCalled();
