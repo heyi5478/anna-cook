@@ -3,7 +3,7 @@
 </div>
 <h1 align="center" style="font-weight: 700">安那煮 | 家傳好菜－Anna Cook</h1>
 <div align="center" >
-<a href="https://anna-cook.vercel.app/" >專案網址</a >
+<a href="https://anna-cook.zeabur.app/" >專案網址</a >
 <span>|</span>
 <a href="https://an-na-zhusorganization.gitbook.io/an-na-zhu-anna-cook" >專案文件</a >
 </div>

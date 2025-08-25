@@ -26,7 +26,7 @@ export default defineConfig({
   use: {
     // 基礎 URL
     baseURL: process.env.CI
-      ? 'https://anna-cook.vercel.app'
+      ? 'https://anna-cook.zeabur.app/'
       : 'http://localhost:3000',
 
     // 追蹤設定
