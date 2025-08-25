@@ -17,9 +17,9 @@ export * from './recipe-draft';
 
 /**
  * 食譜詳細頁面樣式變體
- * 用於食譜展示、評分、步驟顯示等功能
+ * 注意：食譜詳細頁面已重構為純 TailwindCSS 實現，不再使用 CVA
+ * 此區塊已移除，樣式定義已遷移到 src/components/pages/RecipePage/styles.ts
  */
-export * from './recipe-page';
 
 /**
  * 食譜草稿影片頁面樣式變體
