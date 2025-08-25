@@ -2,14 +2,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
-import { cn } from '@/lib/utils';
-import {
-  actionButtonVariants,
-  errorMessageVariants,
-  buttonGroupVariants,
-  primaryActionButtonVariants,
-  forceSubmitButtonVariants,
-} from '@/styles/cva/video-upload';
 
 /**
  * 操作按鈕元件屬性
@@ -23,31 +15,22 @@ type ActionButtonsProps = {
   isSubmitting: boolean;
   errors: Record<string, string | undefined>;
   apiError: string | null;
-  atCancel: () => void;
   atSubmit: () => void;
   setErrors: React.Dispatch<
     React.SetStateAction<Record<string, string | undefined>>
   >;
 };
 
-// 操作按鈕元件 - 處理取消和確認操作，包含錯誤處理機制
+// 操作按鈕元件 - 處理確認操作，包含錯誤處理機制
 export default function ActionButtons({
   segments,
   currentSegmentIndex,
   isSubmitting,
   errors,
   apiError,
-  atCancel,
   atSubmit,
   setErrors,
 }: ActionButtonsProps) {
-  // 獲取提交按鈕狀態
-  const getSubmitButtonState = () => {
-    if (isSubmitting) return 'loading';
-    if (Object.keys(errors).length > 0) return 'disabled';
-    return 'normal';
-  };
-
   // 檢查是否顯示強制提交按鈕
   const shouldShowForceSubmit = () => {
     return (
@@ -82,10 +65,10 @@ export default function ActionButtons({
   };
 
   return (
-    <div className={actionButtonVariants()}>
+    <div className="space-y-4">
       {/* API 錯誤訊息 */}
       {apiError && (
-        <div className={cn(errorMessageVariants({ type: 'api' }), 'api-error')}>
+        <div className="text-red-500 p-2 bg-red-50 border border-red-300 rounded-md mt-2 flex items-center">
           <div
             className="h-4 w-4 mr-1 rounded-full bg-red-500"
             aria-hidden="true"
@@ -94,26 +77,13 @@ export default function ActionButtons({
         </div>
       )}
 
-      {/* 按鈕群組 */}
-      <div className={buttonGroupVariants()}>
-        <Button
-          onClick={atCancel}
-          variant="outline"
-          className={primaryActionButtonVariants({ state: 'normal' })}
-        >
-          {COMMON_TEXTS.CANCEL}
-        </Button>
+      {/* 完成按鈕 (置中) */}
+      <div className="flex justify-center mt-6">
         <Button
           onClick={handleSubmitClick}
           disabled={isSubmitting || Object.keys(errors).length > 0}
-          variant={
-            isSubmitting || Object.keys(errors).length > 0
-              ? 'secondary'
-              : 'default'
-          }
-          className={primaryActionButtonVariants({
-            state: getSubmitButtonState(),
-          })}
+          variant="default"
+          className="w-full flex items-center justify-center px-6"
         >
           {isSubmitting ? (
             COMMON_TEXTS.UPLOADING
@@ -131,7 +101,7 @@ export default function ActionButtons({
         <Button
           onClick={handleForceSubmitClick}
           variant="default"
-          className={forceSubmitButtonVariants()}
+          className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white"
         >
           強制繼續 (狀態已修復)
         </Button>

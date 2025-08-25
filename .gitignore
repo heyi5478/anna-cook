@@ -18,6 +18,7 @@
 /playwright-report/
 /playwright/.cache/
 /tests/.auth/
+test-results.json
 
 # next.js
 /.next/

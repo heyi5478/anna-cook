@@ -70,20 +70,10 @@ export const useVideoEditor = () => {
   }, [videoUrl]);
 
   /**
-   * 初始驗證說明文字
+   * 初始驗證說明文字 - 移除無限迴圈的 useEffect
    */
-  useEffect(() => {
-    // 初始驗證說明文字
-    if (
-      segments[currentSegmentIndex]?.description &&
-      segments[currentSegmentIndex]?.description.trim().length < 10
-    ) {
-      setErrors({
-        ...errors,
-        description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
-      });
-    }
-  }, [segments, currentSegmentIndex, setErrors, errors]);
+  // 移除此 useEffect 以避免無限迴圈問題
+  // 驗證邏輯改在 atDescriptionChange 和 validateForm 中處理
 
   /**
    * 處理影片檔案上傳
@@ -213,6 +203,7 @@ export const useVideoEditor = () => {
     // 驗證說明文字
     if (value.trim().length < 10) {
       console.log('說明文字不足 10 字，設置錯誤');
+      // 避免無限迴圈，不依賴當前 errors 狀態
       setErrors({
         ...errors,
         description: VALIDATION_MESSAGES.MIN_VIDEO_DESCRIPTION_LENGTH,
@@ -671,6 +662,49 @@ export const useVideoEditor = () => {
   };
 
   /**
+   * 創建影片時間同步回調函數
+   */
+  const createVideoTimeSyncCallback = () => {
+    return (startTime: number) => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = startTime;
+      }
+    };
+  };
+
+  /**
+   * 包裝的新增片段函數，確保同步影片時間軸
+   */
+  const atAddSegment = () => {
+    const onSegmentAdded = createVideoTimeSyncCallback();
+    addSegment(onSegmentAdded);
+  };
+
+  /**
+   * 包裝的前一個片段函數，確保同步影片時間
+   */
+  const atGoToPreviousSegment = () => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    goToPreviousSegment(onSegmentChange);
+  };
+
+  /**
+   * 包裝的下一個片段函數，確保同步影片時間
+   */
+  const atGoToNextSegment = () => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    goToNextSegment(onSegmentChange);
+  };
+
+  /**
+   * 包裝的設置當前片段索引函數，確保同步影片時間
+   */
+  const atSetCurrentSegmentIndex = (index: number) => {
+    const onSegmentChange = createVideoTimeSyncCallback();
+    setCurrentSegmentIndex(index, onSegmentChange);
+  };
+
+  /**
    * 獲取當前片段文字描述
    */
   const getCurrentDescription = () => {
@@ -712,11 +746,12 @@ export const useVideoEditor = () => {
     validateForm,
     getCurrentDescription,
 
-    // 導航
-    addSegment,
+    // 導航 (使用包裝函數確保影片時間同步)
+    atAddSegment,
     deleteCurrentSegment,
-    atGoPreviousSegment: goToPreviousSegment,
-    atGoNextSegment: goToNextSegment,
+    atGoPreviousSegment: atGoToPreviousSegment,
+    atGoNextSegment: atGoToNextSegment,
+    atSetCurrentSegmentIndex,
     resetCurrentSegment,
   };
 };

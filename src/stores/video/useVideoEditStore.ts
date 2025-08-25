@@ -87,12 +87,15 @@ type VideoEditStore = {
 
   setSegments: (segments: Segment[]) => void;
   updateCurrentSegmentDescription: (description: string) => void;
-  setCurrentSegmentIndex: (index: number) => void;
+  setCurrentSegmentIndex: (
+    index: number,
+    onSegmentChange?: (startTime: number) => void,
+  ) => void;
   setTrimValues: (values: [number, number]) => void;
-  addSegment: () => void;
+  addSegment: (onSegmentAdded?: (startTime: number) => void) => void;
   deleteCurrentSegment: () => void;
-  goToPreviousSegment: () => void;
-  goToNextSegment: () => void;
+  goToPreviousSegment: (onSegmentChange?: (startTime: number) => void) => void;
+  goToNextSegment: (onSegmentChange?: (startTime: number) => void) => void;
   markStartPoint: (time: number) => void;
   markEndPoint: (time: number) => void;
   resetCurrentSegment: () => void;
@@ -216,12 +219,17 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       };
     }),
 
-  setCurrentSegmentIndex: (index) =>
+  setCurrentSegmentIndex: (index, onSegmentChange) =>
     set((state) => {
       const { segments: segmentList } = state.segments;
       if (index < 0 || index >= segmentList.length) return state;
 
       const segment = segmentList[index];
+
+      // 呼叫回調函數同步影片時間
+      if (onSegmentChange) {
+        onSegmentChange(segment.startTime);
+      }
 
       return {
         segments: {
@@ -261,7 +269,7 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       };
     }),
 
-  addSegment: () =>
+  addSegment: (onSegmentAdded) =>
     set((state) => {
       const { duration } = get().player;
       if (duration <= 0) return state;
@@ -284,6 +292,11 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
 
       const newSegments = [...state.segments.segments, newSegment];
       const newIndex = newSegments.length - 1;
+
+      // 呼叫回調函數同步影片時間到新片段開始時間
+      if (onSegmentAdded) {
+        onSegmentAdded(middleTime);
+      }
 
       return {
         segments: {
@@ -314,13 +327,18 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       };
     }),
 
-  goToPreviousSegment: () =>
+  goToPreviousSegment: (onSegmentChange) =>
     set((state) => {
       const { currentSegmentIndex, segments: segmentList } = state.segments;
       if (currentSegmentIndex <= 0) return state;
 
       const newIndex = currentSegmentIndex - 1;
       const segment = segmentList[newIndex];
+
+      // 呼叫回調函數同步影片時間
+      if (onSegmentChange) {
+        onSegmentChange(segment.startTime);
+      }
 
       return {
         segments: {
@@ -331,13 +349,18 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       };
     }),
 
-  goToNextSegment: () =>
+  goToNextSegment: (onSegmentChange) =>
     set((state) => {
       const { currentSegmentIndex, segments: segmentList } = state.segments;
       if (currentSegmentIndex >= segmentList.length - 1) return state;
 
       const newIndex = currentSegmentIndex + 1;
       const segment = segmentList[newIndex];
+
+      // 呼叫回調函數同步影片時間
+      if (onSegmentChange) {
+        onSegmentChange(segment.startTime);
+      }
 
       return {
         segments: {

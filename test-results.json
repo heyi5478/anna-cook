@@ -9,9 +9,9 @@
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
-    "maxFailures": 0,
+    "maxFailures": 1,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 2
     },
     "preserveOutput": "always",
     "reporter": [
@@ -39,7 +39,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "setup",
         "name": "setup",
@@ -55,7 +55,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "chromium-no-auth",
         "name": "chromium-no-auth",
@@ -71,7 +71,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "firefox-no-auth",
         "name": "firefox-no-auth",
@@ -87,7 +87,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "chromium-auth",
         "name": "chromium-auth",
@@ -105,7 +105,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "firefox-auth",
         "name": "firefox-auth",
@@ -123,7 +123,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "webkit-auth",
         "name": "webkit-auth",
@@ -141,7 +141,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 2
         },
         "id": "mobile-chrome-auth",
         "name": "mobile-chrome-auth",
@@ -197,12 +197,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3877,
+                      "duration": 3341,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-01T05:36:52.317Z",
+                      "startTime": "2025-08-19T03:05:04.904Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -231,12 +231,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 3832,
+                      "duration": 3379,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-07-01T05:36:52.319Z",
+                      "startTime": "2025-08-19T03:05:04.904Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -248,74 +248,6 @@
               "file": "navigation/01-homepage.test.ts",
               "line": 34,
               "column": 7
-            },
-            {
-              "title": "應該能夠正常載入首頁",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox-no-auth",
-                  "projectName": "firefox-no-auth",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 6412,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-01T05:36:52.316Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "adf54eba28ba7e768dff-993f94254db40abff611",
-              "file": "navigation/01-homepage.test.ts",
-              "line": 11,
-              "column": 7
-            },
-            {
-              "title": "應該顯示頁面主要內容",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox-no-auth",
-                  "projectName": "firefox-no-auth",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 5727,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-01T05:36:52.327Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "adf54eba28ba7e768dff-42f68e9d82647c71233f",
-              "file": "navigation/01-homepage.test.ts",
-              "line": 34,
-              "column": 7
             }
           ]
         }
@@ -324,9 +256,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-01T05:36:50.065Z",
-    "duration": 11255.911,
-    "expected": 4,
+    "startTime": "2025-08-19T03:04:56.466Z",
+    "duration": 13803.853,
+    "expected": 2,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

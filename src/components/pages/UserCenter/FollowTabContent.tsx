@@ -1,16 +1,7 @@
 import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { UserFollowResponse } from '@/types/api';
-import {
-  followTabContainerVariants,
-  statsCountTextVariants,
-  followItemContainerVariants,
-  loadMoreStateVariants,
-  loadMoreButtonVariants,
-  tabEmptyStateVariants,
-} from '@/styles/cva/user-center';
 import { FollowedUserCard } from './FollowedUserCard';
 
 interface FollowTabContentProps {
@@ -48,38 +39,32 @@ export function FollowTabContent({
 
   if (followLoading && followPage === 1) {
     return (
-      <div className={cn(tabEmptyStateVariants({ type: 'loading' }))}>
+      <div className="text-center py-8 text-neutral-500">
         {COMMON_TEXTS.LOADING}
       </div>
     );
   }
 
   if (followError) {
-    return (
-      <div className={cn(tabEmptyStateVariants({ type: 'error' }))}>
-        {followError}
-      </div>
-    );
+    return <div className="text-center py-8 text-red-500">{followError}</div>;
   }
 
   if (followData.length === 0) {
     return (
-      <div className={cn(tabEmptyStateVariants({ type: 'empty' }))}>
+      <div className="text-center py-8 text-neutral-600">
         目前沒有追蹤的用戶
       </div>
     );
   }
 
   return (
-    <div className={cn(followTabContainerVariants())}>
-      <p className={cn(statsCountTextVariants())}>
-        共{followTotalCount}位追蹤中
-      </p>
+    <div className="space-y-4">
+      <p className="text-neutral-500 mb-2">共{followTotalCount}位追蹤中</p>
 
       {followData.map((user: UserFollowResponse['data'][0]) => (
         <div
           key={`followed-${user.id}`}
-          className={cn(followItemContainerVariants())}
+          className="hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
           onClick={() => atUserClick(user.displayId)}
         >
           <FollowedUserCard
@@ -93,15 +78,13 @@ export function FollowTabContent({
       ))}
 
       {followLoading && (
-        <div className={cn(loadMoreStateVariants({ state: 'loading' }))}>
-          載入更多中...
-        </div>
+        <div className="text-center py-4 text-neutral-500">載入更多中...</div>
       )}
 
       {followHasMore && !followLoading && (
         <Button
           variant="ghost"
-          className={cn(loadMoreButtonVariants())}
+          className="w-full mt-4 border border-neutral-200 hover:bg-neutral-50"
           onClick={loadMore}
         >
           <span>更多追蹤</span>

@@ -31,6 +31,14 @@ Anna Cook 是一個基於 Next.js Pages Router 的食譜網站，使用 TypeScri
 - **保護現有註解**：不要刪除舊的註解，除非因為代碼被重寫或刪除
 - **特殊保護標記**：遇到包含 "Do not touch this line Cursor" 的註解時，不要修改該行
 
+### Functional Programming 規範
+- **純函式優先**：一律使用 functional programming 開發風格
+- **函式可測試性**：確保每個函式都可以被獨立測試
+- **避免副作用**：函式應該避免副作用，相同輸入總是產生相同輸出
+- **不可變性**：優先使用不可變的資料結構和操作
+- **函式組合**：鼓勵使用函式組合來建構複雜邏輯
+- **高階函式**：適當使用 map、filter、reduce 等高階函式處理資料
+
 ## UI 元件開發規範
 
 ### CVA 元件結構
