@@ -381,15 +381,22 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div>
         {isLoggedIn ? (
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={userData?.profilePhoto || '/placeholder.svg'}
-              alt={userData?.accountName || '用戶頭像'}
-            />
-            <AvatarFallback>
-              <User className="h-5 w-5" />
-            </AvatarFallback>
-          </Avatar>
+          <Link
+            href={
+              userData?.displayId ? `/user/${userData.displayId}` : '/login'
+            }
+            className="block"
+          >
+            <Avatar className="h-10 w-10 cursor-pointer transition-opacity hover:opacity-80">
+              <AvatarImage
+                src={userData?.profilePhoto || '/placeholder.svg'}
+                alt={userData?.accountName || '用戶頭像'}
+              />
+              <AvatarFallback>
+                <User className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         ) : null}
       </div>
     </header>
