@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { formatTime, cn } from '@/lib/utils';
+import { formatTime, cn, isMobileDevice } from '@/lib/utils';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import {
   videoPlayerVariants,
@@ -49,6 +49,23 @@ export default function VideoPlayer({
     return 'ready';
   };
 
+  // 獲取行動裝置優化設定
+  const getMobileOptimizations = () => {
+    if (isMobileDevice()) {
+      return {
+        playsInline: true,
+        preload: 'metadata' as const,
+        controls: false,
+        muted: false, // iOS 允許非靜音播放使用者觸發的影片
+      };
+    }
+    return {
+      playsInline: true,
+      preload: 'metadata' as const,
+      controls: false,
+    };
+  };
+
   return (
     <div className={videoPlayerVariants({ state: getPlayerState() })}>
       {/* 影片預覽 */}
@@ -63,9 +80,8 @@ export default function VideoPlayer({
             onLoadedMetadata={atVideoLoaded}
             onTimeUpdate={atTimeUpdate}
             onClick={atTogglePlayPause}
-            playsInline
-            preload="metadata"
-            crossOrigin="anonymous"
+            {...getMobileOptimizations()}
+            crossOrigin={videoUrl.startsWith('blob:') ? undefined : 'anonymous'}
           >
             <track kind="captions" label="中文" default />
             您的瀏覽器不支援影片標籤
