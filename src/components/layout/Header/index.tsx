@@ -387,7 +387,7 @@ export const Header: React.FC<HeaderProps> = ({
             }
             className="block"
           >
-            <Avatar className="h-10 w-10 cursor-pointer transition-opacity hover:opacity-80">
+            <Avatar className="h-10 w-10 cursor-pointer transition-transform hover:scale-110">
               <AvatarImage
                 src={userData?.profilePhoto || '/placeholder.svg'}
                 alt={userData?.accountName || '用戶頭像'}
