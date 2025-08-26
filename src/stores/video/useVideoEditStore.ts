@@ -93,7 +93,9 @@ type VideoEditStore = {
   ) => void;
   setTrimValues: (values: [number, number]) => void;
   addSegment: (onSegmentAdded?: (startTime: number) => void) => void;
-  deleteCurrentSegment: () => void;
+  deleteCurrentSegment: (
+    onSegmentDeleted?: (startTime: number) => void,
+  ) => void;
   goToPreviousSegment: (onSegmentChange?: (startTime: number) => void) => void;
   goToNextSegment: (onSegmentChange?: (startTime: number) => void) => void;
   markStartPoint: (time: number) => void;
@@ -307,7 +309,7 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       };
     }),
 
-  deleteCurrentSegment: () =>
+  deleteCurrentSegment: (onSegmentDeleted) =>
     set((state) => {
       const { segments: segmentList, currentSegmentIndex } = state.segments;
       if (segmentList.length <= 1) return state;
@@ -317,6 +319,11 @@ export const useVideoEditStore = create<VideoEditStore>((set, get) => ({
       );
       const newIndex = Math.min(currentSegmentIndex, newSegments.length - 1);
       const currentSegment = newSegments[newIndex];
+
+      // 呼叫回調函數同步影片時間到新的當前片段
+      if (onSegmentDeleted && currentSegment) {
+        onSegmentDeleted(currentSegment.startTime);
+      }
 
       return {
         segments: {
