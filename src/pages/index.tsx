@@ -383,7 +383,15 @@ export default function HomePage({
         {/* 浮動選單 */}
         {showFloatingMenu && (
           <div className="flex flex-col gap-3 mb-3 items-end">
-            <Button className="bg-primary-800 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32">
+            <Button
+              className="bg-primary-800 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32"
+              onClick={() => {
+                // 發送自定義事件
+                window.dispatchEvent(new CustomEvent('focusSearchInput'));
+                // 關閉浮動選單
+                setShowFloatingMenu(false);
+              }}
+            >
               搜尋食譜
             </Button>
             <Button
