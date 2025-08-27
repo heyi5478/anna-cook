@@ -397,8 +397,12 @@ export const useVideoEditor = () => {
             ];
 
       setSegments(updatedSegments);
-      setCurrentSegmentIndex(0);
-      setTrimValues([0, 100]);
+
+      // 只有在沒有現有片段或是第一次載入時才重置到第一個片段
+      if (segments.length === 0 || currentSegmentIndex === -1) {
+        setCurrentSegmentIndex(0);
+        setTrimValues([0, 100]);
+      }
 
       // 針對移動裝置最佳化：只在非行動裝置上生成縮圖，或減少縮圖數量
       if (!isMobileDevice()) {
@@ -440,12 +444,42 @@ export const useVideoEditor = () => {
   };
 
   /**
+   * 智慧錯誤處理機制
+   */
+  const handlePlaybackError = (error: any) => {
+    // 記錄詳細錯誤資訊
+    console.error('影片播放失敗詳細資訊:', {
+      error: error.message || error,
+      videoReadyState: videoRef.current?.readyState,
+      videoSrc: videoUrl,
+      isMobile: isMobileDevice(),
+      userAgent: navigator.userAgent,
+    });
+
+    // 根據錯誤類型提供不同處理方式
+    if (error.name === 'NotAllowedError') {
+      // 自動播放被阻擋
+      setApiError('請手動點擊播放按鈕開始播放影片');
+    } else if (error.name === 'AbortError') {
+      // 載入中斷，嘗試重新載入
+      if (videoRef.current) {
+        videoRef.current.load();
+      }
+      setApiError('影片載入中斷，請稍後再試');
+    } else {
+      // 其他錯誤
+      setApiError('影片播放失敗，請檢查影片格式或重新上傳');
+    }
+  };
+
+  /**
    * 處理播放/暫停切換
    */
   const atTogglePlayPause = () => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        setIsPlaying(false);
       } else {
         // 確保在當前選中片段的範圍內播放
         const currentSegment = segments[currentSegmentIndex];
@@ -458,17 +492,32 @@ export const useVideoEditor = () => {
           }
         }
 
-        // 使用使用者互動觸發播放
+        // iOS 特殊處理
+        if (isMobileDevice()) {
+          // 確保影片已載入
+          if (videoRef.current.readyState < 2) {
+            videoRef.current.load();
+          }
+        }
+
+        // 使用 Promise 處理播放
         const playPromise = videoRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error('播放失敗:', error);
-            // 提示使用者手動觸發播放
-            alert('請再次點擊播放按鈕開始播放');
-          });
+          playPromise
+            .then(() => {
+              // 播放成功
+              setIsPlaying(true);
+            })
+            .catch((error) => {
+              console.error('播放失敗:', error);
+              setIsPlaying(false);
+              handlePlaybackError(error);
+            });
+        } else {
+          // 對於不支援 Promise 的舊瀏覽器
+          setIsPlaying(true);
         }
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -667,7 +716,35 @@ export const useVideoEditor = () => {
   const createVideoTimeSyncCallback = () => {
     return (startTime: number) => {
       if (videoRef.current) {
+        // 如果正在播放，先暫停再跳轉時間
+        const wasPlaying = isPlaying;
+        if (wasPlaying && !videoRef.current.paused) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        }
+
         videoRef.current.currentTime = startTime;
+
+        // 短暫延遲後恢復播放狀態（如果之前在播放）
+        if (wasPlaying) {
+          setTimeout(() => {
+            if (videoRef.current) {
+              const playPromise = videoRef.current.play();
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    setIsPlaying(true);
+                  })
+                  .catch((error) => {
+                    console.error('恢復播放失敗:', error);
+                    handlePlaybackError(error);
+                  });
+              } else {
+                setIsPlaying(true);
+              }
+            }
+          }, 100);
+        }
       }
     };
   };
@@ -694,6 +771,14 @@ export const useVideoEditor = () => {
   const atGoToNextSegment = () => {
     const onSegmentChange = createVideoTimeSyncCallback();
     goToNextSegment(onSegmentChange);
+  };
+
+  /**
+   * 包裝的刪除當前片段函數，確保同步影片時間到新的當前片段
+   */
+  const atDeleteCurrentSegment = () => {
+    const onSegmentDeleted = createVideoTimeSyncCallback();
+    deleteCurrentSegment(onSegmentDeleted);
   };
 
   /**
@@ -748,7 +833,7 @@ export const useVideoEditor = () => {
 
     // 導航 (使用包裝函數確保影片時間同步)
     atAddSegment,
-    deleteCurrentSegment,
+    atDeleteCurrentSegment,
     atGoPreviousSegment: atGoToPreviousSegment,
     atGoNextSegment: atGoToNextSegment,
     atSetCurrentSegmentIndex,

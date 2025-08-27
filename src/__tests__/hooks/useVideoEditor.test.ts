@@ -487,8 +487,8 @@ describe('useVideoEditor', () => {
         .fn()
         .mockRejectedValue(new Error('播放失敗'));
 
-      // Mock alert
-      global.alert = jest.fn();
+      // Mock console.error
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
       const { result } = renderHook(() => useVideoEditor());
       result.current.videoRef.current = mockVideoElement as HTMLVideoElement;
@@ -497,7 +497,10 @@ describe('useVideoEditor', () => {
         result.current.atTogglePlayPause();
       });
 
-      expect(global.alert).toHaveBeenCalledWith('請再次點擊播放按鈕開始播放');
+      expect(mockStoreActions.setIsPlaying).toHaveBeenCalledWith(false);
+      expect(consoleSpy).toHaveBeenCalledWith('播放失敗:', expect.any(Error));
+
+      consoleSpy.mockRestore();
     });
   });
 
@@ -850,11 +853,11 @@ describe('useVideoEditor', () => {
     });
 
     // 測試刪除當前片段
-    test('應該呼叫 deleteCurrentSegment', () => {
+    test('應該呼叫 atDeleteCurrentSegment', () => {
       const { result } = renderHook(() => useVideoEditor());
 
       act(() => {
-        result.current.deleteCurrentSegment();
+        result.current.atDeleteCurrentSegment();
       });
 
       expect(mockStoreActions.deleteCurrentSegment).toHaveBeenCalled();

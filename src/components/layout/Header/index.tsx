@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -88,6 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
     role: number;
     loginProvider: number;
   } | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * 驗證用戶登入狀態
@@ -162,6 +163,17 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   /**
+   * 處理聚焦搜尋框事件
+   */
+  const atFocusSearchEvent = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+      // 可選：滾動到頂部
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  /**
    * 元件載入時檢查用戶認證狀態
    */
   useEffect(() => {
@@ -178,6 +190,16 @@ export const Header: React.FC<HeaderProps> = ({
 
     // 無論 localStorage 中是否有資料，都嘗試驗證 token
     verifyAuthentication();
+  }, [verifyAuthentication]);
+
+  /**
+   * 設置聚焦搜尋框事件監聽器
+   */
+  useEffect(() => {
+    window.addEventListener('focusSearchInput', atFocusSearchEvent);
+    return () => {
+      window.removeEventListener('focusSearchInput', atFocusSearchEvent);
+    };
   }, []);
 
   /**
@@ -367,6 +389,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Search className="h-5 w-5 text-primary" />
           </div>
           <Input
+            ref={searchInputRef}
             type="search"
             placeholder="關鍵字搜尋"
             className={cn(
@@ -381,15 +404,22 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div>
         {isLoggedIn ? (
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={userData?.profilePhoto || '/placeholder.svg'}
-              alt={userData?.accountName || '用戶頭像'}
-            />
-            <AvatarFallback>
-              <User className="h-5 w-5" />
-            </AvatarFallback>
-          </Avatar>
+          <Link
+            href={
+              userData?.displayId ? `/user/${userData.displayId}` : '/login'
+            }
+            className="block"
+          >
+            <Avatar className="h-10 w-10 cursor-pointer transition-transform hover:scale-110">
+              <AvatarImage
+                src={userData?.profilePhoto || '/placeholder.svg'}
+                alt={userData?.accountName || '用戶頭像'}
+              />
+              <AvatarFallback>
+                <User className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         ) : null}
       </div>
     </header>
