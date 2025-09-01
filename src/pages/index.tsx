@@ -285,7 +285,7 @@ export default function HomePage({
         <div className="relative w-full h-[240px] bg-primary-400">
           <div className="absolute inset-0">
             <Image
-              src="/ad_home_02.png"
+              src="/ad_home_03.webp"
               alt="香麻辣到心坎裡"
               layout="fill"
               objectFit="cover"
