@@ -1,5 +1,4 @@
 import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
   fetchRecipeDetailServer,
@@ -8,6 +7,8 @@ import {
 import RecipePageComponent from '@/components/pages/RecipePage';
 import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { RecipeSEO } from '@/components/seo/RecipeSEO';
+import { truncateDescription } from '@/lib/utils/seo';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -40,16 +41,63 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   const { recipe } = recipeData.data;
   console.log('食譜資料:', recipeData.data);
 
+  // 準備食譜 SEO 資料
+  const recipeTitle = `${recipe.recipeName}｜安那煮 | 家傳好菜－Anna Cook`;
+  const recipeDescription = truncateDescription(
+    `${recipe.description || `學習製作 ${recipe.recipeName}`}。安那煮Anna Cook食譜教學，讓做菜變簡單。影片食譜一鍵教學，家常食譜一次學會，輕鬆完成美味料理。`,
+    160,
+  );
+
+  // 構建食譜圖片陣列
+  const recipeImages: string[] = [];
+  if (recipe.coverPhoto) {
+    recipeImages.push(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`,
+    );
+  }
+
+  // 由於 API 回傳的資料結構中沒有 recipeSteps，這裡暫時註解掉
+  // 未來如果 API 有提供步驟資料，可以取消註解
+  // const recipeInstructions = recipeData.data.steps?.map((step, index) => ({
+  //   name: `步驟 ${index + 1}`,
+  //   text: step.content,
+  //   image: step.image ? generateImageUrl(step.image) : undefined
+  // })) || [];
+
+  const recipeInstructions: Array<{
+    name?: string;
+    text: string;
+    image?: string;
+  }> = [];
+
   return (
     <>
-      <Head>
-        <title>{`${recipe.recipeName} - 食譜詳情`}</title>
-        <meta
-          name="description"
-          content={recipe.description || '美味食譜詳情'}
-        />
-        <link rel="icon" href="/login-small-logo.svg" />
-      </Head>
+      <RecipeSEO
+        title={recipeTitle}
+        description={recipeDescription}
+        canonical={`/recipe-page/${recipe.id}`}
+        recipe={{
+          name: recipe.recipeName,
+          description:
+            recipe.description ||
+            `學習製作 ${recipe.recipeName}，安那煮提供詳細的食譜步驟和影音教學。`,
+          image:
+            recipeImages.length > 0 ? recipeImages : ['/images/og-default.jpg'],
+          author: '安那煮 Anna Cook', // API 中沒有 author 欄位
+          datePublished: new Date().toISOString(), // API 中沒有 createdAt 欄位
+          cookTime: recipe.cookingTime?.toString(),
+          recipeYield: recipe.portion?.toString(),
+          recipeCategory: '台灣料理', // API 中沒有 recipeCategory 欄位
+          recipeCuisine: '台灣菜',
+          recipeInstructions,
+          aggregateRating: recipe.rating
+            ? {
+                ratingValue: recipe.rating,
+                reviewCount: 1, // API 中沒有 reviewCount 欄位，使用預設值
+              }
+            : undefined,
+        }}
+      />
       <RecipePageComponent recipeData={recipeData.data} />
     </>
   );

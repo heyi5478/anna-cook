@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import UserCenter from '@/components/pages/UserCenter';
 import { AuthorProfile } from '@/components/pages/AuthorProfile';
 import { mockAuthor } from '@/components/pages/AuthorProfile/types';
 import { fetchUserProfileServer, ServerUserProfileResponse } from '@/services';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 interface UserPageProps {
   userProfileData?: ServerUserProfileResponse;
@@ -128,17 +128,37 @@ export default function UserPage({
     );
   }
 
+  // 生成動態 SEO 內容
+  const generateSEOContent = () => {
+    if (isCurrentUser) {
+      // 個人中心的 SEO
+      return {
+        title: '我的個人中心｜安那煮 | 家傳好菜－Anna Cook',
+        description:
+          '管理我的食譜和個人資料。安那煮Anna Cook食譜教學，讓做菜變簡單。影片食譜一鍵教學，家常食譜一次學會，輕鬆完成美味料理。',
+        canonical: `/user/${displayId}`,
+      };
+    }
+    // 作者頁面的 SEO
+    const authorBio = author.bio || `${author.name}的美味食譜分享`;
+    return {
+      title: `${author.name}的所有食譜｜安那煮 | 家傳好菜－Anna Cook`,
+      description: `${authorBio}。安那煮Anna Cook食譜教學，讓做菜變簡單。影片食譜一鍵教學，家常食譜一次學會，輕鬆完成美味料理。`,
+      canonical: `/user/${displayId}`,
+    };
+  };
+
+  const seoContent = generateSEOContent();
+
   return (
     <>
-      <Head>
-        <title>
-          {isCurrentUser ? '我的個人中心' : `${author.name}的個人頁面`}
-        </title>
-        <meta
-          name="description"
-          content={`查看${isCurrentUser ? '我的' : `${author.name}的`}食譜和個人資料`}
-        />
-      </Head>
+      {/* SEO 標籤 */}
+      <PageSEO
+        title={seoContent.title}
+        description={seoContent.description}
+        canonical={seoContent.canonical}
+        keywords={`${author.name}, 食譜作者, 美味食譜, 料理教學, 影片食譜`}
+      />
 
       <div className="min-h-screen bg-gray-50">
         {isCurrentUser ? (
