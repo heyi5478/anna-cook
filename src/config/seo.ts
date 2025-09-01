@@ -7,12 +7,12 @@ import type {
 
 // 網站基本資訊
 const SITE_CONFIG = {
-  name: '安那煮 Anna Cook',
+  name: '安那煮 | 家傳好菜－Anna Cook',
   description:
-    '安那煮 Anna Cook 提供阿公阿嬤的經典食譜，透過沉浸式影音教學，讓您輕鬆學會傳統家鄉味。探索台灣傳統料理的溫暖記憶。',
-  url: 'https://annacook.com',
-  author: '安那煮 Anna Cook',
-  keywords: '台灣料理, 傳統食譜, 家鄉味, 影音教學, 阿公阿嬤食譜',
+    '安那煮是一個專為行動裝置設計的食譜教學平台，讓做菜變簡單。提供分段播放的影片食譜，手機一鍵切換教學步驟，減少操作中斷，家常食譜一次學會不手忙腳亂，讓你輕鬆依照每步食譜完成美味料理。',
+  url: 'https://anna-cook.zeabur.app',
+  author: '安那煮 | 家傳好菜－Anna Cook',
+  keywords: '食譜教學, 行動裝置, 影片食譜, 分段播放, 家常料理, 手機食譜',
   locale: 'zh_TW',
 } as const;
 
