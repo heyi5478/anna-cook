@@ -2,7 +2,7 @@ import { Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { FollowButton } from '@/components/features/FollowButton';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import type { Author } from '@/types/recipe';
 import {
   authorCardVariants,
