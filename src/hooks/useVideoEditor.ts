@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useVideoEditStore } from '@/stores/video/useVideoEditStore';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
-import { isMobileDevice } from '@/lib/utils';
+import { isMobileDevice } from '@/lib/utils/device';
 import { HTTP_STATUS } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
