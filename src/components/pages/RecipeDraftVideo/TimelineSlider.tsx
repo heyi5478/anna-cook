@@ -4,7 +4,7 @@ import {
   formatTime as formatTimeHMS,
   formatSeconds as formatSec,
 } from '@/components/common/VimeoPlayer';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   timelineVariants,
   timelineMarkerVariants,
