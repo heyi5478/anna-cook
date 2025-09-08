@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useVideoEditor } from '@/hooks/useVideoEditor';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
-import { isMobileDevice } from '@/lib/utils';
+import { isMobileDevice } from '@/lib/utils/device';
 
 // Mock 外部依賴
 jest.mock('next/router', () => ({
@@ -16,7 +16,7 @@ jest.mock('@/services/recipes', () => ({
   updateRecipeSteps: jest.fn(),
 }));
 
-jest.mock('@/lib/utils', () => ({
+jest.mock('@/lib/utils/device', () => ({
   isMobileDevice: jest.fn(),
 }));
 
