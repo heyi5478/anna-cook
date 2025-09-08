@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { formatTime, cn, isMobileDevice } from '@/lib/utils';
+import { formatTime } from '@/lib/utils/time';
+import { isMobileDevice } from '@/lib/utils/device';
+import { cn } from '@/lib/utils/ui';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import {
   videoPlayerVariants,

@@ -9,7 +9,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   segmentNavigationVariants,
   segmentNavigationControlsVariants,

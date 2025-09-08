@@ -1,4 +1,4 @@
-import { formatTime } from '@/lib/utils';
+import { formatTime } from '@/lib/utils/time';
 
 describe('formatTime 函式', () => {
   // 測試基本時間格式化功能

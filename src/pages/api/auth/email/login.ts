@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { setServerCookie } from '@/lib/utils';
+import { setServerCookie } from '@/lib/utils/auth';
 import { loginWithEmail } from '@/services/auth';
 import { HTTP_STATUS } from '@/lib/constants';
 

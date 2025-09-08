@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { setServerCookie } from '@/lib/utils';
+import { setServerCookie } from '@/lib/utils/auth';
 import { exchangeGoogleCodeForToken } from '@/services/auth';
 
 /**

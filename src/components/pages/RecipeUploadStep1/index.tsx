@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Pencil } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { useRouter } from 'next/router';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';

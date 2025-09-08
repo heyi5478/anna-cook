@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Clock, Users, Star } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import type { Recipe } from '@/types/recipe';
 
 // 管理食譜卡片容器的樣式變體

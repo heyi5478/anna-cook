@@ -16,7 +16,8 @@ import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { fetchRecipeDraft, submitRecipeDraft } from '@/services/recipes';
 
 // 工具函數
-import { convertApiStepsToComponentSteps, cn } from '@/lib/utils';
+import { convertApiStepsToComponentSteps } from '@/lib/utils/data';
+import { cn } from '@/lib/utils/ui';
 import { formatSeconds as formatSec } from '@/components/common/VimeoPlayer';
 
 // 子元件

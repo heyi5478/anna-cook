@@ -1,7 +1,8 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { formatTime, cn } from '@/lib/utils';
+import { formatTime } from '@/lib/utils/time';
+import { cn } from '@/lib/utils/ui';
 import { VIDEO_SEGMENT_LIMITS, VIDEO_SEGMENT_STATUS } from '@/lib/constants';
 
 /**

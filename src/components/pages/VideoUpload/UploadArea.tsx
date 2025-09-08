@@ -2,7 +2,7 @@ import type React from 'react';
 import { AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   uploadAreaVariants,
   uploadContainerVariants,

@@ -1,4 +1,4 @@
-import { convertApiStepsToComponentSteps } from '@/lib/utils';
+import { convertApiStepsToComponentSteps } from '@/lib/utils/data';
 import type { RecipeDraftStep } from '@/types/api';
 
 describe('convertApiStepsToComponentSteps 函式', () => {

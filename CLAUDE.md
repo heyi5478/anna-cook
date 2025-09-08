@@ -99,12 +99,29 @@ Anna Cook 是一個基於 Next.js Pages Router 的食譜網站，使用 TypeScri
 src/
 ├── components/
 │   └── ui/              # CVA + shadCN UI 元件
+├── lib/
+│   └── utils/           # 模組化工具函式庫
+│       ├── ui.ts        # UI相關工具 (cn函式)
+│       ├── time.ts      # 時間相關工具
+│       ├── auth.ts      # 認證相關工具
+│       ├── device.ts    # 設備檢測工具
+│       ├── performance.ts # 性能優化工具
+│       ├── data.ts      # 資料轉換工具
+│       ├── id.ts        # ID生成工具
+│       └── seo.ts       # SEO工具
 ├── stores/              # Zustand 狀態管理
 ├── pages/               # Next.js Pages Router 頁面
 │   └── api/            # API 路由
 ├── styles/              # CSS 樣式檔案
 └── types/               # TypeScript 類型定義
 ```
+
+### 工具函式使用規範
+- **模組化匯入**：使用具體的模組路徑而非通用路徑
+  - ✅ `import { cn } from '@/lib/utils/ui'`
+  - ❌ `import { cn } from '@/lib/utils'`
+- **功能分組**：新的工具函式應加入對應的功能模組
+- **單一職責**：每個模組只包含相關功能的工具函式
 
 ### 測試結構
 - 測試檔案應與被測試檔案在相同目錄層級

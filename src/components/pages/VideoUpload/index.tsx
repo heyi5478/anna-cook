@@ -2,7 +2,7 @@ import { AlertCircle } from 'lucide-react';
 import StepIndicator from '@/components/common/StepIndicator';
 import { useVideoEditor } from '@/hooks/useVideoEditor';
 import { Segment } from '@/stores/video/useVideoEditStore';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   videoEditorContainerVariants,
   errorMessageVariants,
