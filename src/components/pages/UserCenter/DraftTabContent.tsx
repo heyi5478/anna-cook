@@ -6,7 +6,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
 import { DraftRecipeCard } from './DraftRecipeCard';
