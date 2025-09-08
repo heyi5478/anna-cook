@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { generateId } from '@/lib/utils';
+import { generateId } from '@/lib/utils/id';
 
 /**
  * 片段類型定義
