@@ -2,7 +2,7 @@ import { User } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import type { UserProfileCardProps as BaseUserProfileCardProps } from '@/components/pages/UserCenter/types';
 
 // 管理用戶資料卡片主容器的樣式變體
