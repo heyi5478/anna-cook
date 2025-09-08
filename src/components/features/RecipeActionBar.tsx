@@ -1,7 +1,7 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 
 // 管理操作列容器的佈局樣式變體
