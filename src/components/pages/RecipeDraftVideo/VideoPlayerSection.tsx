@@ -3,7 +3,7 @@ import {
   VimeoPlayer,
   formatSeconds as formatSec,
 } from '@/components/common/VimeoPlayer';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   videoPlayerSectionVariants,
   videoContainerVariants,

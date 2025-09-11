@@ -1,4 +1,4 @@
-import { isMobileDevice } from '@/lib/utils';
+import { isMobileDevice } from '@/lib/utils/device';
 
 describe('isMobileDevice 函式', () => {
   // 測試 iPhone 裝置

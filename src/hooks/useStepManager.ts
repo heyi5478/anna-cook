@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Step } from '@/types/recipe';
-import { debounce } from '@/lib/utils';
+import { debounce } from '@/lib/utils/performance';
 import {
   DEFAULT_RECIPE_STEPS,
   DEFAULT_TIME_VALUES,

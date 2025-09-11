@@ -19,6 +19,11 @@ import {
 } from '@/services/server-api';
 import { SORT_TYPES } from '@/lib/constants';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { PageSEO } from '@/components/seo/PageSEO';
+import {
+  organizationStructuredData,
+  websiteStructuredData,
+} from '@/config/seo';
 
 // 定義分類類型
 type Category = {
@@ -278,145 +283,156 @@ export default function HomePage({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* 主要內容 */}
-      <main className="flex-1">
-        {/* 橫幅廣告區域 */}
-        <div className="relative w-full h-[240px] bg-primary-400">
-          <div className="absolute inset-0">
-            <Image
-              src="/ad_home_02.png"
-              alt="香麻辣到心坎裡"
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
-        </div>
+    <>
+      {/* SEO 標籤 */}
+      <PageSEO
+        title="安那煮 | 家傳好菜－Anna Cook"
+        description="安那煮是一個專為行動裝置設計的食譜教學平台，讓做菜變簡單。提供分段播放的影片食譜，手機一鍵切換教學步驟，減少操作中斷，家常食譜一次學會不手忙腳亂，讓你輕鬆依照每步食譜完成美味料理。"
+        keywords="食譜教學, 行動裝置, 影片食譜, 分段播放, 家常料理, 手機食譜"
+        canonical="/"
+        structuredData={[organizationStructuredData, websiteStructuredData]}
+      />
 
-        {/* 特色區塊 - 使用 API 資料渲染 */}
-        {featureSections.map((section) => (
-          <section key={section.sectionPos} className="py-4">
-            <Carousel
-              title={section.sectionName}
-              items={section.recipes.map(mapToCategoryCard)}
-              renderItem={(category: Category, index: number) => (
-                <CategoryCard
-                  key={category.id}
-                  category={category}
-                  className="bg-white shadow-sm"
-                  index={index + 1}
-                />
-              )}
-            />
-          </section>
-        ))}
-
-        {/* 標籤欄 */}
-        <div className="sticky top-0 z-10 bg-white shadow-sm">
-          <Tabs
-            value={activeTab}
-            onValueChange={handleTabChange}
-            className="w-full"
-          >
-            <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
-              <TabsTrigger
-                value={SORT_TYPES.LATEST}
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
-              >
-                最新食譜
-              </TabsTrigger>
-              <TabsTrigger
-                value={SORT_TYPES.POPULAR}
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
-              >
-                人氣食譜
-              </TabsTrigger>
-              <TabsTrigger
-                value="convenience"
-                className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
-              >
-                經典食譜
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* 食譜列表載入中狀態 */}
-        {isLoading && (
-          <div className="py-8 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-2 text-neutral-500">{COMMON_TEXTS.LOADING}</p>
-          </div>
-        )}
-
-        {/* 食譜列表 - 根據選中的標籤顯示不同的食譜 */}
-        {!isLoading && (
-          <div className="px-4">
-            {getCurrentRecipes().map((recipe) => (
-              <RecipeCard
-                key={`${recipe.id}-${activeTab}`}
-                recipe={recipe}
-                className="shadow-sm mt-8"
+      <div className="min-h-screen flex flex-col bg-white">
+        {/* 主要內容 */}
+        <main className="flex-1">
+          {/* 橫幅廣告區域 */}
+          <div className="relative w-full h-[240px] bg-primary-400">
+            <div className="absolute inset-0">
+              <Image
+                src="/ad_home_03.webp"
+                alt="香麻辣到心坎裡"
+                layout="fill"
+                objectFit="cover"
               />
-            ))}
+            </div>
           </div>
-        )}
 
-        {/* 載入更多按鈕 - 只在有更多資料時顯示 */}
-        {hasMore() && (
-          <div className="flex justify-center py-4">
-            <Button
-              variant="ghost"
-              className="text-neutral-500 flex items-center gap-1"
-              onClick={onLoadMore}
-              disabled={isLoading}
+          {/* 特色區塊 - 使用 API 資料渲染 */}
+          {featureSections.map((section) => (
+            <section key={section.sectionPos} className="py-4">
+              <Carousel
+                title={section.sectionName}
+                items={section.recipes.map(mapToCategoryCard)}
+                renderItem={(category: Category, index: number) => (
+                  <CategoryCard
+                    key={category.id}
+                    category={category}
+                    className="bg-white shadow-sm"
+                    index={index + 1}
+                  />
+                )}
+              />
+            </section>
+          ))}
+
+          {/* 標籤欄 */}
+          <div className="sticky top-0 z-10 bg-white shadow-sm">
+            <Tabs
+              value={activeTab}
+              onValueChange={handleTabChange}
+              className="w-full"
             >
-              {isLoading ? COMMON_TEXTS.LOADING : '更多食譜'}{' '}
-              {!isLoading && <ChevronDown size={16} />}
-            </Button>
+              <TabsList className="flex justify-between mb-0 w-full rounded-none border-b bg-white p-0 h-auto">
+                <TabsTrigger
+                  value={SORT_TYPES.LATEST}
+                  className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
+                >
+                  最新食譜
+                </TabsTrigger>
+                <TabsTrigger
+                  value={SORT_TYPES.POPULAR}
+                  className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
+                >
+                  人氣食譜
+                </TabsTrigger>
+                <TabsTrigger
+                  value="convenience"
+                  className="flex-1 rounded-none border-b-2 border-transparent px-3 py-3 data-[state=active]:border-primary-400 data-[state=active]:shadow-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary-400 font-normal data-[state=active]:font-normal"
+                >
+                  經典食譜
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-        )}
-      </main>
 
-      {/* 浮動按鈕和選單 */}
-      <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
-        {/* 浮動選單 */}
-        {showFloatingMenu && (
-          <div className="flex flex-col gap-3 mb-3 items-end">
-            <Button
-              className="bg-primary-800 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32"
-              onClick={() => {
-                // 發送自定義事件
-                window.dispatchEvent(new CustomEvent('focusSearchInput'));
-                // 關閉浮動選單
-                setShowFloatingMenu(false);
-              }}
-            >
-              搜尋食譜
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-white text-neutral-800 border-primary border hover:bg-primary-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
-              onClick={() => router.push('/upload-recipe-step1')}
-            >
-              新增食譜
-            </Button>
-          </div>
-        )}
+          {/* 食譜列表載入中狀態 */}
+          {isLoading && (
+            <div className="py-8 text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+              <p className="mt-2 text-neutral-500">{COMMON_TEXTS.LOADING}</p>
+            </div>
+          )}
 
-        {/* 主浮動按鈕 */}
-        <Button
-          size="icon"
-          onClick={toggleFloatingMenu}
-          className={`h-12 w-12 rounded-full shadow-lg transition-all duration-300 ${
-            showFloatingMenu
-              ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300'
-              : 'bg-primary text-primary-50 hover:bg-primary-50 hover:text-primary hover:border-primary'
-          }`}
-        >
-          {showFloatingMenu ? <X size={24} /> : <Plus size={24} />}
-        </Button>
+          {/* 食譜列表 - 根據選中的標籤顯示不同的食譜 */}
+          {!isLoading && (
+            <div className="px-4">
+              {getCurrentRecipes().map((recipe) => (
+                <RecipeCard
+                  key={`${recipe.id}-${activeTab}`}
+                  recipe={recipe}
+                  className="shadow-sm mt-8"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 載入更多按鈕 - 只在有更多資料時顯示 */}
+          {hasMore() && (
+            <div className="flex justify-center py-4">
+              <Button
+                variant="ghost"
+                className="text-neutral-500 flex items-center gap-1"
+                onClick={onLoadMore}
+                disabled={isLoading}
+              >
+                {isLoading ? COMMON_TEXTS.LOADING : '更多食譜'}{' '}
+                {!isLoading && <ChevronDown size={16} />}
+              </Button>
+            </div>
+          )}
+        </main>
+
+        {/* 浮動按鈕和選單 */}
+        <div className="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-20">
+          {/* 浮動選單 */}
+          {showFloatingMenu && (
+            <div className="flex flex-col gap-3 mb-3 items-end">
+              <Button
+                className="bg-primary-800 hover:bg-primary-600 text-white font-medium px-4 py-2 rounded-md shadow-md w-32"
+                onClick={() => {
+                  // 發送自定義事件
+                  window.dispatchEvent(new CustomEvent('focusSearchInput'));
+                  // 關閉浮動選單
+                  setShowFloatingMenu(false);
+                }}
+              >
+                搜尋食譜
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white text-neutral-800 border-primary border hover:bg-primary-50 font-medium px-4 py-2 rounded-md shadow-md w-32"
+                onClick={() => router.push('/upload-recipe-step1')}
+              >
+                新增食譜
+              </Button>
+            </div>
+          )}
+
+          {/* 主浮動按鈕 */}
+          <Button
+            size="icon"
+            onClick={toggleFloatingMenu}
+            className={`h-12 w-12 rounded-full shadow-lg transition-all duration-300 ${
+              showFloatingMenu
+                ? 'bg-neutral-200 text-neutral-600 hover:bg-neutral-300'
+                : 'bg-primary text-primary-50 hover:bg-primary-50 hover:text-primary hover:border-primary'
+            }`}
+          >
+            {showFloatingMenu ? <X size={24} /> : <Plus size={24} />}
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

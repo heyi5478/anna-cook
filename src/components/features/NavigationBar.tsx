@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 
 // 導航欄容器樣式變體
 const navigationBarVariants = cva('w-full p-4 flex items-center z-20', {

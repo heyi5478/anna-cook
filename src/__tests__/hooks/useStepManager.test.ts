@@ -1,10 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { useStepManager } from '@/hooks/useStepManager';
 import type { Step } from '@/types/recipe';
-import { debounce } from '@/lib/utils';
+import { debounce } from '@/lib/utils/performance';
 
 // Mock debounce function
-jest.mock('@/lib/utils', () => ({
+jest.mock('@/lib/utils/performance', () => ({
   debounce: jest.fn((fn) => fn),
 }));
 

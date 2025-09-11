@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 
 // 定義輸入框的基本樣式和變體
 const inputVariants = cva(

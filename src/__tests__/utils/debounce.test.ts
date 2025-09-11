@@ -1,4 +1,4 @@
-import { debounce } from '@/lib/utils';
+import { debounce } from '@/lib/utils/performance';
 
 describe('debounce 函式', () => {
   beforeEach(() => {

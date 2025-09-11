@@ -1,4 +1,4 @@
-import { generateId } from '@/lib/utils';
+import { generateId } from '@/lib/utils/id';
 
 describe('generateId 函式', () => {
   // 測試基本 ID 生成功能

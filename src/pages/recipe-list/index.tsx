@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -12,6 +11,7 @@ import { searchRecipesServer } from '@/services/server-api';
 import { GetStaticProps } from 'next';
 import { SORT_TYPES, PAGINATION_DEFAULTS } from '@/lib/constants';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { PageSEO } from '@/components/seo/PageSEO';
 
 // 定義頁面 props 介面
 interface RecipeListPageProps {
@@ -334,11 +334,37 @@ export default function RecipeListPage({
     );
   }
 
+  // 生成動態 SEO 內容
+  const generateSEOContent = () => {
+    if (query && query.trim() !== '') {
+      // 有搜尋關鍵字時的 SEO
+      const keyword = query.trim();
+      return {
+        title: `${keyword}相關美味食譜｜安那煮 | 家傳好菜－Anna Cook`,
+        description: `所有${keyword}相關美味食譜，都在安那煮Anna Cook。安那煮手機食譜教學，讓做菜變簡單。分段播放影片食譜，手機一鍵教學步驟，家常食譜一次學會不手忙腳亂，讓你輕鬆依照每步食譜完成美味料理。`,
+        canonical: `/recipe-list?search=${encodeURIComponent(keyword)}`,
+      };
+    }
+    // 沒有搜尋關鍵字時的預設 SEO
+    return {
+      title: '食譜搜尋｜安那煮 | 家傳好菜－Anna Cook',
+      description:
+        '探索安那煮Anna Cook的豐富食譜庫。安那煮手機食譜教學，讓做菜變簡單。分段播放影片食譜，手機一鍵教學步驟，家常食譜一次學會不手忙腳亂，讓你輕鬆依照每步食譜完成美味料理。',
+      canonical: '/recipe-list',
+    };
+  };
+
+  const seoContent = generateSEOContent();
+
   return (
     <>
-      <Head>
-        <title>{`${query ? `${query} - 搜尋結果` : '食譜搜尋'} | Anna Cook`}</title>
-      </Head>
+      {/* SEO 標籤 */}
+      <PageSEO
+        title={seoContent.title}
+        description={seoContent.description}
+        canonical={seoContent.canonical}
+        keywords="食譜搜尋, 手機食譜, 影片教學, 分段播放, 家常料理, 美味食譜"
+      />
 
       {/* 次導覽列 */}
       <div className="bg-white p-3 flex items-center text-sm">

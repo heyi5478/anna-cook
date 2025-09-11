@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Menu, Search, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,7 +16,7 @@ import { checkAuth } from '@/services/auth';
  * 定義 header 的基本樣式和變體
  */
 const headerVariants = cva(
-  'w-full flex items-center justify-between bg-primary px-4 py-2 h-16',
+  'w-full flex items-center justify-between bg-primary-700 px-4 py-2 h-16',
   {
     variants: {
       variant: {

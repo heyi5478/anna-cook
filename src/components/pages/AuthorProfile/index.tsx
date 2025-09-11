@@ -6,7 +6,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/router';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import type { Author } from '@/types/recipe';
 import {
   profileContainerVariants,

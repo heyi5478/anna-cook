@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 
 describe('cn 函式', () => {
   // 測試基本的 class 名稱合併功能

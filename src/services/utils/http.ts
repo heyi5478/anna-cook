@@ -1,6 +1,6 @@
 import { authConfig } from '@/config';
 import { DEV_TEST_TOKEN, COOKIE_EXPIRES } from '@/lib/constants';
-import { setClientCookie } from '@/lib/utils';
+import { setClientCookie } from '@/lib/utils/auth';
 
 /**
  * 從 Cookie 或 localStorage 獲取 JWT Token

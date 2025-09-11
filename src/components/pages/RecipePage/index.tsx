@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { Clock, Star, MessageSquare, Share2, Bookmark } from 'lucide-react';
 
 // 引入 UI 元件

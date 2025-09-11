@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/features/RecipeCard';
 import { fetchUserRecipes } from '@/services/users';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   recipesSectionVariants,
   recipeTitleVariants,

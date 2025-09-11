@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Smartphone, RotateCcw, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import {
   rotationPromptOverlayVariants,
   rotationPromptContentVariants,

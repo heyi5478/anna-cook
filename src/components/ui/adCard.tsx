@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 
 type ProductCardProps = {
   id: string;

@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/ui';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 // 步驟指示器容器樣式變體

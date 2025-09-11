@@ -3,7 +3,7 @@ import {
   NextApiResponse,
 } from 'next';
 import { authConfig, getApiConfig } from '@/config';
-import { setServerCookie } from '@/lib/utils';
+import { setServerCookie } from '@/lib/utils/auth';
 
 // 擴展 NextApiRequest 類型，添加 user 屬性
 declare module 'next' {
