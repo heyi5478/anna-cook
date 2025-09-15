@@ -2,6 +2,18 @@
 # specstory
 .specstory
 
+# kiro
+.kiro
+.kiro/*
+.kiro/settings/*
+.kiro/settings/mcp.json
+.kiro/settings/mcp.json
+
+.vscode
+.vscode/*
+.vscode/settings.json
+.vscode/settings.json
+
 # dependencies
 /node_modules
 /.pnp
