@@ -14,6 +14,7 @@ module.exports = {
     'plugin:prettier/recommended',
     'next/core-web-vitals',
     'next/typescript',
+    'plugin:storybook/recommended',
   ],
   settings: {
     'import/resolver': {
