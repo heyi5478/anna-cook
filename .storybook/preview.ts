@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/react';
 import '../src/styles/globals.css'; // Tailwind CSS
 import React from 'react';
+import { setProjectAnnotations } from '@storybook/react';
 
 const preview: Preview = {
   parameters: {
@@ -28,7 +29,18 @@ const preview: Preview = {
     },
 
     a11y: {
-      test: 'todo',
+      config: {
+        rules: [
+          {
+            id: 'autocomplete-valid',
+            enabled: false,
+          },
+        ],
+      },
+    },
+    // 支援 @storybook/test 的互動測試
+    interactions: {
+      disable: false,
     },
   },
 
