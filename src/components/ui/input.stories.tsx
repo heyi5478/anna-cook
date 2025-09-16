@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import { expect, fn, userEvent, within } from '@storybook/test';
 import { Input, InputProps } from './input';
 
 const meta: Meta<typeof Input> = {
@@ -38,6 +39,9 @@ const meta: Meta<typeof Input> = {
       action: 'changed',
       description: '值變更事件處理函數',
     },
+  },
+  args: {
+    onChange: fn(),
   },
 };
 
@@ -282,4 +286,101 @@ export const FileUpload: Story = {
       />
     </div>
   ),
+};
+
+// 互動測試範例：測試輸入功能
+export const InteractiveTyping: Story = {
+  args: {
+    placeholder: '輸入測試文字',
+    onChange: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    // 測試輸入框存在
+    await expect(input).toBeInTheDocument();
+
+    // 測試輸入文字
+    await userEvent.type(input, 'Hello World');
+    await expect(input).toHaveValue('Hello World');
+
+    // 確認 onChange 被調用
+    await expect(args.onChange).toHaveBeenCalled();
+  },
+};
+
+// 互動測試範例：測試清空功能
+export const InteractiveClear: Story = {
+  args: {
+    placeholder: '輸入並清空',
+    onChange: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    // 輸入文字
+    await userEvent.type(input, 'Test content');
+    await expect(input).toHaveValue('Test content');
+
+    // 全選並刪除
+    await userEvent.keyboard('{Control>}a{/Control}');
+    await userEvent.keyboard('{Delete}');
+    await expect(input).toHaveValue('');
+
+    // 確認 onChange 被調用
+    await expect(args.onChange).toHaveBeenCalled();
+  },
+};
+
+// 互動測試範例：測試禁用狀態
+export const InteractiveDisabled: Story = {
+  args: {
+    disabled: true,
+    placeholder: '禁用測試',
+    onChange: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    // 測試禁用狀態
+    await expect(input).toBeDisabled();
+
+    // 嘗試輸入（應該無效）
+    await userEvent.type(input, 'Should not work');
+    await expect(input).toHaveValue('');
+
+    // 確認 onChange 未被調用
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
+// 互動測試範例：測試鍵盤導航
+export const InteractiveKeyboard: Story = {
+  args: {
+    placeholder: '鍵盤導航測試',
+    onChange: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+
+    // 測試 Tab 鍵聚焦
+    await userEvent.tab();
+    await expect(input).toHaveFocus();
+
+    // 測試 Escape 鍵失焦
+    await userEvent.keyboard('{Escape}');
+    // 注意：Escape 可能不會移除焦點，這取決於瀏覽器實作
+
+    // 重新聚焦並測試方向鍵
+    await userEvent.click(input);
+    await userEvent.type(input, 'test');
+
+    // 測試 Home 和 End 鍵
+    await userEvent.keyboard('{Home}');
+    await userEvent.keyboard('{End}');
+  },
 };

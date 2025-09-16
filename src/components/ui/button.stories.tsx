@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import { expect, fn, userEvent, within } from '@storybook/test';
 import { Button, ButtonProps } from './button';
 
 const meta: Meta<typeof Button> = {
@@ -39,6 +40,9 @@ const meta: Meta<typeof Button> = {
       action: 'clicked',
       description: '點擊事件處理函數',
     },
+  },
+  args: {
+    onClick: fn(),
   },
 };
 
@@ -183,5 +187,124 @@ export const AsChild: Story = {
         作為連結
       </a>
     ),
+  },
+};
+
+// 互動測試範例：測試按鈕點擊
+export const InteractiveClick: Story = {
+  args: {
+    children: '點擊我測試',
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // 測試按鈕是否存在且可見
+    await expect(button).toBeInTheDocument();
+    await expect(button).toBeVisible();
+
+    // 測試點擊事件
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+// 互動測試範例：測試禁用狀態
+export const InteractiveDisabled: Story = {
+  args: {
+    children: '禁用按鈕測試',
+    disabled: true,
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // 測試按鈕處於禁用狀態
+    await expect(button).toBeDisabled();
+
+    // 嘗試點擊禁用的按鈕
+    await userEvent.click(button);
+
+    // 確認 onClick 未被調用
+    await expect(args.onClick).toHaveBeenCalledTimes(0);
+  },
+};
+
+// 互動測試範例：測試鍵盤操作
+export const InteractiveKeyboard: Story = {
+  args: {
+    children: '鍵盤測試',
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    // 測試 Tab 鍵聚焦
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
+    // 測試 Enter 鍵觸發點擊
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // 測試 Space 鍵觸發點擊
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
+// 互動測試範例：測試多種變體
+export const InteractiveVariants: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      <Button
+        variant="default"
+        onClick={args.onClick}
+        data-testid="default-btn"
+      >
+        Default
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={args.onClick}
+        data-testid="destructive-btn"
+      >
+        Destructive
+      </Button>
+      <Button
+        variant="outline"
+        onClick={args.onClick}
+        data-testid="outline-btn"
+      >
+        Outline
+      </Button>
+    </div>
+  ),
+  args: {
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // 測試每個變體按鈕
+    const defaultBtn = canvas.getByTestId('default-btn');
+    const destructiveBtn = canvas.getByTestId('destructive-btn');
+    const outlineBtn = canvas.getByTestId('outline-btn');
+
+    // 測試所有按鈕存在
+    await expect(defaultBtn).toBeInTheDocument();
+    await expect(destructiveBtn).toBeInTheDocument();
+    await expect(outlineBtn).toBeInTheDocument();
+
+    // 依序點擊每個按鈕
+    await userEvent.click(defaultBtn);
+    await userEvent.click(destructiveBtn);
+    await userEvent.click(outlineBtn);
+
+    // 確認所有按鈕都被點擊了
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
   },
 };
