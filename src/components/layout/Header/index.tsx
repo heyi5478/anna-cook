@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
   /**
    * 驗證用戶登入狀態
    */
-  const verifyAuthentication = async () => {
+  const verifyAuthentication = useCallback(async () => {
     try {
       const response = await checkAuth();
 
@@ -121,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
         onLoginStateChange(false);
       }
     }
-  };
+  }, [onLoginStateChange]);
 
   /**
    * 處理登出功能
@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
 
     // 無論 localStorage 中是否有資料，都嘗試驗證 token
     verifyAuthentication();
-  }, [verifyAuthentication]);
+  }, []); // 只在元件初次載入時執行
 
   /**
    * 設置聚焦搜尋框事件監聽器

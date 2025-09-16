@@ -18,15 +18,16 @@ import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 import {
   uploadPageVariants,
-  uploadFieldVariants,
   uploadButtonVariants,
   recipeUploadErrorMessageVariants as errorMessageVariants,
   recipeUploadStepContainerVariants as stepContainerVariants,
-  recipeUploadLabelVariants as labelVariants,
-  recipeUploadTagVariants as tagVariants,
-  recipeUploadIngredientRowVariants as ingredientRowVariants,
 } from '@/styles/cva';
-import { separatorVariants } from '@/styles/cva/recipe-upload';
+
+// 引入拆分的子元件
+import RecipeIntroSection from './RecipeIntroSection';
+import IngredientList from './IngredientList';
+import TagsSection from './TagsSection';
+import CookingInfo from './CookingInfo';
 
 // 定義表單驗證 schema
 const recipeStep2Schema = z.object({
@@ -86,8 +87,7 @@ export default function RecipeUploadStep2() {
   // 設定目前步驟狀態
   const [currentStep] = useState(2);
 
-  // 設定自訂標籤
-  const [customTag, setCustomTag] = useState('');
+  // 設定標籤
   const [tags, setTags] = useState<string[]>([]);
 
   // 從 localStorage 取得食譜名稱
@@ -246,41 +246,6 @@ export default function RecipeUploadStep2() {
     appendSeasoning({ name: '', amount: '', unit: '' });
   };
 
-  /**
-   * 添加標籤
-   */
-  const atAddTag = () => {
-    if (
-      customTag.trim() &&
-      !tags.includes(customTag.trim()) &&
-      tags.length < 5
-    ) {
-      const newTags = [...tags, customTag.trim()];
-      setTags(newTags);
-      setValue('tags', newTags); // 同步更新表單值
-      setCustomTag('');
-    }
-  };
-
-  /**
-   * 移除標籤
-   */
-  const atRemoveTag = (tagToRemove: string) => {
-    const newTags = tags.filter((tag) => tag !== tagToRemove);
-    setTags(newTags);
-    setValue('tags', newTags); // 同步更新表單值
-  };
-
-  /**
-   * 處理標籤輸入按 Enter 鍵
-   */
-  const atTagKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      atAddTag();
-    }
-  };
-
   return (
     <div className={uploadPageVariants()}>
       {/* 麵包屑導航 */}
@@ -320,387 +285,51 @@ export default function RecipeUploadStep2() {
 
       {/* 表單 */}
       <form onSubmit={handleSubmit(atSubmit)}>
-        {/* 食譜標題 */}
-        <div className={stepContainerVariants({ variant: 'titleSection' })}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">
-              {recipeName || '馬鈴薯燉肉'}
-            </h2>
-          </div>
-        </div>
-
-        {/* 食譜介紹 */}
-        <div className={stepContainerVariants()}>
-          <div className={labelVariants()} id="recipeDescription-label">
-            輸入食譜介紹
-          </div>
-          <textarea
-            id="recipeDescription"
-            rows={10}
-            placeholder="食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！食譜簡介料理中加入在生薑燒肉，醬汁香濃厚序，這味甜甜醬醬，豬肉的燒烤味入鍋子！"
-            aria-labelledby="recipeDescription-label"
-            className={uploadFieldVariants({
-              variant: 'textarea',
-              state: errors.recipeDescription ? 'error' : 'default',
-            })}
-            {...register('recipeDescription')}
-          />
-          {errors.recipeDescription && (
-            <p className={errorMessageVariants()}>
-              {errors.recipeDescription.message}
-            </p>
-          )}
-        </div>
+        {/* 食譜介紹區塊 */}
+        <RecipeIntroSection
+          recipeName={recipeName}
+          register={register}
+          errors={errors}
+        />
 
         {/* 所需食材 */}
-        <div className="mb-6">
-          <h2 className={labelVariants()}>所需食材</h2>
-
-          <div
-            className={stepContainerVariants({
-              variant: 'ingredientsContainer',
-            })}
-          >
-            {ingredientFields.map((field, index) => (
-              <div key={field.id}>
-                <div
-                  className={ingredientRowVariants({
-                    variant: field.name ? 'filled' : 'empty',
-                  })}
-                >
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      placeholder="食材"
-                      className="w-full bg-transparent border-none outline-none placeholder-neutral-400"
-                      {...register(`ingredients.${index}.name`)}
-                    />
-                  </div>
-                  <div className="w-0 h-6 border-l border-neutral-300" />
-                  <div className="w-20 text-center">
-                    <input
-                      type="text"
-                      placeholder="份量"
-                      className="w-full bg-transparent border-none outline-none text-center placeholder-neutral-400"
-                      {...register(`ingredients.${index}.amount`)}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeIngredient(index)}
-                    className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
-                    aria-label={`${COMMON_TEXTS.DELETE}食材`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M3 6h18" />
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                      <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
-                      <line x1="10" x2="10" y1="11" y2="17" />
-                      <line x1="14" x2="14" y1="11" y2="17" />
-                    </svg>
-                  </button>
-                </div>
-                {index < ingredientFields.length - 1 && (
-                  <div
-                    className={separatorVariants({
-                      variant: 'dashed',
-                      spacing: 'sm',
-                    })}
-                  />
-                )}
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={atAddIngredient}
-              className={uploadButtonVariants({
-                variant: 'addIngredient',
-                size: 'default',
-              })}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="m12 8 0 8" />
-                <path d="m8 12 8 0" />
-              </svg>
-              <span>食材</span>
-            </button>
-          </div>
-        </div>
+        <IngredientList
+          fields={ingredientFields}
+          onAdd={atAddIngredient}
+          onRemove={removeIngredient}
+          register={register}
+          errors={errors}
+          isSeasoningMode={false}
+          title="所需食材"
+          addButtonText="食材"
+          itemPlaceholder="食材"
+        />
 
         {/* 所需調料 */}
-        <div className="mb-6">
-          <h2 className={labelVariants()}>所需調料</h2>
-
-          <div
-            className={stepContainerVariants({
-              variant: 'ingredientsContainer',
-            })}
-          >
-            {seasoningFields.map((field, index) => (
-              <div key={field.id}>
-                <div
-                  className={ingredientRowVariants({
-                    variant: field.name ? 'filled' : 'empty',
-                  })}
-                >
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      placeholder="調料"
-                      className="w-full bg-transparent border-none outline-none placeholder-neutral-400"
-                      {...register(`seasonings.${index}.name`)}
-                    />
-                  </div>
-                  <div className="w-0 h-6 border-l border-neutral-300" />
-                  <div className="w-20 text-center">
-                    <input
-                      type="text"
-                      placeholder="份量"
-                      className="w-full bg-transparent border-none outline-none text-center placeholder-neutral-400"
-                      {...register(`seasonings.${index}.amount`)}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeSeasoning(index)}
-                    className="p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
-                    aria-label={`${COMMON_TEXTS.DELETE}調料`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M3 6h18" />
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                      <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
-                      <line x1="10" x2="10" y1="11" y2="17" />
-                      <line x1="14" x2="14" y1="11" y2="17" />
-                    </svg>
-                  </button>
-                </div>
-                {index < seasoningFields.length - 1 && (
-                  <div
-                    className={separatorVariants({
-                      variant: 'dashed',
-                      spacing: 'sm',
-                    })}
-                  />
-                )}
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={atAddSeasoning}
-              className={uploadButtonVariants({
-                variant: 'addIngredient',
-                size: 'default',
-              })}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="m12 8 0 8" />
-                <path d="m8 12 8 0" />
-              </svg>
-              <span>調料</span>
-            </button>
-          </div>
-        </div>
+        <IngredientList
+          fields={seasoningFields}
+          onAdd={atAddSeasoning}
+          onRemove={removeSeasoning}
+          register={register}
+          errors={errors}
+          isSeasoningMode
+          title="所需調料"
+          addButtonText="調料"
+          itemPlaceholder="調料"
+        />
 
         {/* 食譜標籤 */}
-        <div className={stepContainerVariants()}>
-          <h2 className={labelVariants()}>食譜標籤</h2>
-          <div className={stepContainerVariants({ variant: 'infoSection' })}>
-            <div className="flex justify-between items-center mb-2">
-              <span>增加新標籤 ({tags.length}/5)</span>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="輸入自訂標籤"
-                className={uploadFieldVariants({
-                  variant: 'input',
-                  state: 'default',
-                })}
-                value={customTag}
-                onChange={(e) => setCustomTag(e.target.value)}
-                onKeyDown={atTagKeyDown}
-                disabled={tags.length >= 5}
-              />
-              <button
-                type="button"
-                className={uploadButtonVariants({
-                  variant: 'secondary',
-                  state:
-                    !customTag.trim() || tags.length >= 5
-                      ? 'disabled'
-                      : 'default',
-                  size: 'sm',
-                })}
-                onClick={atAddTag}
-                disabled={!customTag.trim() || tags.length >= 5}
-              >
-                新增
-              </button>
-            </div>
-
-            {/* 已新增的標籤 */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {tags.map((tag) => (
-                  <div
-                    key={tag}
-                    className={tagVariants({ variant: 'removable' })}
-                  >
-                    <span>{tag}</span>
-                    <button
-                      type="button"
-                      className="ml-1 text-neutral-500"
-                      onClick={() => atRemoveTag(tag)}
-                      aria-label={`移除標籤 ${tag}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {errors.tags && (
-              <p className={errorMessageVariants()}>{errors.tags.message}</p>
-            )}
-          </div>
-        </div>
+        <TagsSection
+          tags={tags}
+          setTags={setTags}
+          setValue={setValue}
+          errors={errors}
+          maxTags={5}
+          title="食譜標籤"
+        />
 
         {/* 烹調時間和人份 */}
-        <div className="flex justify-between items-start max-w-md mx-auto mb-10">
-          {/* 烹調時間 */}
-          <div className="flex-1 max-w-[186px]">
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label
-              htmlFor="cookingTime"
-              className="block text-base font-normal text-neutral-700 leading-6 mb-2"
-            >
-              烹調時間
-            </label>
-            <div
-              className={`border rounded-lg px-4 py-2 min-h-[44px] ${
-                errors.cookingTime
-                  ? 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200'
-                  : 'border-neutral-400 hover:border-neutral-500 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full h-full">
-                <input
-                  id="cookingTime"
-                  type="number"
-                  className="flex-1 bg-transparent border-none outline-none text-base font-normal text-neutral-500 placeholder:text-neutral-400 min-w-0"
-                  placeholder="120"
-                  {...register('cookingTime')}
-                />
-                <span className="text-base font-normal text-neutral-700 ml-3 flex-shrink-0">
-                  分鐘
-                </span>
-              </div>
-            </div>
-            {errors.cookingTime && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.cookingTime.message}
-              </p>
-            )}
-          </div>
-
-          {/* 分隔線 */}
-          <div className="w-0 h-[72px] border-l border-neutral-50 mx-2 mt-2.5" />
-
-          {/* 人份 */}
-          <div className="flex-1 max-w-[186px]">
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label
-              htmlFor="servings"
-              className="block text-base font-normal text-neutral-700 leading-6 mb-2"
-            >
-              幾人份
-            </label>
-            <div
-              className={`border rounded-lg px-4 py-2 min-h-[44px] ${
-                errors.servings
-                  ? 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200'
-                  : 'border-neutral-400 hover:border-neutral-500 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full h-full">
-                <input
-                  id="servings"
-                  type="number"
-                  className="flex-1 bg-transparent border-none outline-none text-base font-normal text-neutral-500 placeholder:text-neutral-400 min-w-0"
-                  placeholder="4"
-                  {...register('servings')}
-                />
-                <span className="text-base font-normal text-neutral-700 ml-3 flex-shrink-0">
-                  人份
-                </span>
-              </div>
-            </div>
-            {errors.servings && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.servings.message}
-              </p>
-            )}
-          </div>
-        </div>
+        <CookingInfo register={register} errors={errors} />
 
         {/* 下一步按鈕 */}
         <button
