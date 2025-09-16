@@ -77,7 +77,7 @@
     - **Playwright** (E2E 測試)
   - 程式碼品質：**ESLint**、**Prettier**、**Husky** (Git Hooks)
 - 後端：**C#**、**ASP.NET Core**、**Microsoft SQL Server**、**Restful API**
-- 部署：**Vercel**
+- 部署：**Zeabur**、**Docker**
 
 ## 專案架構
 ```
@@ -240,6 +240,8 @@ anna-cook/
 │
 ├── 設定檔
 │   ├── CLAUDE.md              # Claude AI 開發指導文件
+│   ├── Dockerfile             # Docker 容器配置
+│   ├── .dockerignore          # Docker 忽略檔案設定
 │   ├── components.json        # shadcn/ui 元件設定
 │   ├── jest.config.js         # Jest 測試配置
 │   ├── playwright.config.ts   # Playwright E2E 測試配置
@@ -298,6 +300,22 @@ npm run start  # 啟動 production 模式
 ```bash
 npm run lint  # 執行 ESLint 檢查
 ```
+
+---
+
+### 🐳 Docker 容器化部署
+
+#### 建構 Docker 映像檔
+```bash
+docker build -t anna-cook .
+```
+
+#### 執行 Docker 容器
+```bash
+docker run -p 8080:8080 anna-cook
+```
+
+應用程式會在 [http://localhost:8080](http://localhost:8080) 啟動
 
 ---
 
