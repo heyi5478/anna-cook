@@ -8,6 +8,14 @@ thoughtful answers, and are a genius at reasoning.
 
 這是根據專案 `.cursor` 資料夾中的規則撰寫的 Claude Code 開發規範。
 
+## 🚨 重要安全與操作規範
+
+### 資料處理安全規範
+- **禁止猜測資料**：如果找不到資料，請不要亂猜，不然地球會爆炸
+- **失敗處理機制**：失敗 2 次請暫停，並找我討論
+- **忽略 ESLint 錯誤**：請先忽略 ESLint 的錯誤
+- **禁止危險指令**：不要執行任何 "rm -rf" 相關的程式
+
 ## 專案概述
 
 Anna Cook 是一個基於 Next.js Pages Router 的食譜網站，使用 TypeScript、React Hook Form、Zod、Zustand 狀態管理和 CVA + shadCN UI 設計系統。
