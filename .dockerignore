@@ -10,6 +10,8 @@ out
 coverage
 .nyc_output
 test-results
+test-results.json
+tests
 
 # 開發檔案
 .env.local
