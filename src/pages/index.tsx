@@ -19,6 +19,7 @@ import {
 } from '@/services/server-api';
 import { SORT_TYPES } from '@/lib/constants';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { getImageUrl } from '@/lib/utils/media';
 import { PageSEO } from '@/components/seo/PageSEO';
 import {
   organizationStructuredData,
@@ -192,9 +193,10 @@ export default function HomePage({
     return {
       id: recipe.id.toString(),
       title: recipe.recipeName,
-      image: recipe.coverPhoto
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
-        : '/placeholder.svg?height=150&width=150',
+      image: getImageUrl(
+        recipe.coverPhoto,
+        '/placeholder.svg?height=150&width=150',
+      ),
       description: recipe.author,
       rating: recipe.rating,
     };
@@ -209,9 +211,10 @@ export default function HomePage({
     return {
       id: recipe.id.toString(),
       title: recipe.recipeName,
-      image: recipe.coverPhoto
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`
-        : '/placeholder.svg?height=80&width=80',
+      image: getImageUrl(
+        recipe.coverPhoto,
+        '/placeholder.svg?height=80&width=80',
+      ),
       category: '',
       time: recipe.cookingTime,
       cookingTime: recipe.cookingTime,

@@ -18,6 +18,7 @@ import { useUserDisplayId } from '@/hooks/useUserDisplayId';
 import { useRecipeDraftStore } from '@/stores/recipes/useRecipeDraftStore';
 import type { Ingredient, Seasoning } from '@/types/recipe';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { getImageUrl } from '@/lib/utils/media';
 import {
   draftPageVariants,
   draftSectionVariants,
@@ -34,9 +35,6 @@ import { IngredientList } from './IngredientList';
 import { TagSection } from './TagsSection';
 import { CookingInfo } from './CookingInfo';
 import { CookingStep } from './CookingSteps';
-
-// API 基礎 URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
 /**
  * 食譜草稿編輯器元件 - 用於建立和編輯食譜草稿
@@ -339,11 +337,7 @@ export default function RecipeDraft() {
             >
               {recipeImage ? (
                 <img
-                  src={
-                    recipeImage.startsWith('http')
-                      ? recipeImage
-                      : `${API_BASE_URL}${recipeImage}`
-                  }
+                  src={getImageUrl(recipeImage, '/placeholder.svg')}
                   alt="食譜封面"
                   className="object-cover w-full h-full rounded"
                 />
