@@ -31,6 +31,7 @@ import {
   fetchRecipeRatingComments,
 } from '@/services/recipes';
 import { RecipeRatingCommentResponse } from '@/types/api';
+import { getImageUrl } from '@/lib/utils/media';
 
 // 引入樣式
 import {
@@ -92,28 +93,6 @@ interface RecipePageProps {
     }[];
   };
 }
-
-/**
- * 處理圖片URL，如果不是絕對URL則加上API基礎URL
- */
-const getImageUrl = (coverPhoto: string | null | undefined): string => {
-  if (!coverPhoto) {
-    return '/placeholder.svg?height=500&width=500';
-  }
-
-  // 檢查是否已經是絕對URL (以 http:// 或 https:// 開頭)
-  if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
-    return coverPhoto;
-  }
-
-  // 檢查是否已經是完整的相對路徑 (以 / 開頭)
-  if (coverPhoto.startsWith('/')) {
-    return `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${coverPhoto}`;
-  }
-
-  // 其他情況，確保路徑前有 /
-  return `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}/${coverPhoto}`;
-};
 
 /**
  * 食譜詳情頁面元件，顯示食譜的完整資訊、社交互動和評論
@@ -321,7 +300,10 @@ export default function RecipePageComponent({ recipeData }: RecipePageProps) {
         {/* 食譜主圖 */}
         <div className={mainImageStyles}>
           <Image
-            src={getImageUrl(recipe.coverPhoto)}
+            src={getImageUrl(
+              recipe.coverPhoto,
+              '/placeholder.svg?height=500&width=500',
+            )}
             alt={recipe.recipeName}
             fill
             className="object-cover"
