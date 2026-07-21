@@ -48,7 +48,6 @@ export default async function handler(
     return res.status(500).json({
       StatusCode: 500,
       msg: '處理 Google 回調時發生錯誤',
-      error: error instanceof Error ? error.message : String(error),
     });
   }
 }

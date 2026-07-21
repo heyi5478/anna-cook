@@ -6,7 +6,6 @@ import {
   CheckAuthResponse,
 } from '@/types/api';
 import { HTTP_STATUS } from '@/lib/constants';
-import { updateAuthToken } from '../utils/http';
 
 /**
  * 獲取 Google 登入 URL
@@ -182,19 +181,10 @@ export const loginWithEmail = async (
       throw new Error(`回應不是有效的 JSON: ${responseText}`);
     }
 
-    // 如果登入成功，將 token 存儲到 localStorage
+    // 登入成功後僅存放非敏感的用戶資料；token 一律由伺服器端 HttpOnly cookie 保存
     if (responseData.StatusCode === HTTP_STATUS.OK && responseData.token) {
-      // 檢查是否在瀏覽器環境
-      if (typeof window !== 'undefined') {
-        updateAuthToken(responseData.token);
-
-        // 如果有用戶資料，也存儲到 localStorage
-        if (responseData.userData) {
-          localStorage.setItem(
-            'userData',
-            JSON.stringify(responseData.userData),
-          );
-        }
+      if (typeof window !== 'undefined' && responseData.userData) {
+        localStorage.setItem('userData', JSON.stringify(responseData.userData));
       }
     }
 

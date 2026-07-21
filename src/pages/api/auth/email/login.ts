@@ -54,7 +54,6 @@ export default async function handler(
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       StatusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       msg: '處理登入請求時發生錯誤',
-      error: error instanceof Error ? error.message : String(error),
     });
   }
 }

@@ -71,7 +71,6 @@ export default async function handler(
     console.error('處理食譜影片上傳請求失敗:', error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       error: '處理請求時發生錯誤',
-      message: error instanceof Error ? error.message : String(error),
     });
   }
 }

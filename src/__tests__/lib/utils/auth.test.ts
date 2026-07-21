@@ -1,4 +1,4 @@
-import { setClientCookie, setServerCookie } from '@/lib/utils/auth';
+import { setServerCookie } from '@/lib/utils/auth';
 
 // Mock 依賴
 jest.mock('@/config', () => ({
@@ -13,23 +13,16 @@ jest.mock('@/lib/constants', () => ({
   },
 }));
 
-// Mock document 物件
-const mockDocument = {
-  cookie: '',
-};
-
-// Mock console.log 以避免測試輸出干擾
+// Mock console.log 以避免測試輸出干擾，並用於驗證不洩漏 token
 const mockConsoleLog = jest.fn();
 console.log = mockConsoleLog;
 
 describe('Auth Utils', () => {
-  const originalDocument = global.document;
   const originalProcessEnv = process.env;
   let mockProcessEnv: Record<string, string>;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockDocument.cookie = '';
     mockConsoleLog.mockClear();
 
     // Mock 整個 process.env 物件
@@ -46,10 +39,6 @@ describe('Auth Utils', () => {
   });
 
   afterEach(() => {
-    // 重置環境
-    if (originalDocument) {
-      global.document = originalDocument;
-    }
     // 還原原始的 process.env
     Object.defineProperty(process, 'env', {
       value: originalProcessEnv,
@@ -58,85 +47,9 @@ describe('Auth Utils', () => {
     });
   });
 
-  describe('setClientCookie 行為', () => {
-    test('應該生成正確格式的 Cookie 字串', () => {
-      global.document = mockDocument as any;
-
-      const result = setClientCookie('test-token', {}, 'auth-token');
-
-      expect(result).toContain('auth-token=test-token');
-      expect(result).toContain('Path=/');
-      expect(result).toContain('SameSite=Lax');
-      expect(result).toContain('Max-Age=86400');
-    });
-
-    test('應該使用預設的 cookie 名稱', () => {
-      global.document = mockDocument as any;
-
-      const result = setClientCookie('test-token');
-
-      expect(result).toContain('auth-token=test-token');
-    });
-
-    test.skip('應該在 SSR 環境返回空字串', () => {
-      // 跳過此測試，因為在 Jest 環境中很難正確模擬 SSR 環境
-    });
-
-    test('應該在 production 環境設置 Secure 選項', () => {
-      global.document = mockDocument as any;
-      mockProcessEnv.NODE_ENV = 'production';
-
-      const result = setClientCookie('test-token');
-
-      expect(result).toContain('Secure');
-    });
-
-    test('應該在 development 環境不設置 Secure 選項', () => {
-      global.document = mockDocument as any;
-      mockProcessEnv.NODE_ENV = 'development';
-
-      const result = setClientCookie('test-token');
-
-      expect(result).not.toContain('Secure');
-    });
-
-    test('應該接受自定義選項', () => {
-      global.document = mockDocument as any;
-      const customOptions = {
-        maxAge: 3600, // 1小時
-        sameSite: 'strict' as const,
-      };
-
-      const result = setClientCookie('test-token', customOptions);
-
-      expect(result).toContain('Max-Age=3600');
-      expect(result).toContain('SameSite=Strict');
-    });
-
-    test('應該設置 HttpOnly 為 false', () => {
-      global.document = mockDocument as any;
-
-      const result = setClientCookie('test-token');
-
-      expect(result).not.toContain('HttpOnly');
-    });
-
-    test('應該記錄 console 訊息', () => {
-      global.document = mockDocument as any;
-
-      setClientCookie('test-token');
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '已設置可讀取的 cookie (非 HttpOnly)，用於客戶端直接上傳',
-      );
-    });
-  });
-
   describe('setServerCookie 行為', () => {
     test('應該正確設置回應標頭', () => {
-      const mockRes = {
-        setHeader: jest.fn(),
-      };
+      const mockRes = { setHeader: jest.fn() };
 
       setServerCookie(mockRes, 'server-token');
 
@@ -209,48 +122,38 @@ describe('Auth Utils', () => {
       expect(cookieHeader).toContain('custom-cookie=test-token');
     });
 
-    test('應該記錄 console 訊息', () => {
+    test('應該正確編碼特殊字符', () => {
       const mockRes = { setHeader: jest.fn() };
 
-      setServerCookie(mockRes, 'test-token');
+      setServerCookie(mockRes, 'token with spaces & symbols');
 
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '已設定非 HttpOnly cookie 允許 JavaScript 讀取:',
-        expect.stringContaining('auth-token=test-token'),
-      );
-    });
-  });
-
-  describe('錯誤處理', () => {
-    test.skip('setClientCookie 應該處理 document 不存在的情況', () => {
-      // 跳過此測試，因為在 Jest 環境中很難正確模擬 document 不存在的情況
-    });
-
-    test('setServerCookie 應該處理 res 物件為 null 的情況', () => {
-      expect(() => {
-        setServerCookie(null as any, 'test-token');
-      }).toThrow('Cannot read properties of null');
-    });
-  });
-
-  describe('cookie 序列化行為', () => {
-    test('應該正確編碼特殊字符', () => {
-      global.document = mockDocument as any;
-      const specialValue = 'token with spaces & symbols';
-
-      const result = setClientCookie(specialValue);
-
-      expect(result).toContain(
+      const cookieHeader = mockRes.setHeader.mock.calls[0][1];
+      expect(cookieHeader).toContain(
         'auth-token=token%20with%20spaces%20%26%20symbols',
       );
     });
 
-    test('應該正確處理空值', () => {
-      global.document = mockDocument as any;
+    test('不應將 token 內容寫入 console 日誌', () => {
+      const mockRes = { setHeader: jest.fn() };
 
-      const result = setClientCookie('');
+      setServerCookie(mockRes, 'super-secret-token');
 
-      expect(result).toContain('auth-token=');
+      // 不得把含 token 的 cookie 字串寫入日誌
+      const loggedToken = mockConsoleLog.mock.calls.some((args) =>
+        args.some(
+          (arg: unknown) =>
+            typeof arg === 'string' && arg.includes('super-secret-token'),
+        ),
+      );
+      expect(loggedToken).toBe(false);
+    });
+  });
+
+  describe('錯誤處理', () => {
+    test('setServerCookie 應該處理 res 物件為 null 的情況', () => {
+      expect(() => {
+        setServerCookie(null as any, 'test-token');
+      }).toThrow('Cannot read properties of null');
     });
   });
 });

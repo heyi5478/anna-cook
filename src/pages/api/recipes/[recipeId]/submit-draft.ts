@@ -80,7 +80,6 @@ export default async function handler(
     console.error('處理提交食譜草稿請求失敗:', error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       error: '處理請求時發生錯誤',
-      message: error instanceof Error ? error.message : String(error),
     });
   }
 }

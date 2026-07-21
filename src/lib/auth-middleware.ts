@@ -183,11 +183,10 @@ export const proxyAuthRequest = async (
         error: e,
       });
 
-      // 如果無法解析為 JSON，返回原始錯誤
+      // 如果無法解析為 JSON，返回一般化錯誤（詳細內容已記於伺服器端日誌）
       return res.status(500).json({
         Status: false,
         Message: '從後端 API 接收到無效的回應格式',
-        error: `無法解析回應為 JSON: ${responseText.substring(0, 100)}${responseText.length > 100 ? '...' : ''}`,
       });
     }
 
@@ -204,7 +203,6 @@ export const proxyAuthRequest = async (
     return res.status(500).json({
       Status: false,
       Message: '代理認證請求時發生錯誤',
-      error: error instanceof Error ? error.message : String(error),
     });
   }
 };
