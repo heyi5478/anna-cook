@@ -1,0 +1,91 @@
+name: Deploy to AWS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, feat/ci-cd-deploy] # TODO: 驗證通過後移除 feat/ci-cd-deploy
+
+# id-token: write 是 OIDC 換取短期 AWS 憑證的必要權限
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY: anna-cook
+  EC2_INSTANCE_ID: i-01f986ac406b699b4
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 用 OIDC 向 AWS 換取短期憑證，過程不涉及任何長期存放的 access key
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest" \
+            .
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+      # 透過 SSM 通知 EC2：拉新 image、換掉舊容器，全程不需對外開 SSH
+      - name: Deploy to EC2 via SSM
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cat > /tmp/deploy-params.json << EOF
+          {
+            "commands": [
+              "aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY}",
+              "sudo docker pull ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}",
+              "sudo docker rm -f anna-cook || true",
+              "sudo docker run -d --name anna-cook --restart unless-stopped -p 127.0.0.1:3000:3000 ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}",
+              "sudo docker image prune -f"
+            ]
+          }
+          EOF
+
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$EC2_INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy anna-cook ${IMAGE_TAG}" \
+            --parameters file:///tmp/deploy-params.json \
+            --query "Command.CommandId" --output text)
+          echo "SSM Command ID: $CMD_ID"
+
+          aws ssm wait command-executed --command-id "$CMD_ID" --instance-id "$EC2_INSTANCE_ID" || true
+
+          STATUS=$(aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$EC2_INSTANCE_ID" --query "Status" --output text)
+          echo "Deploy status: $STATUS"
+          echo "--- stdout ---"
+          aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$EC2_INSTANCE_ID" --query "StandardOutputContent" --output text
+          echo "--- stderr ---"
+          aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$EC2_INSTANCE_ID" --query "StandardErrorContent" --output text
+
+          if [ "$STATUS" != "Success" ]; then
+            echo "Deploy 失敗"
+            exit 1
+          fi
+
+      - name: Smoke test
+        run: |
+          sleep 5
+          curl -fsS -o /dev/null -w "https://anna-cook.com -> %{http_code}\n" https://anna-cook.com/
