@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feat/ci-cd-deploy] # TODO: 驗證通過後移除 feat/ci-cd-deploy
 
 # id-token: write 是 OIDC 換取短期 AWS 憑證的必要權限
 permissions:
