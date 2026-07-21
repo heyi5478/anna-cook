@@ -27,7 +27,6 @@ export default async function handler(
     console.error('處理獲取食譜草稿請求失敗:', error);
     return res.status(500).json({
       error: '處理請求時發生錯誤',
-      message: error instanceof Error ? error.message : String(error),
     });
   }
 }

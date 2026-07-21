@@ -20,10 +20,6 @@ jest.mock('@/config', () => ({
   }),
 }));
 
-jest.mock('@/services/utils/http', () => ({
-  updateAuthToken: jest.fn(),
-}));
-
 // Mock localStorage
 const mockLocalStorage = {
   getItem: jest.fn(),

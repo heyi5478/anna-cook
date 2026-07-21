@@ -33,7 +33,6 @@ export default async function handler(
     console.error('處理食譜第二步更新請求失敗:', error);
     return res.status(500).json({
       error: '處理請求時發生錯誤',
-      message: error instanceof Error ? error.message : String(error),
     });
   }
 }
