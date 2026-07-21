@@ -9,6 +9,7 @@ import { HTTP_STATUS, REVALIDATE_INTERVALS } from '@/lib/constants';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { RecipeSEO } from '@/components/seo/RecipeSEO';
 import { truncateDescription } from '@/lib/utils/seo';
+import { getImageUrl } from '@/lib/utils/media';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -51,9 +52,7 @@ const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   // 構建食譜圖片陣列
   const recipeImages: string[] = [];
   if (recipe.coverPhoto) {
-    recipeImages.push(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${recipe.coverPhoto}`,
-    );
+    recipeImages.push(getImageUrl(recipe.coverPhoto, '/images/og-default.jpg'));
   }
 
   // 由於 API 回傳的資料結構中沒有 recipeSteps，這裡暫時註解掉

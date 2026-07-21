@@ -11,18 +11,14 @@ import {
   deleteMultipleRecipes,
 } from '@/services/recipes';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { getImageUrl } from '@/lib/utils/media';
 import type { FavoriteTabType } from '@/components/pages/UserCenter/types';
-
-// 獲取 API 基礎 URL
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
 /**
  * 將相對路徑轉換為完整的圖片 URL
  */
 const getFullImageUrl = (path: string) => {
-  if (!path) return '/placeholder.svg';
-  if (path.startsWith('http')) return path; // 已經是完整URL
-  return `${apiBaseUrl}${path}`;
+  return getImageUrl(path, '/placeholder.svg');
 };
 
 /**
