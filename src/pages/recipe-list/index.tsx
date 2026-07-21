@@ -11,6 +11,7 @@ import { searchRecipesServer } from '@/services/server-api';
 import { GetStaticProps } from 'next';
 import { SORT_TYPES, PAGINATION_DEFAULTS } from '@/lib/constants';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
+import { getImageUrl } from '@/lib/utils/media';
 import { PageSEO } from '@/components/seo/PageSEO';
 
 // 定義頁面 props 介面
@@ -63,9 +64,10 @@ export default function RecipeListPage({
           const newRecipes = data.data.map((item: any) => ({
             id: String(item.id),
             title: item.recipeName,
-            image: item.coverPhoto
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
-              : '/images/recipe-placeholder.jpg',
+            image: getImageUrl(
+              item.coverPhoto,
+              '/images/recipe-placeholder.jpg',
+            ),
             category: '',
             time: item.cookingTime,
             cookingTime: item.cookingTime,
@@ -419,9 +421,7 @@ export const getStaticProps: GetStaticProps = async () => {
     const recipes: RecipeCardType[] = searchResults.data.map((item) => ({
       id: String(item.id),
       title: item.recipeName,
-      image: item.coverPhoto
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL_DEV}${item.coverPhoto}`
-        : '/images/recipe-placeholder.jpg',
+      image: getImageUrl(item.coverPhoto, '/images/recipe-placeholder.jpg'),
       category: '', // 填入空字串，因為這個欄位是必須的
       time: item.cookingTime,
       cookingTime: item.cookingTime,

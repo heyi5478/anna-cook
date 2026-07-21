@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { RecipeCard } from '@/components/features/RecipeCard';
 import { fetchUserRecipes } from '@/services/users';
 import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
+import { getImageUrl } from '@/lib/utils/media';
 import { cn } from '@/lib/utils/ui';
 import {
   recipesSectionVariants,
@@ -11,8 +12,6 @@ import {
   loadMoreButtonVariants,
   loadingStateVariants,
 } from '@/styles/cva/author-profile';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
 
 interface AuthorRecipesProps {
   displayId: string;
@@ -83,9 +82,7 @@ export const AuthorRecipes = ({
   const formatRecipeForCard = (apiRecipe: any) => ({
     id: apiRecipe.recipeId.toString(),
     title: apiRecipe.title,
-    image: apiRecipe.coverPhoto
-      ? `${apiBaseUrl}${apiRecipe.coverPhoto}`
-      : '/images/recipe-placeholder.jpg',
+    image: getImageUrl(apiRecipe.coverPhoto, '/images/recipe-placeholder.jpg'),
     description: apiRecipe.description,
     time: apiRecipe.cookTime,
     cookingTime: apiRecipe.cookTime,
