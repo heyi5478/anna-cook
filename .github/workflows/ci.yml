@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+# PR 合併前先驗證：build（含 ESLint/typecheck）+ 測試，避免問題拖到 prod 部署才爆。
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: '0' # CI 不需要安裝 git hooks，避免 prepare 腳本呼叫 husky 失敗
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (含 ESLint + typecheck)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://annacook.rocket-coding.com/api
+
+      - name: Test
+        run: npm test
