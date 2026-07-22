@@ -1,6 +1,3 @@
-// 匯出 utils 工具
-export * from './utils/http';
-
 // 匯出認證服務模組
 export * from './auth';
 
