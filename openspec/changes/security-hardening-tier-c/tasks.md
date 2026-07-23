@@ -6,7 +6,7 @@
 
 ## 2. CSP（content-security-policy）
 
-- [ ] 2.1 以 `Content-Security-Policy-Report-Only` 部署，收集違規報告
+- [x] 2.1 以 `Content-Security-Policy-Report-Only` 部署，收集違規報告（隨 add-pwa-support 導入：`next.config` 標頭 + `/api/csp-report` 收集端點）
 - [ ] 2.2 放行 Vimeo / GTM / 後端圖片、`worker-src 'self'`/`manifest-src 'self'`（PWA，見 add-pwa-support）、處理 inline script（nonce 或 hash）
 - [ ] 2.3 穩定後改為強制 `Content-Security-Policy`
 
