@@ -22,7 +22,12 @@ export default async function handler(
 
   try {
     // 使用通用代理函數處理請求
-    return proxyAuthRequest(req, res, `/users/${userId}/follow`, req.method);
+    return proxyAuthRequest(
+      req,
+      res,
+      `/users/${encodeURIComponent(userId)}/follow`,
+      req.method,
+    );
   } catch (error) {
     const action = req.method === 'POST' ? '追蹤' : '取消追蹤';
     console.error(`處理${action}用戶請求失敗:`, error);

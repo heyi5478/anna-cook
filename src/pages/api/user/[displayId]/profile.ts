@@ -25,7 +25,12 @@ export default async function handler(
 
   try {
     // 使用通用代理函數處理請求
-    return proxyAuthRequest(req, res, `/user/${displayId}`, 'GET');
+    return proxyAuthRequest(
+      req,
+      res,
+      `/user/${encodeURIComponent(displayId)}`,
+      'GET',
+    );
   } catch (error) {
     console.error('處理獲取用戶個人資料請求失敗:', error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({

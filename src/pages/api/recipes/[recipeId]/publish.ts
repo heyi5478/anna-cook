@@ -25,7 +25,7 @@ export default async function handler(
     return proxyAuthRequest(
       req,
       res,
-      `/recipes/${recipeId}/publish`,
+      `/recipes/${encodeURIComponent(recipeId)}/publish`,
       'PATCH',
       req.body,
     );
