@@ -10,6 +10,7 @@ import { COMMON_TEXTS, ERROR_MESSAGES } from '@/lib/constants/messages';
 import { RecipeSEO } from '@/components/seo/RecipeSEO';
 import { truncateDescription } from '@/lib/utils/seo';
 import { getImageUrl } from '@/lib/utils/media';
+import { useWakeLock } from '@/hooks/useWakeLock';
 
 interface RecipePageProps {
   recipeData: RecipeDetailResponse;
@@ -17,6 +18,13 @@ interface RecipePageProps {
 
 const RecipePage: NextPage<RecipePageProps> = ({ recipeData }) => {
   const router = useRouter();
+
+  // 煮菜頁：顯示食譜時請求 Wake Lock，避免螢幕自動熄滅
+  useWakeLock(
+    !router.isFallback &&
+      recipeData?.StatusCode === HTTP_STATUS.OK &&
+      !!recipeData?.data,
+  );
 
   // 如果頁面正在建立，顯示載入中狀態
   if (router.isFallback) {

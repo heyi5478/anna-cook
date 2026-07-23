@@ -22,7 +22,12 @@ export default async function handler(
 
   try {
     // 使用通用代理函數處理請求
-    return proxyAuthRequest(req, res, `/recipes/${recipeId}/teaching`, 'GET');
+    return proxyAuthRequest(
+      req,
+      res,
+      `/recipes/${encodeURIComponent(recipeId)}/teaching`,
+      'GET',
+    );
   } catch (error) {
     console.error('處理獲取食譜教學資訊請求失敗:', error);
     return res.status(500).json({

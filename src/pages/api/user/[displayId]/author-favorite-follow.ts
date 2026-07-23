@@ -25,15 +25,15 @@ export default async function handler(
 
   try {
     // 構建 API 路徑
-    let apiPath = `/user/${displayId}/author-favorite-follow`;
+    let apiPath = `/user/${encodeURIComponent(displayId)}/author-favorite-follow`;
     const queryParams = [];
 
     if (table) {
-      queryParams.push(`table=${table}`);
+      queryParams.push(`table=${encodeURIComponent(String(table))}`);
     }
 
     if (page) {
-      queryParams.push(`page=${page}`);
+      queryParams.push(`page=${encodeURIComponent(String(page))}`);
     }
 
     if (queryParams.length > 0) {

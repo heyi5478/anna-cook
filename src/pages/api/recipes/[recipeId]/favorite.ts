@@ -25,7 +25,7 @@ export default async function handler(
     return proxyAuthRequest(
       req,
       res,
-      `/recipes/${recipeId}/favorite`,
+      `/recipes/${encodeURIComponent(recipeId)}/favorite`,
       req.method,
     );
   } catch (error) {

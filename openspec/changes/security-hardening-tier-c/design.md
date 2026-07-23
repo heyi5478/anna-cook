@@ -16,7 +16,7 @@ Tier C 特性是「會動到運作中行為、需搭配後端」。前端 `parse
 ## Decisions
 
 1. **JWT**：前端無簽章密鑰、不自行驗簽；改為授權決策一律以後端驗簽結果為準，移除 `check-current-user` 的未驗證判斷。後端（`anna-cook-backend`）以密鑰/公鑰驗簽。
-2. **CSP**：先 `Content-Security-Policy-Report-Only` 收集報告，放行 `player.vimeo.com`、`*.googletagmanager.com`、後端圖片網域、必要 inline（nonce 或 hash）；穩定後改為強制 `Content-Security-Policy`。
+2. **CSP**：先 `Content-Security-Policy-Report-Only` 收集報告，放行 `player.vimeo.com`、`*.googletagmanager.com`、後端圖片網域、`worker-src 'self'`、`manifest-src 'self'`（供 `add-pwa-support` 的 PWA）、必要 inline（nonce 或 hash）；穩定後改為強制 `Content-Security-Policy`。
 3. **OAuth state**：由後端在授權 URL 產生 `state`、callback 驗證，前端配合帶回。
 
 ## Risks / Trade-offs
@@ -27,7 +27,7 @@ Tier C 特性是「會動到運作中行為、需搭配後端」。前端 `parse
 
 ## Migration Plan
 
-CSP 分兩階段（report-only → enforce）；JWT / OAuth 與後端協調上線；回滾＝移除 CSP 標頭 / revert。
+CSP 分兩階段（report-only → enforce）；**enforce 前 `add-pwa-support` 的 SW/manifest 需先就位**（否則會擋掉 PWA 安裝/啟動）；JWT / OAuth 與後端協調上線；回滾＝移除 CSP 標頭 / revert。
 
 ## Open Questions
 
