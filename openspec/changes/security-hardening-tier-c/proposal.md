@@ -5,7 +5,7 @@
 ## What Changes
 
 - **JWT 驗簽 / 移除未驗證信任**：`src/lib/auth-middleware.ts` 的 `parseJWT` 與 `check-current-user` 只解碼 payload、未驗簽，可偽造 claims。授權判斷改以（會驗簽的）後端結果為準；後端務必驗簽。
-- **CSP**：Tier A 已加其他安全標頭但刻意未含 CSP。以 `Content-Security-Policy-Report-Only` 先行，逐步放行 Vimeo / GTM / 後端圖片後改為強制。
+- **CSP**：Tier A 已加其他安全標頭但刻意未含 CSP。以 `Content-Security-Policy-Report-Only` 先行，逐步放行 Vimeo / GTM / 後端圖片後改為強制。另需放行 `worker-src 'self'` / `manifest-src 'self'` 供 `add-pwa-support` 的 PWA；enforce 前 SW/manifest 需先就位。
 - **OAuth `state`**：Google 登入流程加入 `state` 產生與驗證，防登入 CSRF。
 
 ## Capabilities
