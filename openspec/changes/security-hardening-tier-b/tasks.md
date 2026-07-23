@@ -10,9 +10,13 @@
 
 - [x] 2.1 連網執行 `npm audit`，記錄 high/critical 清單
 - [x] 2.2 升級 Next.js 到最新 15.x，跑 `npm run build` + jest
-- [ ] 2.3 處理其餘 high/critical 漏洞
+- [x] 2.3 處理其餘 high/critical 漏洞（production 面向者已清；dev-only 殘留另案追蹤）
 
-> 註：Next `15.2.3 → 15.5.21`；`npm audit fix`（非破壞性）將漏洞 38 → 15，清掉 storybook/vite/webpack/ws/yaml 整串 devDependency。剩餘 15 項幾乎都是 **Next 內建的 `sharp` / `postcss`**；`npm audit fix --force` 會把 Next 降到 **9.3.3**（重大破壞），故**不執行**。2.3 待 Next 上游更新內建 sharp/postcss，或評估以 `package.json` `overrides` 強制修補版（有相容風險，需另測）。
+> 註：Next `15.2.3 → 15.5.21`；`npm audit fix`（非破壞性）將漏洞 38 → 15。
+>
+> **sharp / postcss**：改以 `package.json` `overrides` 強推修補版（`sharp@0.35.3`、`postcss@8.5.22`；postcss 為直接 devDep，用 `$postcss` 參照語法避開 EOVERRIDE）。`--force` 會把 Next 降到 9.3.3（重大破壞）故不採用。已驗證 `npm run build` + jest（567）通過，並以 `next start` 實測 `/_next/image` 對本地圖片最佳化為 webp 正常（HTTP 200），確認 Next 15.5 與 `sharp@0.35.3` 相容。
+>
+> **殘留（另案追蹤，不在本次範圍）**：`npm audit` 尚有 6 high + 6 low；其 high 為 `@typescript-eslint` v6（ESLint 工具鏈、devDependency，不進 production bundle、runtime 零暴露），修補需升到 v8（牽動 ESLint / airbnb config）。
 
 ## 3. 路徑參數安全（api-path-parameter-safety）
 
