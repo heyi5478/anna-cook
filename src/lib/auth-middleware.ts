@@ -5,36 +5,6 @@ import {
 import { authConfig, getApiConfig } from '@/config';
 import { setServerCookie } from '@/lib/utils/auth';
 
-// 擴展 NextApiRequest 類型，添加 user 屬性
-declare module 'next' {
-  interface NextApiRequest {
-    user?: {
-      DisplayId: string;
-      Id: number;
-    };
-  }
-}
-
-/**
- * 解析 JWT Token 取得使用者資訊
- */
-export const parseJWT = (token: string): { DisplayId: string; Id: number } => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error('解析 JWT 失敗:', e);
-    return { DisplayId: '', Id: 0 };
-  }
-};
-
 /**
  * 從伺服器請求中獲取 JWT Token
  * 此函數可處理 NextApiRequest 並從其 cookies 屬性中提取 token
@@ -44,47 +14,6 @@ export const getServerToken = (req: OriginalNextApiRequest): string | null => {
   const { cookies } = req;
   const token = cookies[authConfig.tokenCookieName];
   return token || null;
-};
-
-/**
- * 認證中間件
- * 檢查請求中是否有有效的認證 Token
- * 如果有，將其附加到 req 物件上，便於後續處理
- */
-export const withAuth = (
-  handler: (req: OriginalNextApiRequest, res: NextApiResponse) => Promise<void>,
-) => {
-  return async (req: OriginalNextApiRequest, res: NextApiResponse) => {
-    // 從 Cookie 獲取 token
-    const token = getServerToken(req);
-
-    // 如果沒有 token，返回未授權錯誤
-    if (!token) {
-      return res.status(401).json({
-        Status: false,
-        Message: '未登入或 Token 不存在',
-      });
-    }
-
-    try {
-      // 檢查 token 是否有效
-      // 如果需要驗證 token 有效性，可以在這裡向後端 API 發送請求
-      // 為簡化流程，這裡僅解析 token 中的資訊
-      const userData = parseJWT(token);
-
-      // 將用戶數據附加到請求對象，方便後續處理
-      req.user = userData;
-
-      // 繼續處理請求
-      return handler(req, res);
-    } catch (error) {
-      console.error('Token 驗證失敗:', error);
-      return res.status(401).json({
-        Status: false,
-        Message: '身份驗證失敗',
-      });
-    }
-  };
 };
 
 /**
