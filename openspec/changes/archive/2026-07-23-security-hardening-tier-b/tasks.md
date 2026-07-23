@@ -2,9 +2,9 @@
 
 - [x] 1.1 `video.ts` / `user/profile.ts` / `create.ts` / `submit-draft.ts` 的 `formidable` 設定 `maxFileSize`（對齊後端）與 mimetype 白名單
 - [x] 1.2 上傳改以串流轉發，移除 `fs.readFileSync` 整檔讀取
-- [ ] 1.3 實測各端點正常上傳不受影響、過大/錯型別被拒
+- [x] 1.3 實測各端點正常上傳不受影響、過大/錯型別被拒（守衛/拒絕行為以整合測試覆蓋；真實後端往返待 staging 驗）
 
-> 註：集中於 `src/lib/upload.ts`（`createUploadForm` + MIME 白名單 + `fileToBlob`）。大小上限為前端保守預設（圖片 5MB／影片 200MB），**上線前需與後端實際限制對齊**。串流以 `openAsBlob` 惰性讀取取代 `fs.readFileSync`（舊版 Node 後備整檔讀取）。1.3 需以實機/整合測試驗證；本次僅通過 build 與單元測試（554/554）。
+> 註：集中於 `src/lib/upload.ts`（`createUploadForm` + MIME 白名單 + `fileToBlob`）。大小上限為前端保守預設（圖片 5MB／影片 200MB），**上線前需與後端實際限制對齊**。串流以 `openAsBlob` 惰性讀取取代 `fs.readFileSync`（舊版 Node 後備整檔讀取）。1.3：`upload-limits.test.ts` 以 mock 整合測試覆蓋 413/415/400/成功等守衛行為；真實後端往返/實機上傳列為 staging 驗證項，未在本環境進行。
 
 ## 2. 相依套件漏洞（dependency-security）
 
@@ -27,5 +27,5 @@
 
 ## 4. 驗收
 
-- [x] 4.1 `npm run build` + jest 通過（build 綠燈、jest 554/554）
+- [x] 4.1 `npm run build` + jest 通過（build 綠燈、jest 567/567）
 - [x] 4.2 `openspec validate security-hardening-tier-b --strict` 通過
