@@ -5,8 +5,8 @@ import fs from 'node:fs';
  * 上傳檔案大小上限（bytes）。
  * 注意：此為前端保守預設值，實際上線前應與後端限制對齊。
  */
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
-export const MAX_VIDEO_BYTES = 200 * 1024 * 1024; // 200 MB
+export const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB（涵蓋高解析手機照片）
+export const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500 MB
 
 /**
  * 允許的圖片 MIME 類型白名單
