@@ -10,3 +10,10 @@
 #### Scenario: 強制階段
 - **WHEN** CSP 改為強制模式
 - **THEN** 未列入白名單的 inline/外部來源被封鎖，Vimeo 播放器與 GTM 仍正常運作
+
+### Requirement: CSP 不得破壞 PWA 的 Service Worker 與 manifest
+CSP 的來源白名單 SHALL 包含 `worker-src 'self'` 與 `manifest-src 'self'`，使 `add-pwa-support` 引入的 Service Worker 可註冊、Web App Manifest 可載入。CSP 轉為強制前，PWA 的 SW/manifest MUST 已就位，以避免破壞安裝與啟動。
+
+#### Scenario: PWA 資產在 CSP 下正常
+- **WHEN** CSP（report-only 或強制）部署，且站台已註冊 Service Worker、連結 manifest
+- **THEN** Service Worker 註冊成功、manifest 正常載入，皆未被 CSP 封鎖

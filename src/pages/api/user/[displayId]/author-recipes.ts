@@ -25,8 +25,10 @@ export default async function handler(
 
   try {
     // 構建 API 路徑
-    const apiPath = `/user/${displayId}/author-recipes${
-      isPublished !== undefined ? `?isPublished=${isPublished}` : ''
+    const apiPath = `/user/${encodeURIComponent(displayId)}/author-recipes${
+      isPublished !== undefined
+        ? `?isPublished=${encodeURIComponent(String(isPublished))}`
+        : ''
     }`;
 
     // 使用通用代理函數處理請求
