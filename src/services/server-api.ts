@@ -444,7 +444,9 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
       `伺服器端發送請求: GET ${getApiConfig().baseUrl}/home/features`,
     );
 
-    const response = await fetch(`${getApiConfig().baseUrl}/home/features`);
+    const response = await fetch(`${getApiConfig().baseUrl}/home/features`, {
+      next: { revalidate: 3600 },
+    });
 
     console.log('伺服器端回應狀態:', response.status);
 
@@ -503,7 +505,7 @@ export const fetchHomeRecipes = async (
     const apiUrl = `${getApiConfig().baseUrl}/home/recipes?type=${type}&number=${number}`;
     console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, { next: { revalidate: 3600 } });
 
     console.log('伺服器端回應狀態:', response.status);
 
