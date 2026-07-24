@@ -15,7 +15,7 @@
 ## 3. Client 互動頁（`next/router` → `next/navigation`）
 
 - [x] 3.1 `recipe-video` → `app/(bare)/recipe-video/`（PoC：query + Suspense + bare group）
-- [ ] 3.2 `login` / `login-email` / `login-verify` / `signin-email`（auth，`(bare)` group；`login` 另含 `next/head`）
+- [x] 3.2 `login` / `login-email` / `login-verify` / `signin-email`（auth，`(bare)` group；`login` 另含 `next/head`；client 元件 + server shell metadata，router.push → next/navigation）
 - [ ] 3.3 `recipe-list`（`router.query` 搜尋/篩選 → `useSearchParams`）
 - [ ] 3.4 `recipe-draft` / `recipe-draft-video` / `upload-recipe-step1` / `upload-recipe-step2` / `upload-video` / `user-center-edit`
 
