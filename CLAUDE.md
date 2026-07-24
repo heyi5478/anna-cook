@@ -18,14 +18,15 @@ thoughtful answers, and are a genius at reasoning.
 
 ## 專案概述
 
-Anna Cook 是一個基於 Next.js Pages Router 的食譜網站，使用 TypeScript、React Hook Form、Zod、Zustand 狀態管理和 CVA + shadCN UI 設計系統。
+Anna Cook 是一個 Next.js 食譜網站，使用 TypeScript、React Hook Form、Zod、Zustand 狀態管理和 CVA + shadCN UI 設計系統。目前正**漸進式從 Pages Router 遷移至 App Router**（`app/` 與 `pages/` 並存）。
 
 ## 核心開發規則
 
-### 框架限制
-- **必須使用 Next.js Pages Router**：禁止使用 App Router 相關功能
-- **路由結構**：所有路由和頁面應遵循 Pages Router 的結構和模式
-- **API Routes**：使用 `pages/api/` 目錄結構建立 API 路由
+### 框架規範（Pages Router → App Router 遷移中）
+- **App Router 已解禁**：App Router 為採用方向，不再禁止；`app/` 與 `pages/` 目錄並存，同一路由僅存在於其中一邊（重疊時 App Router 優先）。
+- **新開發優先 App Router**：新頁面與路由優先建立於 `app/`（Server Components、Route Handlers、Metadata API、nested layouts）。
+- **既有 Pages Router 程式碼**：在該路由完成遷移前照原樣維護，避免無謂改動；遷移採逐頁、可回退方式進行。
+- **API 路由**：既有 `pages/api/` 維持運作；新 API 以 `app/` 的 Route Handler（`route.ts`）建立。
 
 ### TypeScript 規範
 - **純 TypeScript 開發**：所有代碼都使用 TypeScript，不使用純 JavaScript
@@ -118,8 +119,9 @@ src/
 │       ├── id.ts        # ID生成工具
 │       └── seo.ts       # SEO工具
 ├── stores/              # Zustand 狀態管理
-├── pages/               # Next.js Pages Router 頁面
-│   └── api/            # API 路由
+├── app/                 # App Router 頁面／Route Handlers（遷移目標，逐步增加）
+├── pages/               # Pages Router 頁面（遷移來源，逐步移出）
+│   └── api/            # 既有 API 路由
 ├── styles/              # CSS 樣式檔案
 └── types/               # TypeScript 類型定義
 ```
@@ -137,7 +139,7 @@ src/
 
 ## 開發工作流程
 
-1. **開發前**：確認專案使用 Pages Router 架構
+1. **開發前**：確認目標路由屬 App Router（`app/`）或 Pages Router（`pages/`），依對應模式開發；新功能優先 App Router
 2. **編寫代碼**：遵循 TypeScript 和註解規範
 3. **元件開發**：使用 CVA 結構和設計系統規範
 4. **狀態管理**：使用 Zustand 標準模式

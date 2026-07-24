@@ -23,7 +23,7 @@
 這些規則始終適用於整個專案：
 - **代碼註解規範** - 確保所有代碼都有適當註解
 - **TypeScript 使用規範** - TypeScript 開發標準
-- **Next.js Pages Router** - 框架架構限制
+- **Next.js Router 遷移** - Pages Router → App Router 遷移政策
 
 ### Auto Attached Rules (`globs: 模式`)
 這些規則根據檔案模式自動套用：

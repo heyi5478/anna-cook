@@ -1,6 +1,5 @@
-import type React from 'react';
 import Link from 'next/link';
-// import { Footer } from '@/components/layout/Footer';
+import type { Metadata } from 'next';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,10 +9,15 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-/**
- * 隱私權政策頁面元件
- */
-const PrivacyPolicyPage: React.FC = () => {
+// 隱私權政策頁面的 Metadata（取代 Pages Router 的 next/head）
+export const metadata: Metadata = {
+  title: '隱私權政策',
+  description:
+    '安那煮 Anna Cook 隱私權保護政策：說明個人資料的蒐集、處理、利用與保護方式。',
+};
+
+// 隱私權政策頁面
+export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 bg-gray-50">
@@ -145,6 +149,4 @@ const PrivacyPolicyPage: React.FC = () => {
       </main>
     </div>
   );
-};
-
-export default PrivacyPolicyPage;
+}
