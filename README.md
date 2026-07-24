@@ -3,7 +3,7 @@
 </div>
 <h1 align="center" style="font-weight: 700">安那煮 | 家傳好菜－Anna Cook</h1>
 <div align="center" >
-<a href="https://anna-cook.zeabur.app/" >專案網址</a >
+<a href="https://anna-cook.com/" >專案網址</a >
 <span>|</span>
 <a href="https://an-na-zhusorganization.gitbook.io/an-na-zhu-anna-cook" >專案文件</a >
 </div>
@@ -21,6 +21,7 @@
 - 搜尋頁：提供搜尋功能，方便用戶查找食譜。
 - 上傳食譜頁：提供用戶上傳食譜的功能，方便用戶分享自己的食譜。
 - 會員功能：提供用戶註冊、登入、忘記密碼、修改密碼、修改個人資料等功能。
+- PWA 體驗：可安裝到主畫面（standalone 啟動），煮菜頁螢幕不自動熄滅。
 
 ## 建議體驗流程
 ### 上傳者
@@ -75,16 +76,20 @@
   - 測試框架：
     - **Jest**、**@testing-library/react** (單元測試)
     - **Playwright** (E2E 測試)
+  - PWA：**Web App Manifest**、**Service Worker**、**Screen Wake Lock**（可安裝、煮菜頁防螢幕熄滅）
+  - 前端資安：**CSP（Report-Only）**、安全標頭、JWT 驗簽、相依安全掃描
   - 程式碼品質：**ESLint**、**Prettier**、**Husky** (Git Hooks)
+- 規格與流程：**OpenSpec**（spec-driven 變更管理）
 - 後端：**C#**、**ASP.NET Core**、**Microsoft SQL Server**、**Restful API**
-- 部署：**Zeabur**、**Docker**
+- 部署：**Docker**（容器 `PORT=3000`）、正式站 **anna-cook.com**
 
 ## 專案架構
 ```
 anna-cook/
 ├── public/                     # 靜態資源目錄
-│   ├── ad_home_02.png          # 首頁廣告圖片
-│   ├── ad_home_03.webp         # 首頁廣告圖片
+│   ├── manifest.webmanifest    # PWA App Manifest
+│   ├── sw.js                   # PWA Service Worker（於 _app.tsx 註冊）
+│   ├── icons/                  # PWA 圖示（icon-192 / icon-512 / maskable-512 / apple-touch）
 │   ├── big-logo.png            # 專案主要 Logo
 │   ├── google-icon.svg         # Google 登入圖示
 │   ├── login-logo.svg          # 登入頁面 Logo
@@ -98,34 +103,33 @@ anna-cook/
 ├── screenshots/                # E2E 測試截圖目錄
 │
 ├── tests/                      # E2E 測試目錄 (Playwright)
-│   ├── auth.setup.ts           # 認證設定
+│   ├── auth.setup.ts           # 認證設定（真實 /signin-email 登入 → 產生 storageState）
 │   ├── config/                 # 測試配置
 │   │   └── test-config.ts      # 測試環境配置
 │   ├── helpers/                # 測試助手函式
 │   │   ├── test-base.ts        # 基礎測試工具
 │   │   ├── common/             # 通用測試工具
 │   │   │   ├── assertion-helpers.ts
-│   │   │   ├── page-helpers.ts
-│   │   │   └── navigation-helpers.ts
+│   │   │   ├── test-data.ts
+│   │   │   └── wait-utils.ts
 │   │   └── video/              # 影片測試專用工具
-│   │       ├── video-helpers.ts
-│   │       ├── upload-helpers.ts
-│   │       └── [其他影片相關工具]
+│   │       ├── video-upload.ts
+│   │       ├── video-playback.ts
+│   │       ├── segment-helpers.ts
+│   │       ├── thumbnail-helpers.ts
+│   │       └── device-detection.ts
 │   ├── e2e/                    # E2E 測試案例
-│   │   ├── auth/               # 認證測試
-│   │   ├── navigation/         # 導覽測試
-│   │   ├── recipes/            # 食譜功能測試
-│   │   ├── user/               # 用戶功能測試
-│   │   └── video/              # 影片功能測試 (18個測試檔案)
+│   │   ├── navigation/         # 導覽測試（no-auth）
+│   │   └── video/              # 影片功能測試（多數暫以 test.describe.skip quarantine）
 │   ├── fixtures/               # 測試資料
 │   │   ├── mock-data/          # 模擬資料
-│   │   │   ├── recipes.json
-│   │   │   ├── users.json
-│   │   │   └── videos.json
+│   │   │   ├── api-responses.json
+│   │   │   ├── recipe-drafts.json
+│   │   │   └── video-metadata.json
 │   │   └── videos/             # 測試影片檔案
 │   ├── setup/                  # 測試設定檔案
 │   │   └── video/              # 影片測試設定
-│   └── README.md               # 測試說明文件
+│   └── README.md               # 測試說明（認證前置、E2E_BASE_URL、quarantine 政策）
 │
 ├── playwright/                 # Playwright 配置和快取
 ├── playwright-report/          # Playwright 測試報告
@@ -238,6 +242,15 @@ anna-cook/
 │   │
 │   └── setupTests.js           # Jest 測試環境設定
 │
+├── openspec/                   # OpenSpec 規格驅動開發（spec-driven）
+│   ├── specs/                  # 已落地的能力規格（11 個 capability）
+│   ├── changes/                # 進行中的變更提案（archive/ 存放已歸檔）
+│   └── config.yaml             # OpenSpec 設定
+│
+├── .husky/                     # Git hooks（pre-commit / pre-push）
+├── .storybook/                 # Storybook 設定
+├── .claude/                    # Claude Code 設定與 commands（含 opsx 工作流）
+│
 ├── 設定檔
 │   ├── CLAUDE.md              # Claude AI 開發指導文件
 │   ├── Dockerfile             # Docker 容器配置
@@ -312,10 +325,10 @@ docker build -t anna-cook .
 
 #### 執行 Docker 容器
 ```bash
-docker run -p 8080:8080 anna-cook
+docker run -p 3000:3000 anna-cook
 ```
 
-應用程式會在 [http://localhost:8080](http://localhost:8080) 啟動
+應用程式會在 [http://localhost:3000](http://localhost:3000) 啟動（容器內 `PORT=3000`、`EXPOSE 3000`）
 
 ---
 
@@ -537,11 +550,9 @@ npm run build
 #### E2E 測試
 - 測試檔案命名：`{功能名稱}.test.ts`
 - 測試檔案位置：`tests/e2e/` 目錄下，按功能分類：
-  - `navigation/` - 頁面導覽測試
-  - `auth/` - 認證相關測試
-  - `recipes/` - 食譜功能測試
-  - `user/` - 用戶功能測試
-  - `video/` - 影片相關測試
+  - `navigation/` - 頁面導覽測試（no-auth）
+  - `video/` - 影片相關測試（多數功能尚未實作，暫以 `test.describe.skip` quarantine）
+- 認證前置：需認證的測試由 `auth.setup.ts` 以真實 `/signin-email` 登入產生 storageState；憑證走環境變數 `TEST_USER_EMAIL` / `TEST_USER_PASSWORD`（詳見 [tests/README.md](./tests/README.md)）
 
 ### ✍️ 測試撰寫規範
 
@@ -584,6 +595,32 @@ npm run test:all           # 執行單元測試 + E2E 測試
 ### PR Naming
   - 分支名稱
   - 用 md 格式描述這次 PR 做了什麼
+
+## 🧭 OpenSpec 規格驅動開發流程
+
+本專案採用 **OpenSpec** 管理「會影響行為」的變更：先寫規格提案、再實作、最後歸檔，讓變更有跡可循。
+
+- **規格來源**：`openspec/specs/`（11 個能力，如 `http-security-headers`、`file-upload-limits`、`pwa-installability`、`screen-wake-lock`、`e2e-auth-provisioning` 等）。
+- **變更提案**：`openspec/changes/<name>/`（`proposal.md` / `design.md` / `tasks.md` / `specs/` 差異），完成後歸檔至 `openspec/changes/archive/`。
+- **常用指令**（`.claude/commands/opsx/`）：`/opsx:propose`（建立提案）→ `/opsx:apply`（依 tasks 實作）→ `/opsx:sync`（併入主 specs）→ `/opsx:archive`（歸檔）。
+- **CLI**：`openspec list`、`openspec validate <name> --strict`、`openspec archive <name>`。
+
+## 📱 PWA（漸進式網頁應用）
+
+- **可安裝**：`public/manifest.webmanifest` + 圖示（192 / 512 / maskable / apple-touch），Android/iOS 皆可「加到主畫面」以 standalone 啟動。
+- **Service Worker**：`public/sw.js`，於 `src/pages/_app.tsx` 註冊。
+- **Screen Wake Lock**：`src/hooks/useWakeLock.ts`，掛在食譜煮菜頁（`recipe-page/[...id]`），煮菜時螢幕不自動熄滅；不支援的瀏覽器優雅降級。
+
+## 🔒 前端資安 Hardening
+
+分階段（tier A/B/C）強化前端資安：
+
+- **安全標頭**：`next.config.ts` 設定 `X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`、`Strict-Transport-Security`、`Permissions-Policy` 等。
+- **CSP**：目前以 `Content-Security-Policy-Report-Only` 收集違規，回報端點 `/api/csp-report`；穩定後再轉強制。
+- **JWT 驗簽**：授權判斷一律以（會驗簽的）後端結果為準，不信任前端未驗證的 claims。
+- **其他**：相依安全（以 `overrides` 修補漏洞）、API 路徑參數編碼、上傳大小限制（圖片 10MB／影片 500MB）。
+
+> 細節見 `openspec/specs/` 對應能力與 `openspec/changes/`（含 archive）。
 
 ## 授權資訊
 
