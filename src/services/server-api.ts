@@ -581,7 +581,8 @@ export const searchRecipesServer = async (
     const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
     console.log(`伺服器端發送請求: GET ${apiUrl}`);
 
-    const response = await fetch(apiUrl);
+    // App Router：資料快取每小時重新驗證（對應原 recipe-list getStaticProps 的 revalidate 3600）
+    const response = await fetch(apiUrl, { next: { revalidate: 3600 } });
 
     console.log('伺服器端回應狀態:', response.status);
 
