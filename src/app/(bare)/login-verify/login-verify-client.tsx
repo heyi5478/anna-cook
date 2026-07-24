@@ -1,12 +1,14 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { COUNTDOWN } from '@/lib/constants';
 
 /**
  * 電子郵件驗證提示頁面
  */
-export default function VerifyEmailPage() {
+export function LoginVerifyClient() {
   const router = useRouter();
   const [countdown, setCountdown] = useState<number>(
     COUNTDOWN.LOGIN_VERIFY_SECONDS,
