@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,7 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils/ui';
 import type { Author } from '@/types/recipe';
 import {
@@ -30,7 +32,7 @@ export const AuthorProfile = ({
   displayId,
 }: AuthorProfileProps) => {
   // 從 URL 獲取 displayId (如果沒有直接傳入)
-  const router = useRouter();
+  const params = useParams();
 
   // 顯示 author 的值，Debug 用
   console.log('AuthorProfile/index.tsx - author:', author);
@@ -38,12 +40,12 @@ export const AuthorProfile = ({
 
   // 獲取 URL 中的 displayId
   let urlDisplayId: string | undefined;
-  if (router.query.displayId) {
-    if (Array.isArray(router.query.displayId)) {
-      const [firstDisplayId] = router.query.displayId;
+  if (params?.displayId) {
+    if (Array.isArray(params.displayId)) {
+      const [firstDisplayId] = params.displayId;
       urlDisplayId = firstDisplayId;
     } else {
-      urlDisplayId = router.query.displayId;
+      urlDisplayId = params.displayId;
     }
   }
 

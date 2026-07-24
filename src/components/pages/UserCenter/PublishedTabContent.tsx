@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { AuthorRecipesResponse } from '@/types/api';
 import { PublishedRecipeCard } from './PublishedRecipeCard';

@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BookmarkIcon, Users, Clock, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
