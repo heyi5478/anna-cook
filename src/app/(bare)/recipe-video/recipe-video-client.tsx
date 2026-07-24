@@ -1,7 +1,8 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import { useRecipeVideoStore } from '@/stores/video/useRecipeVideoStore';
 import { useRecipeTeaching } from '@/hooks/useRecipeTeaching';
@@ -12,11 +13,14 @@ import { NavigationBar } from '@/components/features/NavigationBar';
 import { RotationPrompt } from '@/components/common/RotationPrompt';
 
 /**
- * 食譜視頻頁面組件
+ * 食譜視頻頁面組件（client）
+ * 由 App Router 的 server page.tsx 以 <Suspense> 包住渲染
  */
-export default function RecipeVideoPage() {
-  const router = useRouter();
-  const { id } = router.query;
+export function RecipeVideoClient() {
+  // Pages Router 的 router.query.id → App Router 以 useSearchParams 取得
+  // 注意：useSearchParams() 型別為可能 null（與 router.query 不同），需 optional chaining
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id') ?? null;
   const recipeId = typeof id === 'string' ? parseInt(id, 10) : undefined;
 
   // 使用 Zustand store 管理狀態
@@ -41,6 +45,13 @@ export default function RecipeVideoPage() {
   const { teachingData, steps, videoId, loading, error } =
     useRecipeTeaching(recipeId);
   const { isMobile, isPortrait } = useScreenOrientation(); // CSS-First 方向偵測
+
+  // 動態標題：取代 next/head 的 <title>（依 client 端載入的食譜名稱設定 document.title）
+  useEffect(() => {
+    if (teachingData?.recipeName) {
+      document.title = `${teachingData.recipeName} - 教學視頻 | Anna Cook`;
+    }
+  }, [teachingData]);
 
   // 旋轉提示狀態管理
   const [isRotationPromptDismissed, setIsRotationPromptDismissed] =
@@ -161,18 +172,6 @@ export default function RecipeVideoPage() {
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      <Head>
-        <title>{teachingData.recipeName} - 教學視頻 | Anna Cook</title>
-        <meta
-          name="description"
-          content={`${teachingData.recipeName} 的製作教學`}
-        />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-      </Head>
-
       {/* 視頻區域 */}
       <div className="relative flex h-full">
         <NavigationBar recipeId={recipeId} currentTime={currentTime} />
