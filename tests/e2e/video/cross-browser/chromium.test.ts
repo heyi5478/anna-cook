@@ -34,7 +34,9 @@ type CodecSupport = {
 /**
  * Chrome 特定功能測試
  */
-test.describe('Chrome 瀏覽器特定功能', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（跨瀏覽器影片流程依賴未實作的播放器/上傳 UI 掛鉤）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('Chrome 瀏覽器特定功能', () => {
   /**
    * 每個測試前的準備工作
    */

@@ -24,10 +24,12 @@ export default defineConfig({
 
   // 全域設定
   use: {
-    // 基礎 URL
-    baseURL: process.env.CI
-      ? 'https://anna-cook.zeabur.app/'
-      : 'http://localhost:3000',
+    // 基礎 URL（可用 E2E_BASE_URL 覆寫，例如指向本機自建的 dev server）
+    baseURL:
+      process.env.E2E_BASE_URL ||
+      (process.env.CI
+        ? 'https://anna-cook.zeabur.app/'
+        : 'http://localhost:3000'),
 
     // 追蹤設定
     trace: 'on-first-retry',
@@ -47,7 +49,10 @@ export default defineConfig({
   projects: [
     {
       name: 'setup',
-      testMatch: /.*\.setup\.ts/,
+      // auth.setup.ts 位於 tests/ 根層（testDir 為 tests/e2e），故此專案自訂 testDir
+      // 並精準匹配 auth.setup.ts，避免掃到 tests/setup/video/*.setup.ts
+      testDir: './tests',
+      testMatch: /auth\.setup\.ts/,
     },
     // 不需要認證的測試（如首頁、公開頁面）
     {
@@ -103,15 +108,16 @@ export default defineConfig({
     },
   ],
 
-  // 本地開發伺服器
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'npm run dev',
-        url: 'http://localhost:3000',
-        reuseExistingServer: !process.env.CI,
-        timeout: 120 * 1000,
-      },
+  // 本地開發伺服器（設定 E2E_BASE_URL 時代表使用外部伺服器，跳過自動啟動）
+  webServer:
+    process.env.CI || process.env.E2E_BASE_URL
+      ? undefined
+      : {
+          command: 'npm run dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120 * 1000,
+        },
 
   // 輸出目錄
   outputDir: 'test-results/',

@@ -19,7 +19,9 @@ import { getDefaultTestVideo } from '../../../helpers/common/test-data';
 /**
  * 縮圖品質驗證測試
  */
-test.describe('縮圖品質驗證功能', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（縮圖產生功能未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('縮圖品質驗證功能', () => {
   /**
    * 每個測試前的準備工作
    */

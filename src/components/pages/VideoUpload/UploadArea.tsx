@@ -64,6 +64,7 @@ export default function UploadArea({
 
       <div
         className={uploadContainerVariants({ state: getContainerState() })}
+        data-testid="video-upload-dropzone"
         onClick={() =>
           !isUploading && document.getElementById('video-upload')?.click()
         }
@@ -72,6 +73,7 @@ export default function UploadArea({
           type="file"
           accept="video/*"
           id="video-upload"
+          data-testid="video-upload-input"
           className="hidden"
           onChange={onUpload}
           disabled={isUploading}
