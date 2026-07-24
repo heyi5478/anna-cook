@@ -97,10 +97,10 @@ export const uploadVideoFile = async (
   // 取得檔案上傳輸入元素
   const fileInput = await getVideoUploadInput(page);
 
-  // 確認檔案輸入元素存在
-  await expect(fileInput).toBeVisible();
+  // 確認檔案輸入元素已掛載（隱藏 input 為拖放區標準設計，故不斷言可見）
+  await expect(fileInput).toBeAttached();
 
-  // 設定檔案
+  // 設定檔案（setInputFiles 可作用於隱藏 input）
   await fileInput.setInputFiles(filePath);
 
   // 等待檔案選擇完成，使用配置中的延遲或預設值

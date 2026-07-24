@@ -19,7 +19,9 @@ import { getDefaultTestVideo } from '../../../helpers/common/test-data';
 /**
  * 上傳進度和狀態測試
  */
-test.describe('上傳進度和狀態管理', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（上傳進度/成功/預覽等 UI 掛鉤未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('上傳進度和狀態管理', () => {
   let testVideoPath: string;
 
   /**

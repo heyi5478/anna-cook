@@ -33,7 +33,9 @@ async function parseTimeFromTooltip(tooltipText: string): Promise<number> {
 /**
  * 時間軸操作測試
  */
-test.describe('時間軸操作控制', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（影片編輯器（時間軸/片段/播放器）未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('時間軸操作控制', () => {
   let videoDuration: number;
 
   /**

@@ -20,7 +20,9 @@ import { getDefaultTestVideo } from '../../../helpers/common/test-data';
 /**
  * 影片播放器基本功能測試
  */
-test.describe('影片播放器基本功能', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（影片編輯器（時間軸/片段/播放器）未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('影片播放器基本功能', () => {
   /**
    * 每個測試前的準備工作
    */

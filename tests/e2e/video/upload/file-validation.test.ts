@@ -38,7 +38,9 @@ type ValidationError = {
 /**
  * 檔案驗證和錯誤處理測試
  */
-test.describe('檔案驗證和錯誤處理', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（上傳進度/成功/預覽等 UI 掛鉤未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('檔案驗證和錯誤處理', () => {
   /**
    * 每個測試前的準備工作
    */

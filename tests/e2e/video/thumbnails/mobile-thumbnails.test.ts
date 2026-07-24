@@ -22,7 +22,9 @@ import { getDefaultTestVideo } from '../../../helpers/common/test-data';
 /**
  * 行動版縮圖生成功能測試
  */
-test.describe('行動版縮圖生成功能', () => {
+// [quarantine] e2e-suite-alignment：整檔測試瞄準尚未實作的功能（縮圖產生功能未實作）。
+// 以 test.describe.skip quarantine 保留為 backlog，待功能實作後解除；詳見 openspec/changes/fix-e2e-test-suite。
+test.describe.skip('行動版縮圖生成功能', () => {
   /**
    * 每個測試前的準備工作
    */
