@@ -8,9 +8,9 @@
 ## 2. 靜態內容頁（Static pages）
 
 - [x] 2.1 `privacy-policy` → `app/(site)/privacy-policy/page.tsx`（PoC）
-- [ ] 2.2 `about-us`（含 `next/head` → Metadata）
-- [ ] 2.3 `fqa`（含 `next/head` → Metadata）
-- [ ] 2.4 `contact-us`
+- [x] 2.2 `about-us`（含 `next/head` → Metadata）
+- [x] 2.3 `fqa`（含 `next/head` → Metadata）
+- [x] 2.4 `contact-us`（表單元件補 `'use client'`）
 
 ## 3. Client 互動頁（`next/router` → `next/navigation`）
 

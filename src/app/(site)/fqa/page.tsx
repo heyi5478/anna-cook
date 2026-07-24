@@ -1,6 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
+import type { Metadata } from 'next';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,10 +16,14 @@ type FAQItem = {
   answer: string;
 };
 
-/**
- * 常見問題頁面元件
- */
-const FAQPage: React.FC = () => {
+// 常見問題頁面 Metadata（取代 Pages Router 的 next/head）
+export const metadata: Metadata = {
+  title: '常見問題',
+  description: '安那煮 Anna Cook 常見問題解答',
+};
+
+// 常見問題頁面
+export default function FAQPage() {
   // FAQ 問答資料
   const faqItems: FAQItem[] = [
     {
@@ -68,11 +71,6 @@ const FAQPage: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Head>
-        <title>常見問題 | 安那煮 Anna Cook</title>
-        <meta name="description" content="安那煮 Anna Cook 常見問題解答" />
-      </Head>
-
       <main className="flex-1 bg-white">
         {/* 麵包屑導航 */}
         <div className="px-4 py-3 border-b">
@@ -114,6 +112,4 @@ const FAQPage: React.FC = () => {
       </main>
     </div>
   );
-};
-
-export default FAQPage;
+}
