@@ -23,8 +23,8 @@
 
 - [x] 4.1 `index`（`getStaticProps` → async Server Component fetch + `revalidate=3600`，維持 `○` static/ISR；`PageSEO`+structuredData → `generateMetadata`+`JsonLd`；tabs/load-more 抽成 client 元件；`fetchHomeFeatures/Recipes` fetch 加 `next.revalidate`）
 - [x] 4.2 `recipe-page/[...id]`（`generateStaticParams`（空，按需 ISR）+ `revalidate`；`fallback` → `loading.tsx`；`useWakeLock` 劃 client 包裝；`RecipeSEO` → `generateMetadata` + `JsonLd`；無效 id → `notFound()`）
-- [ ] 4.3 `user/[...displayId]`（`getServerSideProps` → Server Component + `cookies()`）
-- [ ] 4.4 SEO 元件重構（部分）：新增 RSC 版 `JsonLd`（內嵌 `<script>`，取代 next/head 版 `StructuredData`）✅；`RecipeSEO` 已於 recipe-page 退場；`PageSEO` 待 index/user 遷移後退場
+- [x] 4.3 `user/[...displayId]`（`getServerSideProps` → async Server Component + `cookies()`（組 req 沿用 `fetchUserProfileServer`）；400→`notFound()`；`ƒ` dynamic SSR；連帶遷 `AuthorProfile`（`useParams`）+ `UserCenter` + 3 tabs + `useUserCenter`（`router.push`→next/navigation））
+- [x] 4.4 SEO 元件重構：RSC `JsonLd`（內嵌 `<script>`）取代 next/head 版 `StructuredData`；`PageSEO`/`RecipeSEO`/`StructuredData` 已全數改用 `generateMetadata` + `JsonLd`，現無外部引用（3 個舊 SEO 元件檔於收尾階段刪除）
 
 ## 5. API Route Handlers
 

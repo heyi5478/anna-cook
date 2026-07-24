@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 import { UserFollowResponse } from '@/types/api';

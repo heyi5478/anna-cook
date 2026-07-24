@@ -8,7 +8,7 @@ import {
 
 // Mock 外部依賴
 const mockRouterPush = jest.fn();
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
     pathname: '/user-center',
