@@ -1,0 +1,25 @@
+---
+description: 專案漸進式從 Pages Router 遷移至 App Router；app/ 與 pages/ 並存，新開發優先 App Router。
+alwaysApply: true
+---
+
+# Next.js Router 遷移規範（Pages Router → App Router）
+
+## 核心規則
+
+- **App Router 已解禁**：App Router 為採用方向，不再禁止；可自由建議與使用其功能、提供其程式碼範例。
+- **並存架構**：`app/` 與 `pages/` 目錄並存，同一路由僅存在於其中一邊（重疊時 App Router 優先）。
+- **新開發優先 App Router**：新頁面／路由優先建立於 `app/`，善用 Server Components、Route Handlers、Metadata API、nested layouts。
+- **既有 Pages Router 程式碼**：在該路由完成遷移前照原樣維護；遷移採逐頁、可回退方式進行，避免無謂改動。
+- **API 路由**：既有 `pages/api/` 維持運作；新 API 以 `app/` 的 Route Handler（`route.ts`）建立。
+
+## 遷移對照（Pages → App）
+
+```typescript
+// 資料抓取：getStaticProps/getServerSideProps → Server Component 內直接 await fetch（帶 revalidate/cache 選項）
+// 動態路徑：getStaticPaths → generateStaticParams；fallback → dynamicParams + loading.tsx
+// SEO：next/head → Metadata API（export const metadata / generateMetadata）；JSON-LD 可保留為內嵌 <script>
+// 導頁：next/router → next/navigation（useRouter().push 相容；query → useSearchParams/useParams；pathname → usePathname）
+// API：pages/api 的 handler(req, res) → app/**/route.ts 的 GET/POST(request: Request)
+// 版面：_app / _document → app/layout.tsx（＋ route groups 處理「有／無 Header」的頁面）
+```
