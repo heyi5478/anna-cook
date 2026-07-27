@@ -20,7 +20,9 @@ describe('API 路徑參數編碼（api-path-parameter-safety）', () => {
   });
 
   test('draft：惡意 recipeId 會被編碼，阻止路徑穿越', async () => {
-    await draftGET(req, { params: Promise.resolve({ recipeId: '../../secret' }) });
+    await draftGET(req, {
+      params: Promise.resolve({ recipeId: '../../secret' }),
+    });
 
     expect(mockProxy).toHaveBeenCalledWith(
       req,
@@ -46,7 +48,9 @@ describe('API 路徑參數編碼（api-path-parameter-safety）', () => {
   });
 
   test('follow：含斜線的 userId 會被編碼', async () => {
-    await followPOST(req, { params: Promise.resolve({ userId: 'u/../admin' }) });
+    await followPOST(req, {
+      params: Promise.resolve({ userId: 'u/../admin' }),
+    });
 
     expect(mockProxy).toHaveBeenCalledWith(
       req,
