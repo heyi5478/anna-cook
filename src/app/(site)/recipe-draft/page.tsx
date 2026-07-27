@@ -1,16 +1,13 @@
-import { NextPage } from 'next';
-import RecipeDraft from '@/components/pages/RecipeDraft';
+'use client';
+
 import { useAuth } from '@/hooks/useAuth';
+import RecipeDraft from '@/components/pages/RecipeDraft';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 
-/**
- * 食譜草稿頁面
- */
-const RecipeDraftPage: NextPage = () => {
-  // 檢查用戶是否已登入，未登入則重定向到登入頁
+// 登入守衛頁（未登入時 useAuth 會自動導回登入頁）
+export default function RecipeDraftPage() {
   const { isLoading, isAuthenticated } = useAuth();
 
-  // 載入中顯示載入提示
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -19,12 +16,10 @@ const RecipeDraftPage: NextPage = () => {
     );
   }
 
-  // 未認證的情況（理論上不會顯示，因為 useAuth 會自動重定向）
+  // 未認證（理論上不會顯示，useAuth 會自動重定向）
   if (!isAuthenticated) {
     return null;
   }
 
   return <RecipeDraft />;
-};
-
-export default RecipeDraftPage;
+}

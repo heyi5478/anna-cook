@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 
 import { useState, useEffect } from 'react';
@@ -6,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils/ui';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeFormData } from '@/types/api';
 import {
@@ -168,10 +170,7 @@ export default function RecipeUploadForm() {
       if (result && result.StatusCode === 200) {
         // 上傳成功後跳轉到步驟2頁面，並帶上創建的食譜 ID
         console.log('上傳成功，跳轉到步驟2頁面');
-        router.push({
-          pathname: '/upload-recipe-step2',
-          query: { recipeId: result.Id },
-        });
+        router.push(`/upload-recipe-step2?recipeId=${result.Id}`);
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);

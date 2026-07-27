@@ -1,9 +1,11 @@
+'use client';
+
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageIcon } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -43,7 +45,8 @@ import { CookingStep } from './CookingSteps';
  */
 export default function RecipeDraft() {
   const router = useRouter();
-  const { recipeId } = router.query;
+  const searchParams = useSearchParams();
+  const recipeId = searchParams?.get('recipeId') ?? undefined;
   const userDisplayId = useUserDisplayId();
 
   // 從 store 獲取狀態和動作

@@ -1,5 +1,7 @@
+'use client';
+
 import { useRef, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useVideoEditStore } from '@/stores/video/useVideoEditStore';
 import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import { isMobileDevice } from '@/lib/utils/device';
@@ -13,7 +15,8 @@ import { VALIDATION_MESSAGES } from '@/lib/constants/validation';
 export const useVideoEditor = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const router = useRouter();
-  const { recipeId } = router.query;
+  const searchParams = useSearchParams();
+  const recipeId = searchParams?.get('recipeId') ?? undefined;
 
   // 從 store 獲取狀態和動作
   const {

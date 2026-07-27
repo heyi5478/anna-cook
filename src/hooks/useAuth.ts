@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { checkAuth } from '@/services/auth';
 import type { AuthStatus } from '@/types/auth';
@@ -10,6 +12,7 @@ import type { AuthStatus } from '@/types/auth';
  */
 export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
   const router = useRouter();
+  const pathname = usePathname();
   const [authStatus, setAuthStatus] = useState<AuthStatus>({
     isAuthenticated: null,
     isLoading: true,
@@ -58,7 +61,7 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
         localStorage.removeItem('userData');
 
         // 驗證失敗，重定向到登入頁
-        if (router.pathname !== redirectTo) {
+        if (pathname !== redirectTo) {
           console.log(`重定向到 ${redirectTo}`);
           router.push(redirectTo);
         }
@@ -71,7 +74,7 @@ export const useAuth = (redirectTo: string = '/login'): AuthStatus => {
     };
 
     verifyAuth();
-  }, [router, redirectTo]);
+  }, [router, pathname, redirectTo]);
 
   return authStatus;
 };

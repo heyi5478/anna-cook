@@ -1,8 +1,10 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import StepIndicator from '@/components/common/StepIndicator';
 import { RecipeStep2Data } from '@/types/api';
 import {
@@ -76,7 +78,8 @@ type RecipeStep2Values = z.infer<typeof recipeStep2Schema>;
 export default function RecipeUploadStep2() {
   // 初始化路由器取得 recipeId
   const router = useRouter();
-  const { recipeId } = router.query;
+  const searchParams = useSearchParams();
+  const recipeId = searchParams?.get('recipeId') ?? undefined;
 
   // 設定載入狀態
   const [isLoading, setIsLoading] = useState(false);
@@ -215,10 +218,7 @@ export default function RecipeUploadStep2() {
       if (result && result.StatusCode === 200) {
         // 更新成功後跳轉到步驟3頁面
         console.log('更新成功，跳轉到上傳影片頁面');
-        router.push({
-          pathname: '/upload-video',
-          query: { recipeId: result.Id },
-        });
+        router.push(`/upload-video?recipeId=${result.Id}`);
       } else {
         // API 回傳錯誤
         console.error('API 回傳錯誤:', result);

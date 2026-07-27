@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 
 import { useState, useEffect, useRef } from 'react';
@@ -32,7 +34,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCurrentUserProfile, updateUserProfile } from '@/services/users';
 import {

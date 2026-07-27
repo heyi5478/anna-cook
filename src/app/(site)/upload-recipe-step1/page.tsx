@@ -1,16 +1,13 @@
-import { NextPage } from 'next';
-import RecipeUploadForm from '@/components/pages/RecipeUploadStep1';
+'use client';
+
 import { useAuth } from '@/hooks/useAuth';
+import RecipeUploadForm from '@/components/pages/RecipeUploadStep1';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 
-/**
- * 上傳食譜第一步頁面
- */
-const CreateRecipePage: NextPage = () => {
-  // 檢查用戶是否已登入，未登入則重定向到登入頁
+// 上傳食譜步驟一：登入守衛（未登入時 useAuth 會自動導回登入頁）
+export default function UploadRecipeStep1Page() {
   const { isLoading, isAuthenticated } = useAuth();
 
-  // 載入中顯示載入提示
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -19,7 +16,7 @@ const CreateRecipePage: NextPage = () => {
     );
   }
 
-  // 未認證的情況（理論上不會顯示，因為 useAuth 會自動重定向）
+  // 未認證（理論上不會顯示，useAuth 會自動重定向）
   if (!isAuthenticated) {
     return null;
   }
@@ -29,6 +26,4 @@ const CreateRecipePage: NextPage = () => {
       <RecipeUploadForm />
     </div>
   );
-};
-
-export default CreateRecipePage;
+}
