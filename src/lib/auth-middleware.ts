@@ -2,8 +2,10 @@ import {
   NextApiRequest as OriginalNextApiRequest,
   NextApiResponse,
 } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { authConfig, getApiConfig } from '@/config';
 import { setServerCookie } from '@/lib/utils/auth';
+import { COOKIE_EXPIRES } from '@/lib/constants/time';
 
 /**
  * 從伺服器請求中獲取 JWT Token
@@ -133,5 +135,106 @@ export const proxyAuthRequest = async (
       Status: false,
       Message: '代理認證請求時發生錯誤',
     });
+  }
+};
+
+/**
+ * App Router 版：代理需要認證的 API 請求（用於 route handlers；取代 proxyAuthRequest）
+ * token 由 request.cookies 取得，回傳 NextResponse；後端回傳新 token 時更新 cookie。
+ */
+export const proxyAuthRequestApp = async (
+  request: NextRequest,
+  url: string,
+  method: string = 'GET',
+  body: unknown = null,
+): Promise<NextResponse> => {
+  const token = request.cookies.get(authConfig.tokenCookieName)?.value ?? null;
+
+  if (!token) {
+    return NextResponse.json(
+      { Status: false, Message: '未登入或 Token 不存在' },
+      { status: 401 },
+    );
+  }
+
+  try {
+    const options: RequestInit = {
+      method,
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    // 若未明確傳入 body 且非 GET，讀取原始請求的 JSON body 以轉發
+    let requestBody = body;
+    if (requestBody === null && method !== 'GET') {
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        requestBody = await request.json().catch(() => null);
+      }
+    }
+
+    if (requestBody && method !== 'GET') {
+      if (requestBody instanceof FormData) {
+        options.body = requestBody;
+      } else {
+        options.headers = {
+          ...(options.headers as Record<string, string>),
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        };
+        options.body = JSON.stringify(requestBody);
+      }
+    }
+
+    // 附加查詢參數（排除路徑參數）
+    let apiUrl = `${getApiConfig().baseUrl}${url}`;
+    const { searchParams } = request.nextUrl;
+    const queryString = Array.from(searchParams.keys())
+      .filter((key) => !['recipeId', 'userId', 'displayId'].includes(key))
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(
+            searchParams.get(key) ?? '',
+          )}`,
+      )
+      .join('&');
+    if (queryString) {
+      apiUrl += (apiUrl.includes('?') ? '&' : '?') + queryString;
+    }
+
+    const apiResponse = await fetch(apiUrl, options);
+    const responseText = await apiResponse.text();
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('解析回應 JSON 失敗:', { status: apiResponse.status });
+      return NextResponse.json(
+        { Status: false, Message: '從後端 API 接收到無效的回應格式' },
+        { status: 500 },
+      );
+    }
+
+    const response = NextResponse.json(data, { status: apiResponse.status });
+
+    // 後端回傳新 token → 更新 cookie（沿用 setServerCookie 的設定）
+    if (data && (data.token || data.newToken)) {
+      const newToken = data.token || data.newToken;
+      response.cookies.set(authConfig.tokenCookieName, newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: COOKIE_EXPIRES.TOKEN_EXPIRY_SECONDS,
+        path: '/',
+      });
+    }
+
+    return response;
+  } catch (error) {
+    console.error(`代理認證請求失敗 (${url}):`, error);
+    return NextResponse.json(
+      { Status: false, Message: '代理認證請求時發生錯誤' },
+      { status: 500 },
+    );
   }
 };

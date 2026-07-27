@@ -28,8 +28,8 @@
 
 ## 5. API Route Handlers
 
-- [ ] 5.1 改寫 `proxyAuthRequest`（`NextApiRequest/Response` → Web `Request/Response`）
-- [ ] 5.2 批次遷移 19 支 proxy route → `app/**/route.ts`
+- [x] 5.1 新增 App Router 版代理 helper `proxyAuthRequestApp`（Web `Request` → `NextResponse`；token 由 `request.cookies`、新 token 更新 cookie、query 自動附加）；舊 `proxyAuthRequest` 待上傳批遷完後移除
+- [x] 5.2 遷移 13 支純 proxy route → `app/**/route.ts`（每 method 一個 export、405 交框架自動處理）；`path-param-encoding` 安全測試更新為 App Router 版。剩 4 支上傳-proxy 併入 5.3、6 支自訂（email-login / google×2 / logout / test-token / search）併入 5.4
 - [ ] 5.3 重寫 5 支上傳 route（`formidable` + `bodyParser:false` → `request.formData()`）＋ 調整 `lib/upload` ＋ 更新 `upload-limits`/`path-param` 測試（維持 413/415 行為）
 - [ ] 5.4 `csp-report`、auth routes（`google/*` 含 OAuth `state` 與後端協調）
 
