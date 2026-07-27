@@ -1,127 +1,78 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import createHandler from '@/pages/api/recipes/create';
-import { proxyAuthRequest } from '@/lib/auth-middleware';
-import { createUploadForm, isFileTooLargeError } from '@/lib/upload';
-import { HTTP_STATUS } from '@/lib/constants';
+import type { NextRequest } from 'next/server';
+import { POST as createPOST } from '@/app/api/recipes/create/route';
+import { proxyAuthRequestApp } from '@/lib/auth-middleware';
 
 jest.mock('@/lib/auth-middleware', () => ({
-  proxyAuthRequest: jest.fn(),
+  proxyAuthRequestApp: jest.fn(),
 }));
 
-// Mock 上傳工具，讓測試控制 parse 結果並攔截後端代理
+// 收窄大小/型別上限，便於測試
 jest.mock('@/lib/upload', () => ({
-  createUploadForm: jest.fn(),
-  isFileTooLargeError: jest.fn(),
-  fileToBlob: jest.fn(async () => new Blob(['x'])),
   MAX_IMAGE_BYTES: 100,
   IMAGE_MIME_WHITELIST: ['image/jpeg', 'image/png'],
 }));
 
-const mockProxy = proxyAuthRequest as jest.Mock;
-const mockCreateForm = createUploadForm as jest.Mock;
-const mockIsTooLarge = isFileTooLargeError as jest.Mock;
+// NextResponse.json 在 jsdom 直接用有 server-only 依賴，mock 成簡單物件
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init?: { status?: number }) => ({
+      status: init?.status ?? 200,
+      body,
+    }),
+  },
+}));
 
-// 設定 form.parse 的行為：resolve 指定的 [fields, files]，或 reject 指定錯誤
-const setParse = (impl: { resolve?: unknown; reject?: unknown }) => {
-  const parse = jest.fn();
-  if (impl.reject !== undefined) {
-    parse.mockRejectedValue(impl.reject);
-  } else {
-    parse.mockResolvedValue(impl.resolve);
-  }
-  mockCreateForm.mockReturnValue({ parse });
-};
+const mockProxy = proxyAuthRequestApp as jest.Mock;
 
-const createRes = () => {
-  const res = { status: jest.fn(), json: jest.fn() };
-  res.status.mockReturnValue(res);
-  res.json.mockReturnValue(res);
-  return res as unknown as NextApiResponse & {
-    status: jest.Mock;
-    json: jest.Mock;
-  };
-};
+// create route 只呼叫 request.formData()，用最小 request 提供
+const reqWith = (fd: FormData) =>
+  ({ formData: async () => fd }) as unknown as NextRequest;
 
-const req = { method: 'POST', query: {} } as unknown as NextApiRequest;
+const imageFile = (type: string, bytes: number, name = 'x') =>
+  new File([new Uint8Array(bytes)], name, { type });
 
 describe('上傳限制（file-upload-limits）— create 端點', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockIsTooLarge.mockReturnValue(false);
   });
 
   test('檔案過大時回 413，且不代理到後端', async () => {
-    setParse({ reject: { httpCode: 413 } });
-    mockIsTooLarge.mockReturnValue(true);
-    const res = createRes();
-
-    await createHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(413);
+    const fd = new FormData();
+    fd.append('recipeName', '蛋糕');
+    fd.append('photo', imageFile('image/jpeg', 200, 'big.jpg'));
+    const res = await createPOST(reqWith(fd));
+    expect(res.status).toBe(413);
     expect(mockProxy).not.toHaveBeenCalled();
   });
 
   test('缺少必填封面圖片時回 400', async () => {
-    setParse({ resolve: [{ recipeName: ['蛋糕'] }, {}] });
-    const res = createRes();
-
-    await createHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
+    const fd = new FormData();
+    fd.append('recipeName', '蛋糕');
+    const res = await createPOST(reqWith(fd));
+    expect(res.status).toBe(400);
     expect(mockProxy).not.toHaveBeenCalled();
   });
 
   test('非白名單 MIME 型別時回 415', async () => {
-    setParse({
-      resolve: [
-        { recipeName: ['蛋糕'] },
-        {
-          photo: [
-            {
-              mimetype: 'application/x-msdownload',
-              filepath: '/tmp/x',
-              originalFilename: 'x.exe',
-            },
-          ],
-        },
-      ],
-    });
-    const res = createRes();
-
-    await createHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(415);
+    const fd = new FormData();
+    fd.append('recipeName', '蛋糕');
+    fd.append('photo', imageFile('application/x-msdownload', 10, 'x.exe'));
+    const res = await createPOST(reqWith(fd));
+    expect(res.status).toBe(415);
     expect(mockProxy).not.toHaveBeenCalled();
   });
 
   test('合法圖片會通過並代理到後端 /recipes', async () => {
-    setParse({
-      resolve: [
-        { recipeName: ['蛋糕'] },
-        {
-          photo: [
-            {
-              mimetype: 'image/jpeg',
-              filepath: '/tmp/cake.jpg',
-              originalFilename: 'cake.jpg',
-            },
-          ],
-        },
-      ],
-    });
-    const res = createRes();
-
-    await createHandler(req, res);
-
+    const fd = new FormData();
+    fd.append('recipeName', '蛋糕');
+    fd.append('photo', imageFile('image/jpeg', 10, 'cake.jpg'));
+    await createPOST(reqWith(fd));
     expect(mockProxy).toHaveBeenCalledTimes(1);
     expect(mockProxy).toHaveBeenCalledWith(
-      req,
-      res,
+      expect.anything(),
       '/recipes',
       'POST',
-      expect.anything(),
+      expect.any(FormData),
     );
-    expect(res.status).not.toHaveBeenCalledWith(413);
-    expect(res.status).not.toHaveBeenCalledWith(415);
   });
 });

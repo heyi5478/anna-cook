@@ -30,7 +30,7 @@
 
 - [x] 5.1 新增 App Router 版代理 helper `proxyAuthRequestApp`（Web `Request` → `NextResponse`；token 由 `request.cookies`、新 token 更新 cookie、query 自動附加）；舊 `proxyAuthRequest` 待上傳批遷完後移除
 - [x] 5.2 遷移 13 支純 proxy route → `app/**/route.ts`（每 method 一個 export、405 交框架自動處理）；`path-param-encoding` 安全測試更新為 App Router 版。剩 4 支上傳-proxy 併入 5.3、6 支自訂（email-login / google×2 / logout / test-token / search）併入 5.4
-- [ ] 5.3 重寫 5 支上傳 route（`formidable` + `bodyParser:false` → `request.formData()`）＋ 調整 `lib/upload` ＋ 更新 `upload-limits`/`path-param` 測試（維持 413/415 行為）
+- [x] 5.3 上傳批 5 支重寫（`create`/`submit-draft`/`video`/`user/profile`/`csp-report`）：`formidable`+`bodyParser:false` → `await request.formData()`；Web `File` 本身是 Blob 直接轉發（`fileToBlob` 移除）；手動驗 `File.size`(413)/`File.type`(415)；`lib/upload` 精簡為常數；`upload-limits.test` 改 App Router 版、刪除已失效的 `upload.test`。**Phase 5 完成：24 支 API 全數遷移，`pages/` 只剩 `_app`/`_document`**
 - [x] 5.4 自訂批 6 支遷移：`recipes/search`（GET proxy）、`auth/logout`（清 cookie）、`auth/test-token`（dev）、`auth/email/login`（設 cookie）、`auth/google/google`+`auth/google/callback`（OAuth；`NextResponse.redirect` + cookie，**Tier-C state 待後端另加**）。cookie 於 App Router 以 `NextResponse.cookies` 設/清。`csp-report`（用 formidable）併入上傳批
 
 ## 6. 收尾（Cleanup）
