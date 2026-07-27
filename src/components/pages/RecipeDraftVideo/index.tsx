@@ -1,6 +1,8 @@
+'use client';
+
 import type React from 'react';
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 
 // 型別
@@ -100,7 +102,8 @@ const VideoEditor: React.FC<VideoEditorProps> = ({
   recipeId,
 }) => {
   const router = useRouter();
-  const { recipeId: urlRecipeId } = router.query;
+  const searchParams = useSearchParams();
+  const urlRecipeId = searchParams?.get('recipeId') ?? undefined;
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');

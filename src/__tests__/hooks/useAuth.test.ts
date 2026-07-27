@@ -1,17 +1,17 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useAuth, isUserLoggedIn } from '@/hooks/useAuth';
 import { checkAuth } from '@/services/auth';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 
 // Mock next/router
 const mockPush = jest.fn();
 const mockRouter = {
-  pathname: '/dashboard',
   push: mockPush,
 };
 
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  usePathname: jest.fn(),
 }));
 
 // Mock auth service
@@ -35,6 +35,7 @@ describe('useAuth', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    (usePathname as jest.Mock).mockReturnValue('/dashboard');
     Object.defineProperty(window, 'localStorage', {
       value: localStorageMock,
       writable: true,
@@ -156,10 +157,7 @@ describe('useAuth', () => {
     // 測試不重定向到相同頁面
     test('應該不重定向到相同頁面', async () => {
       const mockError = new Error('驗證失敗');
-      (useRouter as jest.Mock).mockReturnValue({
-        ...mockRouter,
-        pathname: '/login',
-      });
+      (usePathname as jest.Mock).mockReturnValue('/login');
 
       localStorageMock.getItem.mockReturnValue(null);
       (checkAuth as jest.Mock).mockRejectedValue(mockError);

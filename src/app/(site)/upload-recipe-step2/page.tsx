@@ -1,15 +1,13 @@
-import RecipeUploadStep2 from '@/components/pages/RecipeUploadStep2';
+'use client';
+
 import { useAuth } from '@/hooks/useAuth';
+import RecipeUploadStep2 from '@/components/pages/RecipeUploadStep2';
 import { COMMON_TEXTS } from '@/lib/constants/messages';
 
-/**
- * 上傳食譜第二步頁面
- */
-export default function CreateRecipeStep2Page() {
-  // 檢查用戶是否已登入，未登入則重定向到登入頁
+// 上傳食譜步驟二：登入守衛（未登入時 useAuth 會自動導回登入頁）
+export default function UploadRecipeStep2Page() {
   const { isLoading, isAuthenticated } = useAuth();
 
-  // 載入中顯示載入提示
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -18,7 +16,7 @@ export default function CreateRecipeStep2Page() {
     );
   }
 
-  // 未認證的情況（理論上不會顯示，因為 useAuth 會自動重定向）
+  // 未認證（理論上不會顯示，useAuth 會自動重定向）
   if (!isAuthenticated) {
     return null;
   }

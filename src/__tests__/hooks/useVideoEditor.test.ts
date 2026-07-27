@@ -4,11 +4,11 @@ import { uploadRecipeVideo, updateRecipeSteps } from '@/services/recipes';
 import { isMobileDevice } from '@/lib/utils/device';
 
 // Mock 外部依賴
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    query: { recipeId: '123' },
     push: jest.fn(),
   }),
+  useSearchParams: () => new URLSearchParams({ recipeId: '123' }),
 }));
 
 jest.mock('@/services/recipes', () => ({

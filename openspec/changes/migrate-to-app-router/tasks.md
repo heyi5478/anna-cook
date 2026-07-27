@@ -17,7 +17,7 @@
 - [x] 3.1 `recipe-video` → `app/(bare)/recipe-video/`（PoC：query + Suspense + bare group）
 - [x] 3.2 `login` / `login-email` / `login-verify` / `signin-email`（auth，`(bare)` group；`login` 另含 `next/head`；client 元件 + server shell metadata，router.push → next/navigation）
 - [x] 3.3 `recipe-list`（**RSC**：Server Component 讀 `searchParams` 於 server 端抓取；排序/分頁由 client `router.push` → server 重抓；`getStaticProps` 移除；資料快取 `revalidate 3600`；頁面轉為 `ƒ` dynamic）
-- [ ] 3.4 `recipe-draft` / `recipe-draft-video` / `upload-recipe-step1` / `upload-recipe-step2` / `upload-video` / `user-center-edit`
+- [x] 3.4 6 頁表單全數遷移（recipe-draft / recipe-draft-video / upload ×3 / user-center-edit）→ client `page.tsx` + `useAuth` 守衛；連帶遷 `useAuth`（`pathname`→`usePathname`）、`useVideoEditor`、5 元件（`router.query`→`useSearchParams`、`router.push({pathname,query})` 物件式→字串 URL）；`setupTests` 加 next/navigation 全域 mock，`useAuth`/`useVideoEditor` 測試 mock 對應更新。**所有 19 route pages 遷移完成**
 
 ## 4. SSR/ISR 資料頁（Server data pages）
 
