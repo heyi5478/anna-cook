@@ -35,12 +35,12 @@
 
 ## 6. 收尾（Cleanup）
 
-- [ ] 6.1 全部 pages 路由遷移後移除 `_app.tsx` / `_document.tsx`
-- [ ] 6.2 清理 `next/router` 殘留匯入、`_app` `noLayoutPages` 死碼
-- [ ] 6.3 e2e 路徑走查、全站回歸、SEO 比對、評估 CSP enforce（GTM nonce）
+- [x] 6.1 移除 `_app.tsx` / `_document.tsx`（**`src/pages/` 完全移除，Pages Router 退場**）；一併移除已無用的舊 `proxyAuthRequest` 與 3 個死 SEO 元件（`PageSEO`/`RecipeSEO`/`StructuredData`）
+- [x] 6.2 `next/router` 已無殘留（全站改 `next/navigation`）；`_app` 的 `noLayoutPages` 隨 `_app` 移除而消失
+- [~] 6.3 build + jest（562）+ lint 全綠（每批 CI 驗證）；e2e 路徑走查 / 全站手動回歸 / SEO 比對 / CSP enforce（GTM nonce）屬部署階段驗證，留待進 prod 前執行（`formidable` 依賴亦可另以 lockfile PR 移除）
 
 ## 7. 驗收
 
-- [ ] 7.1 全站 `npm run build` 綠燈；`pages/` 無殘留（或列明刻意保留者）
-- [ ] 7.2 逐頁走查（登入、含 Vimeo 的食譜頁、GTM、上傳）功能正常
-- [ ] 7.3 `openspec validate migrate-to-app-router --strict` 通過
+- [x] 7.1 `npm run build` 綠燈；`src/pages/` 已完全移除（app-only；route table 僅剩 `Route (app)`）
+- [~] 7.2 逐頁走查（登入 / 含 Vimeo 的食譜頁 / GTM / 上傳）—— 屬部署階段手動驗證，留待進 prod 前執行
+- [x] 7.3 `openspec validate migrate-to-app-router --strict` 通過
