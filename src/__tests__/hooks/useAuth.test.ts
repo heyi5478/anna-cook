@@ -3,7 +3,7 @@ import { useAuth, isUserLoggedIn } from '@/hooks/useAuth';
 import { checkAuth } from '@/services/auth';
 import { useRouter, usePathname } from 'next/navigation';
 
-// Mock next/router
+// Mock next/navigation
 const mockPush = jest.fn();
 const mockRouter = {
   push: mockPush,

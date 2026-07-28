@@ -37,7 +37,7 @@
 
 - [x] 6.1 移除 `_app.tsx` / `_document.tsx`（**`src/pages/` 完全移除，Pages Router 退場**）；一併移除已無用的舊 `proxyAuthRequest` 與 3 個死 SEO 元件（`PageSEO`/`RecipeSEO`/`StructuredData`）
 - [x] 6.2 `next/router` 已無殘留（全站改 `next/navigation`）；`_app` 的 `noLayoutPages` 隨 `_app` 移除而消失
-- [~] 6.3 build + jest（562）+ lint 全綠（每批 CI 驗證）；e2e 路徑走查 / 全站手動回歸 / SEO 比對 / CSP enforce（GTM nonce）屬部署階段驗證，留待進 prod 前執行（`formidable` 依賴亦可另以 lockfile PR 移除）
+- [~] 6.3 build + jest（562）+ lint 全綠（每批 CI 驗證）；**`formidable` 依賴 + `setupTests.js` 的死 `next/router` mock 已移除（src 已 0 個 `next/router` 引用）**；e2e 路徑走查 / 全站手動回歸 / SEO 比對 / CSP enforce（GTM nonce）屬部署階段驗證，留待進 prod 前執行
 
 ## 7. 驗收
 
