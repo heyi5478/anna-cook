@@ -6,6 +6,18 @@ import { DEV_TEST_TOKEN, HTTP_STATUS, SORT_TYPES } from '@/lib/constants';
 import { ERROR_MESSAGES } from '@/lib/constants/messages';
 
 /**
+ * 僅在非 production 環境輸出伺服器端除錯訊息
+ * 避免請求 URL 與完整 API 回應內容（含使用者資料）被寫入正式環境的容器 log
+ * @param args 要輸出的除錯內容
+ */
+const devLog = (...args: readonly unknown[]): void => {
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.log(...args);
+  }
+};
+
+/**
  * 從 IncomingMessage 請求 Cookie 中獲取 JWT Token
  * @param req 伺服器端請求物件
  * @returns JWT Token 或 null
@@ -44,7 +56,7 @@ export const getAuthTokenForServer = (req: IncomingMessage): string | null => {
 
   // 在開發環境中使用測試 token
   if (process.env.NODE_ENV === 'development') {
-    console.log('Using development test token');
+    devLog('Using development test token');
     return DEV_TEST_TOKEN;
   }
 
@@ -97,9 +109,7 @@ export const fetchUserProfileServer = async (
   req: IncomingMessage,
 ): Promise<UserProfileResponse> => {
   try {
-    console.log(
-      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}`,
-    );
+    devLog(`伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}`);
 
     // 獲取 token (若有)
     const token = getAuthTokenForServer(req);
@@ -120,7 +130,7 @@ export const fetchUserProfileServer = async (
       },
     );
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -178,7 +188,7 @@ export const fetchUserRecipesServer = async (
   page: number = 1,
 ): Promise<UserRecipesResponse> => {
   try {
-    console.log(
+    devLog(
       `伺服器端發送請求: GET ${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
@@ -187,7 +197,7 @@ export const fetchUserRecipesServer = async (
       `${getApiConfig().baseUrl}/user/${displayId}/recipes?page=${page}`,
     );
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     // 處理 404 或其他錯誤狀態
     if (!response.ok) {
@@ -212,7 +222,7 @@ export const fetchUserRecipesServer = async (
 
     // 解析回應資料
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
@@ -276,7 +286,7 @@ export const fetchAuthorRecipesServer = async (
     const queryParam = isPublished ? '?isPublished=true' : '?isPublished=false';
     const apiUrl = `${getApiConfig().baseUrl}/user/${displayId}/management/recipe${queryParam}`;
 
-    console.log(`伺服器端發送請求: GET ${apiUrl}`);
+    devLog(`伺服器端發送請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -285,7 +295,7 @@ export const fetchAuthorRecipesServer = async (
       },
     });
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -296,7 +306,7 @@ export const fetchAuthorRecipesServer = async (
     }
 
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
@@ -364,7 +374,7 @@ export const fetchRecipeDetailServer = async (
   req?: IncomingMessage,
 ): Promise<RecipeDetailResponse> => {
   try {
-    console.log(
+    devLog(
       `伺服器端發送請求: GET ${getApiConfig().baseUrl}/recipes/${recipeId}`,
     );
 
@@ -388,7 +398,7 @@ export const fetchRecipeDetailServer = async (
       },
     );
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -402,7 +412,7 @@ export const fetchRecipeDetailServer = async (
 
     // 解析回應資料
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
@@ -440,15 +450,13 @@ export interface HomeFeatureResponse {
  */
 export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
   try {
-    console.log(
-      `伺服器端發送請求: GET ${getApiConfig().baseUrl}/home/features`,
-    );
+    devLog(`伺服器端發送請求: GET ${getApiConfig().baseUrl}/home/features`);
 
     const response = await fetch(`${getApiConfig().baseUrl}/home/features`, {
       next: { revalidate: 3600 },
     });
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -459,7 +467,7 @@ export const fetchHomeFeatures = async (): Promise<HomeFeatureResponse> => {
     }
 
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
@@ -503,11 +511,11 @@ export const fetchHomeRecipes = async (
 ): Promise<HomeRecipesResponse> => {
   try {
     const apiUrl = `${getApiConfig().baseUrl}/home/recipes?type=${type}&number=${number}`;
-    console.log(`伺服器端發送請求: GET ${apiUrl}`);
+    devLog(`伺服器端發送請求: GET ${apiUrl}`);
 
     const response = await fetch(apiUrl, { next: { revalidate: 3600 } });
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -520,7 +528,7 @@ export const fetchHomeRecipes = async (
     }
 
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
@@ -581,12 +589,12 @@ export const searchRecipesServer = async (
     queryParams.append('number', String(number));
 
     const apiUrl = `${getApiConfig().baseUrl}/recipes/search?${queryParams.toString()}`;
-    console.log(`伺服器端發送請求: GET ${apiUrl}`);
+    devLog(`伺服器端發送請求: GET ${apiUrl}`);
 
     // App Router：資料快取每小時重新驗證（對應原 recipe-list getStaticProps 的 revalidate 3600）
     const response = await fetch(apiUrl, { next: { revalidate: 3600 } });
 
-    console.log('伺服器端回應狀態:', response.status);
+    devLog('伺服器端回應狀態:', response.status);
 
     if (!response.ok) {
       return {
@@ -600,7 +608,7 @@ export const searchRecipesServer = async (
     }
 
     const data = await response.json();
-    console.log('伺服器端回應資料:', data);
+    devLog('伺服器端回應資料:', data);
 
     return data;
   } catch (error) {
