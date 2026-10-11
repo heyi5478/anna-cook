@@ -22,7 +22,10 @@
     "hooks:check": "ls -la .husky/ && echo '✅ Husky hooks are installed'",
     "hooks:reinstall": "rm -rf .husky && npx husky init && chmod +x .husky/pre-commit && chmod +x .husky/pre-push && echo '✅ Husky hooks reinstalled'",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare:static-demo": "node --experimental-strip-types examples/static-demo/prepare-assets.mts",
+    "dev:static-demo": "npm run prepare:static-demo && next dev examples/static-demo --port 3001",
+    "build:static-demo": "npm run prepare:static-demo && next build examples/static-demo"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

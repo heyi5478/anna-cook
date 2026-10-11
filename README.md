@@ -83,6 +83,10 @@
 - 後端：**C#**、**ASP.NET Core**、**Microsoft SQL Server**、**Restful API**
 - 部署：**Docker**（容器 `PORT=3000`）、正式站 **anna-cook.com**
 
+## Day27 靜態首頁展示
+
+執行 `npm run build:static-demo`，會產生可上傳 S3＋CloudFront 的 `examples/static-demo/out/`。這是使用固定食譜資料的獨立展示版；完整網站仍使用原本的 `npm run build` 和 EC2 部署。操作方式見 [展示版說明](examples/static-demo/README.md)。
+
 ## 專案架構
 ```
 anna-cook/

@@ -23,6 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build static homepage demo
+        run: |
+          npm run build:static-demo
+          test -f examples/static-demo/out/index.html
+          test -f examples/static-demo/out/404.html
+          test -f examples/static-demo/out/ad_home_03.webp
+
       - name: Build (含 ESLint + typecheck)
         run: npm run build
         env:
