@@ -1,5 +1,8 @@
 import type { NextConfig } from 'next';
 
+// 設定 STATIC_EXPORT=true 時才匯出靜態檔案，平常維持原本的 Docker 部署
+const isStaticExport = process.env.STATIC_EXPORT === 'true';
+
 // CSP（Content-Security-Policy）— 先以 Report-Only 收集違規、不阻擋；
 // 穩定後（含以 nonce/hash 處理 GTM inline script）再改為強制。
 // 涵蓋 GTM、Vimeo 播放器、後端圖片，以及 PWA 的 SW/manifest（worker-src/manifest-src）。
@@ -42,21 +45,28 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   // 產出自包含的 standalone server（server.js + 精簡依賴），供 Docker 部署使用
-  output: 'standalone',
+  output: isStaticExport ? 'export' : 'standalone',
   // 不回傳 X-Powered-By，避免洩漏框架指紋
   poweredByHeader: false,
   images: {
     domains: ['annacook.rocket-coding.com'],
+    // 靜態匯出時沒有 Next.js Server，改由瀏覽器直接讀取原始圖片
+    unoptimized: isStaticExport,
   },
-  // 對所有路由套用安全性標頭
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ];
-  },
+  // 靜態匯出不支援 headers()，只在 standalone 模式保留這項設定
+  ...(isStaticExport
+    ? {}
+    : {
+        // 對所有路由套用安全性標頭
+        async headers() {
+          return [
+            {
+              source: '/:path*',
+              headers: securityHeaders,
+            },
+          ];
+        },
+      }),
 };
 
 export default nextConfig;
