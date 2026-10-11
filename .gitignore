@@ -61,3 +61,9 @@ next-env.d.ts
 
 *storybook.log
 storybook-static
+
+# 獨立的 Day27 靜態展示版建置產物
+/examples/static-demo/.next/
+/examples/static-demo/out/
+/examples/static-demo/public/
+/examples/static-demo/next-env.d.ts

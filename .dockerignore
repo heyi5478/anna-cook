@@ -50,3 +50,6 @@ playwright-report
 
 # 快取
 .cache
+
+# 獨立展示版不屬於正式 Docker 部署
+examples/static-demo
