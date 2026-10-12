@@ -1,0 +1,107 @@
+name: Deploy static demo
+
+on:
+  push:
+    branches: [dev]
+    # 展示版另外會從根目錄 public 複製三個素材，並共用根目錄的依賴
+    paths:
+      - 'examples/static-demo/**'
+      - 'public/ad_home_02.png'
+      - 'public/ad_home_03.webp'
+      - 'public/login-small-logo.svg'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-static-demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 同一時間只跑一個部署，避免兩次上傳交錯
+concurrency:
+  group: deploy-static-demo
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-1
+  S3_BUCKET: anna-cook-20261010
+  CLOUDFRONT_DISTRIBUTION_ID: E1NZMO9NT5AN7J
+  SITE_URL: https://static.anna-cook.com
+
+jobs:
+  # build 會執行 npm 套件的程式，所以不給 id-token: write，這個 job 換不到 AWS 身分
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: '0' # CI 不需要安裝 git hooks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static demo
+        run: npm run build:static-demo
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v7
+        with:
+          name: static-demo
+          path: examples/static-demo/out/
+          if-no-files-found: error
+          retention-days: 1
+
+  # deploy 只執行 AWS CLI，不跑專案或套件的程式；只有這個 job 能用 OIDC 換 AWS 身分
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build output
+        uses: actions/download-artifact@v8
+        with:
+          name: static-demo
+          path: out
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_STATIC_DEMO_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 先傳檔名帶 hash 的 _next/static，再傳 HTML，避免新 HTML 上線時還找不到新的 JS/CSS；
+      # 舊的 _next/static 不刪，已經開著的舊頁面還讀得到
+      - name: Upload to S3
+        run: |
+          aws s3 sync out/_next/static "s3://$S3_BUCKET/_next/static" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync out/ "s3://$S3_BUCKET/" \
+            --exclude "_next/static/*" \
+            --cache-control "public, max-age=0, s-maxage=31536000" \
+            --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*" \
+            --query Invalidation.Id --output text)
+          echo "Invalidation ID: $INVALIDATION_ID"
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --id "$INVALIDATION_ID"
+
+      # 線上首頁要跟這次 build 出來的 index.html 一模一樣
+      - name: Smoke test
+        run: |
+          curl --silent --show-error --head "$SITE_URL/" | grep -iE '^(HTTP|cache-control|x-cache)'
+          curl --fail --silent --show-error --output served-index.html "$SITE_URL/"
+          cmp served-index.html out/index.html
