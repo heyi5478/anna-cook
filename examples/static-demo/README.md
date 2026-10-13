@@ -39,7 +39,15 @@ bucket 名稱和 region 換成自己的設定。沿用 Day27 的私有 S3、Bloc
 
 本展示版只有首頁；互動不會導向 `/login`、`/api` 或不存在的食譜路由。不用設定 SPA 全站回退或子路徑改寫。`404.html` 會一起輸出，但自訂錯誤回應仍需另外在 CloudFront 設定。
 
-再次更新時重新 build、上傳；如果仍看到舊畫面，再使用 Day27 的 invalidation 步驟。範例沒有建立、修改或刪除 AWS 資源的自動部署程式。
+## 自動部署（Day29）
+
+push 到 `dev` 且改到展示版用到的檔案時，`.github/workflows/deploy-static-demo.yml` 會自動部署：
+
+1. build job 執行 `npm ci` 與 `npm run build:static-demo`，把 `out/` 交給下一個 job。這個 job 沒有 `id-token: write`，換不到 AWS 身分。
+2. deploy job 用 OIDC 換到 `vars.AWS_STATIC_DEMO_ROLE_ARN` 的身分，先上傳 `_next/static`（`public, max-age=31536000, immutable`），再上傳其他檔案（`public, max-age=0, s-maxage=31536000`，並刪除 bucket 裡已不存在的頁面）。舊的 `_next/static` 會保留，已開著的舊頁面仍讀得到。
+3. 清除 CloudFront 快取（`/*`），等清除完成後，確認線上首頁與這次 build 的 `index.html` 相同。
+
+workflow 只更新既有的 bucket 與 distribution，不建立或刪除 AWS 資源。部署用的 IAM role 只信任 `dev` branch，權限只有這個 bucket 的列出、上傳、刪除，以及這個 distribution 的清除快取。手動上傳時，請比照 workflow 分兩次 `aws s3 sync` 並加上 `--cache-control`。
 
 ## 驗收
 
